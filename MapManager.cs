@@ -1,9 +1,9 @@
-﻿using MakeEveryDayRecount.Tiles;
+﻿using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
-
+using MakeEveryDayRecount.GameObjects;
 
 namespace MakeEveryDayRecount
 {
@@ -13,36 +13,21 @@ namespace MakeEveryDayRecount
     /// </summary>
     internal class MapManager
     {
-        /// <summary>
-        /// Keep track of the room the player is currently in
-        /// </summary>
-        public enum Rooms
-        {
-            Cell = 0,
-            Cafiteria = 1,
-            Matinence = 2,
-            // add rest of rooms
-        }
-
-        private Rooms _currentRoom;
-
-        private Tile[,] _currentRoomTiles;
-        private Tile[][,] _allRoomTiles;
-
+        private Room _currentRoom;
+        private Room[] _rooms;
         private Texture2D[] _tileSprites;
 
-        public MapManager(Texture2D[] tileSprites)
-        {
+        public MapManager(Texture2D[] tileSprites) { 
             _tileSprites = tileSprites;
-            // Assume the player always starts in their cell
-            // May change later in different levels
-            _currentRoom = Rooms.Cell;
-
-            // Retrieve data from the files and establish the 
-            // current room to display on first call
-            _allRoomTiles = LoadMapData();
-            _currentRoomTiles = _allRoomTiles[(int)_currentRoom];
+            _rooms = LoadMapData();
         }
+
+
+
+        public void TransitionRoom(Door transDoor) {
+            throw new NotImplementedException("TransitionRoom not been created yet in MapManager");
+        }
+
 
         /// <summary>
         /// Draw the current room to the screen
@@ -68,23 +53,11 @@ namespace MakeEveryDayRecount
         /// from the corresponding files and format them
         /// </summary>
         /// <returns>Formated data loaded from files</returns>
-        private Tile[][,] LoadMapData()
+        private Room[] LoadMapData()
         {
 
-            /*
-             * Form of data files
-             * 
-             * int tileArrayLength
-             * int tileArrayHeight
-             * 
-             * Tiles:
-             *      Bit
-             *      0 -> Door/vent
-             *      1 -> Other (Floor, Wall, Bench)
-             *      
-             *      If 0
-             *          int source
-             */
+            // only read binary data here
+            // each room is in charge of parsing itself
             throw new NotImplementedException("LoadMapData has not been created yet in MapManager");
         }
 

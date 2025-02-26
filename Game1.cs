@@ -60,5 +60,9 @@ namespace MakeEveryDayRecount
 
             base.Draw(gameTime);
         }
+
+        private void CheckKeyboardInput() { }
+        private void DisplayPauseMenu(SpriteBatch sb) { }
+        private void DisplayMainMenu(SpriteBatch sb) { }
     }
 }

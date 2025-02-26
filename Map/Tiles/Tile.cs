@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MakeEveryDayRecount.Tiles
+namespace MakeEveryDayRecount.Map.Tiles
 {
     /// <summary>
     /// Hold the data relating to a single tile in the map

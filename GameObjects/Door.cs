@@ -1,17 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
+using System;
 
-namespace MakeEveryDayRecount.Tiles
+
+namespace MakeEveryDayRecount.GameObjects
 {
     /// <summary>
     /// A door that has the same properties of a 
-    /// tile but all has the ability to be opened 
+    /// GameObject but all has the ability to be opened 
     /// and direct the user to another room
     /// </summary>
-    internal class Door : Tile
+    internal class Door : GameObject, IInteractable
     {
         /// <summary>
         /// Track which key is required to access the door/vent
@@ -45,17 +44,9 @@ namespace MakeEveryDayRecount.Tiles
         /// </summary>
         public DoorKeyType KeyType { get => _keyType; }
 
-        /// <summary>
-        /// Create an instance of a door or vent with the needed data
-        /// </summary>
-        /// <param name="sourceDoor">Door in the current room</param>
-        /// <param name="destRoom">Room the door leads to</param>
-        /// <param name="destDoor">Door the door leads to in the next room</param>
-        /// <param name="keyType">Type of key required to access the door</param>
-        /// <param name="isWalkable">If the tile can be walked on</param>
-        /// <param name="spriteIndex">The sprite index of the tile</param>
-        public Door(int sourceDoor, int destRoom, int destDoor, DoorKeyType keyType,
-                    bool isWalkable, int spriteIndex) : base(isWalkable, spriteIndex)
+       
+        public Door(int sourceDoor, int destRoom, int destDoor, DoorKeyType keyType, 
+            Point location, Texture2D sprite): base(location, sprite)
         {
             _sourceDoor = sourceDoor;
             _destRoom = destRoom;
@@ -67,9 +58,14 @@ namespace MakeEveryDayRecount.Tiles
         /// Check to see if this door can be interacted with
         /// </summary>
         /// <returns>If the door can be interacted</returns>
-        public bool Interact() {
+        public void Interact(Player player)
+        {
             throw new NotImplementedException("Interact has not been created yet in Door");
         }
 
+        public override void Update(float deltaTimeS)
+        {
+            throw new NotImplementedException("Update has not been created yet in Door");
+        }
     }
 }
