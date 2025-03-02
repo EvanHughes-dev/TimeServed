@@ -8,26 +8,51 @@ using System.Threading.Tasks;
 namespace MakeEveryDayRecount
 {
     public static class InputManager
-    {
+    {        
         private static KeyboardState PriorState { get; set; }
         private static KeyboardState CurrentState { get; set; }
 
+        /// <summary>
+        /// Updates prior and current state.
+        /// </summary>
         public static void Update()
         {
-            throw new NotImplementedException("Update has not been implemented in InputManager");
+            //Set the Prior state to the current state
+            PriorState = CurrentState;
+
+            //Get the current Keyboard state
+            CurrentState = Keyboard.GetState();
         }
 
+        /// <summary>
+        /// Checks if the key was pressed this frame.
+        /// </summary>
+        /// <param name="key">Key being checked</param>
+        /// <returns>True if CurrentState is down and PriorState is up, false otherwise</returns>
         public static bool GetKeyPress(Keys key)
         {
-            throw new NotImplementedException("GetKeyPress has not been implemented in InputManager");
+            return CurrentState.IsKeyDown(key) && PriorState.IsKeyUp(key);
         }
+
+        /// <summary>
+        /// Checks if the key was released this frame
+        /// </summary>
+        /// <param name="key">Key being checked</param>
+        /// <returns>True if CurrentState is up and PriorState is down, false otherwise</returns>
         public static bool GetKeyRelease(Keys key)
         {
-            throw new NotImplementedException("GetKeyRelease has not been implemented in InputManager");
+            return CurrentState.IsKeyUp(key) && PriorState.IsKeyDown(key);
         }
+
+        /// <summary>
+        /// Returns the current state of the given key
+        /// </summary>
+        /// <param name="key">Key being checked</param>
+        /// <returns>True if the key is down, false otherwise</returns>
+        /// <exception cref="NotImplementedException"></exception>
         public static bool GetKeyStatus(Keys key)
         {
-            throw new NotImplementedException("GetKeyStatus has not been implemented in InputManager");
+            return CurrentState.IsKeyDown(key);
         }
     }
 }

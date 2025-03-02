@@ -21,6 +21,8 @@ namespace MakeEveryDayRecount
 
         public void Update(GameTime gameTime)
         {
+            //Check for input
+            
             throw new NotImplementedException("Update has not been created yet in GamePlayManager");
         }
         public void Draw(SpriteBatch sb)
