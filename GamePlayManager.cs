@@ -1,7 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-
 
 namespace MakeEveryDayRecount
 {
@@ -18,17 +17,14 @@ namespace MakeEveryDayRecount
             _map = new MapManager(tileMap);
         }
 
-
         public void Update(GameTime gameTime)
         {
             throw new NotImplementedException("Update has not been created yet in GamePlayManager");
         }
+
         public void Draw(SpriteBatch sb)
         {
             throw new NotImplementedException("Draw has not been created yet in GamePlayManager");
-
         }
-
-
     }
 }

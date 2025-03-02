@@ -1,14 +1,14 @@
-﻿using MakeEveryDayRecount.Map;
+﻿using System;
+using MakeEveryDayRecount.GameObjects;
+using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
-using MakeEveryDayRecount.GameObjects;
 
 namespace MakeEveryDayRecount
 {
     /// <summary>
-    /// Keep track of the room the player is currently 
+    /// Keep track of the room the player is currently
     /// in and load the needed map
     /// </summary>
     internal class MapManager
@@ -17,17 +17,16 @@ namespace MakeEveryDayRecount
         private Room[] _rooms;
         private Texture2D[] _tileSprites;
 
-        public MapManager(Texture2D[] tileSprites) { 
+        public MapManager(Texture2D[] tileSprites)
+        {
             _tileSprites = tileSprites;
             _rooms = LoadMapData();
         }
 
-
-
-        public void TransitionRoom(Door transDoor) {
+        public void TransitionRoom(Door transDoor)
+        {
             throw new NotImplementedException("TransitionRoom not been created yet in MapManager");
         }
-
 
         /// <summary>
         /// Draw the current room to the screen
@@ -45,23 +44,21 @@ namespace MakeEveryDayRecount
         /// <returns>If the player is allowed to move there</returns>
         public bool CheckPlayerCollision(Point playerDest)
         {
-          throw new NotImplementedException("CheckPlayerCollisionhas not been created yet in MapManager");
+            throw new NotImplementedException(
+                "CheckPlayerCollisionhas not been created yet in MapManager"
+            );
         }
 
         /// <summary>
-        /// Load all the needed data relating to each room 
+        /// Load all the needed data relating to each room
         /// from the corresponding files and format them
         /// </summary>
         /// <returns>Formated data loaded from files</returns>
         private Room[] LoadMapData()
         {
-
             // only read binary data here
             // each room is in charge of parsing itself
             throw new NotImplementedException("LoadMapData has not been created yet in MapManager");
         }
-
-
-
     }
 }
