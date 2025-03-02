@@ -5,14 +5,14 @@ using System;
 
 namespace MakeEveryDayRecount.GameObjects
 {
-    internal class Item : GameObject, IInteractable
+    internal class Item : Prop
     {
 
         public Item(Point location, Texture2D sprite): base(location, sprite)
         {
          
         }
-        public void Interact(Player player)
+        public override void Interact(Player player)
         {
             throw new NotImplementedException("Interact has not been created yet in Item");
 

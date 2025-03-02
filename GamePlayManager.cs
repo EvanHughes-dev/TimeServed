@@ -4,14 +4,14 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace MakeEveryDayRecount
 {
-    internal class GamePlayManager
+    internal class GameplayManager
     {
         private int _currentLevel;
         private Player _player;
 
         private MapManager _map;
 
-        public GamePlayManager(Player player, Texture2D[] tileMap)
+        public GameplayManager(Player player, Texture2D[] tileMap)
         {
             _player = player;
             _map = new MapManager(tileMap);

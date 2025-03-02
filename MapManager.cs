@@ -45,7 +45,7 @@ namespace MakeEveryDayRecount
         public bool CheckPlayerCollision(Point playerDest)
         {
             throw new NotImplementedException(
-                "CheckPlayerCollisionhas not been created yet in MapManager"
+                "CheckPlayerCollision has not been created yet in MapManager"
             );
         }
 
