@@ -24,7 +24,6 @@ namespace MakeEveryDayRecount
             Down = 3
         }
 
-
         public Point PlayerPos { get; private set; }
         private Direction _playerCurrentDirection;
 
