@@ -45,7 +45,7 @@ namespace MakeEveryDayRecount
         public void Draw(SpriteBatch sb) {
             throw new NotImplementedException("Draw has not been created yet in Player");
         }
-        private void KeyBoardInput()
+        private void KeyboardInput()
         {
             throw new NotImplementedException("KeyBoardInput has not been created yet in Player");
         }

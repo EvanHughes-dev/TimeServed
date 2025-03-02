@@ -10,7 +10,7 @@ namespace MakeEveryDayRecount.GameObjects
     /// GameObject but all has the ability to be opened 
     /// and direct the user to another room
     /// </summary>
-    internal class Door : GameObject, IInteractable
+    internal class Door : Prop
     {
         /// <summary>
         /// Track which key is required to access the door/vent
@@ -58,7 +58,7 @@ namespace MakeEveryDayRecount.GameObjects
         /// Check to see if this door can be interacted with
         /// </summary>
         /// <returns>If the door can be interacted</returns>
-        public void Interact(Player player)
+        public override void Interact(Player player)
         {
             throw new NotImplementedException("Interact has not been created yet in Door");
         }
