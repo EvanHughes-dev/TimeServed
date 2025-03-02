@@ -7,6 +7,11 @@ using System.Threading.Tasks;
 
 namespace MakeEveryDayRecount
 {
+    /// <summary>
+    /// James Young
+    /// Holds keyboard state for this frame and keyboard state for the prior frame.
+    /// Methods allow checking if a key was pressed or released this frame, or what state a key is right now.
+    /// </summary>
     public static class InputManager
     {        
         private static KeyboardState PriorState { get; set; }
