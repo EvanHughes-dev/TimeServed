@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework.Content;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,12 +11,15 @@ namespace MakeEveryDayRecount
 {
     public static class AssetManager
     {
-        /*
-         * Place public read-only properties for assets here!
-         */
+        public static Texture2D[] TileMap { get; }
+        public static Texture2D PlayerTexture { get; }
+        public static Texture2D DoorTexture { get; }
+        public static Texture2D[] PropTextures { get; }
+
 
         public static void LoadContent(ContentManager content)
         {
+            
             throw new NotImplementedException("LoadContent has not been implemented in AssetManager");
         }
     }
