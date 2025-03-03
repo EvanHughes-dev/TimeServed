@@ -6,15 +6,22 @@ namespace MakeEveryDayRecount
 {
     internal class GameplayManager
     {
-        private int _currentLevel;
-        private Player _player;
+        /// <summary>
+        /// Access the player's current level
+        /// </summary>
+        public int Level { get; private set; }
+
+        /// <summary>
+        /// Access the reference to the Player
+        /// </summary>
+        public Player PlayerObject { get; private set; }
 
         private MapManager _map;
 
-        public GameplayManager(Player player, Texture2D[] tileMap)
+        public GameplayManager(Player player)
         {
-            _player = player;
-            _map = new MapManager(tileMap);
+            PlayerObject = player;
+            _map = new MapManager(this);
         }
 
         public void Update(GameTime gameTime)

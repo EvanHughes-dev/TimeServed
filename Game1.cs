@@ -44,7 +44,10 @@ namespace MakeEveryDayRecount
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            if (
+                GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed
+                || Keyboard.GetState().IsKeyDown(Keys.Escape)
+            )
                 Exit();
 
             // TODO: Add your update logic here
@@ -62,7 +65,9 @@ namespace MakeEveryDayRecount
         }
 
         private void CheckKeyboardInput() { }
+
         private void DisplayPauseMenu(SpriteBatch sb) { }
+
         private void DisplayMainMenu(SpriteBatch sb) { }
     }
 }

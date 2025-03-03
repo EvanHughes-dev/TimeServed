@@ -1,13 +1,12 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using System;
 using Microsoft.Xna.Framework;
-using System;
-
+using Microsoft.Xna.Framework.Graphics;
 
 namespace MakeEveryDayRecount.GameObjects
 {
     /// <summary>
-    /// A door that has the same properties of a 
-    /// GameObject but all has the ability to be opened 
+    /// A door that has the same properties of a
+    /// GameObject but all has the ability to be opened
     /// and direct the user to another room
     /// </summary>
     internal class Door : Prop
@@ -30,23 +29,44 @@ namespace MakeEveryDayRecount.GameObjects
         /// <summary>
         /// Get the position of this door
         /// </summary>
-        public int SourceDoor { get => _sourceDoor; }
+        public int SourceDoor
+        {
+            get => _sourceDoor;
+        }
+
         /// <summary>
         /// Get the room this door leads to
         /// </summary>
-        public int DestRoom { get => _destRoom; }
+        public int DestRoom
+        {
+            get => _destRoom;
+        }
+
         /// <summary>
         /// Get the door this door leads to
         /// </summary>
-        public int DestDoor { get => _destDoor; }
+        public int DestDoor
+        {
+            get => _destDoor;
+        }
+
         /// <summary>
         /// Get the required key for this door
         /// </summary>
-        public DoorKeyType KeyType { get => _keyType; }
+        public DoorKeyType KeyType
+        {
+            get => _keyType;
+        }
 
-       
-        public Door(int sourceDoor, int destRoom, int destDoor, DoorKeyType keyType, 
-            Point location, Texture2D sprite): base(location, sprite)
+        public Door(
+            int sourceDoor,
+            int destRoom,
+            int destDoor,
+            DoorKeyType keyType,
+            Point location,
+            Texture2D sprite
+        )
+            : base(location, sprite)
         {
             _sourceDoor = sourceDoor;
             _destRoom = destRoom;

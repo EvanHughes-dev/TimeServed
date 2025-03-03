@@ -1,9 +1,9 @@
 ﻿using System;
+using System.IO;
 using MakeEveryDayRecount.GameObjects;
 using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace MakeEveryDayRecount
 {
@@ -17,10 +17,17 @@ namespace MakeEveryDayRecount
         private Room[] _rooms;
         private Texture2D[] _tileSprites;
 
-        public MapManager(Texture2D[] tileSprites)
+        private GameplayManager _gameplayManager;
+
+        /// <summary>
+        /// Initialize the map manger and make rooms
+        /// </summary>
+        /// <param name="gameplayManager">Reference to the gamePlayManager</param>
+        public MapManager(GameplayManager gameplayManager)
         {
-            _tileSprites = tileSprites;
-            _rooms = LoadMapData();
+            _tileSprites = AssetManager.MapTiles;
+            _gameplayManager = gameplayManager;
+            _rooms = LoadMapData(_gameplayManager.Level);
         }
 
         public void TransitionRoom(Door transDoor)
@@ -53,12 +60,39 @@ namespace MakeEveryDayRecount
         /// Load all the needed data relating to each room
         /// from the corresponding files and format them
         /// </summary>
-        /// <returns>Formated data loaded from files</returns>
-        private Room[] LoadMapData()
+        /// <param name="currentLevel">Current level of the game</param>
+        /// <returns>Formatted data loaded from files</returns>
+        private Room[] LoadMapData(int currentLevel)
         {
             // only read binary data here
             // each room is in charge of parsing itself
-            throw new NotImplementedException("LoadMapData has not been created yet in MapManager");
+            string folderPath = $"../../MapFiles/Level{currentLevel}";
+
+            // Load the level config file
+            // File is structured in the following form:
+
+            /*
+            * int roomCount
+            *   Rooms:
+            *   string roomName
+            *   int roomIndex
+            *
+            * Loop through and pass path and index to a new room object
+            */
+
+            Stream streamReader = File.OpenRead(folderPath + "/Level.level");
+            BinaryReader binaryReader = new BinaryReader(streamReader);
+
+            int roomCount = binaryReader.ReadInt32();
+            Room[] rooms = new Room[roomCount];
+
+            for (int currentRoom = 0; currentRoom < roomCount; currentRoom++)
+            {
+                rooms[currentRoom] = new Room();
+            }
+
+            binaryReader.Close();
+            return null;
         }
     }
 }
