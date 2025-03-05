@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using MakeEveryDayRecount.GameObjects;
 using MakeEveryDayRecount.GameObjects.Props;
 using MakeEveryDayRecount.Map.Tiles;
@@ -10,17 +11,35 @@ using Microsoft.Xna.Framework.Graphics;
 namespace MakeEveryDayRecount.Map
 {
     /// <summary>
+    /// Transition from one room to another
+    /// </summary>
+    /// <param name="interactedDoor">Door that was interacted with</param>
+    delegate void DoorTransition(Door interactedDoor);
+
+    /// <summary>
     /// Hold all the information relating to what should be
     /// draw in each given room. Also controls which room should
     /// be entered when the Player uses a door
     /// </summary>
     internal class Room
     {
-        private Tile[,] _map;
-        private List<GameObject> _props;
-        private List<Door> _doors;
+        /// <summary>
+        /// Called when a valid door is interacted with
+        /// </summary>
+        public event DoorTransition DoorTransition;
+
+        /// <summary>
+        /// Get the current room
+        /// </summary>
         public int RoomIndex { get; private set; }
+
+        /// <summary>
+        /// Get the room's name
+        /// </summary>
         public string RoomName { get; private set; }
+        private Tile[,] _map;
+        private List<GameObject> _gameObjects;
+        private List<Door> _doors;
 
         private const int TileSize = 128;
 
@@ -34,7 +53,43 @@ namespace MakeEveryDayRecount.Map
         {
             RoomIndex = roomIndex;
             RoomName = roomName;
+
+            _map = new Tile[,] { };
+            _gameObjects = new List<GameObject> { };
+            _doors = new List<Door> { };
             ParseData(filePath);
+        }
+
+        #region  Drawing Logic
+        /// <summary>
+        /// Convert an a position from tile space to world space
+        /// </summary>
+        /// <param name="tilePosition">Position in tile space</param>
+        /// <returns>Position in world space</returns>
+        private Vector2 TileToWorld(Vector2 tilePosition)
+        {
+            return tilePosition * TileSize;
+        }
+
+        /// <summary>
+        /// Convert an a position from tile space to world space
+        /// </summary>
+        /// <param name="tilePosition">Position in tile space</param>
+        /// <returns>Position in world space</returns>
+        private Vector2 TileToWorld(Point tilePosition)
+        {
+            return TileToWorld(tilePosition.X, tilePosition.Y);
+        }
+
+        /// <summary>
+        /// Convert an a position from tile space to world space
+        /// </summary>
+        /// <param name="xPos">X position in tile space</param>
+        /// <param name="yPos">Y position in tile space</param>
+        /// <returns>Position in world space</returns>
+        private Vector2 TileToWorld(int xPos, int yPos)
+        {
+            return new Vector2(xPos, yPos) * TileSize;
         }
 
         /// <summary>
@@ -65,15 +120,59 @@ namespace MakeEveryDayRecount.Map
             );
 
             // Find the coordinates of the four corners to figure out which
-            // tiles and objects need to be displayed
+            // tiles and objects need to be displayed in tile positions
+            // By casting to an int, we make sure we get all partial tiles
+            // If any edge of a tile is on the screen, it still is displayed
+            int screenMinX = (int)worldToScreen.X / TileSize;
+            int screenMinY = (int)worldToScreen.Y / TileSize;
+            int screenMaxX = (int)(worldToScreen.X + screenSize.X) / TileSize;
+            int screenMaxY = (int)(worldToScreen.Y + screenSize.Y) / TileSize;
 
-            int screenMinX = (int)worldToScreen.X;
-            int screenMinY = (int)worldToScreen.Y;
-            float screenMaxX = worldToScreen.X + 0;
-            float screenMaxY = 0;
+            // Display all tiles that are on screen
+            for (int xTile = screenMinX; xTile <= screenMaxX; xTile++)
+            {
+                for (int yTile = screenMinY; yTile <= screenMaxY; yTile++)
+                {
+                    Tile currentTile = _map[xTile, yTile];
+                    Vector2 screenPos = TileToWorld(xTile, yTile) - worldToScreen;
+                    sb.Draw(AssetManager.TileMap[currentTile.SpriteIndex], screenPos, Color.White);
+                }
+            }
 
-            throw new NotImplementedException("Draw not been created yet in Room");
+            // Display all GameObjects on screen
+            foreach (GameObject propToDraw in _gameObjects)
+            {
+                Point propPosition = propToDraw.Location;
+
+                if (
+                    propPosition.X > screenMinX
+                    && propPosition.X < screenMaxX
+                    && propPosition.Y > screenMinY
+                    && propPosition.Y < screenMaxY
+                )
+                {
+                    sb.Draw(propToDraw.Sprite, TileToWorld(propPosition), Color.White);
+                }
+            }
+
+            // Display all doors
+            foreach (Door doorToDraw in _doors)
+            {
+                Point propPosition = doorToDraw.Location;
+
+                if (
+                    propPosition.X > screenMinX
+                    && propPosition.X < screenMaxX
+                    && propPosition.Y > screenMinY
+                    && propPosition.Y < screenMaxY
+                )
+                {
+                    sb.Draw(doorToDraw.Sprite, TileToWorld(propPosition), Color.White);
+                }
+            }
         }
+
+        #endregion
 
         /// <summary>
         /// Parse the binary file that contains the structure for the
@@ -107,7 +206,6 @@ namespace MakeEveryDayRecount.Map
                 *       int entranceIndex
                 *       int destRoom
                 *       int destDoor
-                *
                 */
                 Stream stream = File.OpenRead(filePath);
                 BinaryReader binaryReader = new BinaryReader(stream);
@@ -133,6 +231,7 @@ namespace MakeEveryDayRecount.Map
                 // Could be a door
                 int numberOfGameObjects = binaryReader.ReadInt32();
 
+                // Parse all needed GameObjects from the file
                 while (numberOfGameObjects > 0)
                 {
                     int propIndex = binaryReader.ReadInt32();
@@ -141,21 +240,24 @@ namespace MakeEveryDayRecount.Map
 
                     if (binaryReader.ReadBoolean())
                     {
+                        // Parse a door from the file
                         // Next three values correspond to the needed data
-                        _doors.Add(
-                            new Door(
-                                binaryReader.ReadInt32(),
-                                binaryReader.ReadInt32(),
-                                binaryReader.ReadInt32(),
-                                Door.DoorKeyType.None,
-                                new Point(posX, posY),
-                                AssetManager.PropTextures[propIndex]
-                            )
+                        Door doorFromFile = new Door(
+                            binaryReader.ReadInt32(),
+                            binaryReader.ReadInt32(),
+                            binaryReader.ReadInt32(),
+                            Door.DoorKeyType.None,
+                            new Point(posX, posY),
+                            AssetManager.PropTextures[propIndex]
                         );
+
+                        doorFromFile.DoorInteracted += TransitionPlayer;
+                        _doors.Add(doorFromFile);
                     }
                     else
                     {
-                        _props.Add(
+                        // Parse a prop from the file
+                        _gameObjects.Add(
                             new Item(new Point(posX, posY), AssetManager.PropTextures[propIndex])
                         );
                     }
@@ -171,6 +273,15 @@ namespace MakeEveryDayRecount.Map
                     $"File could not be found when loading room {RoomName}. File path {filePath}"
                 );
             }
+        }
+
+        /// <summary>
+        /// Transition the player from one room to another
+        /// </summary>
+        /// <param name="interactedDoor"></param>
+        private void TransitionPlayer(Door interactedDoor)
+        {
+            DoorTransition(interactedDoor);
         }
     }
 }

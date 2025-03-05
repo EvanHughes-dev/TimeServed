@@ -28,6 +28,8 @@ namespace MakeEveryDayRecount
         /// <param name="screenSize">Size of the screen</param>
         public GameplayManager(Vector2 screenSize)
         {
+            Level = 1;
+            PlayerObject = new Player(Point.Zero, AssetManager.PlayerTexture);
             _map = new MapManager(this);
             ScreenSize = screenSize;
         }
@@ -35,13 +37,13 @@ namespace MakeEveryDayRecount
         public void Update(GameTime gameTime)
         {
             //Check for input
-            
+
             throw new NotImplementedException("Update has not been created yet in GamePlayManager");
         }
 
         public void Draw(SpriteBatch sb)
         {
-            throw new NotImplementedException("Draw has not been created yet in GamePlayManager");
+            _map.Draw(sb);
         }
     }
 }

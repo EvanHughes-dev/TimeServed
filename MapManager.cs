@@ -28,6 +28,12 @@ namespace MakeEveryDayRecount
             _tileSprites = AssetManager.TileMap;
             _gameplayManager = gameplayManager;
             _rooms = LoadMapData(_gameplayManager.Level);
+            _currentRoom = _rooms[0];
+
+            foreach (Room room in _rooms)
+            {
+                room.DoorTransition += TransitionRoom;
+            }
         }
 
         public void TransitionRoom(Door transDoor)
@@ -80,13 +86,14 @@ namespace MakeEveryDayRecount
             *
             * Loop through and pass path and index to a new room object
             */
+            Room[] rooms = new Room[0];
             if (File.Exists(folderPath + "/Level.level"))
             {
                 Stream streamReader = File.OpenRead(folderPath + "/Level.level");
                 BinaryReader binaryReader = new BinaryReader(streamReader);
 
                 int roomCount = binaryReader.ReadInt32();
-                Room[] rooms = new Room[roomCount];
+                rooms = new Room[roomCount];
 
                 for (int currentRoom = 0; currentRoom < roomCount; currentRoom++)
                 {
@@ -105,7 +112,7 @@ namespace MakeEveryDayRecount
                     $"No Level.level file located for level {currentLevel}. File path: {folderPath}/Level.level"
                 );
             }
-            return null;
+            return rooms;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -38,6 +39,8 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// </summary>
         public int DestDoor { get; private set; }
 
+        public event DoorTransition DoorInteracted;
+
         /// <summary>
         ///Create the door object
         /// </summary>
@@ -69,8 +72,10 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// <returns>If the door can be interacted</returns>
         public override void Interact(Player player)
         {
-            if (_keyType != DoorKeyType.None && player.ContainsKey(_keyType)) { }
-            throw new NotImplementedException("Interact has not been created yet in Door");
+            if (_keyType != DoorKeyType.None && player.ContainsKey(_keyType))
+            {
+                DoorInteracted(this);
+            }
         }
 
         public override void Update(float deltaTimeS)
