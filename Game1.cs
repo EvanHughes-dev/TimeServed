@@ -21,6 +21,8 @@ namespace MakeEveryDayRecount
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
+        private GameplayManager _gameplayManager;
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -31,7 +33,7 @@ namespace MakeEveryDayRecount
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-
+            _gameplayManager = new GameplayManager();
             base.Initialize();
         }
 

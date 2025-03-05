@@ -18,9 +18,8 @@ namespace MakeEveryDayRecount
 
         private MapManager _map;
 
-        public GameplayManager(Player player)
+        public GameplayManager()
         {
-            PlayerObject = player;
             _map = new MapManager(this);
         }
 

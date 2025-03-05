@@ -1,13 +1,12 @@
-﻿using MakeEveryDayRecount.GameObjects;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
+﻿using System;
 using System.Collections.Generic;
-using System;
-
+using MakeEveryDayRecount.GameObjects;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace MakeEveryDayRecount
 {
-    internal class Player: GameObject
+    internal class Player : GameObject
     {
         public enum PlayerState
         {
@@ -34,17 +33,14 @@ namespace MakeEveryDayRecount
         private Rectangle _sourceRectangle;
         private Texture2D _playerTextures;
 
-        public Player(Point location, Texture2D sprite) : base(location, sprite)
+        public Player(Point location, Texture2D sprite)
+            : base(location, sprite) { }
+
+        public override void Update(float gameTime)
         {
-
-        }
-
-        public override void Update(float gameTime) {
             throw new NotImplementedException("Update has not been created yet in Player");
         }
-        public void Draw(SpriteBatch sb) {
-            throw new NotImplementedException("Draw has not been created yet in Player");
-        }
+
         private void KeyboardInput()
         {
             throw new NotImplementedException("KeyBoardInput has not been created yet in Player");

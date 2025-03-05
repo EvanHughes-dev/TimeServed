@@ -66,9 +66,10 @@ namespace MakeEveryDayRecount
         {
             // only read binary data here
             // each room is in charge of parsing itself
-            string folderPath = $"../../MapFiles/Level{currentLevel}";
+            string folderPath = $"./Content/Level{currentLevel}";
 
-            // Load the level config file
+            // Level.level should exist in every Level folder
+            // Acts as a config file for the .room files
             // File is structured in the following form:
 
             /*
@@ -79,19 +80,31 @@ namespace MakeEveryDayRecount
             *
             * Loop through and pass path and index to a new room object
             */
-
-            Stream streamReader = File.OpenRead(folderPath + "/Level.level");
-            BinaryReader binaryReader = new BinaryReader(streamReader);
-
-            int roomCount = binaryReader.ReadInt32();
-            Room[] rooms = new Room[roomCount];
-
-            for (int currentRoom = 0; currentRoom < roomCount; currentRoom++)
+            if (File.Exists(folderPath + "/Level.level"))
             {
-                rooms[currentRoom] = new Room();
-            }
+                Stream streamReader = File.OpenRead(folderPath + "/Level.level");
+                BinaryReader binaryReader = new BinaryReader(streamReader);
 
-            binaryReader.Close();
+                int roomCount = binaryReader.ReadInt32();
+                Room[] rooms = new Room[roomCount];
+
+                for (int currentRoom = 0; currentRoom < roomCount; currentRoom++)
+                {
+                    string roomName = binaryReader.ReadString();
+                    string roomFilePath = $"{folderPath}/{roomName}.room";
+                    int roomIndex = binaryReader.ReadInt32();
+                    rooms[currentRoom] = new Room(roomFilePath, roomName, roomIndex);
+                }
+
+                binaryReader.Close();
+            }
+            else
+            {
+                // Provide more details about what level the error occurred on
+                throw new FileNotFoundException(
+                    $"No Level.level file located for level {currentLevel}. File path: {folderPath}/Level.level"
+                );
+            }
             return null;
         }
     }
