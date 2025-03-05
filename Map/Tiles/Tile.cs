@@ -1,18 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MakeEveryDayRecount.Map.Tiles
+﻿namespace MakeEveryDayRecount.Map.Tiles
 {
     /// <summary>
-    /// Hold the data relating to a single tile in the map
+    /// Hold data about whether a tile can be stood on
+    /// and what sprite it should be
     /// </summary>
     internal class Tile
     {
-        public bool _isWalkable;
-        public int _spriteIndex;
+        /// <summary>
+        /// Get if the tile is walkable
+        /// </summary>
+        public bool IsWalkable { get; private set; }
+
+        /// <summary>
+        /// Get then index that corresponds to this tile's sprite
+        /// </summary>
+        public int SpriteIndex { get; private set; }
 
         /// <summary>
         /// Create an instance of a tile with the needed data
@@ -21,8 +23,8 @@ namespace MakeEveryDayRecount.Map.Tiles
         /// <param name="spriteIndex">The sprite index of the tile</param>
         public Tile(bool isWalkable, int spriteIndex)
         {
-            _isWalkable = isWalkable;
-            _spriteIndex = spriteIndex;
+            IsWalkable = isWalkable;
+            SpriteIndex = spriteIndex;
         }
     }
 }

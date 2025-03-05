@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using MakeEveryDayRecount.GameObjects;
+using MakeEveryDayRecount.GameObjects.Props;
 using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -25,7 +25,7 @@ namespace MakeEveryDayRecount
         /// <param name="gameplayManager">Reference to the gamePlayManager</param>
         public MapManager(GameplayManager gameplayManager)
         {
-            _tileSprites = AssetManager.MapTiles;
+            _tileSprites = AssetManager.TileMap;
             _gameplayManager = gameplayManager;
             _rooms = LoadMapData(_gameplayManager.Level);
         }
@@ -41,7 +41,7 @@ namespace MakeEveryDayRecount
         /// <param name="batch">Batch of sprites to add to</param>
         public void Draw(SpriteBatch batch)
         {
-            throw new NotImplementedException("Draw has not been created yet in MapManager");
+            _currentRoom.Draw(batch, _gameplayManager.PlayerObject, _gameplayManager.ScreenSize);
         }
 
         /// <summary>

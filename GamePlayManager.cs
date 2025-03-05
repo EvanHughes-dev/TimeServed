@@ -16,11 +16,20 @@ namespace MakeEveryDayRecount
         /// </summary>
         public Player PlayerObject { get; private set; }
 
+        /// <summary>
+        /// Get the size of the screen
+        /// </summary>
+        public Vector2 ScreenSize { get; private set; }
         private MapManager _map;
 
-        public GameplayManager()
+        /// <summary>
+        /// Initialize GameplayManager
+        /// </summary>
+        /// <param name="screenSize">Size of the screen</param>
+        public GameplayManager(Vector2 screenSize)
         {
             _map = new MapManager(this);
+            ScreenSize = screenSize;
         }
 
         public void Update(GameTime gameTime)

@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace MakeEveryDayRecount.GameObjects
+namespace MakeEveryDayRecount.GameObjects.Props
 {
     internal class Camera : Prop
     {

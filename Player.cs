@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using MakeEveryDayRecount.GameObjects;
+using MakeEveryDayRecount.GameObjects.Props;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -24,6 +25,7 @@ namespace MakeEveryDayRecount
         }
 
         public Point PlayerPos { get; private set; }
+        public Point PlayerWorldPos { get; private set; }
         private Direction _playerCurrentDirection;
 
         private PlayerState _playerState;
@@ -44,6 +46,17 @@ namespace MakeEveryDayRecount
         private void KeyboardInput()
         {
             throw new NotImplementedException("KeyBoardInput has not been created yet in Player");
+        }
+
+        /// <summary>
+        /// Search the player's inventory to see if they have a key
+        /// of a certain type
+        /// </summary>
+        /// <param name="doorKeyType">Type of key to search for</param>
+        /// <returns></returns>
+        public bool ContainsKey(Door.DoorKeyType doorKeyType)
+        {
+            throw new NotImplementedException("ContainsKey has not been created yet in Player");
         }
     }
 }

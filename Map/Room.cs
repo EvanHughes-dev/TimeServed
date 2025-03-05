@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using MakeEveryDayRecount.GameObjects;
+using MakeEveryDayRecount.GameObjects.Props;
 using MakeEveryDayRecount.Map.Tiles;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace MakeEveryDayRecount.Map
@@ -19,6 +21,8 @@ namespace MakeEveryDayRecount.Map
         private List<Door> _doors;
         public int RoomIndex { get; private set; }
         public string RoomName { get; private set; }
+
+        private const int TileSize = 128;
 
         /// <summary>
         /// Establish the room object
@@ -37,8 +41,9 @@ namespace MakeEveryDayRecount.Map
         /// Draw all tiles and GameObjects in the current room
         /// </summary>
         /// <param name="sb">Sprite batch to draw with</param>
-        /// <exception cref="NotImplementedException"></exception>
-        public void Draw(SpriteBatch sb)
+        /// <param name="player">Reference to the player</param>
+        /// <param name="screenSize">Size of the screen</param>
+        public void Draw(SpriteBatch sb, Player player, Vector2 screenSize)
         {
             /*
             * Draw order
@@ -47,6 +52,25 @@ namespace MakeEveryDayRecount.Map
             * GameObjects
             * Doors (type of GameObject)
             */
+            // Find the player's position in pixels, not tiles
+            Vector2 playerPos = new Vector2(
+                player.PlayerWorldPos.X * TileSize + TileSize / 2,
+                player.PlayerWorldPos.Y * TileSize + TileSize / 2
+            );
+            Vector2 worldToScreen = playerPos - screenSize / 2;
+
+            worldToScreen = new Vector2(
+                MathHelper.Clamp(worldToScreen.X, 0, _map.GetLength(0) * TileSize - screenSize.X),
+                MathHelper.Clamp(worldToScreen.Y, 0, _map.GetLength(1) * TileSize - screenSize.Y)
+            );
+
+            // Find the coordinates of the four corners to figure out which
+            // tiles and objects need to be displayed
+
+            int screenMinX = (int)worldToScreen.X;
+            int screenMinY = (int)worldToScreen.Y;
+            float screenMaxX = worldToScreen.X + 0;
+            float screenMaxY = 0;
 
             throw new NotImplementedException("Draw not been created yet in Room");
         }
@@ -68,7 +92,7 @@ namespace MakeEveryDayRecount.Map
                 * int tileMapHeight
                 *
                 * Tiles:
-                *   bit isWalkable 0 -> false 1 -> true
+                *   bool isWalkable
                 *   int textureIndex
                 *
                 * int gameObjectCount
@@ -78,10 +102,11 @@ namespace MakeEveryDayRecount.Map
                 *   int positionX
                 *   int positionY
                 *
-                *   bit isDoor 0 -> false 1 -> true
-                *   int entranceIndex
-                *   int destRoom
-                *   int destDoor
+                *   boolean isDoor
+                *   if True
+                *       int entranceIndex
+                *       int destRoom
+                *       int destDoor
                 *
                 */
                 Stream stream = File.OpenRead(filePath);
@@ -110,11 +135,30 @@ namespace MakeEveryDayRecount.Map
 
                 while (numberOfGameObjects > 0)
                 {
-                    //TODO finish
-
                     int propIndex = binaryReader.ReadInt32();
                     int posX = binaryReader.ReadInt32();
                     int posY = binaryReader.ReadInt32();
+
+                    if (binaryReader.ReadBoolean())
+                    {
+                        // Next three values correspond to the needed data
+                        _doors.Add(
+                            new Door(
+                                binaryReader.ReadInt32(),
+                                binaryReader.ReadInt32(),
+                                binaryReader.ReadInt32(),
+                                Door.DoorKeyType.None,
+                                new Point(posX, posY),
+                                AssetManager.PropTextures[propIndex]
+                            )
+                        );
+                    }
+                    else
+                    {
+                        _props.Add(
+                            new Item(new Point(posX, posY), AssetManager.PropTextures[propIndex])
+                        );
+                    }
 
                     numberOfGameObjects--;
                 }

@@ -13,10 +13,8 @@ namespace MakeEveryDayRecount
         /*
          * Place public read-only properties for assets here!
          */
-        /// <summary>
-        /// An array corresponding to all tiles for the map's environment
-        /// </summary>
-        public static Texture2D[] MapTiles { get; private set; }
+        public static Texture2D[] TileMap { get; private set; }
+        public static Texture2D[] PropTextures { get; private set; }
 
         public static void LoadContent(ContentManager content)
         {

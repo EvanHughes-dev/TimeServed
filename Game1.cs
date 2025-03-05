@@ -33,7 +33,7 @@ namespace MakeEveryDayRecount
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            _gameplayManager = new GameplayManager();
+
             base.Initialize();
         }
 
@@ -41,6 +41,10 @@ namespace MakeEveryDayRecount
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            // Gameplay manager must be called after all content is loaded
+            _gameplayManager = new GameplayManager(
+                new Vector2(GraphicsDevice.Viewport.X, GraphicsDevice.Viewport.Y)
+            );
             // TODO: use this.Content to load your game content here
         }
 
