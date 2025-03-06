@@ -5,9 +5,21 @@ namespace MakeEveryDayRecount
 {
     public static class AssetManager
     {
+        /// <summary>
+        /// Array with every type of tile asset we have in the game
+        /// </summary>
         public static Texture2D[] TileMap { get; private set; }
+        /// <summary>
+        /// Spritesheet for the player
+        /// </summary>
         public static Texture2D PlayerTexture { get; private set; }
+        /// <summary>
+        /// Texture for the door
+        /// </summary>
         public static Texture2D DoorTexture { get; private set; }
+        /// <summary>
+        /// Array of the assets for the props in the game
+        /// </summary>
         public static Texture2D[] PropTextures { get; private set; }
 
         public static void LoadContent(ContentManager content)
