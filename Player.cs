@@ -64,20 +64,14 @@ namespace MakeEveryDayRecount
         /// <param name="deltaTimeS">The elapsed time between frames in seconds</param>
         private void KeyboardInput(float deltaTimeS)
         {
-
             //if we were walking already
-            //if we're going in the same direction we were just going
-            //increment the counter
-            //if the counter is high enough, move by one in our current direction and reduce the counter by the threshold amount
-
-            //if our direction has changed
-            //reset the counter
-            //move by 1 in the new direction
-            //change the player's direction
             if (_playerState == PlayerState.Walking)
             {
                 if (InputManager.GetKeyStatus(Keys.Left) || InputManager.GetKeyStatus(Keys.A))
                 {
+                    //if we're going in the same direction we were just going
+                    //increment the counter
+                    //if the counter is high enough, move by one in our current direction and reduce the counter by the threshold amount
                     if (_playerCurrentDirection == Direction.Left)
                     {
                         _walkingSeconds += deltaTimeS;
@@ -87,12 +81,17 @@ namespace MakeEveryDayRecount
                             _walkingSeconds -= _secondsPerTile;
                         }
                     }
+                    //if our direction has changed
+                    //reset the counter
+                    //move by 1 in the new direction
+                    //change the player's direction
                     else
                     {
                         _walkingSeconds = 0;
                         _location.X = _location.X - 1;
                         _playerCurrentDirection = Direction.Left;
                     }
+                    //this structure is the same for all the keys
                 }
                 else if (InputManager.GetKeyStatus(Keys.Right) || InputManager.GetKeyStatus(Keys.D))
                 {
