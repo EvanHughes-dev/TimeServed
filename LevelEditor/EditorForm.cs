@@ -2,7 +2,7 @@
 // 2/9/25
 // The EditorForm, with a palette, selected color, save and load buttons, and a grid of PictureBoxes the user can draw on
 
-namespace HW2_LevelEditor
+namespace LevelEditor
 {
     /// <summary>
     /// The EditorForm, with a palette, selected color, save and load buttons, and a grid of PictureBoxes the user can draw on.
@@ -34,7 +34,7 @@ namespace HW2_LevelEditor
             InitializeComponent();
 
             // Creates all of the buttons in the palette
-            CreatePalette();
+            CreateTilePalette();
 
             // Sets the selected color to some sort of reasonable default -- Palette[0, 0] is the only place we can guarantee there's a color in the palette
             //   (assuming the developer didn't change Palette to an entirely empty array)
@@ -59,13 +59,13 @@ namespace HW2_LevelEditor
         public EditorForm(string filePath) 
             : this()
         {
-            LoadFromFile(filePath);
+            LoadRoomFromFile(filePath);
         }
 
         /// <summary>
         /// Creates the color selection buttons corresponding with the palette. Should only be run once!
         /// </summary>
-        private void CreatePalette()
+        private void CreateTilePalette()
         {
             // Uses the dimensions from the hardcoded palette to determine the grid dimensions of the buttons
             // This is just the easiest way for me to program this, I think the ideal version of this would
@@ -75,10 +75,10 @@ namespace HW2_LevelEditor
             int height = Palette.GetLength(1);
 
             // 5-unit padding on each side and 20-unit padding on the top just happens to look nice
-            Rectangle paletteBounds = PadRectInwards(groupBoxPalette.ClientRectangle, 5, 5, 20, 5);
+            Rectangle paletteBounds = PadRectInwards(tabPageTiles.ClientRectangle, 5, 5, 20, 5);
 
             // Give it 5 units of padding between each button just because it happens to look nice
-            Button[,] swatches = GenerateGrid<Button>(width, height, paletteBounds, 5, groupBoxPalette);
+            Button[,] swatches = GenerateGrid<Button>(width, height, paletteBounds, 5, tabPageTiles);
 
             for (int x = 0; x < width; x++)
             {
@@ -245,7 +245,7 @@ namespace HW2_LevelEditor
 
             if (result == DialogResult.OK)
             {
-                SaveToFile(saveFileDialog.FileName);
+                SaveRoomToFile(saveFileDialog.FileName);
             }
         }
 
@@ -258,7 +258,7 @@ namespace HW2_LevelEditor
 
             if (result == DialogResult.OK)
             {
-                LoadFromFile(openFileDialog.FileName);
+                LoadRoomFromFile(openFileDialog.FileName);
             }
         }
 
@@ -266,16 +266,28 @@ namespace HW2_LevelEditor
         /// Saves the current map to a given file path.
         /// </summary>
         /// <param name="path">The path to save to.</param>
-        private void SaveToFile(string path)
+        private void SaveRoomToFile(string path)
         {
             // File IO is always completely unsafe, so we try-catch everything
             try
             {
                 /*
-                 * THE .level FILE FORMAT:
+                 * THE .room FILE FORMAT:
                  *  - int width
                  *  - int height
-                 *  - one argb int per tile
+                 *  - Several tiles, with the following format:
+                 *    - bit isWalkable (1 == walkable, 0 == not walkable)
+                 *    - int tileIndex
+                 *  - int numOfProps
+                 *  - Several props, with the following format:
+                 *    - int propIndex
+                 *    - int positionX
+                 *    - int positionY
+                 *    - bit isDoor (1 == this is a door, 0 == this is not a door)
+                 *    - If isDoor is 1, then it also includes the following data:
+                 *      - int entranceIndex
+                 *      - int destinationRoom
+                 *      - int destinationDoor
                  */
                 BinaryWriter writer = new(new FileStream(path, FileMode.Create));
 
@@ -307,11 +319,12 @@ namespace HW2_LevelEditor
         /// Loads a map from a file.
         /// </summary>
         /// <param name="path">The path to load from.</param>
-        private void LoadFromFile(string path)
+        private void LoadRoomFromFile(string path)
         {
             // File IO is always completely unsafe, so we try-catch everything
             try
             {
+                // Read the file format from above!
                 BinaryReader reader = new(new FileStream(path, FileMode.Open));
 
                 int width = reader.ReadInt32();
