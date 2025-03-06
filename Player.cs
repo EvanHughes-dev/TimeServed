@@ -26,11 +26,12 @@ namespace MakeEveryDayRecount
         }
 
         public Point PlayerPos { get; private set; }
+        public Point PlayerScreenPosition { get; private set; }
         private Direction _playerCurrentDirection;
-
         private PlayerState _playerState;
         private readonly float _secondsPerTile = 0.2f;
         private float _walkingSeconds;
+
         private List<GameObject> _inventory;
 
         private Rectangle _sourceRectangle;
@@ -38,38 +39,115 @@ namespace MakeEveryDayRecount
 
         public Player(Point location, Texture2D sprite) : base(location, sprite)
         {
-
+            //NOTE: For now, the player's screen position is always in the middle
             _walkingSeconds = 0;
         }
 
         public override void Update(float deltaTimeS) {
-            throw new NotImplementedException("Update has not been created yet in Player");
             KeyboardInput(deltaTimeS);
         }
         public void Draw(SpriteBatch sb) {
-            throw new NotImplementedException("Draw has not been created yet in Player");
+            //REMEMBER THEY ONLY DRAW AT THE MIDDLE OF THE SCREEN
+            sb.Draw(_sprite, new Rectangle(300, 250, _sprite.Width, _sprite.Height), Color.White);
         }
         private void KeyboardInput(float deltaTimeS)
         {
             throw new NotImplementedException("KeyBoardInput has not been created yet in Player");
 
             //if we were walking already
+            //if we're going in the same direction we were just going
+            //increment the counter
+            //if the counter is high enough, move by one in our current direction and reduce the counter by the threshold amount
+
+            //if our direction has changed
+            //reset the counter
+            //move by 1 in the new direction
+            //change the player's direction
             if (_playerState == PlayerState.Walking)
             {
-                //if we're going in the same direction we were just going
-                //increment the counter
-                //if the counter is high enough, move by one in our current direction and reduce the counter by the threshold amount
-
-                //if our direction has changed
-                //reset the counter
-                //move by 1 in the new direction
-                //change the player's direction
+                if (InputManager.GetKeyStatus(Keys.Left) || InputManager.GetKeyStatus(Keys.A))
+                {
+                    if (_playerCurrentDirection == Direction.Left)
+                    {
+                        _walkingSeconds += deltaTimeS;
+                        if (_walkingSeconds >= _secondsPerTile)
+                        {
+                            _location.X = _location.X - 1;
+                            _walkingSeconds -= _secondsPerTile;
+                        }
+                    }
+                    else
+                    {
+                        _walkingSeconds = 0;
+                        _location.X = _location.X - 1;
+                        _playerCurrentDirection = Direction.Left;
+                    }
+                }
+                else if (InputManager.GetKeyStatus(Keys.Right) || InputManager.GetKeyStatus(Keys.D))
+                {
+                    if (_playerCurrentDirection == Direction.Right)
+                    {
+                        _walkingSeconds += deltaTimeS;
+                        if (_walkingSeconds >= _secondsPerTile)
+                        {
+                            _location.X = _location.X + 1;
+                            _walkingSeconds -= _secondsPerTile;
+                        }
+                    }
+                    else
+                    {
+                        _walkingSeconds = 0;
+                        _location.X = _location.X + 1;
+                        _playerCurrentDirection = Direction.Right;
+                    }
+                }
+                else if (InputManager.GetKeyStatus(Keys.Up) || InputManager.GetKeyStatus(Keys.W))
+                {
+                    if (_playerCurrentDirection == Direction.Up)
+                    {
+                        _walkingSeconds += deltaTimeS;
+                        if (_walkingSeconds >= _secondsPerTile)
+                        {
+                            _location.Y = _location.Y - 1;
+                            _walkingSeconds -= _secondsPerTile;
+                        }
+                    }
+                    else
+                    {
+                        _walkingSeconds = 0;
+                        _location.Y = _location.Y - 1;
+                        _playerCurrentDirection = Direction.Up;
+                    }
+                }
+                else if (InputManager.GetKeyStatus(Keys.Down) || InputManager.GetKeyStatus(Keys.S))
+                {
+                    if (_playerCurrentDirection == Direction.Down)
+                    {
+                        _walkingSeconds += deltaTimeS;
+                        if (_walkingSeconds >= _secondsPerTile)
+                        {
+                            _location.Y = _location.Y + 1;
+                            _walkingSeconds -= _secondsPerTile;
+                        }
+                    }
+                    else
+                    {
+                        _walkingSeconds = 0;
+                        _location.Y = _location.Y + 1;
+                        _playerCurrentDirection = Direction.Down;
+                    }
+                }
+                //if we were walking and we stop pressing a key, go back to standing
+                else
+                {
+                    _playerState = PlayerState.Standing;
+                    _walkingSeconds = 0;
+                    //but don't change the direction you're facing
+                }
             }
-            //if we just started walking
+            //if we're standing
             if (_playerState == PlayerState.Standing)
             {
-                //reset the walking counter to 0
-                _walkingSeconds = 0;
                 //if some key is pressed, move in the corresponding direction and increment the walking counter
                 if (InputManager.GetKeyStatus(Keys.Left) || InputManager.GetKeyStatus(Keys.A))
                 {
@@ -100,7 +178,6 @@ namespace MakeEveryDayRecount
                     _walkingSeconds += deltaTimeS;
                 }
             }
-            //If there's no key pressed, walkingseconds = 0, state = standing
         }
     }
 }
