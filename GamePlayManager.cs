@@ -7,7 +7,6 @@ using System;
 namespace MakeEveryDayRecount
 {
     /// <summary>
-    /// James Young
     /// Manager of Player and the Map Manager.
     /// </summary>
     internal class GameplayManager
