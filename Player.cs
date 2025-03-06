@@ -52,7 +52,6 @@ namespace MakeEveryDayRecount
         }
         private void KeyboardInput(float deltaTimeS)
         {
-            throw new NotImplementedException("KeyBoardInput has not been created yet in Player");
 
             //if we were walking already
             //if we're going in the same direction we were just going
