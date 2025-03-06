@@ -28,7 +28,7 @@ namespace MakeEveryDayRecount
         public Point PlayerScreenPosition { get; private set; }
         private Direction _playerCurrentDirection;
         private PlayerState _playerState;
-        private readonly float _secondsPerTile = 0.2f;
+        private readonly float _secondsPerTile = 1f;
         private float _walkingSeconds;
 
         private List<GameObject> _inventory;
@@ -150,6 +150,7 @@ namespace MakeEveryDayRecount
             //if we're standing
             if (_playerState == PlayerState.Standing)
             {
+
                 //if some key is pressed, move in the corresponding direction and increment the walking counter
                 if (InputManager.GetKeyStatus(Keys.Left) || InputManager.GetKeyStatus(Keys.A))
                 {

@@ -58,6 +58,8 @@ namespace MakeEveryDayRecount
                 || Keyboard.GetState().IsKeyDown(Keys.Escape)
             )
                 Exit();
+
+            InputManager.Update();
             _gameplayManager.Update(gameTime);
             // TODO: Add your update logic here
 
