@@ -10,7 +10,7 @@ namespace MakeEveryDayRecount
     internal class GameplayManager
     {
         /// <summary>
-        /// Access the player's current level
+        /// The current level being played
         /// </summary>
         public int Level { get; private set; }
 
@@ -23,7 +23,10 @@ namespace MakeEveryDayRecount
         /// Get the size of the screen
         /// </summary>
         public Vector2 ScreenSize { get; private set; }
-        private MapManager _map;
+        /// <summary>
+        /// The map manager currently being used by this gameplay manager
+        /// </summary>
+        public MapManager Map { get; private set; }
 
         /// <summary>
         /// Initialize GameplayManager
@@ -32,8 +35,8 @@ namespace MakeEveryDayRecount
         public GameplayManager(Vector2 screenSize)
         {
             Level = 1;
-            PlayerObject = new Player(Point.Zero, AssetManager.PlayerTexture);
-            _map = new MapManager(this);
+            PlayerObject = new Player(Point.Zero, AssetManager.PlayerTexture, this);
+            Map = new MapManager(this);
             ScreenSize = screenSize;
         }
 
@@ -51,7 +54,7 @@ namespace MakeEveryDayRecount
         public void Draw(SpriteBatch sb)
         {
             //Draw the map
-            _map.Draw(sb);
+            Map.Draw(sb);
 
             //Draw the player
             PlayerObject.Draw(sb);
