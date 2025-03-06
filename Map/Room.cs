@@ -283,5 +283,15 @@ namespace MakeEveryDayRecount.Map
         {
             DoorTransition(interactedDoor);
         }
+
+        /// <summary>
+        /// Return if a tile can be walk on
+        /// </summary>
+        /// <param name="pointToCheck">Tile to check</param>
+        /// <returns>If the tile is walkable</returns>
+        public bool VerifyWalkable(Point pointToCheck)
+        {
+            return _map[pointToCheck.X, pointToCheck.Y].IsWalkable;
+        }
     }
 }

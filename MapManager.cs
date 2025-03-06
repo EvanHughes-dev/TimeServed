@@ -15,9 +15,8 @@ namespace MakeEveryDayRecount
     {
         private Room _currentRoom;
         private Room[] _rooms;
-        private Texture2D[] _tileSprites;
 
-        private GameplayManager _gameplayManager;
+        private readonly GameplayManager _gameplayManager;
 
         /// <summary>
         /// Initialize the map manger and make rooms
@@ -25,7 +24,6 @@ namespace MakeEveryDayRecount
         /// <param name="gameplayManager">Reference to the gamePlayManager</param>
         public MapManager(GameplayManager gameplayManager)
         {
-            _tileSprites = AssetManager.TileMap;
             _gameplayManager = gameplayManager;
             _rooms = LoadMapData(_gameplayManager.Level);
             _currentRoom = _rooms[0];
@@ -38,6 +36,8 @@ namespace MakeEveryDayRecount
 
         public void TransitionRoom(Door transDoor)
         {
+            _currentRoom = _rooms[transDoor.DestRoom];
+            // Figure out how to update the player's position
             throw new NotImplementedException("TransitionRoom not been created yet in MapManager");
         }
 
@@ -57,9 +57,7 @@ namespace MakeEveryDayRecount
         /// <returns>If the player is allowed to move there</returns>
         public bool CheckPlayerCollision(Point playerDest)
         {
-            throw new NotImplementedException(
-                "CheckPlayerCollision has not been created yet in MapManager"
-            );
+            return _currentRoom.VerifyWalkable(playerDest);
         }
 
         /// <summary>
