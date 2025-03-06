@@ -77,10 +77,5 @@ namespace MakeEveryDayRecount.GameObjects.Props
                 DoorInteracted(this);
             }
         }
-
-        public override void Update(float deltaTimeS)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

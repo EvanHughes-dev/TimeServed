@@ -14,13 +14,5 @@ namespace MakeEveryDayRecount.GameObjects
             Location = location;
             Sprite = sprite;
         }
-
-        //Methods
-        public abstract void Update(float deltaTimeS);
-
-        public void Draw(SpriteBatch sb)
-        {
-            throw new NotImplementedException("Draw not been created yet in GameObject");
-        }
     }
 }

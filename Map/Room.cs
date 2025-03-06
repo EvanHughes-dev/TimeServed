@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using MakeEveryDayRecount.GameObjects;
 using MakeEveryDayRecount.GameObjects.Props;
 using MakeEveryDayRecount.Map.Tiles;
@@ -15,6 +13,12 @@ namespace MakeEveryDayRecount.Map
     /// </summary>
     /// <param name="interactedDoor">Door that was interacted with</param>
     delegate void DoorTransition(Door interactedDoor);
+
+    /// <summary>
+    /// Pickup an object from the room
+    /// </summary>
+    /// <param name="objectToPickup">Object that was picked up</param>
+    delegate void ItemPickup(Item objectToPickup);
 
     /// <summary>
     /// Hold all the information relating to what should be
@@ -38,8 +42,8 @@ namespace MakeEveryDayRecount.Map
         /// </summary>
         public string RoomName { get; private set; }
         private Tile[,] _map;
-        private List<GameObject> _gameObjects;
-        private List<Door> _doors;
+        private List<Item> _itemsInRoom;
+        private readonly List<Door> _doors;
 
         private const int TileSize = 128;
 
@@ -55,7 +59,7 @@ namespace MakeEveryDayRecount.Map
             RoomName = roomName;
 
             _map = new Tile[,] { };
-            _gameObjects = new List<GameObject> { };
+            _itemsInRoom = new List<Item> { };
             _doors = new List<Door> { };
             ParseData(filePath);
         }
@@ -140,7 +144,7 @@ namespace MakeEveryDayRecount.Map
             }
 
             // Display all GameObjects on screen
-            foreach (GameObject propToDraw in _gameObjects)
+            foreach (GameObject propToDraw in _itemsInRoom)
             {
                 Point propPosition = propToDraw.Location;
 
@@ -250,16 +254,21 @@ namespace MakeEveryDayRecount.Map
                             new Point(posX, posY),
                             AssetManager.PropTextures[propIndex]
                         );
-
+                        // When this door is interacted with, transition the player
                         doorFromFile.DoorInteracted += TransitionPlayer;
                         _doors.Add(doorFromFile);
                     }
                     else
                     {
                         // Parse a prop from the file
-                        _gameObjects.Add(
-                            new Item(new Point(posX, posY), AssetManager.PropTextures[propIndex])
+
+                        Item newItemInRoom = new Item(
+                            new Point(posX, posY),
+                            AssetManager.PropTextures[propIndex]
                         );
+                        // When this item is picked up, remove it from this room
+                        newItemInRoom.ItemPickedUp += RemoveGameObject;
+                        _itemsInRoom.Add(newItemInRoom);
                     }
 
                     numberOfGameObjects--;
@@ -292,6 +301,15 @@ namespace MakeEveryDayRecount.Map
         public bool VerifyWalkable(Point pointToCheck)
         {
             return _map[pointToCheck.X, pointToCheck.Y].IsWalkable;
+        }
+
+        /// <summary>
+        /// Remove an object from the room's inventory
+        /// </summary>
+        /// <param name="itemToRemove">Item to remove</param>
+        public void RemoveGameObject(Item itemToRemove)
+        {
+            _itemsInRoom.Remove(itemToRemove);
         }
     }
 }

@@ -13,10 +13,5 @@ namespace MakeEveryDayRecount.GameObjects.Props
         {
             throw new NotImplementedException("Interact has not been created yet in Camera");
         }
-
-        public override void Update(float deltaTimeS)
-        {
-            throw new NotImplementedException("Update has not been created yet in Camera");
-        }
     }
 }

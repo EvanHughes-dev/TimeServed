@@ -38,9 +38,14 @@ namespace MakeEveryDayRecount
         public Player(Point location, Texture2D sprite)
             : base(location, sprite) { }
 
-        public override void Update(float gameTime)
+        public void Update(float gameTime)
         {
             throw new NotImplementedException("Update has not been created yet in Player");
+        }
+
+        public void Draw(SpriteBatch sb)
+        {
+            throw new NotImplementedException("Draw has not been created yet in Player");
         }
 
         private void KeyboardInput()
