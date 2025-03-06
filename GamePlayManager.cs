@@ -1,36 +1,49 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 
 
 namespace MakeEveryDayRecount
 {
+    /// <summary>
+    /// Manager of Player and the Map Manager.
+    /// </summary>
     internal class GameplayManager
     {
-        private int _currentLevel;
-        private Player _player;
+        public int CurrentLevel { get; private set; }
+        public Player PlayerObject { get; private set; }
 
         private MapManager _map;
 
         public GameplayManager(Player player, Texture2D[] tileMap)
         {
-            _player = player;
+            PlayerObject = player;
             _map = new MapManager(tileMap);
         }
 
-
-        public void Update(GameTime gameTime)
+        /// <summary>
+        /// Updates the player (and maybe additional stuff later)
+        /// </summary>
+        /// <param name="deltaTimeS">How much time has ellapsed since the last update</param>
+        public void Update(float deltaTimeS)
         {
-            //Check for input
-            
-            throw new NotImplementedException("Update has not been created yet in GamePlayManager");
+            //Update Player
+            PlayerObject.Update(deltaTimeS);
         }
+
+        /// <summary>
+        /// Draws the map and the player.
+        /// </summary>
+        /// <param name="sb">sprite batch used to draw</param>
+        /// <exception cref="NotImplementedException"></exception>
         public void Draw(SpriteBatch sb)
         {
-            throw new NotImplementedException("Draw has not been created yet in GamePlayManager");
+            //Draw the map
+            _map.Draw(sb);
 
+            //Draw the player
+            PlayerObject.Draw(sb);
         }
-
-
     }
 }
