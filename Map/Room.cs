@@ -113,8 +113,8 @@ namespace MakeEveryDayRecount.Map
             */
             // Find the player's position in pixels, not tiles
             Vector2 playerPos = new Vector2(
-                player.PlayerWorldPos.X * TileSize + TileSize / 2,
-                player.PlayerWorldPos.Y * TileSize + TileSize / 2
+                player.PlayerPos.X * TileSize + TileSize / 2,
+                player.PlayerPos.Y * TileSize + TileSize / 2
             );
             Vector2 worldToScreen = playerPos - screenSize / 2;
 

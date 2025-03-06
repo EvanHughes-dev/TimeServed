@@ -25,7 +25,7 @@ namespace MakeEveryDayRecount
         }
 
         public Point PlayerPos { get; private set; }
-        public Point PlayerWorldPos { get; private set; }
+        public Point PlayerScreenPos { get; private set; }
         private Direction _playerCurrentDirection;
 
         private PlayerState _playerState;

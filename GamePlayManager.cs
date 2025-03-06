@@ -1,8 +1,6 @@
 ﻿using System;
-using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace MakeEveryDayRecount
 {
@@ -42,7 +40,7 @@ namespace MakeEveryDayRecount
         public void Update(GameTime gameTime)
         {
             //Update Player
-            PlayerObject.Update(deltaTimeS);
+            PlayerObject.Update(gameTime.ElapsedGameTime.Milliseconds);
         }
 
         /// <summary>
