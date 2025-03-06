@@ -1,14 +1,14 @@
-﻿using MakeEveryDayRecount.GameObjects;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
+﻿using System;
 using System.Collections.Generic;
-using System;
+using MakeEveryDayRecount.GameObjects;
+using MakeEveryDayRecount.GameObjects.Props;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-
 
 namespace MakeEveryDayRecount
 {
-    internal class Player: GameObject
+    internal class Player : GameObject
     {
         public enum PlayerState
         {
@@ -25,39 +25,57 @@ namespace MakeEveryDayRecount
             Down = 3
         }
 
-        public Point PlayerPos { get; private set; }
         public Point PlayerScreenPosition { get; private set; }
         private Direction _playerCurrentDirection;
         private PlayerState _playerState;
-        private readonly float _secondsPerTile = 0.2f;
+        private readonly float _secondsPerTile = .2f;
         private float _walkingSeconds;
 
+        private const int TileSize = 128;
         private List<GameObject> _inventory;
 
         private Rectangle _sourceRectangle;
         private Texture2D _playerTextures; //Probably a sprite sheet
 
-        public Player(Point location, Texture2D sprite) : base(location, sprite)
+        private GameplayManager _gamePlayManager;
+
+        public Player(Point location, Texture2D sprite, GameplayManager gameplayManager)
+            : base(location, sprite)
         {
             //NOTE: For now, the player's screen position is always in the middle
             _walkingSeconds = 0;
+            _gamePlayManager = gameplayManager;
         }
 
         /// <summary>
         /// Updates the player's position in world space
         /// </summary>
         /// <param name="deltaTimeS">The elapsed time between frames in seconds</param>
-        public override void Update(float deltaTimeS) {
+        public void Update(float deltaTimeS)
+        {
             KeyboardInput(deltaTimeS);
         }
+
         /// <summary>
         /// Draws the player in the center of the screen
         /// </summary>
         /// <param name="sb">The instance of spritebatch to be used to draw the player</param>
-        public void Draw(SpriteBatch sb) {
-            //REMEMBER THEY ONLY DRAW AT THE MIDDLE OF THE SCREEN
-            sb.Draw(_sprite, new Rectangle(300, 250, _sprite.Width, _sprite.Height), Color.White);
+        public void Draw(SpriteBatch sb)
+        {
+            //REMEMBER THEY ONLY DRAW AT THE CENTER TILE
+            //TODO add the ability for the player to walk up to but into through the walls
+            sb.Draw(
+                Sprite,
+                new Rectangle(
+                    (int)(_gamePlayManager.ScreenSize.X / 2 / TileSize) * TileSize,
+                    (int)(_gamePlayManager.ScreenSize.Y / 2 / TileSize) * TileSize,
+                    TileSize,
+                    TileSize
+                ),
+                Color.White
+            );
         }
+
         /// <summary>
         /// Gets keyboard input for player movement and moves the player in world space
         /// </summary>
@@ -77,7 +95,7 @@ namespace MakeEveryDayRecount
                         _walkingSeconds += deltaTimeS;
                         if (_walkingSeconds >= _secondsPerTile)
                         {
-                            _location.X = _location.X - 1;
+                            Location += new Point(-1, 0);
                             _walkingSeconds -= _secondsPerTile;
                         }
                     }
@@ -88,7 +106,7 @@ namespace MakeEveryDayRecount
                     else
                     {
                         _walkingSeconds = 0;
-                        _location.X = _location.X - 1;
+                        Location += new Point(-1, 0);
                         _playerCurrentDirection = Direction.Left;
                     }
                     //this structure is the same for all the keys
@@ -100,14 +118,14 @@ namespace MakeEveryDayRecount
                         _walkingSeconds += deltaTimeS;
                         if (_walkingSeconds >= _secondsPerTile)
                         {
-                            _location.X = _location.X + 1;
+                            Location += new Point(1, 0);
                             _walkingSeconds -= _secondsPerTile;
                         }
                     }
                     else
                     {
                         _walkingSeconds = 0;
-                        _location.X = _location.X + 1;
+                        Location += new Point(1, 0);
                         _playerCurrentDirection = Direction.Right;
                     }
                 }
@@ -118,14 +136,14 @@ namespace MakeEveryDayRecount
                         _walkingSeconds += deltaTimeS;
                         if (_walkingSeconds >= _secondsPerTile)
                         {
-                            _location.Y = _location.Y - 1;
+                            Location += new Point(0, -1);
                             _walkingSeconds -= _secondsPerTile;
                         }
                     }
                     else
                     {
                         _walkingSeconds = 0;
-                        _location.Y = _location.Y - 1;
+                        Location += new Point(0, -1);
                         _playerCurrentDirection = Direction.Up;
                     }
                 }
@@ -136,14 +154,14 @@ namespace MakeEveryDayRecount
                         _walkingSeconds += deltaTimeS;
                         if (_walkingSeconds >= _secondsPerTile)
                         {
-                            _location.Y = _location.Y + 1;
+                            Location += new Point(0, 1);
                             _walkingSeconds -= _secondsPerTile;
                         }
                     }
                     else
                     {
                         _walkingSeconds = 0;
-                        _location.Y = _location.Y + 1;
+                        Location += new Point(0, 1);
                         _playerCurrentDirection = Direction.Down;
                     }
                 }
@@ -163,31 +181,36 @@ namespace MakeEveryDayRecount
                 {
                     _playerState = PlayerState.Walking;
                     _playerCurrentDirection = Direction.Left;
-                    _location.X = _location.X - 1;
+                    Location += new Point(-1, 0);
                     _walkingSeconds += deltaTimeS;
                 }
                 else if (InputManager.GetKeyStatus(Keys.Right) || InputManager.GetKeyStatus(Keys.D))
                 {
                     _playerState = PlayerState.Walking;
                     _playerCurrentDirection = Direction.Right;
-                    _location.X = _location.X + 1;
+                    Location += new Point(1, 0);
                     _walkingSeconds += deltaTimeS;
                 }
                 else if (InputManager.GetKeyStatus(Keys.Up) || InputManager.GetKeyStatus(Keys.W))
                 {
                     _playerState = PlayerState.Walking;
                     _playerCurrentDirection = Direction.Up;
-                    _location.Y = _location.Y - 1;
+                    Location += new Point(0, -1);
                     _walkingSeconds += deltaTimeS;
                 }
                 else if (InputManager.GetKeyStatus(Keys.Down) || InputManager.GetKeyStatus(Keys.S))
                 {
                     _playerState = PlayerState.Walking;
                     _playerCurrentDirection = Direction.Down;
-                    _location.Y = _location.Y + 1;
+                    Location += new Point(0, 1);
                     _walkingSeconds += deltaTimeS;
                 }
             }
+        }
+
+        public bool ContainsKey(Door.DoorKeyType keyType)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -1,8 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using System;
-
 
 namespace MakeEveryDayRecount
 {
@@ -11,25 +9,38 @@ namespace MakeEveryDayRecount
     /// </summary>
     internal class GameplayManager
     {
-        public int CurrentLevel { get; private set; }
-        public Player PlayerObject { get; private set; }
-
-        private MapManager _map;
-
-        public GameplayManager(Player player, Texture2D[] tileMap)
-        {
-            PlayerObject = player;
-            _map = new MapManager(tileMap);
-        }
+        /// <summary>
+        /// Access the player's current level
+        /// </summary>
+        public int Level { get; private set; }
 
         /// <summary>
-        /// Updates the player (and maybe additional stuff later)
+        /// Access the reference to the Player
         /// </summary>
-        /// <param name="deltaTimeS">How much time has ellapsed since the last update</param>
-        public void Update(float deltaTimeS)
+        public Player PlayerObject { get; private set; }
+
+        /// <summary>
+        /// Get the size of the screen
+        /// </summary>
+        public Vector2 ScreenSize { get; private set; }
+        private MapManager _map;
+
+        /// <summary>
+        /// Initialize GameplayManager
+        /// </summary>
+        /// <param name="screenSize">Size of the screen</param>
+        public GameplayManager(Vector2 screenSize)
+        {
+            Level = 1;
+            PlayerObject = new Player(new Point(3, 3), AssetManager.PlayerTexture, this);
+            _map = new MapManager(this);
+            ScreenSize = screenSize;
+        }
+
+        public void Update(GameTime gameTime)
         {
             //Update Player
-            PlayerObject.Update(deltaTimeS);
+            PlayerObject.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
         }
 
         /// <summary>
