@@ -7,7 +7,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
 {
     internal class Item : Prop
     {
-        public event ItemPickup ItemPickedUp;
+        public event ItemPickup OnItemPickup;
 
         public Item(Point location, Texture2D sprite)
             : base(location, sprite) { }
@@ -18,7 +18,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// <param name="player">Player object interacting</param>
         public override void Interact(Player player)
         {
-            ItemPickedUp(this);
+            OnItemPickup?.Invoke(this);
         }
     }
 }

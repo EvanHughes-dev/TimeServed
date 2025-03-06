@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using MakeEveryDayRecount.GameObjects;
 using MakeEveryDayRecount.GameObjects.Props;
@@ -112,10 +113,7 @@ namespace MakeEveryDayRecount.Map
             * Doors (type of GameObject)
             */
             // Find the player's position in pixels, not tiles
-            Vector2 playerPos = new Vector2(
-                player.Location.X * TileSize + TileSize / 2,
-                player.Location.Y * TileSize + TileSize / 2
-            );
+            Vector2 playerPos = TileToWorld(player.Location);
             Vector2 worldToScreen = playerPos - screenSize / 2;
 
             worldToScreen = new Vector2(
@@ -188,93 +186,103 @@ namespace MakeEveryDayRecount.Map
         {
             if (File.Exists(filePath))
             {
-                /*
-                * Form of the room data is as follows
-                *
-                * int tileMapWidth
-                * int tileMapHeight
-                *
-                * Tiles:
-                *   bool isWalkable
-                *   int textureIndex
-                *
-                * int gameObjectCount
-                *
-                * GameObject:
-                *   int propIndex
-                *   int positionX
-                *   int positionY
-                *
-                *   boolean isDoor
-                *   if True
-                *       int entranceIndex
-                *       int destRoom
-                *       int destDoor
-                */
-                Stream stream = File.OpenRead(filePath);
-                BinaryReader binaryReader = new BinaryReader(stream);
-
-                // Define the size of the current room and loop to populate tiles
-                int tileMapWidth = binaryReader.ReadInt32();
-                int tileMapHeight = binaryReader.ReadInt32();
-
-                _map = new Tile[tileMapWidth, tileMapHeight];
-
-                for (int tileXIndex = 0; tileXIndex < tileMapWidth; tileXIndex++)
+                BinaryReader binaryReader = null;
+                try
                 {
-                    for (int tileYIndex = 0; tileYIndex < tileMapHeight; tileYIndex++)
+                    /*
+                    * Form of the room data is as follows
+                    *
+                    * int tileMapWidth
+                    * int tileMapHeight
+                    *
+                    * Tiles:
+                    *   bool isWalkable
+                    *   int textureIndex
+                    *
+                    * int gameObjectCount
+                    *
+                    * GameObject:
+                    *   int propIndex
+                    *   int positionX
+                    *   int positionY
+                    *
+                    *   boolean isDoor
+                    *   if True
+                    *       int entranceIndex
+                    *       int destRoom
+                    *       int destDoor
+                    */
+                    Stream stream = File.OpenRead(filePath);
+                    binaryReader = new BinaryReader(stream);
+
+                    // Define the size of the current room and loop to populate tiles
+                    int tileMapWidth = binaryReader.ReadInt32();
+                    int tileMapHeight = binaryReader.ReadInt32();
+
+                    _map = new Tile[tileMapWidth, tileMapHeight];
+
+                    for (int tileXIndex = 0; tileXIndex < tileMapWidth; tileXIndex++)
                     {
-                        _map[tileXIndex, tileYIndex] = new Tile(
-                            binaryReader.ReadBoolean(),
-                            binaryReader.ReadInt32()
-                        );
+                        for (int tileYIndex = 0; tileYIndex < tileMapHeight; tileYIndex++)
+                        {
+                            _map[tileXIndex, tileYIndex] = new Tile(
+                                binaryReader.ReadBoolean(),
+                                binaryReader.ReadInt32()
+                            );
+                        }
+                    }
+
+                    // Define the number of GameObjects in the room
+                    // Could be a door
+                    int numberOfGameObjects = binaryReader.ReadInt32();
+
+                    // Parse all needed GameObjects from the file
+                    while (numberOfGameObjects > 0)
+                    {
+                        int propIndex = binaryReader.ReadInt32();
+                        int posX = binaryReader.ReadInt32();
+                        int posY = binaryReader.ReadInt32();
+
+                        if (binaryReader.ReadBoolean())
+                        {
+                            // Parse a door from the file
+                            // Next three values correspond to the needed data
+                            Door doorFromFile = new Door(
+                                binaryReader.ReadInt32(),
+                                binaryReader.ReadInt32(),
+                                binaryReader.ReadInt32(),
+                                Door.DoorKeyType.None,
+                                new Point(posX, posY),
+                                AssetManager.PropTextures[propIndex]
+                            );
+                            // When this door is interacted with, transition the player
+                            doorFromFile.OnDoorInteract += TransitionPlayer;
+                            _doors.Add(doorFromFile);
+                        }
+                        else
+                        {
+                            // Parse a prop from the file
+
+                            Item newItemInRoom = new Item(
+                                new Point(posX, posY),
+                                AssetManager.PropTextures[propIndex]
+                            );
+                            // When this item is picked up, remove it from this room
+                            newItemInRoom.OnItemPickup += RemoveGameObject;
+                            _itemsInRoom.Add(newItemInRoom);
+                        }
+
+                        numberOfGameObjects--;
                     }
                 }
-
-                // Define the number of GameObjects in the room
-                // Could be a door
-                int numberOfGameObjects = binaryReader.ReadInt32();
-
-                // Parse all needed GameObjects from the file
-                while (numberOfGameObjects > 0)
+                catch (Exception e)
                 {
-                    int propIndex = binaryReader.ReadInt32();
-                    int posX = binaryReader.ReadInt32();
-                    int posY = binaryReader.ReadInt32();
-
-                    if (binaryReader.ReadBoolean())
-                    {
-                        // Parse a door from the file
-                        // Next three values correspond to the needed data
-                        Door doorFromFile = new Door(
-                            binaryReader.ReadInt32(),
-                            binaryReader.ReadInt32(),
-                            binaryReader.ReadInt32(),
-                            Door.DoorKeyType.None,
-                            new Point(posX, posY),
-                            AssetManager.PropTextures[propIndex]
-                        );
-                        // When this door is interacted with, transition the player
-                        doorFromFile.DoorInteracted += TransitionPlayer;
-                        _doors.Add(doorFromFile);
-                    }
-                    else
-                    {
-                        // Parse a prop from the file
-
-                        Item newItemInRoom = new Item(
-                            new Point(posX, posY),
-                            AssetManager.PropTextures[propIndex]
-                        );
-                        // When this item is picked up, remove it from this room
-                        newItemInRoom.ItemPickedUp += RemoveGameObject;
-                        _itemsInRoom.Add(newItemInRoom);
-                    }
-
-                    numberOfGameObjects--;
+                    System.Diagnostics.Debug.Write(e);
                 }
-
-                binaryReader.Close();
+                finally
+                {
+                    binaryReader.Close();
+                }
             }
             else
             {

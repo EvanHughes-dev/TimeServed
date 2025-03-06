@@ -28,19 +28,23 @@ namespace MakeEveryDayRecount
         public Point PlayerScreenPosition { get; private set; }
         private Direction _playerCurrentDirection;
         private PlayerState _playerState;
-        private readonly float _secondsPerTile = 2f;
+        private readonly float _secondsPerTile = .2f;
         private float _walkingSeconds;
 
+        private const int TileSize = 128;
         private List<GameObject> _inventory;
 
         private Rectangle _sourceRectangle;
         private Texture2D _playerTextures; //Probably a sprite sheet
 
-        public Player(Point location, Texture2D sprite)
+        private GameplayManager _gamePlayManager;
+
+        public Player(Point location, Texture2D sprite, GameplayManager gameplayManager)
             : base(location, sprite)
         {
             //NOTE: For now, the player's screen position is always in the middle
             _walkingSeconds = 0;
+            _gamePlayManager = gameplayManager;
         }
 
         /// <summary>
@@ -58,8 +62,18 @@ namespace MakeEveryDayRecount
         /// <param name="sb">The instance of spritebatch to be used to draw the player</param>
         public void Draw(SpriteBatch sb)
         {
-            //REMEMBER THEY ONLY DRAW AT THE MIDDLE OF THE SCREEN
-            sb.Draw(Sprite, new Rectangle(300, 250, Sprite.Width, Sprite.Height), Color.White);
+            //REMEMBER THEY ONLY DRAW AT THE CENTER TILE
+            //TODO add the ability for the player to walk up to but into through the walls
+            sb.Draw(
+                Sprite,
+                new Rectangle(
+                    (int)(_gamePlayManager.ScreenSize.X / 2 / TileSize) * TileSize,
+                    (int)(_gamePlayManager.ScreenSize.Y / 2 / TileSize) * TileSize,
+                    TileSize,
+                    TileSize
+                ),
+                Color.White
+            );
         }
 
         /// <summary>
