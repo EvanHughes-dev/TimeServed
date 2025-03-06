@@ -64,6 +64,7 @@ namespace MakeEveryDayRecount
         /// <param name="deltaTimeS">The elapsed time between frames in seconds</param>
         private void KeyboardInput(float deltaTimeS)
         {
+
             //if we were walking already
             //if we're going in the same direction we were just going
             //increment the counter
