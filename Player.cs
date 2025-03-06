@@ -28,7 +28,7 @@ namespace MakeEveryDayRecount
         public Point PlayerScreenPosition { get; private set; }
         private Direction _playerCurrentDirection;
         private PlayerState _playerState;
-        private readonly float _secondsPerTile = 1f;
+        private readonly float _secondsPerTile = 2f;
         private float _walkingSeconds;
 
         private List<GameObject> _inventory;
@@ -47,7 +47,7 @@ namespace MakeEveryDayRecount
         /// Updates the player's position in world space
         /// </summary>
         /// <param name="deltaTimeS">The elapsed time between frames in seconds</param>
-        public override void Update(float deltaTimeS)
+        public void Update(float deltaTimeS)
         {
             KeyboardInput(deltaTimeS);
         }
