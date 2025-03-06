@@ -25,6 +25,7 @@ namespace MakeEveryDayRecount
                 content.Load<Texture2D>("tile_testWall"),
                 content.Load<Texture2D>("tile_testWalkable")
             };
+            PlayerTexture = content.Load<Texture2D>("player");
         }
     }
 }
