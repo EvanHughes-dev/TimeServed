@@ -1,10 +1,7 @@
 ﻿using System;
-using System;
-using System.Collections.Generic;
 using System.Collections.Generic;
 using MakeEveryDayRecount.GameObjects;
 using MakeEveryDayRecount.GameObjects.Props;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -28,7 +25,6 @@ namespace MakeEveryDayRecount
             Down = 3
         }
 
-        public Point PlayerPos { get; private set; }
         public Point PlayerScreenPosition { get; private set; }
         private Direction _playerCurrentDirection;
         private PlayerState _playerState;
@@ -47,7 +43,7 @@ namespace MakeEveryDayRecount
             _walkingSeconds = 0;
         }
 
-        public override void Update(float deltaTimeS)
+        public void Update(float deltaTimeS)
         {
             KeyboardInput(deltaTimeS);
         }
@@ -55,13 +51,11 @@ namespace MakeEveryDayRecount
         public void Draw(SpriteBatch sb)
         {
             //REMEMBER THEY ONLY DRAW AT THE MIDDLE OF THE SCREEN
-            sb.Draw(_sprite, new Rectangle(300, 250, _sprite.Width, _sprite.Height), Color.White);
+            sb.Draw(Sprite, new Rectangle(300, 250, Sprite.Width, Sprite.Height), Color.White);
         }
 
         private void KeyboardInput(float deltaTimeS)
         {
-            throw new NotImplementedException("KeyBoardInput has not been created yet in Player");
-
             //if we were walking already
             //if we're going in the same direction we were just going
             //increment the counter
@@ -80,14 +74,14 @@ namespace MakeEveryDayRecount
                         _walkingSeconds += deltaTimeS;
                         if (_walkingSeconds >= _secondsPerTile)
                         {
-                            _location.X = _location.X - 1;
+                            Location += new Point(-1, 0);
                             _walkingSeconds -= _secondsPerTile;
                         }
                     }
                     else
                     {
                         _walkingSeconds = 0;
-                        _location.X = _location.X - 1;
+                        Location += new Point(-1, 0);
                         _playerCurrentDirection = Direction.Left;
                     }
                 }
@@ -98,14 +92,14 @@ namespace MakeEveryDayRecount
                         _walkingSeconds += deltaTimeS;
                         if (_walkingSeconds >= _secondsPerTile)
                         {
-                            _location.X = _location.X + 1;
+                            Location += new Point(1, 0);
                             _walkingSeconds -= _secondsPerTile;
                         }
                     }
                     else
                     {
                         _walkingSeconds = 0;
-                        _location.X = _location.X + 1;
+                        Location += new Point(1, 0);
                         _playerCurrentDirection = Direction.Right;
                     }
                 }
@@ -116,14 +110,14 @@ namespace MakeEveryDayRecount
                         _walkingSeconds += deltaTimeS;
                         if (_walkingSeconds >= _secondsPerTile)
                         {
-                            _location.Y = _location.Y - 1;
+                            Location += new Point(0, -1);
                             _walkingSeconds -= _secondsPerTile;
                         }
                     }
                     else
                     {
                         _walkingSeconds = 0;
-                        _location.Y = _location.Y - 1;
+                        Location += new Point(0, -1);
                         _playerCurrentDirection = Direction.Up;
                     }
                 }
@@ -134,14 +128,14 @@ namespace MakeEveryDayRecount
                         _walkingSeconds += deltaTimeS;
                         if (_walkingSeconds >= _secondsPerTile)
                         {
-                            _location.Y = _location.Y + 1;
+                            Location += new Point(0, 1);
                             _walkingSeconds -= _secondsPerTile;
                         }
                     }
                     else
                     {
                         _walkingSeconds = 0;
-                        _location.Y = _location.Y + 1;
+                        Location += new Point(0, 1);
                         _playerCurrentDirection = Direction.Down;
                     }
                 }
@@ -161,31 +155,36 @@ namespace MakeEveryDayRecount
                 {
                     _playerState = PlayerState.Walking;
                     _playerCurrentDirection = Direction.Left;
-                    _location.X = _location.X - 1;
+                    Location += new Point(-1, 0);
                     _walkingSeconds += deltaTimeS;
                 }
                 else if (InputManager.GetKeyStatus(Keys.Right) || InputManager.GetKeyStatus(Keys.D))
                 {
                     _playerState = PlayerState.Walking;
                     _playerCurrentDirection = Direction.Right;
-                    _location.X = _location.X + 1;
+                    Location += new Point(1, 0);
                     _walkingSeconds += deltaTimeS;
                 }
                 else if (InputManager.GetKeyStatus(Keys.Up) || InputManager.GetKeyStatus(Keys.W))
                 {
                     _playerState = PlayerState.Walking;
                     _playerCurrentDirection = Direction.Up;
-                    _location.Y = _location.Y - 1;
+                    Location += new Point(0, -1);
                     _walkingSeconds += deltaTimeS;
                 }
                 else if (InputManager.GetKeyStatus(Keys.Down) || InputManager.GetKeyStatus(Keys.S))
                 {
                     _playerState = PlayerState.Walking;
                     _playerCurrentDirection = Direction.Down;
-                    _location.Y = _location.Y + 1;
+                    Location += new Point(0, 1);
                     _walkingSeconds += deltaTimeS;
                 }
             }
+        }
+
+        public bool ContainsKey(Door.DoorKeyType keyType)
+        {
+            throw new NotImplementedException();
         }
     }
 }
