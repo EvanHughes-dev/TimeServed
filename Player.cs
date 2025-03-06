@@ -43,17 +43,27 @@ namespace MakeEveryDayRecount
             _walkingSeconds = 0;
         }
 
+        /// <summary>
+        /// Updates the player's position in world space
+        /// </summary>
+        /// <param name="deltaTimeS">The elapsed time between frames in seconds</param>
         public override void Update(float deltaTimeS) {
             KeyboardInput(deltaTimeS);
         }
+        /// <summary>
+        /// Draws the player in the center of the screen
+        /// </summary>
+        /// <param name="sb">The instance of spritebatch to be used to draw the player</param>
         public void Draw(SpriteBatch sb) {
             //REMEMBER THEY ONLY DRAW AT THE MIDDLE OF THE SCREEN
             sb.Draw(_sprite, new Rectangle(300, 250, _sprite.Width, _sprite.Height), Color.White);
         }
+        /// <summary>
+        /// Gets keyboard input for player movement and moves the player in world space
+        /// </summary>
+        /// <param name="deltaTimeS">The elapsed time between frames in seconds</param>
         private void KeyboardInput(float deltaTimeS)
         {
-            throw new NotImplementedException("KeyBoardInput has not been created yet in Player");
-
             //if we were walking already
             //if we're going in the same direction we were just going
             //increment the counter
