@@ -1,9 +1,14 @@
 ﻿using System;
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace MakeEveryDayRecount
 {
+    /// <summary>
+    /// Manager of Player and the Map Manager.
+    /// </summary>
     internal class GameplayManager
     {
         /// <summary>
@@ -36,14 +41,22 @@ namespace MakeEveryDayRecount
 
         public void Update(GameTime gameTime)
         {
-            //Check for input
-
-            throw new NotImplementedException("Update has not been created yet in GamePlayManager");
+            //Update Player
+            PlayerObject.Update(deltaTimeS);
         }
 
+        /// <summary>
+        /// Draws the map and the player.
+        /// </summary>
+        /// <param name="sb">sprite batch used to draw</param>
+        /// <exception cref="NotImplementedException"></exception>
         public void Draw(SpriteBatch sb)
         {
+            //Draw the map
             _map.Draw(sb);
+
+            //Draw the player
+            PlayerObject.Draw(sb);
         }
     }
 }
