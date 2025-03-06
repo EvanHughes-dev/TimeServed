@@ -62,19 +62,18 @@ namespace MakeEveryDayRecount
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+            InputManager.Update();
+
             switch (_state)
             {
                 case GameState.Menu:
-                    //If start game button is pressed
-                    //_state = GameState.Level;
+                    //Check if any buttons were clicked
+                    CheckButtonClicks(menuButtons);
                     break;
 
                 case GameState.Pause:
-                    //If quit button is pressed
-                    //_state = GameState.Menu;
-
-                    //If unpaused button is pressed
-                    //_state = GameState.Level;
+                    //Check if any buttons were clicked
+                    CheckButtonClicks(pauseButtons);
                     break;
 
                 case GameState.Level:
@@ -111,8 +110,31 @@ namespace MakeEveryDayRecount
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            //Start the sprite batch
+            _spriteBatch.Begin();
 
+            // TODO: Add your drawing code here
+            switch (_state)
+            {
+                case GameState.Menu:
+                    DrawMenu(_spriteBatch);
+                    break;
+                case GameState.Pause:
+                    DrawPause(_spriteBatch);
+                    break;
+                case GameState.Level:
+                    break;
+                case GameState.Cutscene:
+                    break;
+                case GameState.Playback:
+                    break;
+                default:
+                    break;
+            }
+
+            //End the sprite batch
+
+            _spriteBatch.End();
 
             base.Draw(gameTime);
         }
@@ -147,16 +169,52 @@ namespace MakeEveryDayRecount
             pauseButtons.Add(pauseQuit);
 
             //Fill menu buttons list with buttons
-            Rectangle menuPlayRect = new Rectangle(400, 200, 600, 200);
+            Rectangle menuPlayRect = new Rectangle(400, 200, 300, 100);
             Button menuPlay = new Button(defaultButtonTexture, defaultButtonTexture, menuPlayRect);
             menuPlay.OnClick += MakeSwitchStateAction(GameState.Level);
             menuButtons.Add(menuPlay);
 
-            Rectangle menuQuitRect = new Rectangle(400, 440, 300, 100);
-            Button menuQuit = new Button(defaultButtonTexture, defaultButtonTexture, menuPlayRect);
+            Rectangle menuQuitRect = new Rectangle(400, 340, 100, 40);
+            Button menuQuit = new Button(defaultButtonTexture, defaultButtonTexture, menuQuitRect);
             //menuQuit.OnClick += the method that closes the game
             menuButtons.Add(menuQuit);
 
+        }
+
+        private void CheckButtonClicks(List<Button> list)
+        {
+
+            for (int i = 0; i < list.Count; i++)
+            {
+
+            }
+        }
+
+        /// <summary>
+        /// Draws the main menu.
+        /// </summary>
+        /// <param name="sb">sprite batch used to draw</param>
+        private void DrawMenu(SpriteBatch sb)
+        {
+            //Draw the buttons
+            for (int i = 0; i < menuButtons.Count; i++)
+            {
+                menuButtons[i].Draw(sb);
+            }
+
+        }
+
+        /// <summary>
+        /// Draws the pause menu.
+        /// </summary>
+        /// <param name="sb">sprite batch used to draw</param>
+        private void DrawPause(SpriteBatch sb)
+        {
+            //Draw the buttons
+            for (int i = 0; i < pauseButtons.Count; i++)
+            {
+                pauseButtons[i].Draw(sb);
+            }
         }
 
         /// <summary>

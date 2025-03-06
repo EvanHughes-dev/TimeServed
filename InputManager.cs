@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 namespace MakeEveryDayRecount
 {
+    //Write an enum for mosue states
+    
     /// <summary>
     /// James Young
     /// Holds keyboard state for this frame and keyboard state for the prior frame.
@@ -14,19 +16,23 @@ namespace MakeEveryDayRecount
     /// </summary>
     public static class InputManager
     {        
-        private static KeyboardState PriorState { get; set; }
-        private static KeyboardState CurrentState { get; set; }
+        private static KeyboardState PriorKeyboardState { get; set; }
+        private static KeyboardState CurrentKeyboardState { get; set; }
+        private static MouseState PriorMouseState { get; set; }
+        private static MouseState CurrentMouseState { get; set; }
 
         /// <summary>
-        /// Updates prior and current state.
+        /// Updates prior and current states.
         /// </summary>
         public static void Update()
         {
-            //Set the Prior state to the current state
-            PriorState = CurrentState;
+            //Set the Prior states to the current states
+            PriorKeyboardState = CurrentKeyboardState;
+            PriorMouseState = CurrentMouseState;
 
-            //Get the current Keyboard state
-            CurrentState = Keyboard.GetState();
+            //Get the current states
+            CurrentKeyboardState = Keyboard.GetState();
+            CurrentMouseState = Mouse.GetState();
         }
 
         /// <summary>
@@ -36,7 +42,7 @@ namespace MakeEveryDayRecount
         /// <returns>True if CurrentState is down and PriorState is up, false otherwise</returns>
         public static bool GetKeyPress(Keys key)
         {
-            return CurrentState.IsKeyDown(key) && PriorState.IsKeyUp(key);
+            return CurrentKeyboardState.IsKeyDown(key) && PriorKeyboardState.IsKeyUp(key);
         }
 
         /// <summary>
@@ -46,7 +52,7 @@ namespace MakeEveryDayRecount
         /// <returns>True if CurrentState is up and PriorState is down, false otherwise</returns>
         public static bool GetKeyRelease(Keys key)
         {
-            return CurrentState.IsKeyUp(key) && PriorState.IsKeyDown(key);
+            return CurrentKeyboardState.IsKeyUp(key) && PriorKeyboardState.IsKeyDown(key);
         }
 
         /// <summary>
@@ -57,7 +63,12 @@ namespace MakeEveryDayRecount
         /// <exception cref="NotImplementedException"></exception>
         public static bool GetKeyStatus(Keys key)
         {
-            return CurrentState.IsKeyDown(key);
+            return CurrentKeyboardState.IsKeyDown(key);
+        }
+
+        public static bool GetMousePress(Keys key)
+        {
+            return CurrentMouseState.mouse
         }
     }
 }
