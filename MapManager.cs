@@ -13,7 +13,7 @@ namespace MakeEveryDayRecount
     /// </summary>
     internal class MapManager
     {
-        public Room _currentRoom;
+        private Room _currentRoom;
         private Room[] _rooms;
 
         private readonly GameplayManager _gameplayManager;

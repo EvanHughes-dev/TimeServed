@@ -42,7 +42,7 @@ namespace MakeEveryDayRecount.Map
         /// Get the room's name
         /// </summary>
         public string RoomName { get; private set; }
-        public Tile[,] _map;
+        private Tile[,] _map;
         private List<Item> _itemsInRoom;
         private readonly List<Door> _doors;
 
