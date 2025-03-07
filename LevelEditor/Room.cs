@@ -8,6 +8,8 @@ namespace LevelEditor
 {
     internal class Room
     {
+        public string Name { get; set; }
+
         public int Width { get; }
         public int Height { get; }
 

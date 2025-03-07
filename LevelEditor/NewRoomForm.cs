@@ -9,9 +9,13 @@ namespace LevelEditor
     /// </summary>
     public partial class NewRoomForm : Form
     {
-        public NewRoomForm()
+        private MainForm _mainForm;
+
+        public NewRoomForm(MainForm mainForm)
         {
             InitializeComponent();
+
+            _mainForm = mainForm;
         }
 
         /// <summary>

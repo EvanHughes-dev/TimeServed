@@ -51,7 +51,7 @@
             groupBoxNew.Size = new Size(277, 192);
             groupBoxNew.TabIndex = 1;
             groupBoxNew.TabStop = false;
-            groupBoxNew.Text = "Create New Map";
+            groupBoxNew.Text = "Create New Room";
             // 
             // buttonCreate
             // 
@@ -59,7 +59,7 @@
             buttonCreate.Name = "buttonCreate";
             buttonCreate.Size = new Size(229, 75);
             buttonCreate.TabIndex = 4;
-            buttonCreate.Text = "Create Map";
+            buttonCreate.Text = "Create New Room";
             buttonCreate.UseVisualStyleBackColor = true;
             buttonCreate.Click += buttonCreate_Click;
             // 
@@ -101,7 +101,7 @@
             buttonLoad.Name = "buttonLoad";
             buttonLoad.Size = new Size(229, 75);
             buttonLoad.TabIndex = 0;
-            buttonLoad.Text = "Load Map";
+            buttonLoad.Text = "Import Existing Room";
             buttonLoad.UseVisualStyleBackColor = true;
             buttonLoad.Click += buttonLoad_Click;
             // 
@@ -111,7 +111,7 @@
             openFileDialog.Filter = "Level Files|*.level";
             openFileDialog.Title = "Open a level file";
             // 
-            // MainForm
+            // NewRoomForm
             // 
             AutoScaleMode = AutoScaleMode.None;
             ClientSize = new Size(301, 290);
@@ -119,7 +119,7 @@
             Controls.Add(groupBoxNew);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
-            Name = "MainForm";
+            Name = "NewRoomForm";
             Text = "Level Editor";
             groupBoxNew.ResumeLayout(false);
             groupBoxNew.PerformLayout();
