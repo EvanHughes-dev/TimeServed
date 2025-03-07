@@ -302,6 +302,24 @@ namespace MakeEveryDayRecount.Map
         {
             return _map[pointToCheck.X, pointToCheck.Y].IsWalkable;
         }
+        public Prop VerifyInteractable(Point playerFacing)
+        {
+            foreach(Item prop in _itemsInRoom)
+            {
+                if (playerFacing == prop.Location)
+                {
+                    return prop;
+                }
+            }
+            foreach(Door door in _doors)
+            {
+                if(playerFacing == door.Location)
+                {
+                    return door;
+                }
+            }
+            return null;
+        }
 
         /// <summary>
         /// Remove an object from the room's inventory

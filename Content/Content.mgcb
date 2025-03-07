@@ -73,6 +73,12 @@
 /processorParam:TextureFormat=Color
 /build:item_wireCutters.png
 
+#begin Level1/Caf.room
+/copy:Level1/Caf.room
+
+#begin Level1/Level.level
+/copy:Level1/Level.level
+
 #begin player.png
 /importer:TextureImporter
 /processor:TextureProcessor
