@@ -198,5 +198,23 @@ namespace MakeEveryDayRecount
         {
             throw new NotImplementedException();
         }
+
+        public void Interact() 
+        {
+            Prop thing; //change the name of this variable later
+
+            switch (_playerCurrentDirection)
+            {
+                case Direction.Left:
+                    //thing = .CheckInteractable(Location + new Point(-1, 0));
+                    break;
+                case Direction.Up:
+                    break;
+                case Direction.Right:
+                    break;
+                case Direction.Down:
+                    break;
+            }
+        }
     }
 }
