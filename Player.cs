@@ -212,5 +212,11 @@ namespace MakeEveryDayRecount
         {
             throw new NotImplementedException();
         }
+
+        public void PickUpItem(Item item)
+        {
+            throw new NotImplementedException();
+            //add the item to your inventory
+        }
     }
 }
