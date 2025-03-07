@@ -98,7 +98,7 @@ namespace MakeEveryDayRecount
                 }
                 else if (InputManager.GetKeyStatus(Keys.Right) || InputManager.GetKeyStatus(Keys.D))
                 {
-                    if (_playerCurrentDirection == Direction.Right)
+                    if (_playerCurrentDirection == Direction.Right && _currentMap.CheckPlayerCollision(Location + new Point(1, 0)))
                     {
                         _walkingSeconds += deltaTimeS;
                         if (_walkingSeconds >= _secondsPerTile)
@@ -107,7 +107,7 @@ namespace MakeEveryDayRecount
                             _walkingSeconds -= _secondsPerTile;
                         }
                     }
-                    else
+                    else if (_currentMap.CheckPlayerCollision(Location + new Point(1, 0)))
                     {
                         _walkingSeconds = 0;
                         Location += new Point(1, 0);
@@ -116,7 +116,7 @@ namespace MakeEveryDayRecount
                 }
                 else if (InputManager.GetKeyStatus(Keys.Up) || InputManager.GetKeyStatus(Keys.W))
                 {
-                    if (_playerCurrentDirection == Direction.Up)
+                    if (_playerCurrentDirection == Direction.Up && _currentMap.CheckPlayerCollision(Location + new Point(0, -1)))
                     {
                         _walkingSeconds += deltaTimeS;
                         if (_walkingSeconds >= _secondsPerTile)
@@ -125,7 +125,7 @@ namespace MakeEveryDayRecount
                             _walkingSeconds -= _secondsPerTile;
                         }
                     }
-                    else
+                    else if (_currentMap.CheckPlayerCollision(Location + new Point(0, -1)))
                     {
                         _walkingSeconds = 0;
                         Location += new Point(0, -1);
@@ -134,7 +134,7 @@ namespace MakeEveryDayRecount
                 }
                 else if (InputManager.GetKeyStatus(Keys.Down) || InputManager.GetKeyStatus(Keys.S))
                 {
-                    if (_playerCurrentDirection == Direction.Down)
+                    if (_playerCurrentDirection == Direction.Down && _currentMap.CheckPlayerCollision(Location + new Point(0, 1)))
                     {
                         _walkingSeconds += deltaTimeS;
                         if (_walkingSeconds >= _secondsPerTile)
@@ -143,7 +143,7 @@ namespace MakeEveryDayRecount
                             _walkingSeconds -= _secondsPerTile;
                         }
                     }
-                    else
+                    else if (_currentMap.CheckPlayerCollision(Location + new Point(0, 1)))
                     {
                         _walkingSeconds = 0;
                         Location += new Point(0, 1);
@@ -163,28 +163,28 @@ namespace MakeEveryDayRecount
             {
 
                 //if some key is pressed, move in the corresponding direction and increment the walking counter
-                if (InputManager.GetKeyStatus(Keys.Left) || InputManager.GetKeyStatus(Keys.A))
+                if (InputManager.GetKeyStatus(Keys.Left) || InputManager.GetKeyStatus(Keys.A) && _currentMap.CheckPlayerCollision(Location + new Point(-1, 0)))
                 {
                     _playerState = PlayerState.Walking;
                     _playerCurrentDirection = Direction.Left;
                     Location += new Point(-1, 0);
                     _walkingSeconds += deltaTimeS;
                 }
-                else if (InputManager.GetKeyStatus(Keys.Right) || InputManager.GetKeyStatus(Keys.D))
+                else if (InputManager.GetKeyStatus(Keys.Right) || InputManager.GetKeyStatus(Keys.D) && _currentMap.CheckPlayerCollision(Location + new Point(1, 0)))
                 {
                     _playerState = PlayerState.Walking;
                     _playerCurrentDirection = Direction.Right;
                     Location += new Point(1, 0);
                     _walkingSeconds += deltaTimeS;
                 }
-                else if (InputManager.GetKeyStatus(Keys.Up) || InputManager.GetKeyStatus(Keys.W))
+                else if (InputManager.GetKeyStatus(Keys.Up) || InputManager.GetKeyStatus(Keys.W) && _currentMap.CheckPlayerCollision(Location + new Point(0, 1)))
                 {
                     _playerState = PlayerState.Walking;
                     _playerCurrentDirection = Direction.Up;
                     Location += new Point(0, -1);
                     _walkingSeconds += deltaTimeS;
                 }
-                else if (InputManager.GetKeyStatus(Keys.Down) || InputManager.GetKeyStatus(Keys.S))
+                else if (InputManager.GetKeyStatus(Keys.Down) || InputManager.GetKeyStatus(Keys.S) && _currentMap.CheckPlayerCollision(Location + new Point(0, 1)))
                 {
                     _playerState = PlayerState.Walking;
                     _playerCurrentDirection = Direction.Down;
