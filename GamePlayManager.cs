@@ -35,15 +35,15 @@ namespace MakeEveryDayRecount
         public GameplayManager(Vector2 screenSize)
         {
             Level = 1;
-            PlayerObject = new Player(Point.Zero, AssetManager.PlayerTexture, this);
-            Map = new MapManager(this);
+            PlayerObject = new Player(new Point(3, 3), AssetManager.PlayerTexture, this);
+            _map = new MapManager(this);
             ScreenSize = screenSize;
         }
 
         public void Update(GameTime gameTime)
         {
             //Update Player
-            PlayerObject.Update(gameTime.ElapsedGameTime.Milliseconds);
+            PlayerObject.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
         }
 
         /// <summary>

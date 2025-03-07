@@ -30,7 +30,7 @@ namespace MakeEveryDayRecount
         public Point PlayerScreenPosition { get; private set; }
         private Direction _playerCurrentDirection;
         private PlayerState _playerState;
-        private readonly float _secondsPerTile = 1f;
+        private readonly float _secondsPerTile = .2f;
         private float _walkingSeconds;
 
         //A reference to the gameplay manager which has a reference to the map which lets the player know what's near them
@@ -38,6 +38,7 @@ namespace MakeEveryDayRecount
         //This is a variable that lets me easily get the current map manager so I can verify that tiles are walkable
         private MapManager _currentMap;
 
+        private const int TileSize = 128;
         private List<GameObject> _inventory;
 
         private Rectangle _sourceRectangle;
@@ -52,17 +53,39 @@ namespace MakeEveryDayRecount
             _currentMap = _gameplayManager.Map;
         }
 
+        /// <summary>
+        /// Updates the player's position in world space
+        /// </summary>
+        /// <param name="deltaTimeS">The elapsed time between frames in seconds</param>
         public void Update(float deltaTimeS)
         {
             KeyboardInput(deltaTimeS);
         }
 
+        /// <summary>
+        /// Draws the player in the center of the screen
+        /// </summary>
+        /// <param name="sb">The instance of spritebatch to be used to draw the player</param>
         public void Draw(SpriteBatch sb)
         {
-            //REMEMBER THEY ONLY DRAW AT THE MIDDLE OF THE SCREEN
-            sb.Draw(Sprite, new Rectangle(300, 250, Sprite.Width, Sprite.Height), Color.White);
+            //REMEMBER THEY ONLY DRAW AT THE CENTER TILE
+            //TODO add the ability for the player to walk up to but into through the walls
+            sb.Draw(
+                Sprite,
+                new Rectangle(
+                    (int)(_gamePlayManager.ScreenSize.X / 2 / TileSize) * TileSize,
+                    (int)(_gamePlayManager.ScreenSize.Y / 2 / TileSize) * TileSize,
+                    TileSize,
+                    TileSize
+                ),
+                Color.White
+            );
         }
 
+        /// <summary>
+        /// Gets keyboard input for player movement and moves the player in world space
+        /// </summary>
+        /// <param name="deltaTimeS">The elapsed time between frames in seconds</param>
         private void KeyboardInput(float deltaTimeS)
         {
             #region Walking movement
@@ -81,6 +104,9 @@ namespace MakeEveryDayRecount
             {
                 if (InputManager.GetKeyStatus(Keys.Left) || InputManager.GetKeyStatus(Keys.A))
                 {
+                    //if we're going in the same direction we were just going
+                    //increment the counter
+                    //if the counter is high enough, move by one in our current direction and reduce the counter by the threshold amount
                     if (_playerCurrentDirection == Direction.Left)
                     {
                         _walkingSeconds += deltaTimeS;
@@ -96,6 +122,7 @@ namespace MakeEveryDayRecount
                         Location += new Point(-1, 0);
                         _playerCurrentDirection = Direction.Left;
                     }
+                    //this structure is the same for all the keys
                 }
                 else if (InputManager.GetKeyStatus(Keys.Right) || InputManager.GetKeyStatus(Keys.D))
                 {
@@ -164,7 +191,6 @@ namespace MakeEveryDayRecount
             //if we're standing
             if (_playerState == PlayerState.Standing)
             {
-
                 //if some key is pressed, move in the corresponding direction and increment the walking counter
                 if (InputManager.GetKeyStatus(Keys.Left) || InputManager.GetKeyStatus(Keys.A) && _currentMap.CheckPlayerCollision(Location + new Point(-1, 0)))
                 {
