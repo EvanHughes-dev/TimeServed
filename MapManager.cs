@@ -59,6 +59,10 @@ namespace MakeEveryDayRecount
         {
             return _currentRoom.VerifyWalkable(playerDest);
         }
+        public Prop CheckInteractable(Point playerFacing) 
+        {
+            return _currentRoom.VerifyInteractable(playerFacing);
+        }
 
         /// <summary>
         /// Load all the needed data relating to each room
