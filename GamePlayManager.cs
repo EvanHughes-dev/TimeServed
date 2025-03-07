@@ -35,8 +35,8 @@ namespace MakeEveryDayRecount
         public GameplayManager(Vector2 screenSize)
         {
             Level = 1;
+            Map = new MapManager(this);
             PlayerObject = new Player(new Point(3, 3), AssetManager.PlayerTexture, this);
-            _map = new MapManager(this);
             ScreenSize = screenSize;
         }
 

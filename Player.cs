@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using MakeEveryDayRecount.GameObjects;
 using MakeEveryDayRecount.GameObjects.Props;
 using MakeEveryDayRecount.Map;
@@ -50,6 +51,7 @@ namespace MakeEveryDayRecount
             //NOTE: For now, the player's screen position is always in the middle
             _walkingSeconds = 0;
             _gameplayManager = gameplayManager;
+            Debug.WriteLine(_gameplayManager.Map);
             _currentMap = _gameplayManager.Map;
         }
 
@@ -73,8 +75,8 @@ namespace MakeEveryDayRecount
             sb.Draw(
                 Sprite,
                 new Rectangle(
-                    (int)(_gamePlayManager.ScreenSize.X / 2 / TileSize) * TileSize,
-                    (int)(_gamePlayManager.ScreenSize.Y / 2 / TileSize) * TileSize,
+                    (int)(_gameplayManager.ScreenSize.X / 2 / TileSize) * TileSize,
+                    (int)(_gameplayManager.ScreenSize.Y / 2 / TileSize) * TileSize,
                     TileSize,
                     TileSize
                 ),
@@ -116,6 +118,10 @@ namespace MakeEveryDayRecount
                             _walkingSeconds -= _secondsPerTile;
                         }
                     }
+                    //if our direction has changed
+                    //reset the counter
+                    //move by 1 in the new direction
+                    //change the player's direction
                     else if (_currentMap.CheckPlayerCollision(Location + new Point(-1, 0)))
                     {
                         _walkingSeconds = 0;
