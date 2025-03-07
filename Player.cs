@@ -65,6 +65,7 @@ namespace MakeEveryDayRecount
 
         private void KeyboardInput(float deltaTimeS)
         {
+            #region Walking movement
             //if we were walking already
             //if we're going in the same direction we were just going
             //increment the counter
@@ -158,6 +159,8 @@ namespace MakeEveryDayRecount
                     //but don't change the direction you're facing
                 }
             }
+            #endregion
+            #region Standing movement
             //if we're standing
             if (_playerState == PlayerState.Standing)
             {
@@ -192,6 +195,7 @@ namespace MakeEveryDayRecount
                     _walkingSeconds += deltaTimeS;
                 }
             }
+            #endregion
         }
 
         public bool ContainsKey(Door.DoorKeyType keyType)
