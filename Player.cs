@@ -40,7 +40,7 @@ namespace MakeEveryDayRecount
         private MapManager _currentMap;
 
         private const int TileSize = 128;
-        private List<GameObject> _inventory;
+        private List<Item> _inventory;
 
         private Rectangle _sourceRectangle;
         private Texture2D _playerTextures; //Probably a sprite sheet
@@ -232,7 +232,15 @@ namespace MakeEveryDayRecount
 
         public bool ContainsKey(Door.DoorKeyType keyType)
         {
-            throw new NotImplementedException();
+            foreach (Item item in _inventory)
+            {
+                if (item.ItemKeyType == keyType)
+                {
+                    return true;
+                }
+            }
+            //if we check the whole inventory and don't find anything
+            return false;
         }
 
         public void PickUpItem(Item item)
