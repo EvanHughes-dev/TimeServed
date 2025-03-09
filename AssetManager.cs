@@ -12,7 +12,7 @@ namespace MakeEveryDayRecount
         /// </summary>
         public static Texture2D[] TileMap { get; private set; }
         /// <summary>
-        /// Spritesheet for the player
+        /// Sprite sheet for the player
         /// </summary>
         public static Texture2D PlayerTexture { get; private set; }
         /// <summary>

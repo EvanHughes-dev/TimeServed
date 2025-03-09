@@ -2,6 +2,8 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MakeEveryDayRecount.Map;
+using MakeEveryDayRecount.Debug;
+
 
 namespace MakeEveryDayRecount
 {
@@ -31,6 +33,9 @@ namespace MakeEveryDayRecount
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+
+            DebugMode.Initialize();
+
         }
 
         protected override void Initialize()
@@ -47,6 +52,7 @@ namespace MakeEveryDayRecount
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             AssetManager.LoadContent(Content);
+            DebugMode.SetFont(Content.Load<SpriteFont>("Arial20"));
             // Gameplay manager must be called after all content is loaded
             //TOFO figure out a new way to access screen size
             _gameplayManager = new GameplayManager();
@@ -73,6 +79,9 @@ namespace MakeEveryDayRecount
             GraphicsDevice.Clear(Color.CornflowerBlue);
             _spriteBatch.Begin();
             _gameplayManager.Draw(_spriteBatch);
+
+            DebugMode.Draw(_spriteBatch);
+
             // TODO: Add your drawing code here
             _spriteBatch.End();
             base.Draw(gameTime);

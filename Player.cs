@@ -1,6 +1,4 @@
-﻿// Ignore Spelling: gameplay
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using MakeEveryDayRecount.GameObjects;
 using MakeEveryDayRecount.GameObjects.Props;
@@ -8,6 +6,7 @@ using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MakeEveryDayRecount.Debug;
 
 namespace MakeEveryDayRecount
 {
