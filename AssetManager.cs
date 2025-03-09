@@ -44,7 +44,7 @@ namespace MakeEveryDayRecount
             };
             PlayerTexture = content.Load<Texture2D>("player");
 
-            TileSize = new Point(PlayerTexture.Width, PlayerTexture.Height);
+            TileSize = new Point(TileMap[0].Width, TileMap[0].Height);
         }
     }
 }
