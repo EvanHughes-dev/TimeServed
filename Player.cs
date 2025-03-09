@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using MakeEveryDayRecount.GameObjects;
 using MakeEveryDayRecount.GameObjects.Props;
+using MakeEveryDayRecount.Map;
+using MakeEveryDayRecount.Map.Tiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -35,12 +38,16 @@ namespace MakeEveryDayRecount
         private float _walkingSeconds;
         private bool _readyToMove;
 
+        //A reference to the gameplay manager which has a reference to the map which lets the player know what's near them
+        private readonly GameplayManager _gameplayManager;
+        //This is a variable that lets me easily get the current map manager so I can verify that tiles are walkable
+        private MapManager _currentMap;
+
+        private const int TileSize = 128;
         private List<GameObject> _inventory;
 
         private Rectangle _sourceRectangle;
         private Texture2D _playerTextures; //Probably a sprite sheet
-
-        private GameplayManager _gamePlayManager;
 
         public Player(Point location, Texture2D sprite, GameplayManager gameplayManager)
             : base(location, sprite)

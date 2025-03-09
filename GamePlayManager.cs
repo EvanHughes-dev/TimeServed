@@ -11,7 +11,7 @@ namespace MakeEveryDayRecount
     internal class GameplayManager
     {
         /// <summary>
-        /// Access the player's current level
+        /// The current level being played
         /// </summary>
         public int Level { get; private set; }
 
@@ -32,6 +32,7 @@ namespace MakeEveryDayRecount
         public GameplayManager()
         {
             Level = 1;
+            Map = new MapManager(this);
             PlayerObject = new Player(new Point(3, 3), AssetManager.PlayerTexture, this);
             Map = new MapManager(this);
           
