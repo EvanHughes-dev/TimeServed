@@ -5,6 +5,7 @@ using MakeEveryDayRecount.GameObjects.Props;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MakeEveryDayRecount.Map;
 
 namespace MakeEveryDayRecount
 {
@@ -26,12 +27,14 @@ namespace MakeEveryDayRecount
         }
 
         public Point PlayerScreenPosition { get; private set; }
+        
         private Direction _playerCurrentDirection;
         private PlayerState _playerState;
+
         private readonly float _secondsPerTile = .2f;
         private float _walkingSeconds;
+        private bool _readyToMove;
 
-        private const int TileSize = 128;
         private List<GameObject> _inventory;
 
         private Rectangle _sourceRectangle;
@@ -45,6 +48,7 @@ namespace MakeEveryDayRecount
             //NOTE: For now, the player's screen position is always in the middle
             _walkingSeconds = 0;
             _gamePlayManager = gameplayManager;
+            _readyToMove = true;
         }
 
         /// <summary>
@@ -54,6 +58,7 @@ namespace MakeEveryDayRecount
         public void Update(float deltaTimeS)
         {
             KeyboardInput(deltaTimeS);
+            UpdatePlayerPos();
         }
 
         /// <summary>
@@ -67,10 +72,8 @@ namespace MakeEveryDayRecount
             sb.Draw(
                 Sprite,
                 new Rectangle(
-                    (int)(_gamePlayManager.ScreenSize.X / 2 / TileSize) * TileSize,
-                    (int)(_gamePlayManager.ScreenSize.Y / 2 / TileSize) * TileSize,
-                    TileSize,
-                    TileSize
+                    PlayerScreenPosition,
+                    AssetManager.TileSize
                 ),
                 Color.White
             );
@@ -79,133 +82,106 @@ namespace MakeEveryDayRecount
         /// <summary>
         /// Gets keyboard input for player movement and moves the player in world space
         /// </summary>
-        /// <param name="deltaTimeS">The elapsed time between frames in seconds</param>
-        private void KeyboardInput(float deltaTimeS)
+        /// <param name="deltaTime">The elapsed time between frames in seconds</param>
+        private void KeyboardInput(float deltaTime)
         {
-            //if we were walking already
-            if (_playerState == PlayerState.Walking)
-            {
+            
                 if (InputManager.GetKeyStatus(Keys.Left) || InputManager.GetKeyStatus(Keys.A))
                 {
-                    //if we're going in the same direction we were just going
-                    //increment the counter
-                    //if the counter is high enough, move by one in our current direction and reduce the counter by the threshold amount
-                    if (_playerCurrentDirection == Direction.Left)
+                     UpdateWalkingTime(deltaTime);
+                    if (_readyToMove)
                     {
-                        _walkingSeconds += deltaTimeS;
-                        if (_walkingSeconds >= _secondsPerTile)
-                        {
-                            Location += new Point(-1, 0);
-                            _walkingSeconds -= _secondsPerTile;
-                        }
-                    }
-                    //if our direction has changed
-                    //reset the counter
-                    //move by 1 in the new direction
-                    //change the player's direction
-                    else
-                    {
-                        _walkingSeconds = 0;
                         Location += new Point(-1, 0);
-                        _playerCurrentDirection = Direction.Left;
+                        _readyToMove = false;
                     }
-                    //this structure is the same for all the keys
+
+                // Update the player's walking state if needed
+                if (_playerCurrentDirection!=Direction.Left)
+                        _playerCurrentDirection = Direction.Left;
+                    if (_playerState == PlayerState.Standing)
+                        _playerState = PlayerState.Walking;
+
                 }
                 else if (InputManager.GetKeyStatus(Keys.Right) || InputManager.GetKeyStatus(Keys.D))
                 {
-                    if (_playerCurrentDirection == Direction.Right)
+                    UpdateWalkingTime(deltaTime);
+                    if (_readyToMove)
                     {
-                        _walkingSeconds += deltaTimeS;
-                        if (_walkingSeconds >= _secondsPerTile)
-                        {
-                            Location += new Point(1, 0);
-                            _walkingSeconds -= _secondsPerTile;
-                        }
-                    }
-                    else
-                    {
-                        _walkingSeconds = 0;
                         Location += new Point(1, 0);
-                        _playerCurrentDirection = Direction.Right;
+                        _readyToMove = false;
                     }
+
+                // Update the player's walking state if needed
+                if (_playerCurrentDirection != Direction.Right)
+                        _playerCurrentDirection = Direction.Right;
+                    if (_playerState == PlayerState.Standing)
+                        _playerState = PlayerState.Walking;
                 }
                 else if (InputManager.GetKeyStatus(Keys.Up) || InputManager.GetKeyStatus(Keys.W))
                 {
-                    if (_playerCurrentDirection == Direction.Up)
+                    UpdateWalkingTime(deltaTime);
+                    if (_readyToMove)
                     {
-                        _walkingSeconds += deltaTimeS;
-                        if (_walkingSeconds >= _secondsPerTile)
-                        {
-                            Location += new Point(0, -1);
-                            _walkingSeconds -= _secondsPerTile;
-                        }
-                    }
-                    else
-                    {
-                        _walkingSeconds = 0;
                         Location += new Point(0, -1);
-                        _playerCurrentDirection = Direction.Up;
+                        _readyToMove = false;
                     }
+
+                // Update the player's walking state if needed
+                if (_playerCurrentDirection != Direction.Up)
+                        _playerCurrentDirection = Direction.Up;
+                    if (_playerState == PlayerState.Standing)
+                        _playerState = PlayerState.Walking;
                 }
                 else if (InputManager.GetKeyStatus(Keys.Down) || InputManager.GetKeyStatus(Keys.S))
                 {
-                    if (_playerCurrentDirection == Direction.Down)
+                    UpdateWalkingTime(deltaTime);
+                    if (_readyToMove)
                     {
-                        _walkingSeconds += deltaTimeS;
-                        if (_walkingSeconds >= _secondsPerTile)
-                        {
-                            Location += new Point(0, 1);
-                            _walkingSeconds -= _secondsPerTile;
-                        }
-                    }
-                    else
-                    {
-                        _walkingSeconds = 0;
                         Location += new Point(0, 1);
-                        _playerCurrentDirection = Direction.Down;
+                        _readyToMove = false;
                     }
+
+                    // Update the player's walking state if needed
+                    if (_playerCurrentDirection != Direction.Down)
+                        _playerCurrentDirection = Direction.Down;
+                    if (_playerState == PlayerState.Standing)
+                        _playerState = PlayerState.Walking;
                 }
                 //if we were walking and we stop pressing a key, go back to standing
                 else
                 {
                     _playerState = PlayerState.Standing;
                     _walkingSeconds = 0;
+                    _readyToMove = true;
                     //but don't change the direction you're facing
                 }
-            }
-            //if we're standing
-            if (_playerState == PlayerState.Standing)
+                       
+        }
+
+        /// <summary>
+        /// Update the time value in between each movements
+        /// </summary>
+        /// <param name="deltaTime">Time that has elapsed since last frame</param>
+        private void UpdateWalkingTime(float deltaTime)
+        {
+            _walkingSeconds += deltaTime;
+            if (_walkingSeconds >= _secondsPerTile)
             {
-                //if some key is pressed, move in the corresponding direction and increment the walking counter
-                if (InputManager.GetKeyStatus(Keys.Left) || InputManager.GetKeyStatus(Keys.A))
-                {
-                    _playerState = PlayerState.Walking;
-                    _playerCurrentDirection = Direction.Left;
-                    Location += new Point(-1, 0);
-                    _walkingSeconds += deltaTimeS;
-                }
-                else if (InputManager.GetKeyStatus(Keys.Right) || InputManager.GetKeyStatus(Keys.D))
-                {
-                    _playerState = PlayerState.Walking;
-                    _playerCurrentDirection = Direction.Right;
-                    Location += new Point(1, 0);
-                    _walkingSeconds += deltaTimeS;
-                }
-                else if (InputManager.GetKeyStatus(Keys.Up) || InputManager.GetKeyStatus(Keys.W))
-                {
-                    _playerState = PlayerState.Walking;
-                    _playerCurrentDirection = Direction.Up;
-                    Location += new Point(0, -1);
-                    _walkingSeconds += deltaTimeS;
-                }
-                else if (InputManager.GetKeyStatus(Keys.Down) || InputManager.GetKeyStatus(Keys.S))
-                {
-                    _playerState = PlayerState.Walking;
-                    _playerCurrentDirection = Direction.Down;
-                    Location += new Point(0, 1);
-                    _walkingSeconds += deltaTimeS;
-                }
+                _readyToMove = true;
+                _walkingSeconds -= _secondsPerTile;
             }
+        }
+
+        /// <summary>
+        /// Convert from the player's tile position to world position
+        /// </summary>
+        private void UpdatePlayerPos()
+        {
+
+            Point playerWorldPos = MapUtils.TileToWorld(Location);
+            Point worldToScreen = MapUtils.WorldToScreen();
+
+            PlayerScreenPosition = playerWorldPos - worldToScreen;      
         }
 
         public bool ContainsKey(Door.DoorKeyType keyType)

@@ -1,5 +1,7 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
+
 
 namespace MakeEveryDayRecount
 {
@@ -21,7 +23,10 @@ namespace MakeEveryDayRecount
         /// Array of the assets for the props in the game
         /// </summary>
         public static Texture2D[] PropTextures { get; private set; }
-
+        /// <summary>
+        /// The size of all tiles
+        /// </summary>
+        public static Point TileSize { get; private set; }
         public static void LoadContent(ContentManager content)
         {
             PropTextures = new Texture2D[]
@@ -38,6 +43,8 @@ namespace MakeEveryDayRecount
                 content.Load<Texture2D>("tile_testWalkable")
             };
             PlayerTexture = content.Load<Texture2D>("player");
+
+            TileSize = new Point(PlayerTexture.Width, PlayerTexture.Height);
         }
     }
 }

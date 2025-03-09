@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MakeEveryDayRecount.Map;
 
 namespace MakeEveryDayRecount
 {
@@ -23,7 +24,7 @@ namespace MakeEveryDayRecount
 
         private GameplayManager _gameplayManager;
 
-        private readonly Vector2 _screenSize = new Vector2(1000, 1000);
+        private readonly Point _screenSize = new Point(1280, 1152);
 
         public Game1()
         {
@@ -38,6 +39,7 @@ namespace MakeEveryDayRecount
             _graphics.PreferredBackBufferWidth = (int)_screenSize.X;
             _graphics.PreferredBackBufferHeight = (int)_screenSize.Y;
             _graphics.ApplyChanges();
+            MapUtils.ScreenSize = _screenSize;
             base.Initialize();
         }
 
@@ -47,7 +49,7 @@ namespace MakeEveryDayRecount
             AssetManager.LoadContent(Content);
             // Gameplay manager must be called after all content is loaded
             //TOFO figure out a new way to access screen size
-            _gameplayManager = new GameplayManager(_screenSize);
+            _gameplayManager = new GameplayManager();
             // TODO: use this.Content to load your game content here
         }
 

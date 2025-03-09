@@ -1,4 +1,5 @@
 ﻿using System;
+using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -20,21 +21,21 @@ namespace MakeEveryDayRecount
         public Player PlayerObject { get; private set; }
 
         /// <summary>
-        /// Get the size of the screen
+        /// Access the current MapManager
         /// </summary>
-        public Vector2 ScreenSize { get; private set; }
-        private MapManager _map;
+        public MapManager Map { get; private set; }
 
         /// <summary>
         /// Initialize GameplayManager
         /// </summary>
         /// <param name="screenSize">Size of the screen</param>
-        public GameplayManager(Vector2 screenSize)
+        public GameplayManager()
         {
             Level = 1;
             PlayerObject = new Player(new Point(3, 3), AssetManager.PlayerTexture, this);
-            _map = new MapManager(this);
-            ScreenSize = screenSize;
+            Map = new MapManager(this);
+          
+            MapUtils.SetCurrentPlayer(PlayerObject);
         }
 
         public void Update(GameTime gameTime)
@@ -51,7 +52,7 @@ namespace MakeEveryDayRecount
         public void Draw(SpriteBatch sb)
         {
             //Draw the map
-            _map.Draw(sb);
+            Map.Draw(sb);
 
             //Draw the player
             PlayerObject.Draw(sb);

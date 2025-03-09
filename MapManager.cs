@@ -27,6 +27,7 @@ namespace MakeEveryDayRecount
             _gameplayManager = gameplayManager;
             _rooms = LoadMapData(_gameplayManager.Level);
             _currentRoom = _rooms[0];
+            MapUtils.SetCurrentRoom(_currentRoom);
 
             foreach (Room room in _rooms)
             {
@@ -37,6 +38,7 @@ namespace MakeEveryDayRecount
         public void TransitionRoom(Door transDoor)
         {
             _currentRoom = _rooms[transDoor.DestRoom];
+            MapUtils.SetCurrentRoom(_currentRoom);
             // Figure out how to update the player's position
             throw new NotImplementedException("TransitionRoom not been created yet in MapManager");
         }
@@ -47,7 +49,7 @@ namespace MakeEveryDayRecount
         /// <param name="batch">Batch of sprites to add to</param>
         public void Draw(SpriteBatch batch)
         {
-            _currentRoom.Draw(batch, _gameplayManager.PlayerObject, _gameplayManager.ScreenSize);
+            _currentRoom.Draw(batch);
         }
 
         /// <summary>
