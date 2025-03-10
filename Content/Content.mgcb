@@ -20,6 +20,30 @@
 /processorParam:TextureFormat=Compressed
 /build:Arial20.spritefont
 
+#begin DebugAssets/NOT_WALKABLE.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:DebugAssets/NOT_WALKABLE.png
+
+#begin DebugAssets/WALKABLE.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:DebugAssets/WALKABLE.png
+
 #begin item_hook.png
 /importer:TextureImporter
 /processor:TextureProcessor

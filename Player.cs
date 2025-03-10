@@ -32,6 +32,16 @@ namespace MakeEveryDayRecount
         private Direction _playerCurrentDirection;
         private PlayerState _playerState;
 
+        /// <summary>
+        /// Get the player's current state
+        /// </summary>
+        public PlayerState CurrentPlayerState { get { return _playerState; } }
+
+        /// <summary>
+        /// Get the direction the player is facing
+        /// </summary>
+        public Direction PlayerCurrentDirection {  get { return _playerCurrentDirection; } }    
+
         private readonly float _secondsPerTile = .2f;
         private float _walkingSeconds;
         private bool _readyToMove;
@@ -109,9 +119,9 @@ namespace MakeEveryDayRecount
             else
             {
                 _playerState = PlayerState.Standing;
-                _walkingSeconds = 0;
-                _readyToMove = true;
-                 //but don't change the direction you're facing
+                if (!_readyToMove)
+                    UpdateWalkingTime(deltaTime);
+                //but don't change the direction you're facing
             }
                        
         }
@@ -151,7 +161,7 @@ namespace MakeEveryDayRecount
             if (_walkingSeconds >= _secondsPerTile)
             {
                 _readyToMove = true;
-                _walkingSeconds -= _secondsPerTile;
+                _walkingSeconds = 0;
             }
         }
 
