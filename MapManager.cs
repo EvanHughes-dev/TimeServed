@@ -22,6 +22,14 @@ namespace MakeEveryDayRecount
         public event OnRoomUpdate OnRoomUpdate;
 
         private Room _currentRoom;
+
+        /// <summary>
+        /// Get the current room on the map
+        /// </summary>
+        public Room CurrentRoom
+        {
+            get => _currentRoom;
+        }
         private Room[] _rooms;
 
         private readonly GameplayManager _gameplayManager;

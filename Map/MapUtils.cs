@@ -138,6 +138,10 @@ namespace MakeEveryDayRecount.Map
             ScreenSize = game1.ScreenSize;
             gameplayManager.OnPlayerUpdate += SetCurrentPlayer;
             gameplayManager.Map.OnRoomUpdate += SetCurrentRoom;
+            // Despite the delegate event systems, the object have already been initialized in
+            // memory before the function is added to the event, so get the initial value manually
+            _currentPlayer = gameplayManager.PlayerObject;
+            _currentRoom = gameplayManager.Map.CurrentRoom;
         }
     }
 }
