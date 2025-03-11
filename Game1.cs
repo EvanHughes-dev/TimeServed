@@ -1,9 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using MakeEveryDayRecount.Debug;
+using MakeEveryDayRecount.DebugModes;
+using MakeEveryDayRecount.Map;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MakeEveryDayRecount.Map;
-using MakeEveryDayRecount.Debug;
-
 
 namespace MakeEveryDayRecount
 {
@@ -18,8 +18,6 @@ namespace MakeEveryDayRecount
         Cutscene,
         Playback
     }
-
-   
 
     public class Game1 : Game
     {
@@ -49,7 +47,7 @@ namespace MakeEveryDayRecount
             IsMouseVisible = true;
 
             _debugState = DebugState.None;
-            DebugMode.Initialize();
+            GlobalDebug.Initialize();
             _debugModes = new BaseDebug[2];
         }
 
@@ -68,7 +66,7 @@ namespace MakeEveryDayRecount
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             AssetManager.LoadContent(Content);
             SpriteFont sf = Content.Load<SpriteFont>("Arial20");
-            DebugMode.SetFont(sf);
+            GlobalDebug.SetFont(sf);
 
             // Gameplay manager must be called after all content is loaded
             _gameplayManager = new GameplayManager();
@@ -101,7 +99,7 @@ namespace MakeEveryDayRecount
             switch (_debugState)
             {
                 case DebugState.Global:
-                    DebugMode.Draw(_spriteBatch);
+                    GlobalDebug.Draw(_spriteBatch);
                     break;
                 case DebugState.Player:
                     _debugModes[0].Draw(_spriteBatch);
@@ -119,12 +117,12 @@ namespace MakeEveryDayRecount
         /// Check for user input that effect the game state or debug
         /// modes of the overall game
         /// </summary>
-        private void CheckKeyboardInput() {
-
+        private void CheckKeyboardInput()
+        {
             // Use F1-F4 to control the Debug Modes
             // We don't need to check if the function
             // key is pressed or if the computer is in
-            // function lock since they have separate 
+            // function lock since they have separate
             // key codes and are sent to the OS separately
             if (InputManager.GetKeyStatus(Keys.F1))
                 _debugState = DebugState.None;
@@ -134,7 +132,6 @@ namespace MakeEveryDayRecount
                 _debugState = DebugState.Player;
             else if (InputManager.GetKeyStatus(Keys.F4))
                 _debugState = DebugState.Room;
-
         }
 
         private void DisplayPauseMenu(SpriteBatch sb) { }
