@@ -1,7 +1,6 @@
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
-
 
 namespace MakeEveryDayRecount
 {
@@ -11,32 +10,37 @@ namespace MakeEveryDayRecount
         /// Array with every type of tile asset we have in the game
         /// </summary>
         public static Texture2D[] TileMap { get; private set; }
+
         /// <summary>
         /// Sprite sheet for the player
         /// </summary>
         public static Texture2D PlayerTexture { get; private set; }
+
         /// <summary>
         /// Texture for the door
         /// </summary>
         public static Texture2D DoorTexture { get; private set; }
+
         /// <summary>
         /// Array of the assets for the props in the game
         /// </summary>
         public static Texture2D[] PropTextures { get; private set; }
+
         /// <summary>
         /// Texture for the debug tile for walkable tiles
         /// </summary>
         public static Texture2D DebugWalkableTile { get; private set; }
+
         /// <summary>
         /// Texture for the debug tile for not walkable tiles
         /// </summary>
         public static Texture2D DebugNotWalkableTile { get; private set; }
+
         /// <summary>
-        /// The size of all tiles in pixels
+        /// The size of each tile, in pixels in pixels
         /// </summary>
         public static Point TileSize { get; private set; }
 
-        
         public static void LoadContent(ContentManager content)
         {
             PropTextures = new Texture2D[]
@@ -56,7 +60,7 @@ namespace MakeEveryDayRecount
 
             DebugWalkableTile = content.Load<Texture2D>("DebugAssets/WALKABLE");
             DebugNotWalkableTile = content.Load<Texture2D>("DebugAssets/NOT_WALKABLE");
-            
+
             TileSize = new Point(TileMap[0].Width, TileMap[0].Height);
         }
     }

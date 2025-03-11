@@ -1,10 +1,11 @@
-﻿using Microsoft.Xna.Framework;
+using System.Numerics;
+using Microsoft.Xna.Framework;
 
 namespace MakeEveryDayRecount.Map
 {
     /// <summary>
-    /// This class serves to handle any calculations needed related 
-    /// to the current map and provides utility to the entire project 
+    /// This class serves to handle any calculations needed related
+    /// to the current map and provides utility to the entire project
     /// relating to converting between tile space, screen space,and game space
     /// </summary>
     internal static class MapUtils
@@ -12,17 +13,21 @@ namespace MakeEveryDayRecount.Map
         private static Room _currentRoom;
         private static Player _currentPlayer;
 
-        public static Point ScreenSize;
-
         private const int TileSize = 128;
 
         #region Utility Properties
 
         /// <summary>
+        /// Get the size of the screen in pixels
+        /// </summary>
+        public static Point ScreenSize { get; private set; }
+
+        /// <summary>
         /// Get the center point of the screen in pixels
         /// </summary>
-        public static Point ScreenCenter {
-            get {  return new Point(ScreenSize.X/2, ScreenSize.Y/2); }
+        public static Point ScreenCenter
+        {
+            get { return new Point(ScreenSize.X / 2, ScreenSize.Y / 2); }
         }
 
         /// <summary>
@@ -30,14 +35,7 @@ namespace MakeEveryDayRecount.Map
         /// </summary>
         public static Point MinDisplayableTile
         {
-            get
-            {
-                return
-                    new Point(
-                    (int)ScreenSize.X / 2 / 128,
-                    (int)ScreenSize.Y / 2 / 128
-                    );
-            }
+            get { return new Point(ScreenCenter.X / 128, ScreenCenter.Y / 128); }
         }
 
         /// <summary>
@@ -47,15 +45,13 @@ namespace MakeEveryDayRecount.Map
         {
             get
             {
-                return
-                    new Point(
-                    (int)(MapSizePixels.X- ScreenSize.X / 2) / 128,
-                    (int)(MapSizePixels.Y - ScreenSize.Y / 2) / 128
-                    );
+                return new Point(
+                    (MapSizePixels.X - ScreenCenter.X) / 128,
+                    (MapSizePixels.Y - ScreenCenter.Y) / 128
+                );
             }
         }
 
-        
         /// <summary>
         /// Get the size of the current map in tiles
         /// </summary>
@@ -102,33 +98,49 @@ namespace MakeEveryDayRecount.Map
         /// <returns>Point that corresponds to the distance between world and screen pos</returns>
         public static Point WorldToScreen()
         {
-            Point worldToScreen = MapUtils.TileToWorld(_currentPlayer.Location) - ScreenCenter;
+            Point worldToScreen = TileToWorld(_currentPlayer.Location) - ScreenCenter;
             // Clamp the screen's position so only tiles will be displayed without any empty space
             return new Point(
                 MathHelper.Clamp(worldToScreen.X, 0, MapSizePixels.X - ScreenSize.X),
                 MathHelper.Clamp(worldToScreen.Y, 0, MapSizePixels.Y - ScreenSize.Y)
             );
-          
         }
 
         #endregion
 
         /// <summary>
-        /// Change the room that is being displayed
+        /// Called when the room the player is in changes by MapManager
         /// </summary>
         /// <param name="newRoom">The new room being displayed</param>
-        public static void SetCurrentRoom(Room newRoom)
+        private static void SetCurrentRoom(Room newRoom)
         {
             _currentRoom = newRoom;
         }
 
         /// <summary>
-        /// Change the current player 
+        /// Called when the current player is changed by GameplayManager
         /// </summary>
         /// <param name="player">New player to set</param>
-        public static void SetCurrentPlayer(Player player)
+        private static void SetCurrentPlayer(Player player)
         {
             _currentPlayer = player;
+        }
+
+        /// <summary>
+        /// Initialize the ScreenSize and events to update the components
+        /// of this file that will change during run time
+        /// </summary>
+        /// <param name="game1">Reference to this instance of the game</param>
+        /// <param name="gameplayManager">Reference to the overall GameplayManager</param>
+        public static void Initialize(Game1 game1, GameplayManager gameplayManager)
+        {
+            ScreenSize = game1.ScreenSize;
+            gameplayManager.OnPlayerUpdate += SetCurrentPlayer;
+            gameplayManager.Map.OnRoomUpdate += SetCurrentRoom;
+            // Despite the delegate event systems, the object have already been initialized in
+            // memory before the function is added to the event, so get the initial value manually
+            _currentPlayer = gameplayManager.PlayerObject;
+            _currentRoom = gameplayManager.Map.CurrentRoom;
         }
     }
 }
