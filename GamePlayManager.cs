@@ -6,6 +6,12 @@ using Microsoft.Xna.Framework.Graphics;
 namespace MakeEveryDayRecount
 {
     /// <summary>
+    /// Called when the player object is updated in memory
+    /// </summary>
+    /// <param name="player">New player object</param>
+    delegate void OnPlayerUpdate(Player player);
+
+    /// <summary>
     /// Manager of Player and the Map Manager.
     /// </summary>
     internal class GameplayManager
@@ -25,6 +31,8 @@ namespace MakeEveryDayRecount
         /// </summary>
         public MapManager Map { get; private set; }
 
+        public OnPlayerUpdate OnPlayerUpdate;
+
         /// <summary>
         /// Initialize GameplayManager
         /// </summary>
@@ -34,8 +42,7 @@ namespace MakeEveryDayRecount
             Level = 1;
             PlayerObject = new Player(new Point(3, 3), AssetManager.PlayerTexture, this);
             Map = new MapManager(this);
-          
-            MapUtils.SetCurrentPlayer(PlayerObject);
+            OnPlayerUpdate?.Invoke(PlayerObject);
         }
 
         public void Update(GameTime gameTime)
