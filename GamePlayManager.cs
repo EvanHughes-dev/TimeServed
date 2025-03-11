@@ -1,5 +1,4 @@
 ﻿using System;
-using MakeEveryDayRecount.Debug;
 using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -35,7 +34,7 @@ namespace MakeEveryDayRecount
             Level = 1;
             PlayerObject = new Player(new Point(3, 3), AssetManager.PlayerTexture, this);
             Map = new MapManager(this);
-          
+
             MapUtils.SetCurrentPlayer(PlayerObject);
         }
 

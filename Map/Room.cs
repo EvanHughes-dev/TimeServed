@@ -39,6 +39,11 @@ namespace MakeEveryDayRecount.Map
         public int RoomIndex { get; private set; }
 
         /// <summary>
+        /// Get the path to this room's file
+        /// </summary>
+        public string FilePath { get; private set; }
+
+        /// <summary>
         /// Get the room's name
         /// </summary>
         public string RoomName { get; private set; }
@@ -96,7 +101,7 @@ namespace MakeEveryDayRecount.Map
             int screenMinY = worldToScreen.Y / TileSize.Y;
             int screenMaxX = (worldToScreen.X + MapUtils.ScreenSize.X) / TileSize.X;
             int screenMaxY = (worldToScreen.Y + MapUtils.ScreenSize.Y) / TileSize.Y;
-           
+
             // Display all tiles that are on screen
             for (int xTile = screenMinX; xTile <= screenMaxX; xTile++)
             {
@@ -105,8 +110,12 @@ namespace MakeEveryDayRecount.Map
                     if (xTile >= _map.GetLength(0) || yTile >= _map.GetLength(1))
                         continue;
                     Tile currentTile = _map[xTile, yTile];
-                    Point screenPos = MapUtils.TileToWorld(xTile, yTile)-worldToScreen;
-                    sb.Draw(AssetManager.TileMap[currentTile.SpriteIndex], new Rectangle(screenPos, TileSize), Color.White);
+                    Point screenPos = MapUtils.TileToWorld(xTile, yTile) - worldToScreen;
+                    sb.Draw(
+                        AssetManager.TileMap[currentTile.SpriteIndex],
+                        new Rectangle(screenPos, TileSize),
+                        Color.White
+                    );
                 }
             }
 
@@ -122,7 +131,11 @@ namespace MakeEveryDayRecount.Map
                     && propPosition.Y < screenMaxY
                 )
                 {
-                    sb.Draw(propToDraw.Sprite, new Rectangle(MapUtils.TileToWorld(propPosition)-worldToScreen, TileSize), Color.White);
+                    sb.Draw(
+                        propToDraw.Sprite,
+                        new Rectangle(MapUtils.TileToWorld(propPosition) - worldToScreen, TileSize),
+                        Color.White
+                    );
                 }
             }
 
@@ -138,7 +151,11 @@ namespace MakeEveryDayRecount.Map
                     && propPosition.Y < screenMaxY
                 )
                 {
-                    sb.Draw(doorToDraw.Sprite, new Rectangle(MapUtils.TileToWorld(propPosition)-worldToScreen, TileSize), Color.White);
+                    sb.Draw(
+                        doorToDraw.Sprite,
+                        new Rectangle(MapUtils.TileToWorld(propPosition) - worldToScreen, TileSize),
+                        Color.White
+                    );
                 }
             }
         }
@@ -155,6 +172,8 @@ namespace MakeEveryDayRecount.Map
         {
             if (File.Exists(filePath))
             {
+                // save the file path for debug uses
+                FilePath = filePath;
                 BinaryReader binaryReader = null;
                 try
                 {
@@ -189,7 +208,7 @@ namespace MakeEveryDayRecount.Map
                     int tileMapHeight = binaryReader.ReadInt32();
 
                     _map = new Tile[tileMapWidth, tileMapHeight];
-                    MapSize=new Point(tileMapWidth, tileMapHeight);
+                    MapSize = new Point(tileMapWidth, tileMapHeight);
                     for (int tileXIndex = 0; tileXIndex < tileMapWidth; tileXIndex++)
                     {
                         for (int tileYIndex = 0; tileYIndex < tileMapHeight; tileYIndex++)

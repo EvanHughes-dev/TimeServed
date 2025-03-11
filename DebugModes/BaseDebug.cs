@@ -4,7 +4,7 @@ using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace MakeEveryDayRecount.Debug
+namespace MakeEveryDayRecount.DebugModes
 {
     /// <summary>
     /// Base for all other debug modes besides global debug. Create

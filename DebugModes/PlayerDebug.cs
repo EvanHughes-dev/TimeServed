@@ -2,7 +2,7 @@ using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace MakeEveryDayRecount.Debug
+namespace MakeEveryDayRecount.DebugModes
 {
     /// <summary>
     /// Debug class for the player, displaying relevant position data,
