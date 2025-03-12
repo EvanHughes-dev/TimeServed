@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 

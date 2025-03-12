@@ -47,6 +47,14 @@ namespace MakeEveryDayRecount.Map
         /// Get the room's name
         /// </summary>
         public string RoomName { get; private set; }
+
+        /// <summary>
+        /// Get the number of items in the current room
+        /// </summary>
+        public int ItemCount
+        {
+            get => _itemsInRoom.Count;
+        }
         private Tile[,] _map;
         private List<Item> _itemsInRoom;
         private readonly List<Door> _doors;

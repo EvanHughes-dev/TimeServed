@@ -1,4 +1,3 @@
-using MakeEveryDayRecount.Debug;
 using MakeEveryDayRecount.DebugModes;
 using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
@@ -70,6 +69,7 @@ namespace MakeEveryDayRecount
             // Gameplay manager must be called after all content is loaded
             _gameplayManager = new GameplayManager();
             _debugModes[0] = new PlayerDebug(sf, _gameplayManager);
+            _debugModes[1] = new MapDebug(sf, _gameplayManager);
             MapUtils.Initialize(this, _gameplayManager);
         }
 
@@ -105,6 +105,7 @@ namespace MakeEveryDayRecount
                     _debugModes[0].Draw(_spriteBatch);
                     break;
                 case DebugState.Room:
+                    _debugModes[1].Draw(_spriteBatch);
                     break;
             }
 

@@ -6,7 +6,7 @@ namespace MakeEveryDayRecount.DebugModes
 {
     /// <summary>
     /// Debug class for the player, displaying relevant position data,
-    /// walkable tiles, and interactable elements in the world.
+    /// walkable tiles, and intractable elements in the world.
     /// </summary>
     internal class PlayerDebug : BaseDebug
     {
