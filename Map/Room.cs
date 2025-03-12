@@ -46,7 +46,10 @@ namespace MakeEveryDayRecount.Map
         private List<Item> _itemsInRoom;
         private readonly List<Door> _doors;
 
-        private const int TileSize = 128;
+        /// <summary>
+        /// Size of current map
+        /// </summary>
+        public Point MapSize { get; private set; }
 
         /// <summary>
         /// Establish the room object
@@ -66,44 +69,12 @@ namespace MakeEveryDayRecount.Map
         }
 
         #region  Drawing Logic
-        /// <summary>
-        /// Convert an a position from tile space to world space
-        /// </summary>
-        /// <param name="tilePosition">Position in tile space</param>
-        /// <returns>Position in world space</returns>
-        private Vector2 TileToWorld(Vector2 tilePosition)
-        {
-            return tilePosition * TileSize;
-        }
-
-        /// <summary>
-        /// Convert an a position from tile space to world space
-        /// </summary>
-        /// <param name="tilePosition">Position in tile space</param>
-        /// <returns>Position in world space</returns>
-        private Vector2 TileToWorld(Point tilePosition)
-        {
-            return TileToWorld(tilePosition.X, tilePosition.Y);
-        }
-
-        /// <summary>
-        /// Convert an a position from tile space to world space
-        /// </summary>
-        /// <param name="xPos">X position in tile space</param>
-        /// <param name="yPos">Y position in tile space</param>
-        /// <returns>Position in world space</returns>
-        private Vector2 TileToWorld(int xPos, int yPos)
-        {
-            return new Vector2(xPos, yPos) * TileSize;
-        }
 
         /// <summary>
         /// Draw all tiles and GameObjects in the current room
         /// </summary>
         /// <param name="sb">Sprite batch to draw with</param>
-        /// <param name="player">Reference to the player</param>
-        /// <param name="screenSize">Size of the screen</param>
-        public void Draw(SpriteBatch sb, Player player, Vector2 screenSize)
+        public void Draw(SpriteBatch sb)
         {
             /*
             * Draw order
@@ -112,32 +83,30 @@ namespace MakeEveryDayRecount.Map
             * GameObjects
             * Doors (type of GameObject)
             */
-            // Find the player's position in pixels, not tiles
-            Vector2 playerPos = TileToWorld(player.Location);
-            Vector2 worldToScreen = playerPos - screenSize / 2;
 
-            worldToScreen = new Vector2(
-                MathHelper.Clamp(worldToScreen.X, 0, _map.GetLength(0) * TileSize - screenSize.X),
-                MathHelper.Clamp(worldToScreen.Y, 0, _map.GetLength(1) * TileSize - screenSize.Y)
-            );
+            Point worldToScreen = MapUtils.WorldToScreen();
+
+            Point TileSize = AssetManager.TileSize;
 
             // Find the coordinates of the four corners to figure out which
             // tiles and objects need to be displayed in tile positions
             // By casting to an int, we make sure we get all partial tiles
             // If any edge of a tile is on the screen, it still is displayed
-            int screenMinX = (int)worldToScreen.X / TileSize;
-            int screenMinY = (int)worldToScreen.Y / TileSize;
-            int screenMaxX = (int)(worldToScreen.X + screenSize.X) / TileSize;
-            int screenMaxY = (int)(worldToScreen.Y + screenSize.Y) / TileSize;
-
+            int screenMinX = worldToScreen.X / TileSize.X;
+            int screenMinY = worldToScreen.Y / TileSize.Y;
+            int screenMaxX = (worldToScreen.X + MapUtils.ScreenSize.X) / TileSize.X;
+            int screenMaxY = (worldToScreen.Y + MapUtils.ScreenSize.Y) / TileSize.Y;
+           
             // Display all tiles that are on screen
             for (int xTile = screenMinX; xTile <= screenMaxX; xTile++)
             {
                 for (int yTile = screenMinY; yTile <= screenMaxY; yTile++)
                 {
+                    if (xTile >= _map.GetLength(0) || yTile >= _map.GetLength(1))
+                        continue;
                     Tile currentTile = _map[xTile, yTile];
-                    Vector2 screenPos = TileToWorld(xTile, yTile) - worldToScreen;
-                    sb.Draw(AssetManager.TileMap[currentTile.SpriteIndex], screenPos, Color.White);
+                    Point screenPos = MapUtils.TileToWorld(xTile, yTile)-worldToScreen;
+                    sb.Draw(AssetManager.TileMap[currentTile.SpriteIndex], new Rectangle(screenPos, TileSize), Color.White);
                 }
             }
 
@@ -153,7 +122,7 @@ namespace MakeEveryDayRecount.Map
                     && propPosition.Y < screenMaxY
                 )
                 {
-                    sb.Draw(propToDraw.Sprite, TileToWorld(propPosition), Color.White);
+                    sb.Draw(propToDraw.Sprite, new Rectangle(MapUtils.TileToWorld(propPosition)-worldToScreen, TileSize), Color.White);
                 }
             }
 
@@ -169,7 +138,7 @@ namespace MakeEveryDayRecount.Map
                     && propPosition.Y < screenMaxY
                 )
                 {
-                    sb.Draw(doorToDraw.Sprite, TileToWorld(propPosition), Color.White);
+                    sb.Draw(doorToDraw.Sprite, new Rectangle(MapUtils.TileToWorld(propPosition)-worldToScreen, TileSize), Color.White);
                 }
             }
         }
@@ -220,7 +189,7 @@ namespace MakeEveryDayRecount.Map
                     int tileMapHeight = binaryReader.ReadInt32();
 
                     _map = new Tile[tileMapWidth, tileMapHeight];
-
+                    MapSize=new Point(tileMapWidth, tileMapHeight);
                     for (int tileXIndex = 0; tileXIndex < tileMapWidth; tileXIndex++)
                     {
                         for (int tileYIndex = 0; tileYIndex < tileMapHeight; tileYIndex++)
