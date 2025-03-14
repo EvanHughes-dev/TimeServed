@@ -69,66 +69,7 @@ namespace MakeEveryDayRecount
             _playerFrameRectangle = AnimationUpdate(deltaTime);
         }
 
-        /// <summary>
-        /// Draws the player in the center of the screen
-        /// </summary>
-        /// <param name="sb">The instance of spritebatch to be used to draw the player</param>
-        public void Draw(SpriteBatch sb)
-        {
-            sb.Draw(
-                Sprite,
-                new Rectangle(PlayerScreenPosition, AssetManager.TileSize),
-                _playerFrameRectangle,
-                Color.White
-            );
-        }
-
-        /// <summary>
-        /// Set the current Rectangle that represents the player's current image.
-        /// As it is setup now, the player changes walking animation once per tile
-        /// at the same rate the player walks.
-        /// </summary>
-        /// <param name="deltaTime"></param>
-        /// <returns></returns>
-        private Rectangle AnimationUpdate(float deltaTime)
-        {
-            // Change the animation based on what state the player is currently in
-            switch (_playerState)
-            {
-                case PlayerState.Standing:
-                    // Reset the animation timer to zero so the player doesn't look like
-                    // they're walking of they turn while in the same tile
-                    _animationFrame = 0;
-                    _animationTimeElapsed = 0;
-                    break;
-                case PlayerState.Walking:
-                    _animationTimeElapsed += deltaTime;
-                    // Check if the animation is ready to update
-                    if (_animationTimeElapsed >= SecondsPerTile)
-                    {
-                        _animationTimeElapsed -= SecondsPerTile;
-                        _animationFrame++;
-                        // Walking animations range from 0-3 in the Sprite Sheet
-                        // _animationFrame being < 0 is probably not going to happen
-                        // but its easy enough to check for so might as well
-                        if (_animationFrame >= 4 || _animationFrame < 0)
-                            _animationFrame = 0;
-                    }
-                    break;
-                case PlayerState.Interacting:
-                    // TODO Add animation for picking up/interacting
-                    break;
-            }
-
-            return new Rectangle(
-                new Point(
-                    _playerSize.X * (int)_playerCurrentDirection,
-                    _playerSize.Y * _animationFrame
-                ),
-                _playerSize
-            );
-        }
-
+        #region Player Movement
         /// <summary>
         /// Gets keyboard input for player movement and moves the player in world space
         /// </summary>
@@ -197,6 +138,69 @@ namespace MakeEveryDayRecount
                 _walkingSeconds -= SecondsPerTile;
             }
         }
+        #endregion
+
+        #region Drawing Logic
+
+        /// <summary>
+        /// Draws the player in the center of the screen
+        /// </summary>
+        /// <param name="sb">The instance of spritebatch to be used to draw the player</param>
+        public void Draw(SpriteBatch sb)
+        {
+            sb.Draw(
+                Sprite,
+                new Rectangle(PlayerScreenPosition, AssetManager.TileSize),
+                _playerFrameRectangle,
+                Color.White
+            );
+        }
+
+        /// <summary>
+        /// Set the current Rectangle that represents the player's current image.
+        /// As it is setup now, the player changes walking animation once per tile
+        /// at the same rate the player walks.
+        /// </summary>
+        /// <param name="deltaTime"></param>
+        /// <returns></returns>
+        private Rectangle AnimationUpdate(float deltaTime)
+        {
+            // Change the animation based on what state the player is currently in
+            switch (_playerState)
+            {
+                case PlayerState.Standing:
+                    // Reset the animation timer to zero so the player doesn't look like
+                    // they're walking of they turn while in the same tile
+                    _animationFrame = 0;
+                    _animationTimeElapsed = 0;
+                    break;
+                case PlayerState.Walking:
+                    _animationTimeElapsed += deltaTime;
+                    // Check if the animation is ready to update
+                    if (_animationTimeElapsed >= SecondsPerTile)
+                    {
+                        _animationTimeElapsed -= SecondsPerTile;
+                        _animationFrame++;
+                        // Walking animations range from 0-3 in the Sprite Sheet
+                        // _animationFrame being < 0 is probably not going to happen
+                        // but its easy enough to check for so might as well
+                        if (_animationFrame >= 4 || _animationFrame < 0)
+                            _animationFrame = 0;
+                    }
+                    break;
+                case PlayerState.Interacting:
+                    // TODO Add animation for picking up/interacting
+                    break;
+            }
+
+            return new Rectangle(
+                new Point(
+                    _playerSize.X * (int)_playerCurrentDirection,
+                    _playerSize.Y * _animationFrame
+                ),
+                _playerSize
+            );
+        }
 
         /// <summary>
         /// Convert from the player's tile position to world position
@@ -208,6 +212,8 @@ namespace MakeEveryDayRecount
 
             PlayerScreenPosition = playerWorldPos - worldToScreen;
         }
+
+        #endregion
 
         public bool ContainsKey(Door.DoorKeyType keyType)
         {
