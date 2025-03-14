@@ -22,29 +22,31 @@ namespace MakeEveryDayRecount
 
         public enum Direction
         {
-            Left = 0,
-            Up = 1,
-            Right = 2,
-            Down = 3
+            Left = 3,
+            Up = 2,
+            Right = 1,
+            Down = 0
         }
 
         public Point PlayerScreenPosition { get; private set; }
-        
+
         private Direction _playerCurrentDirection;
         private PlayerState _playerState;
 
-        private readonly float _secondsPerTile = .2f;
+        private const float SecondsPerTile = .2f;
         private float _walkingSeconds;
         private bool _readyToMove;
+
+        private float _animationTimeElapsed;
+        private int _animationFrame;
+        private Rectangle _playerFrameRectangle;
+        private readonly Point _playerSize;
 
         //A reference to the gameplay manager which has a reference
         //to the map which lets the player know what's near them
         private readonly GameplayManager _gameplayManager;
-     
-        private List<GameObject> _inventory;
 
-        private Rectangle _sourceRectangle;
-        private Texture2D _playerTextures; //Probably a sprite sheet
+        private List<GameObject> _inventory;
 
         public Player(Point location, Texture2D sprite, GameplayManager gameplayManager)
             : base(location, sprite)
@@ -52,17 +54,19 @@ namespace MakeEveryDayRecount
             //NOTE: For now, the player's screen position is always in the middle
             _walkingSeconds = 0;
             _gameplayManager = gameplayManager;
-            _readyToMove = true;
+            _animationFrame = 0;
+            _playerSize = new Point(sprite.Width / 4, sprite.Height / 4);
         }
 
         /// <summary>
         /// Updates the player's position in world space
         /// </summary>
-        /// <param name="deltaTimeS">The elapsed time between frames in seconds</param>
-        public void Update(float deltaTimeS)
+        /// <param name="deltaTime">The elapsed time between frames in seconds</param>
+        public void Update(float deltaTime)
         {
-            KeyboardInput(deltaTimeS);
+            KeyboardInput(deltaTime);
             UpdatePlayerPos();
+            _playerFrameRectangle = AnimationUpdate(deltaTime);
         }
 
         /// <summary>
@@ -71,15 +75,57 @@ namespace MakeEveryDayRecount
         /// <param name="sb">The instance of spritebatch to be used to draw the player</param>
         public void Draw(SpriteBatch sb)
         {
-            //REMEMBER THEY ONLY DRAW AT THE CENTER TILE
-            //TODO add the ability for the player to walk up to but into through the walls
             sb.Draw(
                 Sprite,
-                new Rectangle(
-                    PlayerScreenPosition,
-                    AssetManager.TileSize
-                ),
+                new Rectangle(PlayerScreenPosition, AssetManager.TileSize),
+                _playerFrameRectangle,
                 Color.White
+            );
+        }
+
+        /// <summary>
+        /// Set the current Rectangle that represents the player's current image.
+        /// As it is setup now, the player changes walking animation once per tile
+        /// at the same rate the player walks.
+        /// </summary>
+        /// <param name="deltaTime"></param>
+        /// <returns></returns>
+        private Rectangle AnimationUpdate(float deltaTime)
+        {
+            // Change the animation based on what state the player is currently in
+            switch (_playerState)
+            {
+                case PlayerState.Standing:
+                    // Reset the animation timer to zero so the player doesn't look like
+                    // they're walking of they turn while in the same tile
+                    _animationFrame = 0;
+                    _animationTimeElapsed = 0;
+                    break;
+                case PlayerState.Walking:
+                    _animationTimeElapsed += deltaTime;
+                    // Check if the animation is ready to update
+                    if (_animationTimeElapsed >= SecondsPerTile)
+                    {
+                        _animationTimeElapsed -= SecondsPerTile;
+                        _animationFrame++;
+                        // Walking animations range from 0-3 in the Sprite Sheet
+                        // _animationFrame being < 0 is probably not going to happen
+                        // but its easy enough to check for so might as well
+                        if (_animationFrame >= 4 || _animationFrame < 0)
+                            _animationFrame = 0;
+                    }
+                    break;
+                case PlayerState.Interacting:
+                    // TODO Add animation for picking up/interacting
+                    break;
+            }
+
+            return new Rectangle(
+                new Point(
+                    _playerSize.X * (int)_playerCurrentDirection,
+                    _playerSize.Y * _animationFrame
+                ),
+                _playerSize
             );
         }
 
@@ -89,10 +135,9 @@ namespace MakeEveryDayRecount
         /// <param name="deltaTime">The elapsed time between frames in seconds</param>
         private void KeyboardInput(float deltaTime)
         {
-            
             if (InputManager.GetKeyStatus(Keys.Left) || InputManager.GetKeyStatus(Keys.A))
             {
-                PlayerMovement(deltaTime, new Point(-1,0), Direction.Left);
+                PlayerMovement(deltaTime, new Point(-1, 0), Direction.Left);
             }
             else if (InputManager.GetKeyStatus(Keys.Right) || InputManager.GetKeyStatus(Keys.D))
             {
@@ -111,10 +156,8 @@ namespace MakeEveryDayRecount
             {
                 _playerState = PlayerState.Standing;
                 _walkingSeconds = 0;
-                _readyToMove = true;
-                 //but don't change the direction you're facing
+                //but don't change the direction you're facing
             }
-                       
         }
 
         /// <summary>
@@ -128,18 +171,17 @@ namespace MakeEveryDayRecount
         {
             if (!_readyToMove)
                 UpdateWalkingTime(deltaTime);
-            if (_readyToMove  && _gameplayManager.Map.CheckPlayerCollision(Location+movement))
+            if (_readyToMove && _gameplayManager.Map.CheckPlayerCollision(Location + movement))
             {
                 Location += movement;
                 _readyToMove = false;
+                if (_playerState == PlayerState.Standing)
+                    _playerState = PlayerState.Walking;
             }
 
             // Update the player's walking state if needed
             if (_playerCurrentDirection != directionMove)
                 _playerCurrentDirection = directionMove;
-
-            if (_playerState == PlayerState.Standing)
-                _playerState = PlayerState.Walking;
         }
 
         /// <summary>
@@ -149,10 +191,10 @@ namespace MakeEveryDayRecount
         private void UpdateWalkingTime(float deltaTime)
         {
             _walkingSeconds += deltaTime;
-            if (_walkingSeconds >= _secondsPerTile)
+            if (_walkingSeconds >= SecondsPerTile)
             {
                 _readyToMove = true;
-                _walkingSeconds -= _secondsPerTile;
+                _walkingSeconds -= SecondsPerTile;
             }
         }
 
@@ -161,11 +203,10 @@ namespace MakeEveryDayRecount
         /// </summary>
         private void UpdatePlayerPos()
         {
-
             Point playerWorldPos = MapUtils.TileToWorld(Location);
             Point worldToScreen = MapUtils.WorldToScreen();
 
-            PlayerScreenPosition = playerWorldPos - worldToScreen;      
+            PlayerScreenPosition = playerWorldPos - worldToScreen;
         }
 
         public bool ContainsKey(Door.DoorKeyType keyType)
