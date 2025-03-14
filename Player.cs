@@ -17,15 +17,15 @@ namespace MakeEveryDayRecount
         {
             Standing = 0,
             Walking = 1,
-            Interacting
+            Interacting = 2
         }
 
         public enum Direction
         {
-            Left = 3,
-            Up = 2,
+            Down = 0,
             Right = 1,
-            Down = 0
+            Up = 2,
+            Left = 3
         }
 
         public Point PlayerScreenPosition { get; private set; }
