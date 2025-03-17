@@ -51,7 +51,6 @@ namespace MakeEveryDayRecount
         public Player(Point location, Texture2D sprite, GameplayManager gameplayManager)
             : base(location, sprite)
         {
-            //NOTE: For now, the player's screen position is always in the middle
             _walkingSeconds = 0;
             _gameplayManager = gameplayManager;
             _animationFrame = 0;
