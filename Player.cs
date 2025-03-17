@@ -1,6 +1,4 @@
-﻿// Ignore Spelling: gameplay
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using MakeEveryDayRecount.GameObjects;
 using MakeEveryDayRecount.GameObjects.Props;
@@ -29,7 +27,7 @@ namespace MakeEveryDayRecount
         }
 
         public Point PlayerScreenPosition { get; private set; }
-        
+
         private Direction _playerCurrentDirection;
         private PlayerState _playerState;
 
@@ -40,7 +38,7 @@ namespace MakeEveryDayRecount
         //A reference to the gameplay manager which has a reference
         //to the map which lets the player know what's near them
         private readonly GameplayManager _gameplayManager;
-     
+
         private List<GameObject> _inventory;
 
         private Rectangle _sourceRectangle;
@@ -75,10 +73,7 @@ namespace MakeEveryDayRecount
             //TODO add the ability for the player to walk up to but into through the walls
             sb.Draw(
                 Sprite,
-                new Rectangle(
-                    PlayerScreenPosition,
-                    AssetManager.TileSize
-                ),
+                new Rectangle(PlayerScreenPosition, AssetManager.TileSize),
                 Color.White
             );
         }
@@ -89,10 +84,9 @@ namespace MakeEveryDayRecount
         /// <param name="deltaTime">The elapsed time between frames in seconds</param>
         private void KeyboardInput(float deltaTime)
         {
-            
             if (InputManager.GetKeyStatus(Keys.Left) || InputManager.GetKeyStatus(Keys.A))
             {
-                PlayerMovement(deltaTime, new Point(-1,0), Direction.Left);
+                PlayerMovement(deltaTime, new Point(-1, 0), Direction.Left);
             }
             else if (InputManager.GetKeyStatus(Keys.Right) || InputManager.GetKeyStatus(Keys.D))
             {
@@ -112,9 +106,8 @@ namespace MakeEveryDayRecount
                 _playerState = PlayerState.Standing;
                 _walkingSeconds = 0;
                 _readyToMove = true;
-                 //but don't change the direction you're facing
+                //but don't change the direction you're facing
             }
-                       
         }
 
         /// <summary>
@@ -128,7 +121,7 @@ namespace MakeEveryDayRecount
         {
             if (!_readyToMove)
                 UpdateWalkingTime(deltaTime);
-            if (_readyToMove  && _gameplayManager.Map.CheckPlayerCollision(Location+movement))
+            if (_readyToMove && _gameplayManager.Map.CheckPlayerCollision(Location + movement))
             {
                 Location += movement;
                 _readyToMove = false;
@@ -161,11 +154,10 @@ namespace MakeEveryDayRecount
         /// </summary>
         private void UpdatePlayerPos()
         {
-
             Point playerWorldPos = MapUtils.TileToWorld(Location);
             Point worldToScreen = MapUtils.WorldToScreen();
 
-            PlayerScreenPosition = playerWorldPos - worldToScreen;      
+            PlayerScreenPosition = playerWorldPos - worldToScreen;
         }
 
         public bool ContainsKey(Door.DoorKeyType keyType)
