@@ -28,6 +28,7 @@ namespace MakeEveryDayRecount.DebugModes
         private static Dictionary<string, Func<object>> _objectsToDisplay;
 
         private static SpriteFont _spriteFont;
+        private static int _yAxisIncrement;
 
         /// <summary>
         /// Initializes the debug mode system.
@@ -54,12 +55,14 @@ namespace MakeEveryDayRecount.DebugModes
                 return;
 
             Vector2 drawPoint = new Vector2(10, 10);
+            sb.DrawString(_spriteFont, "Debug Mode: Global", drawPoint, Color.Black);
+            drawPoint.Y += _yAxisIncrement;
             foreach (KeyValuePair<string, Func<object>> entry in _objectsToDisplay)
             {
                 string displayValue = $"{entry.Key}: {entry.Value()}";
 
                 sb.DrawString(_spriteFont, displayValue, drawPoint, Color.Black);
-                drawPoint.Y += 20;
+                drawPoint.Y += _yAxisIncrement;
             }
         }
 
@@ -70,6 +73,7 @@ namespace MakeEveryDayRecount.DebugModes
         public static void SetFont(SpriteFont sf)
         {
             _spriteFont = sf;
+            _yAxisIncrement = sf.LineSpacing;
         }
 
         /// <summary>

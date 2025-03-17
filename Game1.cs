@@ -48,6 +48,8 @@ namespace MakeEveryDayRecount
             _debugState = DebugState.None;
             GlobalDebug.Initialize();
             _debugModes = new BaseDebug[2];
+            GlobalDebug.AddObject("State", ()=>_debugState);
+
         }
 
         protected override void Initialize()
@@ -95,7 +97,6 @@ namespace MakeEveryDayRecount
             GraphicsDevice.Clear(Color.CornflowerBlue);
             _spriteBatch.Begin();
             _gameplayManager.Draw(_spriteBatch);
-
             switch (_debugState)
             {
                 case DebugState.Global:
