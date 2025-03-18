@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            flowLayoutPanel1 = new FlowLayoutPanel();
+            flowLayoutPanelRooms = new FlowLayoutPanel();
             buttonAddNewRoom = new Button();
             menuStrip = new MenuStrip();
             fileToolStripMenuItem = new ToolStripMenuItem();
@@ -39,17 +39,21 @@
             tilesToolStripMenuItem = new ToolStripMenuItem();
             reloadTilesToolStripMenuItem = new ToolStripMenuItem();
             folderBrowserDialog = new FolderBrowserDialog();
-            flowLayoutPanel1.SuspendLayout();
+            labelNoLevelOpen = new Label();
+            openFileDialog = new OpenFileDialog();
+            saveFileDialog = new SaveFileDialog();
+            flowLayoutPanelRooms.SuspendLayout();
             menuStrip.SuspendLayout();
             SuspendLayout();
             // 
-            // flowLayoutPanel1
+            // flowLayoutPanelRooms
             // 
-            flowLayoutPanel1.Controls.Add(buttonAddNewRoom);
-            flowLayoutPanel1.Location = new Point(12, 30);
-            flowLayoutPanel1.Name = "flowLayoutPanel1";
-            flowLayoutPanel1.Size = new Size(776, 408);
-            flowLayoutPanel1.TabIndex = 0;
+            flowLayoutPanelRooms.Controls.Add(buttonAddNewRoom);
+            flowLayoutPanelRooms.Location = new Point(12, 30);
+            flowLayoutPanelRooms.Name = "flowLayoutPanelRooms";
+            flowLayoutPanelRooms.Size = new Size(776, 408);
+            flowLayoutPanelRooms.TabIndex = 0;
+            flowLayoutPanelRooms.Visible = false;
             // 
             // buttonAddNewRoom
             // 
@@ -82,12 +86,14 @@
             newLevelToolStripMenuItem.Name = "newLevelToolStripMenuItem";
             newLevelToolStripMenuItem.Size = new Size(123, 22);
             newLevelToolStripMenuItem.Text = "New";
+            newLevelToolStripMenuItem.Click += newLevelToolStripMenuItem_Click;
             // 
             // loadLevelToolStripMenuItem
             // 
             loadLevelToolStripMenuItem.Name = "loadLevelToolStripMenuItem";
             loadLevelToolStripMenuItem.Size = new Size(123, 22);
-            loadLevelToolStripMenuItem.Text = "Load";
+            loadLevelToolStripMenuItem.Text = "Open";
+            loadLevelToolStripMenuItem.Click += loadLevelToolStripMenuItem_Click;
             // 
             // saveLevelToolStripMenuItem
             // 
@@ -120,18 +126,42 @@
             folderBrowserDialog.Description = "Select a Level Folder";
             folderBrowserDialog.UseDescriptionForTitle = true;
             // 
+            // labelNoLevelOpen
+            // 
+            labelNoLevelOpen.AutoSize = true;
+            labelNoLevelOpen.Location = new Point(180, 195);
+            labelNoLevelOpen.Name = "labelNoLevelOpen";
+            labelNoLevelOpen.Size = new Size(415, 15);
+            labelNoLevelOpen.TabIndex = 1;
+            labelNoLevelOpen.Text = "No level open. Use the Level tab to create a new level or open an existing one!";
+            // 
+            // openFileDialog
+            // 
+            openFileDialog.DefaultExt = "level";
+            openFileDialog.FileName = "level.level";
+            openFileDialog.Filter = "Level files|level.level";
+            // 
+            // saveFileDialog
+            // 
+            saveFileDialog.DefaultExt = "level";
+            saveFileDialog.FileName = "level.level";
+            saveFileDialog.Filter = "Level files|level.level";
+            saveFileDialog.Title = "Save Level";
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
-            Controls.Add(flowLayoutPanel1);
+            Controls.Add(flowLayoutPanelRooms);
+            Controls.Add(labelNoLevelOpen);
             Controls.Add(menuStrip);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             MainMenuStrip = menuStrip;
             Name = "MainForm";
             Text = "Recount Level Editor";
             Load += MainForm_Load;
-            flowLayoutPanel1.ResumeLayout(false);
+            flowLayoutPanelRooms.ResumeLayout(false);
             menuStrip.ResumeLayout(false);
             menuStrip.PerformLayout();
             ResumeLayout(false);
@@ -140,7 +170,7 @@
 
         #endregion
 
-        private FlowLayoutPanel flowLayoutPanel1;
+        private FlowLayoutPanel flowLayoutPanelRooms;
         private MenuStrip menuStrip;
         private ToolStripMenuItem fileToolStripMenuItem;
         private ToolStripMenuItem newLevelToolStripMenuItem;
@@ -151,5 +181,8 @@
         private ToolStripMenuItem reloadTilesToolStripMenuItem;
         private Button buttonAddNewRoom;
         private FolderBrowserDialog folderBrowserDialog;
+        private Label labelNoLevelOpen;
+        private OpenFileDialog openFileDialog;
+        private SaveFileDialog saveFileDialog;
     }
 }

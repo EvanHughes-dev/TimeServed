@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 
 namespace LevelEditor
 {
-    internal struct Tile
+    public readonly struct Tile
     {
-        int TileIndex { get; set; }
-        bool IsWalkable { get; set; }
+        public Image Sprite { get; }
+        public bool IsWalkable { get; }
 
-        public Tile()
+        public Tile(Image sprite, bool isWalkable)
         {
-            TileIndex = -1;
-            IsWalkable = true;
+            Sprite = sprite;
+            IsWalkable = isWalkable;
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LevelEditor
 {
-    internal class Level
+    public class Level
     {
         public List<Room> Rooms { get; }
 

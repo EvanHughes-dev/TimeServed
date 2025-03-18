@@ -12,23 +12,74 @@ namespace LevelEditor
     /// </summary>
     internal static class FileIOHelpers
     {
+        /// <summary>
+        /// Saves a given level to the given path.
+        /// </summary>
+        /// <param name="level">The level to save.</param>
+        /// <param name="filePath">The path to save to.</param>
+        public static void SaveLevel(Level level, string filePath)
+        {
+            /*
+             * THE .level FILE FORMAT:
+             *  - int roomCount
+             *  - Several rooms, with the following format:
+             *    - string roomName
+             *    - int roomID
+             */
 
-        public static bool SaveLevel(Level level, string folderPath)
+            BinaryWriter writer = new(new FileStream(filePath, FileMode.Create));
+
+            int roomCount = level.Rooms.Count;
+
+            writer.Write(roomCount);
+
+            foreach (Room room in level.Rooms)
+            {
+                writer.Write(room.Name);
+                writer.Write(room.Id);
+            }
+
+            writer.Close();
+        }
+
+        /// <summary>
+        /// Saves a given level to the given path.
+        /// </summary>
+        /// <param name="level">The level to save.</param>
+        /// <param name="filePath">The path to save to.</param>
+        public static Level LoadLevel(string filePath)
+        {
+            /*
+             * THE .level FILE FORMAT:
+             *  - int roomCount
+             *  - Several rooms, with the following format:
+             *    - string roomName
+             *    - int roomID
+             */
+            Level level = new();
+
+            BinaryReader reader = new(new FileStream(filePath, FileMode.Open));
+
+            int roomCount = reader.ReadInt32();
+
+            for (int i = 0; i < roomCount; i++)
+            {
+                string roomName = reader.ReadString();
+
+                level.Rooms.Add(LoadRoom($"./{roomName}.room"));
+            }
+
+            reader.Close();
+
+            return level;
+        }
+
+        public static bool SaveRoom(Room room, string filePath)
         {
             throw new NotImplementedException();
         }
 
-        public static Level? LoadLevel(string folderPath)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static bool SaveRoom(Room room, string folderPath)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static Room? LoadRoom(string filePath)
+        public static Room LoadRoom(string filePath)
         {
             throw new NotImplementedException();
         }
@@ -53,6 +104,19 @@ namespace LevelEditor
             }
 
             return images;
+        }
+
+        /// <summary>
+        /// Loads a tile from disk given the name of the sprite file in the Tiles folder and whether that tile is walkable.
+        /// </summary>
+        /// <param name="spriteName">The name of the sprite file in the Tiles folder, including file extension.</param>
+        /// <param name="isWalkable">Whether this tile should be allowed to be walked on.</param>
+        /// <returns>The loaded tile.</returns>
+        public static Tile LoadTile(string spriteName, bool isWalkable)
+        {
+            const string TileFolderPath = "./Tiles";
+
+            return new(Image.FromFile(Path.Join(TileFolderPath, spriteName)), isWalkable);
         }
     }
 }

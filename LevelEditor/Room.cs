@@ -6,18 +6,21 @@ using System.Threading.Tasks;
 
 namespace LevelEditor
 {
-    internal class Room
+    public class Room
     {
         public string Name { get; set; }
-
-        public int Width { get; }
-        public int Height { get; }
+        public int Id { get; }
 
         public Tile[,] Tiles { get; }
 
         public Room(int width, int height) {
-            Width = width;
-            Height = height;
+            Tiles = new Tile[height, width];
+
+            Id = Program.Random.Next();
         }
+
+        // TODO: Add Resize(north, south, east, west) method
+        //   Allows for resizing of room after initial creation by adding or removing rows or columns
+        //   on any of the four edges, referred to by cardinal directions
     }
 }

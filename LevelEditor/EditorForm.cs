@@ -9,36 +9,63 @@ namespace LevelEditor
     /// </summary>
     public partial class EditorForm : Form
     {
+        private MainForm _mainForm;
+
         /// <summary>
         /// Gets or sets the color the user currently has selected from the palette.
         /// </summary>
-        private Color SelectedColor { get; set; }
+        private Tile SelectedTile { get; set; }
 
         /// <summary>
         /// Gets or sets the 2D array of grid tiles the user can draw on.
         /// </summary>
-        private PictureBox[,] Tiles { get; set; }
+        private PictureBox[,] TileGrid { get; set; }
+
         /// <summary>
-        /// Gets the palette of colors the user may select from, hardcoded.
+        /// Gets or sets the Room this editor is editing.
         /// </summary>
-        private Color[,] Palette { get; } = { // Literally just colors I picked at random
-            { Color.FloralWhite, Color.CornflowerBlue, Color.LightPink },
-            { Color.LightSeaGreen, Color.YellowGreen, Color.Tomato },
-        };
+        private Room Room { get; set; }
+
+        /// <summary>
+        /// Gets the palette of tiles the user may select from.
+        /// </summary>
+        private Tile[,] Palette { get; }
+
+        /// <summary>
+        /// Gets or sets the buttons that the user presses to select different tiles from the palette.
+        /// </summary>
+        private Button[,] PaletteButtons { get; set; }
 
         /// <summary>
         /// Creates a new EditorForm, doing the work that is common between the two other constructors.
         /// </summary>
-        private EditorForm()
+        private EditorForm(MainForm mainForm)
         {
             InitializeComponent();
 
+            _mainForm = mainForm;
+
+            _mainForm.Level.Rooms.Add(Room!);
+
+            int numOfTiles = _mainForm.Tiles.Count;
+
+            int numOfRows = (int)Math.Ceiling((float)numOfTiles / 4);
+            Palette = new Tile[numOfRows,4];
+
+            for (int i = 0; i < numOfTiles; i++)
+            {
+                int y = (int)Math.Floor((float)i / 4);
+                int x = i % 4;
+
+                Palette[y, x] = _mainForm.Tiles.ElementAt(i);
+            }
+
             // Creates all of the buttons in the palette
-            CreateTilePalette();
+            CreateTilePaletteButtons();
 
             // Sets the selected color to some sort of reasonable default -- Palette[0, 0] is the only place we can guarantee there's a color in the palette
             //   (assuming the developer didn't change Palette to an entirely empty array)
-            SelectedColor = Palette[0, 0];
+            SelectedTile = Palette[0, 0];
         }
 
         /// <summary>
@@ -46,8 +73,8 @@ namespace LevelEditor
         /// </summary>
         /// <param name="width">The width of the new canvas.</param>
         /// <param name="height">The height of the new canvas.</param>
-        public EditorForm(int width, int height) 
-            : this()
+        public EditorForm(MainForm mainForm, int width, int height) 
+            : this(mainForm)
         {
             CreateNewMap(width, height);
         }
@@ -56,8 +83,8 @@ namespace LevelEditor
         /// Creates a new EditorForm, loading from the given file path.
         /// </summary>
         /// <param name="filePath">The file path to load from.</param>
-        public EditorForm(string filePath) 
-            : this()
+        public EditorForm(MainForm mainForm, string filePath) 
+            : this(mainForm)
         {
             LoadRoomFromFile(filePath);
         }
@@ -65,7 +92,7 @@ namespace LevelEditor
         /// <summary>
         /// Creates the color selection buttons corresponding with the palette. Should only be run once!
         /// </summary>
-        private void CreateTilePalette()
+        private void CreateTilePaletteButtons()
         {
             // Uses the dimensions from the hardcoded palette to determine the grid dimensions of the buttons
             // This is just the easiest way for me to program this, I think the ideal version of this would
@@ -87,21 +114,26 @@ namespace LevelEditor
                     // We're going to store the color associated with each button in its back color, and then read the back color
                     //   when the button is clicked. Ideally we would track a color index so we could dramatically reduce the
                     //   file size of the saved maps, but again that's hard and not necessary
-                    swatches[x, y].BackColor = Palette[x, y];
+                    swatches[x, y].Image = Palette[x, y].Sprite;
                     swatches[x, y].Click += Swatch_Click;
                 }
             }
+
+            PaletteButtons = swatches;
         }
 
         /// <summary>
         /// When a "swatch" button is clicked, select its color.
         /// </summary>
-        /// <exception cref="Exception">Thrown when this method is called with a non-Control sender.</exception>
+        /// <exception cref="Exception">Thrown when this method is called with a non-Button sender.</exception>
         private void Swatch_Click(object? sender, EventArgs e)
         {
-            if (sender is not Control swatch) throw new Exception();
+            if (sender is not Button swatch) throw new Exception();
 
-            SelectedColor = swatch.BackColor;
+            (int y, int x) = PaletteButtons.IndexesOf(swatch);
+
+            if (swatch.Image != null)
+                SelectedTile = Palette[y, x];
         }
 
         /// <summary>
@@ -111,11 +143,13 @@ namespace LevelEditor
         /// <param name="height">The height of the new map.</param>
         private void CreateNewMap(int width, int height)
         {
+            Room = new Room(width, height);
+
             // If Tiles isn't null, then this function has been called before and we need to delete (or re-use?) all of the prior existing tiles
-            if (Tiles != null)
+            if (TileGrid != null)
             {
                 // It would be best to reuse all of the existing tiles (with like a pool system) but this is easier
-                foreach (PictureBox tile in Tiles)
+                foreach (PictureBox tile in TileGrid)
                 {
                     // I'm not totally sure what the best thing to do is to destroy these tiles, and this does still seem to cause a memory leak...
                     //   but this is good enough I suppose
@@ -135,12 +169,12 @@ namespace LevelEditor
 
             // Padding of 5 units on each side and 20 units on the top happens to look good
             Rectangle mapBounds = PadRectInwards(groupBoxMap.ClientRectangle, 5, 5, 20, 5);
-            Tiles = GenerateGrid<PictureBox>(width, height, mapBounds, parent: groupBoxMap);
+            TileGrid = GenerateGrid<PictureBox>(width, height, mapBounds, parent: groupBoxMap);
 
-            foreach (PictureBox tile in Tiles)
+            foreach (PictureBox tile in TileGrid)
             {
                 // Palette[0, 0] can be safely assumed to be *a* color at least, so it makes for a good default background color
-                tile.BackColor = Palette[0, 0];
+                tile.Image = Palette[0, 0].Sprite;
                 tile.MouseDown += Tile_MouseDown;
                 tile.MouseMove += Tile_MouseMove;
             }
@@ -152,18 +186,24 @@ namespace LevelEditor
         /// <exception cref="Exception">Thrown when this method is called with a non-Control sender.</exception>
         private void Tile_MouseDown(object? sender, MouseEventArgs e)
         {
-            if (sender is not Control tile) throw new Exception();
+            if (sender is not PictureBox tile) throw new Exception();
 
             // We have to disable this control capturing the mouse so that future MouseMove events can be fired on *other* tiles
             //   (to make clicking and dragging work)
             tile.Capture = false;
 
+            (int y, int x) = TileGrid.IndexesOf(tile);
+
             if (e.Button == MouseButtons.Left)
-                tile.BackColor = SelectedColor;
+            {
+                tile.Image = SelectedTile.Sprite;
+
+                Room.Tiles[y, x] = SelectedTile;
+            }
 
             // Right click picks color! Because that's convenient and I wanted it to be a feature!
             if (e.Button == MouseButtons.Right)
-                SelectedColor = tile.BackColor;
+                SelectedTile = Room.Tiles[y, x];
         }
 
         /// <summary>
@@ -172,11 +212,15 @@ namespace LevelEditor
         /// <exception cref="Exception">Thrown when this method is called with a non-Control sender.</exception>
         private void Tile_MouseMove(object? sender, MouseEventArgs e)
         {
-            if (sender is not Control tile) throw new Exception();
+            if (sender is not PictureBox tile) throw new Exception();
+
+            (int y, int x) = TileGrid.IndexesOf(tile);
 
             if (e.Button == MouseButtons.Left)
             {
-                tile.BackColor = SelectedColor;
+                tile.Image = SelectedTile.Sprite;
+
+                Room.Tiles[y, x] = SelectedTile;
             }
         }
 
@@ -291,8 +335,8 @@ namespace LevelEditor
                  */
                 BinaryWriter writer = new(new FileStream(path, FileMode.Create));
 
-                int width = Tiles.GetLength(0);
-                int height = Tiles.GetLength(1);
+                int width = TileGrid.GetLength(0);
+                int height = TileGrid.GetLength(1);
 
                 writer.Write(width);
                 writer.Write(height);
@@ -301,7 +345,7 @@ namespace LevelEditor
                 {
                     for (int y = 0; y < height; y++)
                     {
-                        writer.Write(Tiles[x, y].BackColor.ToArgb());
+                        writer.Write(TileGrid[x, y].BackColor.ToArgb());
                     }
                 }
 
@@ -336,7 +380,7 @@ namespace LevelEditor
                 {
                     for (int y = 0; y < height; y++)
                     {
-                        Tiles[x, y].BackColor = Color.FromArgb(reader.ReadInt32());
+                        TileGrid[x, y].BackColor = Color.FromArgb(reader.ReadInt32());
                     }
                 }
 

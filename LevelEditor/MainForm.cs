@@ -12,19 +12,37 @@ namespace LevelEditor
 {
     public partial class MainForm : Form
     {
-        public IReadOnlyCollection<Image> Tiles { get; private set; }
+        public IReadOnlyCollection<Tile> Tiles { get; private set; }
+
         private Level _level;
+        public Level Level { get => _level; private set
+            {
+                if (value == null)
+                {
+                    labelNoLevelOpen.Visible = true;
+                    flowLayoutPanelRooms.Visible = false;
+                } else
+                {
+                    labelNoLevelOpen.Visible = false;
+                    flowLayoutPanelRooms.Visible = true;
+                }
+
+                _level = value!;
+            } }
 
         public MainForm()
         {
             InitializeComponent();
+
+            _level = null!;
+            Tiles = null!;
         }
 
         private void MainForm_Load(object sender, EventArgs e)
         {
             LoadTiles();
 
-            OpenLevel();
+            Activate();
         }
 
         private void LoadTiles()
@@ -33,7 +51,11 @@ namespace LevelEditor
 
             try
             {
-                Image[] tiles = FileIOHelpers.LoadImages(tilePath);
+                Tile[] tiles = [
+                    FileIOHelpers.LoadTile("testWalkable.png", true),
+                    FileIOHelpers.LoadTile("testWall.png", false)
+                    ];
+
                 Tiles = tiles.AsReadOnly();
             }
             catch (Exception ex)
@@ -63,21 +85,32 @@ namespace LevelEditor
             }
         }
 
-        private void OpenLevel()
+        private void CreateNewLevel()
         {
-            DialogResult response = folderBrowserDialog.ShowDialog();
+            DialogResult response = saveFileDialog.ShowDialog();
 
             switch (response)
             {
                 case DialogResult.OK:
-                    string folderPath = folderBrowserDialog.SelectedPath;
+                    Level = new();
 
-                    string levelFilePath = folderPath + "/level.level";
-                    if (File.Exists(levelFilePath))
+                    FileIOHelpers.SaveLevel(Level, saveFileDialog.FileName);
+                    break;
+            }
+        }
+
+        private void OpenLevel()
+        {
+            DialogResult response = openFileDialog.ShowDialog();
+
+            switch (response)
+            {
+                case DialogResult.OK:
+                    if (File.Exists(openFileDialog.FileName))
                     {
                         try
                         {
-                            FileIOHelpers.LoadLevel(folderPath);
+                            Level = FileIOHelpers.LoadLevel(openFileDialog.FileName);
                         }
                         catch (Exception ex)
                         {
@@ -86,17 +119,24 @@ namespace LevelEditor
                             MessageBoxButtons.OK,
                             MessageBoxIcon.Error);
                         }
-                    } else
+                    }
+                    else
                     {
-                        _level = new();
+                        MessageBox.Show($"Could not find a level at location {openFileDialog.FileName}",
+                            "Error",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error);
                     }
 
                     break;
-
-                case DialogResult.Cancel:
-                    _level = null!;
-                    break;
             }
+        }
+
+        private void OpenNewRoomForm()
+        {
+            NewRoomForm newRoomForm = new(this);
+
+            newRoomForm.ShowDialog(this);
         }
 
         private void reloadTilesToolStripMenuItem_Click(object sender, EventArgs e)
@@ -106,7 +146,17 @@ namespace LevelEditor
 
         private void buttonAddNewRoom_Click(object sender, EventArgs e)
         {
-            NewRoomForm newRoomForm = new(this);
+            OpenNewRoomForm();
+        }
+
+        private void newLevelToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CreateNewLevel();
+        }
+
+        private void loadLevelToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenLevel();
         }
     }
 }

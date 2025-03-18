@@ -43,8 +43,11 @@ namespace LevelEditor
 
             if (result == DialogResult.OK)
             {
-                EditorForm editor = new(openFileDialog.FileName);
-                editor.ShowDialog();
+                EditorForm editor = new(_mainForm, openFileDialog.FileName);
+
+                Close();
+
+                editor.Show();
             }
         }
 
@@ -98,8 +101,11 @@ namespace LevelEditor
 
             /* Create new EditorForm with given dimensions */
 
-            EditorForm editor = new(width, height);
-            editor.ShowDialog();
+            EditorForm editor = new(_mainForm, width, height);
+
+            Close();
+
+            editor.Show();
         }
     }
 }

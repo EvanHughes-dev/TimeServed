@@ -2,6 +2,8 @@ namespace LevelEditor
 {
     internal static class Program
     {
+        public static Random Random { get; } = new();
+
         /// <summary>
         ///  The main entry point for the application.
         /// </summary>

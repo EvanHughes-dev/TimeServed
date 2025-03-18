@@ -9,14 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Tiles\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Tiles\tile_testWalkable.png">
+    <None Update="Tiles\testWalkable.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Tiles\tile_testWall.png">
+    <None Update="Tiles\testWall.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
