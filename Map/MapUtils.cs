@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using System.Runtime.CompilerServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -15,13 +16,17 @@ namespace MakeEveryDayRecount.Map
         private static Player _currentPlayer;
 
         private const int TileSize = 128;
+        private static Game1 game1Instance;
 
         #region Utility Properties
 
         /// <summary>
         /// Get the size of the screen in pixels
         /// </summary>
-        public static Point ScreenSize { get; private set; }
+        public static Point ScreenSize
+        {
+            get => game1Instance.ScreenSize;
+        }
 
         /// <summary>
         /// Get the center point of the screen in pixels
@@ -135,7 +140,7 @@ namespace MakeEveryDayRecount.Map
         /// <param name="gameplayManager">Reference to the overall GameplayManager</param>
         public static void Initialize(Game1 game1, GameplayManager gameplayManager)
         {
-            ScreenSize = game1.ScreenSize;
+            game1Instance = game1;
             gameplayManager.OnPlayerUpdate += SetCurrentPlayer;
             gameplayManager.Map.OnRoomUpdate += SetCurrentRoom;
             // Despite the delegate event systems, the object have already been initialized in

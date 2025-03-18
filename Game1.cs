@@ -1,4 +1,5 @@
-﻿using MakeEveryDayRecount.Map;
+﻿using System.Diagnostics;
+using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -24,21 +25,27 @@ namespace MakeEveryDayRecount
 
         private GameplayManager _gameplayManager;
 
-        public readonly Point ScreenSize = new Point(1280, 1152);
+        public Point ScreenSize
+        {
+            get
+            {
+                return new Point(
+                    GraphicsDevice.Viewport.Width,
+                    GraphicsDevice.Viewport.Height             
+                );
+            }
+        }
 
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+            Window.AllowUserResizing = true; // Enable user resizing
         }
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
-            _graphics.PreferredBackBufferWidth = (int)ScreenSize.X;
-            _graphics.PreferredBackBufferHeight = (int)ScreenSize.Y;
-            _graphics.ApplyChanges();
             base.Initialize();
         }
 
@@ -70,6 +77,9 @@ namespace MakeEveryDayRecount
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
+            System.Diagnostics.Debug.WriteLine(GraphicsDevice.Viewport.Width);
+
+            System.Diagnostics.Debug.WriteLine(ScreenSize);
             _spriteBatch.Begin();
             _gameplayManager.Draw(_spriteBatch);
             // TODO: Add your drawing code here
@@ -82,5 +92,7 @@ namespace MakeEveryDayRecount
         private void DisplayPauseMenu(SpriteBatch sb) { }
 
         private void DisplayMainMenu(SpriteBatch sb) { }
+
+
     }
 }
