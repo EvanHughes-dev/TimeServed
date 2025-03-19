@@ -210,14 +210,14 @@ namespace MakeEveryDayRecount
         }
 
         /// <summary>
-        /// Convert from the player's tile position to world position
+        /// Convert from the player's tile position to screen position
         /// </summary>
         private void UpdatePlayerPos()
         {
             Point playerWorldPos = MapUtils.TileToWorld(Location);
             Point worldToScreen = MapUtils.WorldToScreen();
 
-            PlayerScreenPosition = playerWorldPos - worldToScreen;
+            PlayerScreenPosition = playerWorldPos - worldToScreen + MapUtils.PixelOffset();
         }
 
         #endregion

@@ -24,20 +24,29 @@ namespace MakeEveryDayRecount
 
         private GameplayManager _gameplayManager;
 
-        public readonly Point ScreenSize = new Point(1280, 1152);
+        /// <summary>
+        /// Access the current size of the screen on pixels
+        /// </summary>
+        public Point ScreenSize
+        {
+            get { return new Point(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height); }
+        }
 
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+            Window.AllowUserResizing = true; // Enable user resizing
         }
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
-            _graphics.PreferredBackBufferWidth = (int)ScreenSize.X;
-            _graphics.PreferredBackBufferHeight = (int)ScreenSize.Y;
+            // Set default window size to half the screen size
+            _graphics.PreferredBackBufferWidth =
+                GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2;
+            _graphics.PreferredBackBufferHeight =
+                GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2;
             _graphics.ApplyChanges();
             base.Initialize();
         }
@@ -47,7 +56,6 @@ namespace MakeEveryDayRecount
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             AssetManager.LoadContent(Content);
             // Gameplay manager must be called after all content is loaded
-            //TOFO figure out a new way to access screen size
             _gameplayManager = new GameplayManager();
             MapUtils.Initialize(this, _gameplayManager);
         }
@@ -69,7 +77,8 @@ namespace MakeEveryDayRecount
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Black);
+
             _spriteBatch.Begin();
             _gameplayManager.Draw(_spriteBatch);
             // TODO: Add your drawing code here
