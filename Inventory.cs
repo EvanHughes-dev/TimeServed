@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using MakeEveryDayRecount.GameObjects.Props;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,13 +26,12 @@ namespace MakeEveryDayRecount
             //    create a button and offset the x
             //}
         }
-        public void Draw(SpriteBatch sb) 
+        public void Draw(SpriteBatch sb)
         {
             //for each(Buton button in inventoryUI)
             //{
             //    button.Draw()
             //}
-
         }
     }
 }
