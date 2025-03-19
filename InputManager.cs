@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework.Input;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,8 +8,16 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MakeEveryDayRecount
-{
-    //Write an enum for mosue states
+{   
+    //Enum for different mouse button states
+    //JAMES NOTE
+    //I think it needs a better name
+    public enum MouseButtonState
+    {
+        Left,
+        Right,
+        Middle
+    }
     
     /// <summary>
     /// James Young
@@ -66,9 +76,79 @@ namespace MakeEveryDayRecount
             return CurrentKeyboardState.IsKeyDown(key);
         }
 
-        public static bool GetMousePress(Keys key)
+        /// <summary>
+        /// Returns a boolean related to the current mouse state
+        /// </summary>
+        /// <param name="mouseState">Mouse state being checked</param>
+        /// <returns>True if the given mouse state was started this frame, false otherwise</returns>
+        public static bool GetMousePress(MouseButtonState mbs)
         {
-            return CurrentMouseState.mouse
+            switch (mbs)
+            {
+                case MouseButtonState.Left:
+                    return CurrentMouseState.LeftButton == ButtonState.Pressed &&
+                        PriorMouseState.LeftButton == ButtonState.Released;
+                case MouseButtonState.Right:
+                    return CurrentMouseState.RightButton == ButtonState.Pressed &&
+                        PriorMouseState.RightButton == ButtonState.Released;
+                case MouseButtonState.Middle:
+                    return CurrentMouseState.MiddleButton == ButtonState.Pressed &&
+                        PriorMouseState.MiddleButton == ButtonState.Released;
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Returns a boolean related to the current mouse state
+        /// </summary>
+        /// <param name="mbs">Mouse state being checked</param>
+        /// <returns>True if the given mouse state was ended this frame, false otherwise</returns>
+        public static bool GetMouseRelease(MouseButtonState mbs)
+        {
+            switch (mbs)
+            {
+                case MouseButtonState.Left:
+                    return CurrentMouseState.LeftButton == ButtonState.Released &&
+                        PriorMouseState.LeftButton == ButtonState.Pressed;
+                case MouseButtonState.Right:
+                    return CurrentMouseState.RightButton == ButtonState.Released &&
+                        PriorMouseState.RightButton == ButtonState.Pressed;
+                case MouseButtonState.Middle:
+                    return CurrentMouseState.MiddleButton == ButtonState.Released &&
+                        PriorMouseState.MiddleButton == ButtonState.Pressed;
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Returns a boolean related to the current mouse state
+        /// </summary>
+        /// <param name="mbs">Mouse state being checked</param>
+        /// <returns>True if the given mouse state is active, false otherwise</returns>
+        public static bool GetMouseStatus(MouseButtonState mbs)
+        {
+            switch (mbs)
+            {
+                case MouseButtonState.Left:
+                    return CurrentMouseState.LeftButton == ButtonState.Pressed;
+                case MouseButtonState.Right:
+                    return CurrentMouseState.RightButton == ButtonState.Pressed;
+                case MouseButtonState.Middle:
+                    return CurrentMouseState.MiddleButton == ButtonState.Pressed;
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Returns a point with the mouse's current X and Y positions
+        /// </summary>
+        /// <returns>A point with the mouse's current X and Y positions</returns>
+        public static Point GetMousePosition()
+        {
+            return new Point(CurrentMouseState.X, CurrentMouseState.Y);
         }
     }
 }

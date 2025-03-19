@@ -47,9 +47,25 @@ namespace MakeEveryDayRecount
             }
         }
 
+        //JAMES NOTE
+        //The methods above and below have two different ways of getting mouse position.
+        //Bottom one is more verbose and goes through input manager.
+        //I don't know which is better code.
+
+        /// <summary>
+        /// 
+        /// </summary>
         public void Click()
         {
-            OnClick?.Invoke();
+            //JAMES NOTE
+            //Should I be checking position in this method or outside of it?
+            
+            Point mousePos = InputManager.GetMousePosition();
+            //If the mouse is within the button and the left mouse button was clicked this frame
+            if (mousePos.X >= _rectangle.Left && mousePos.X <= _rectangle.Right &&
+                mousePos.Y >= _rectangle.Top && mousePos.Y <= _rectangle.Bottom &&
+                InputManager.GetMousePress(MouseButtonState.Left))
+                OnClick?.Invoke();
         }
     }
 }

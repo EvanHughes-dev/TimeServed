@@ -44,6 +44,9 @@ namespace MakeEveryDayRecount
             pauseButtons = new List<Button>();
             menuButtons = new List<Button>();
 
+            //Set initial GameState
+            _state = GameState.Menu;
+
             base.Initialize();
         }
 
@@ -53,26 +56,19 @@ namespace MakeEveryDayRecount
 
             //Load buttons
             LoadButtons();
-
-
         }
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
-
             InputManager.Update();
 
             switch (_state)
             {
                 case GameState.Menu:
-                    //Check if any buttons were clicked
                     CheckButtonClicks(menuButtons);
                     break;
 
                 case GameState.Pause:
-                    //Check if any buttons were clicked
                     CheckButtonClicks(pauseButtons);
                     break;
 
@@ -80,8 +76,9 @@ namespace MakeEveryDayRecount
                     //On level end
                     //_state = GameState.Cutscene;
 
-                    //If pause button is pressed
-                    //_state = GameState.Pause;
+                    //Pause button can change, figured escape makes the most sense
+                    if (InputManager.GetKeyPress(Keys.Escape))
+                        _state = GameState.Pause;
                     break;
 
                 case GameState.Cutscene:
@@ -123,6 +120,7 @@ namespace MakeEveryDayRecount
                     DrawPause(_spriteBatch);
                     break;
                 case GameState.Level:
+
                     break;
                 case GameState.Cutscene:
                     break;
@@ -186,7 +184,11 @@ namespace MakeEveryDayRecount
 
             for (int i = 0; i < list.Count; i++)
             {
+                //JAMES NOTE
+                //Work on this next
 
+                //Invoke the button's on click effect if it has been clicked
+                list[i].Click();
             }
         }
 
@@ -215,6 +217,33 @@ namespace MakeEveryDayRecount
             {
                 pauseButtons[i].Draw(sb);
             }
+        }
+
+        /// <summary>
+        /// Draws the level.
+        /// </summary>
+        /// <param name="sb">sprite batch used to draw</param>
+        private void DrawLevel(SpriteBatch sb)
+        {
+
+        }
+
+        /// <summary>
+        /// Draws the cutscene.
+        /// </summary>
+        /// <param name="sb">sprite batch used to draw</param>
+        private void DrawCutscene(SpriteBatch sb)
+        {
+
+        }
+
+        /// <summary>
+        /// Draws the playback.
+        /// </summary>
+        /// <param name="sb">sprite batch used to draw</param>
+        private void DrawPlayback(SpriteBatch sb)
+        {
+
         }
 
         /// <summary>
