@@ -46,6 +46,9 @@ namespace MakeEveryDayRecount
         //to the map which lets the player know what's near them
         private readonly GameplayManager _gameplayManager;
 
+        //The player's inventory
+        private Inventory _inventory;
+
         public Player(Point location, Texture2D sprite, GameplayManager gameplayManager)
             : base(location, sprite)
         {
@@ -53,6 +56,8 @@ namespace MakeEveryDayRecount
             _gameplayManager = gameplayManager;
             _animationFrame = 0;
             _playerSize = new Point(sprite.Width / 4, sprite.Height / 4);
+            //Create an inventory
+            _inventory = new Inventory();
         }
 
         /// <summary>
@@ -145,12 +150,17 @@ namespace MakeEveryDayRecount
         /// <param name="sb">The instance of spritebatch to be used to draw the player</param>
         public void Draw(SpriteBatch sb)
         {
+
             sb.Draw(
                 Sprite,
                 new Rectangle(PlayerScreenPosition, AssetManager.TileSize),
                 _playerFrameRectangle,
                 Color.White
             );
+
+            //Draw the inventory. If the player were to ever overlap the inventory it will disppear behind it
+            //Because nothing in the game should be drawn on top of the UI
+            _inventory.Draw(sb);
         }
 
         /// <summary>
@@ -214,7 +224,7 @@ namespace MakeEveryDayRecount
 
         public bool ContainsKey(Door.DoorKeyType keyType)
         {
-            foreach (Item item in _inventory)
+            foreach (Item item in _inventory.Contents)
             {
                 if (item.ItemKeyType == keyType)
                 {
@@ -227,8 +237,8 @@ namespace MakeEveryDayRecount
 
         public void PickUpItem(Item item)
         {
-            throw new NotImplementedException();
             //add the item to your inventory
+            _inventory.Contents.Add(item);
         }
     }
 }
