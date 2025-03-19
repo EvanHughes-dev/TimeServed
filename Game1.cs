@@ -152,28 +152,28 @@ namespace MakeEveryDayRecount
 
             //Fill pause buttons list with buttons
             Rectangle pauseContinueRect = new Rectangle(200, 200, 400, 100);
-            Button pauseContinue = new Button(defaultButtonTexture, defaultButtonTexture, pauseContinueRect);
+            Button pauseContinue = new Button(defaultButtonTexture, defaultButtonTexture, pauseContinueRect, true);
             pauseContinue.OnClick += MakeSwitchStateAction(GameState.Level);
             pauseButtons.Add(pauseContinue);
 
             Rectangle pauseLastCheckpointRect = new Rectangle(200, 320, 400, 100);
-            Button pauseLastCheckpoint = new Button(defaultButtonTexture, defaultButtonTexture, pauseLastCheckpointRect);
+            Button pauseLastCheckpoint = new Button(defaultButtonTexture, defaultButtonTexture, pauseLastCheckpointRect, true);
             //pauseLastCheckpoint += the method that brings you back to your last checkpoint
             pauseButtons.Add(pauseLastCheckpoint);
 
             Rectangle pauseQuitRect = new Rectangle(200, 440, 400, 100);
-            Button pauseQuit = new Button(defaultButtonTexture, defaultButtonTexture, pauseQuitRect);
+            Button pauseQuit = new Button(defaultButtonTexture, defaultButtonTexture, pauseQuitRect, true);
             pauseQuit.OnClick += MakeSwitchStateAction(GameState.Menu);
             pauseButtons.Add(pauseQuit);
 
             //Fill menu buttons list with buttons
             Rectangle menuPlayRect = new Rectangle(400, 200, 300, 100);
-            Button menuPlay = new Button(defaultButtonTexture, defaultButtonTexture, menuPlayRect);
+            Button menuPlay = new Button(defaultButtonTexture, defaultButtonTexture, menuPlayRect, true);
             menuPlay.OnClick += MakeSwitchStateAction(GameState.Level);
             menuButtons.Add(menuPlay);
 
             Rectangle menuQuitRect = new Rectangle(400, 340, 100, 40);
-            Button menuQuit = new Button(defaultButtonTexture, defaultButtonTexture, menuQuitRect);
+            Button menuQuit = new Button(defaultButtonTexture, defaultButtonTexture, menuQuitRect, true);
             //menuQuit.OnClick += the method that closes the game
             menuButtons.Add(menuQuit);
 
@@ -184,9 +184,6 @@ namespace MakeEveryDayRecount
 
             for (int i = 0; i < list.Count; i++)
             {
-                //JAMES NOTE
-                //Work on this next
-
                 //Invoke the button's on click effect if it has been clicked
                 list[i].Click();
             }
@@ -217,15 +214,6 @@ namespace MakeEveryDayRecount
             {
                 pauseButtons[i].Draw(sb);
             }
-        }
-
-        /// <summary>
-        /// Draws the level.
-        /// </summary>
-        /// <param name="sb">sprite batch used to draw</param>
-        private void DrawLevel(SpriteBatch sb)
-        {
-
         }
 
         /// <summary>

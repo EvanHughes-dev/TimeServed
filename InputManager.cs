@@ -29,7 +29,7 @@ namespace MakeEveryDayRecount
         private static KeyboardState PriorKeyboardState { get; set; }
         private static KeyboardState CurrentKeyboardState { get; set; }
         private static MouseState PriorMouseState { get; set; }
-        private static MouseState CurrentMouseState { get; set; }
+        public static MouseState CurrentMouseState { get; set; }
 
         /// <summary>
         /// Updates prior and current states.

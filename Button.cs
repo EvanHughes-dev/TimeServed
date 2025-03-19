@@ -9,21 +9,48 @@ using System.Threading.Tasks;
 
 namespace MakeEveryDayRecount
 {
+    /// <summary>
+    /// Basic button with functionality for 
+    /// </summary>
     class Button
     {
         //Fields
         private Texture2D _image;
         private Texture2D _hoverImage;
         private Rectangle _rectangle;
+        private bool _active;
 
         public event Action OnClick;
 
-        //Constructor
-        public Button(Texture2D image, Texture2D hoverImage, Rectangle rectangle)
+        //Properties
+        public bool Active
+        {
+            get { return _active; }
+            set { _active = value; }
+        }
+        public bool Hovered
+        {
+            get 
+            {
+                MouseState ms = InputManager.CurrentMouseState;
+                return (ms.X >= _rectangle.Left && ms.X <= _rectangle.Right &&
+                ms.Y >= _rectangle.Top && ms.Y <= _rectangle.Bottom);
+            }
+        }
+
+        /// <summary>
+        /// Creates a button
+        /// </summary>
+        /// <param name="image">Image the button displays when not hovered over</param>
+        /// <param name="hoverImage">Image the button displays when hovered over</param>
+        /// <param name="rectangle">Rectangle corresponding to the position of the button</param>
+        /// <param name="active">Boolean determining if the button is active (can be clicked) or not</param>
+        public Button(Texture2D image, Texture2D hoverImage, Rectangle rectangle, bool active)
         {
             _image = image;
             _hoverImage = hoverImage;
             _rectangle = rectangle;
+            _active = active;
         }
 
         //Methods
@@ -33,38 +60,19 @@ namespace MakeEveryDayRecount
         /// </summary>
         /// <param name="sb">sprite batch used for drawing the button</param>
         public void Draw(SpriteBatch sb)
-        {
-            MouseState ms = Mouse.GetState();
-            if (ms.X >= _rectangle.Left && ms.X <= _rectangle.Right &&
-                ms.Y >= _rectangle.Top && ms.Y <= _rectangle.Bottom)
-            {
+        {   
+            if (Hovered)
                 sb.Draw(_hoverImage, _rectangle, Color.White);
-            }
-
             else
-            {
                 sb.Draw(_image, _rectangle, Color.White);
-            }
         }
 
-        //JAMES NOTE
-        //The methods above and below have two different ways of getting mouse position.
-        //Bottom one is more verbose and goes through input manager.
-        //I don't know which is better code.
-
         /// <summary>
-        /// 
+        /// If the button is hovered over and clicked, invokes its OnClick method
         /// </summary>
         public void Click()
-        {
-            //JAMES NOTE
-            //Should I be checking position in this method or outside of it?
-            
-            Point mousePos = InputManager.GetMousePosition();
-            //If the mouse is within the button and the left mouse button was clicked this frame
-            if (mousePos.X >= _rectangle.Left && mousePos.X <= _rectangle.Right &&
-                mousePos.Y >= _rectangle.Top && mousePos.Y <= _rectangle.Bottom &&
-                InputManager.GetMousePress(MouseButtonState.Left))
+        {   
+            if (Hovered && InputManager.GetMousePress(MouseButtonState.Left) && _active)
                 OnClick?.Invoke();
         }
     }
