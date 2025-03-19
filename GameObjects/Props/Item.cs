@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace MakeEveryDayRecount.GameObjects.Props
 {
     /// <summary>
-    /// An item the player cabn pick up and add to their inventory
+    /// An item the player can pick up and add to their inventory
     /// </summary>
     internal class Item : Prop
     {
@@ -34,6 +34,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// <param name="player">Player object interacting</param>
         public override void Interact(Player player)
         {
+            //This tells the map manager to remove the item from the room
             OnItemPickup(this);
             //Since it can't return itself because then it wouldn't be an override of GameObject.Interact, this instead calls a method in the player which adds it to the player's inventory
             player.PickUpItem(this);
