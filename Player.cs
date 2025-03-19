@@ -46,8 +46,6 @@ namespace MakeEveryDayRecount
         //to the map which lets the player know what's near them
         private readonly GameplayManager _gameplayManager;
 
-        private List<GameObject> _inventory;
-
         public Player(Point location, Texture2D sprite, GameplayManager gameplayManager)
             : base(location, sprite)
         {
