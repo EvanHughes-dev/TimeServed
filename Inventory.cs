@@ -25,7 +25,7 @@ namespace MakeEveryDayRecount
             //    create a button and offset the x
             //}
         }
-        public void Draw() 
+        public void Draw(SpriteBatch sb) 
         {
             //for each(Buton button in inventoryUI)
             //{
