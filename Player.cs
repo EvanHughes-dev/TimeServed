@@ -39,7 +39,7 @@ namespace MakeEveryDayRecount
         //to the map which lets the player know what's near them
         private readonly GameplayManager _gameplayManager;
 
-        private List<GameObject> _inventory;
+        private List<Item> _inventory;
 
         private Rectangle _sourceRectangle;
         private Texture2D _playerTextures; //Probably a sprite sheet
@@ -160,9 +160,18 @@ namespace MakeEveryDayRecount
             PlayerScreenPosition = playerWorldPos - worldToScreen;
         }
 
+        /// <summary>
+        /// Check the player's inventory to see if it contains a certain key
+        /// </summary>
+        /// <param name="keyType">Type of key to check for</param>
+        /// <returns>Boolean True -> Key in inventory False -> Key not found </returns>
         public bool ContainsKey(Door.DoorKeyType keyType)
         {
-            throw new NotImplementedException();
+            foreach (Item currentItem in _inventory)
+            {
+
+            }
+            return false;
         }
     }
 }
