@@ -12,7 +12,13 @@ namespace MakeEveryDayRecount
 {
     internal class Inventory
     {
-        private Inventory() 
+
+        //inventory will always be 4 buttons
+        //Button[] inventoryUI = new Button[4];
+        private List<Item> _contents;
+        public List<Item> Contents { get { return _contents; } }
+
+        public Inventory() 
         { 
             //for (int i = 0; i < inventory.Length; i++)
             //{
@@ -20,19 +26,5 @@ namespace MakeEveryDayRecount
             //}
         }
 
-        private static Inventory instance = null;
-        public static Inventory Instance
-        {
-            get 
-            { 
-                if (instance == null) { instance = new Inventory(); }
-
-                return instance;
-            }
-        }
-        //inventory will always be 4 buttons
-        //Button[] inventoryUI = new Button[4];
-        private List<Item> _contents;
-        public List<Item> Contents { get { return _contents; } }
     }
 }
