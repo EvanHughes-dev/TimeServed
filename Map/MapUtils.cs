@@ -1,7 +1,4 @@
-﻿using System.Numerics;
-using System.Runtime.CompilerServices;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
 
 namespace MakeEveryDayRecount.Map
 {
@@ -15,7 +12,6 @@ namespace MakeEveryDayRecount.Map
         private static Room _currentRoom;
         private static Player _currentPlayer;
 
-        private const int TileSize = 128;
         private static Game1 game1Instance;
 
         #region Utility Properties
@@ -37,11 +33,17 @@ namespace MakeEveryDayRecount.Map
         }
 
         /// <summary>
-        /// The first tile that map will start shifting
+        /// The first tile that map will start shifting with the player
         /// </summary>
         public static Point MinDisplayableTile
         {
-            get { return new Point(ScreenCenter.X / 128, ScreenCenter.Y / 128); }
+            get
+            {
+                return new Point(
+                    ScreenCenter.X / AssetManager.TileSize.X,
+                    ScreenCenter.Y / AssetManager.TileSize.Y
+                );
+            }
         }
 
         /// <summary>
@@ -52,8 +54,8 @@ namespace MakeEveryDayRecount.Map
             get
             {
                 return new Point(
-                    (MapSizePixels.X - ScreenCenter.X) / 128,
-                    (MapSizePixels.Y - ScreenCenter.Y) / 128
+                    (MapSizePixels.X - ScreenCenter.X) / AssetManager.TileSize.X,
+                    (MapSizePixels.Y - ScreenCenter.Y) / AssetManager.TileSize.Y
                 );
             }
         }
@@ -71,7 +73,13 @@ namespace MakeEveryDayRecount.Map
         /// </summary>
         public static Point MapSizePixels
         {
-            get { return new Point(MapSizeTiles.X * 128, MapSizeTiles.Y * 128); }
+            get
+            {
+                return new Point(
+                    MapSizeTiles.X * AssetManager.TileSize.X,
+                    MapSizeTiles.Y * AssetManager.TileSize.Y
+                );
+            }
         }
 
         #endregion
@@ -95,11 +103,13 @@ namespace MakeEveryDayRecount.Map
         /// <returns>Position in world space</returns>
         public static Point TileToWorld(int xPos, int yPos)
         {
-            return new Point(xPos * TileSize, yPos * TileSize);
+            return new Point(xPos * AssetManager.TileSize.X, yPos * AssetManager.TileSize.Y);
         }
 
         /// <summary>
-        /// Get the point to offset between screen and world positions
+        /// Get the point to offset between screen and world positions assuming the map
+        /// is larger than the size of the screen. To compensate for any needed offset,
+        /// add the PixelOffset value
         /// </summary>
         /// <returns>Point that corresponds to the distance between world and screen pos</returns>
         public static Point WorldToScreen()
@@ -112,6 +122,20 @@ namespace MakeEveryDayRecount.Map
             );
         }
 
+        /// <summary>
+        /// Calculate the difference between the size of the map and size of the screen
+        /// </summary>
+        /// <returns>Point which hold the X and Y axis differences</returns>
+        public static Point PixelOffset()
+        {
+            Point offset = Point.Zero;
+            if (ScreenSize.X > MapSizePixels.X)
+                offset.X = (ScreenSize.X - MapSizePixels.X) / 2;
+
+            if (ScreenSize.Y > MapSizePixels.Y)
+                offset.Y = (ScreenSize.Y - MapSizePixels.Y) / 2;
+            return offset;
+        }
         #endregion
 
         /// <summary>

@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using MakeEveryDayRecount.Map;
+﻿using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -25,15 +24,12 @@ namespace MakeEveryDayRecount
 
         private GameplayManager _gameplayManager;
 
+        /// <summary>
+        /// Access the current size of the screen on pixels
+        /// </summary>
         public Point ScreenSize
         {
-            get
-            {
-                return new Point(
-                    GraphicsDevice.Viewport.Width,
-                    GraphicsDevice.Viewport.Height             
-                );
-            }
+            get { return new Point(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height); }
         }
 
         public Game1()
@@ -42,6 +38,13 @@ namespace MakeEveryDayRecount
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
             Window.AllowUserResizing = true; // Enable user resizing
+
+            // Set default window size to half the screen size
+            _graphics.PreferredBackBufferWidth =
+                GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2;
+            _graphics.PreferredBackBufferHeight =
+                GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2;
+            _graphics.ApplyChanges();
         }
 
         protected override void Initialize()
@@ -54,7 +57,6 @@ namespace MakeEveryDayRecount
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             AssetManager.LoadContent(Content);
             // Gameplay manager must be called after all content is loaded
-            //TOFO figure out a new way to access screen size
             _gameplayManager = new GameplayManager();
             MapUtils.Initialize(this, _gameplayManager);
         }
@@ -76,10 +78,8 @@ namespace MakeEveryDayRecount
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-            System.Diagnostics.Debug.WriteLine(GraphicsDevice.Viewport.Width);
+            GraphicsDevice.Clear(Color.Black);
 
-            System.Diagnostics.Debug.WriteLine(ScreenSize);
             _spriteBatch.Begin();
             _gameplayManager.Draw(_spriteBatch);
             // TODO: Add your drawing code here
@@ -92,7 +92,5 @@ namespace MakeEveryDayRecount
         private void DisplayPauseMenu(SpriteBatch sb) { }
 
         private void DisplayMainMenu(SpriteBatch sb) { }
-
-
     }
 }
