@@ -1,9 +1,16 @@
 ﻿using System;
+using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace MakeEveryDayRecount
 {
+    /// <summary>
+    /// Called when the player object is updated in memory
+    /// </summary>
+    /// <param name="player">New player object</param>
+    delegate void OnPlayerUpdate(Player player);
+
     /// <summary>
     /// Manager of Player and the Map Manager.
     /// </summary>
@@ -20,24 +27,22 @@ namespace MakeEveryDayRecount
         public Player PlayerObject { get; private set; }
 
         /// <summary>
-        /// Get the size of the screen
-        /// </summary>
-        public Vector2 ScreenSize { get; private set; }
-        /// <summary>
-        /// The map manager currently being used by this gameplay manager
+        /// Access the current MapManager
         /// </summary>
         public MapManager Map { get; private set; }
+
+        public OnPlayerUpdate OnPlayerUpdate;
 
         /// <summary>
         /// Initialize GameplayManager
         /// </summary>
         /// <param name="screenSize">Size of the screen</param>
-        public GameplayManager(Vector2 screenSize)
+        public GameplayManager()
         {
             Level = 1;
-            Map = new MapManager(this);
             PlayerObject = new Player(new Point(3, 3), AssetManager.PlayerTexture, this);
-            ScreenSize = screenSize;
+            Map = new MapManager(this);
+            OnPlayerUpdate?.Invoke(PlayerObject);
         }
 
         public void Update(GameTime gameTime)
