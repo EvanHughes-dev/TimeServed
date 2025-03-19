@@ -18,13 +18,20 @@ namespace MakeEveryDayRecount
         private List<Item> _contents;
         public List<Item> Contents { get { return _contents; } }
 
-        public Inventory() 
-        { 
+        public Inventory()
+        {
             //for (int i = 0; i < inventory.Length; i++)
             //{
             //    create a button and offset the x
             //}
         }
+        public void Draw() 
+        {
+            //for each(Buton button in inventoryUI)
+            //{
+            //    button.Draw()
+            //}
 
+        }
     }
 }
