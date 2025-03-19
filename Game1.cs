@@ -38,17 +38,16 @@ namespace MakeEveryDayRecount
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
             Window.AllowUserResizing = true; // Enable user resizing
+        }
 
+        protected override void Initialize()
+        {
             // Set default window size to half the screen size
             _graphics.PreferredBackBufferWidth =
                 GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2;
             _graphics.PreferredBackBufferHeight =
                 GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2;
             _graphics.ApplyChanges();
-        }
-
-        protected override void Initialize()
-        {
             base.Initialize();
         }
 
