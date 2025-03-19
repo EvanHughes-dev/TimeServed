@@ -29,14 +29,13 @@ namespace MakeEveryDayRecount
 
         private PlayerState _playerState;
         private readonly double _tilesPerSecond;
-        private List<GameObject> _inventory;
-
+        private Inventory _inventory = Inventory.Instance;
         private Rectangle _sourceRectangle;
         private Texture2D _playerTextures;
 
         public Player(Point location, Texture2D sprite) : base(location, sprite)
         {
-
+           
         }
 
         public override void Update(float gameTime) {
