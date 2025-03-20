@@ -26,6 +26,9 @@ namespace MakeEveryDayRecount
             Down = 3
         }
 
+        /// <summary>
+        /// Player's current position on the screen
+        /// </summary>
         public Point PlayerScreenPosition { get; private set; }
 
         private Direction _playerCurrentDirection;

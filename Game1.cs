@@ -48,7 +48,6 @@ namespace MakeEveryDayRecount
             _debugState = DebugState.None;
             GlobalDebug.Initialize();
             _debugModes = new BaseDebug[2];
-            GlobalDebug.AddObject("State", ()=>_debugState);
 
         }
 
