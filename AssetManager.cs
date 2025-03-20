@@ -40,10 +40,7 @@ namespace MakeEveryDayRecount
         /// Default font for debugging
         /// </summary>
         public static SpriteFont TimesNewRoman20 { get; private set; }
-        /// <summary>
-        /// Default font for debugging
-        /// </summary>
-        public static SpriteFont TimesNewRoman20 { get; private set; }
+
         /// <summary>
         /// The size of each tile, in pixels
         /// </summary>
