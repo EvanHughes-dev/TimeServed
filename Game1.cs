@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using MakeEveryDayRecount.Map;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
@@ -28,18 +29,35 @@ namespace MakeEveryDayRecount
         private List<Button> menuButtons;
         private Texture2D defaultButtonTexture;
 
-
         private GameState _state;
+
+        private GameplayManager _gameplayManager;
+
+        /// <summary>
+        /// Access the current size of the screen on pixels
+        /// </summary>
+        public Point ScreenSize
+        {
+            get { return new Point(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height); }
+        }
 
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+            Window.AllowUserResizing = true; // Enable user resizing
         }
 
         protected override void Initialize()
         {
+            // Set default window size to half the screen size
+            _graphics.PreferredBackBufferWidth =
+                GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2;
+            _graphics.PreferredBackBufferHeight =
+                GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2;
+            _graphics.ApplyChanges();
+
             //Initialize button lists
             pauseButtons = new List<Button>();
             menuButtons = new List<Button>();
@@ -53,6 +71,10 @@ namespace MakeEveryDayRecount
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+            AssetManager.LoadContent(Content);
+            // Gameplay manager must be called after all content is loaded
+            _gameplayManager = new GameplayManager();
+            MapUtils.Initialize(this, _gameplayManager);
 
             //Load buttons
             LoadButtons();
@@ -98,6 +120,8 @@ namespace MakeEveryDayRecount
                     break;
             }
 
+            InputManager.Update();
+            _gameplayManager.Update(gameTime);
             // TODO: Add your update logic here
 
             base.Update(gameTime);
@@ -105,11 +129,10 @@ namespace MakeEveryDayRecount
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Black);
 
-            //Start the sprite batch
             _spriteBatch.Begin();
-
+            _gameplayManager.Draw(_spriteBatch);
             // TODO: Add your drawing code here
             switch (_state)
             {
@@ -138,7 +161,9 @@ namespace MakeEveryDayRecount
         }
 
         private void CheckKeyboardInput() { }
+
         private void DisplayPauseMenu(SpriteBatch sb) { }
+
         private void DisplayMainMenu(SpriteBatch sb) { }
 
         /// <summary>

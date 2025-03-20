@@ -1,36 +1,54 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using MakeEveryDayRecount.Map;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using System;
-
 
 namespace MakeEveryDayRecount
 {
     /// <summary>
-    /// James Young
+    /// Called when the player object is updated in memory
+    /// </summary>
+    /// <param name="player">New player object</param>
+    delegate void OnPlayerUpdate(Player player);
+
+    /// <summary>
     /// Manager of Player and the Map Manager.
     /// </summary>
     internal class GameplayManager
     {
-        public int CurrentLevel { get; private set; }
-        public Player PlayerObject { get; private set; }
-
-        private MapManager _map;
-
-        public GameplayManager(Player player, Texture2D[] tileMap)
-        {
-            PlayerObject = player;
-            _map = new MapManager(tileMap);
-        }
+        /// <summary>
+        /// The current level being played
+        /// </summary>
+        public int Level { get; private set; }
 
         /// <summary>
-        /// Updates the player (and maybe additional stuff later)
+        /// Access the reference to the Player
         /// </summary>
-        /// <param name="deltaTimeS">How much time has ellapsed since the last update</param>
-        public void Update(float deltaTimeS)
+        public Player PlayerObject { get; private set; }
+
+        /// <summary>
+        /// Access the current MapManager
+        /// </summary>
+        public MapManager Map { get; private set; }
+
+        public OnPlayerUpdate OnPlayerUpdate;
+
+        /// <summary>
+        /// Initialize GameplayManager
+        /// </summary>
+        /// <param name="screenSize">Size of the screen</param>
+        public GameplayManager()
+        {
+            Level = 1;
+            PlayerObject = new Player(new Point(3, 3), AssetManager.PlayerTexture, this);
+            Map = new MapManager(this);
+            OnPlayerUpdate?.Invoke(PlayerObject);
+        }
+
+        public void Update(GameTime gameTime)
         {
             //Update Player
-            PlayerObject.Update(deltaTimeS);
+            PlayerObject.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
         }
 
         /// <summary>
@@ -41,7 +59,7 @@ namespace MakeEveryDayRecount
         public void Draw(SpriteBatch sb)
         {
             //Draw the map
-            _map.Draw(sb);
+            Map.Draw(sb);
 
             //Draw the player
             PlayerObject.Draw(sb);
