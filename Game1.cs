@@ -200,7 +200,7 @@ namespace MakeEveryDayRecount
         }
 
         /// <summary>
-        /// Check for user input that effect the game state or debug
+        /// Check for user input that affects the game state or debug
         /// modes of the overall game
         /// </summary>
         private void CheckKeyboardInput()
