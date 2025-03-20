@@ -23,11 +23,11 @@ namespace MakeEveryDayRecount.DebugModes
         /// </summary>
         /// <param name="spriteFont">The font used for debug text</param>
         /// <param name="gameplayManager">Reference to the game's manager for accessing player data</param>
-        public BaseDebug(SpriteFont sf, GameplayManager gameplayManager)
+        public BaseDebug(GameplayManager gameplayManager)
         {
-            _spriteFont = sf;
+            _spriteFont = AssetManager.TimesNewRoman20;
             _gameplayManager = gameplayManager;
-            _yAxisIncrement = sf.LineSpacing;
+            _yAxisIncrement = _spriteFont.LineSpacing;
             _objectsToDisplay = new Dictionary<string, Func<object>> { };
         }
 

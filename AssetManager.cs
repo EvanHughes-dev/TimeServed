@@ -37,6 +37,10 @@ namespace MakeEveryDayRecount
         public static Texture2D DebugNotWalkableTile { get; private set; }
 
         /// <summary>
+        /// Default font for debugging
+        /// </summary>
+        public static SpriteFont TimesNewRoman20 { get; private set; }
+        /// <summary>
         /// The size of each tile, in pixels in pixels
         /// </summary>
         public static Point TileSize { get; private set; }
@@ -60,6 +64,7 @@ namespace MakeEveryDayRecount
 
             DebugWalkableTile = content.Load<Texture2D>("DebugAssets/WALKABLE");
             DebugNotWalkableTile = content.Load<Texture2D>("DebugAssets/NOT_WALKABLE");
+            TimesNewRoman20 = content.Load<SpriteFont>("Arial20");
 
             TileSize = new Point(TileMap[0].Width, TileMap[0].Height);
         }

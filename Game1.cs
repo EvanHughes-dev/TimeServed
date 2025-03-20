@@ -43,7 +43,7 @@ namespace MakeEveryDayRecount
         private GameplayManager _gameplayManager;
 
         /// <summary>
-        /// Access the current size of the screen on pixels
+        /// Access the current size of the screen in pixels
         /// </summary>
         public Point ScreenSize
         {
@@ -62,7 +62,7 @@ namespace MakeEveryDayRecount
             Window.AllowUserResizing = true; // Enable user resizing
 
             _debugState = DebugState.None;
-            GlobalDebug.Initialize();
+
             _debugModes = new BaseDebug[2];
 
         }
@@ -90,15 +90,15 @@ namespace MakeEveryDayRecount
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             AssetManager.LoadContent(Content);
-            SpriteFont sf = Content.Load<SpriteFont>("Arial20");
-            GlobalDebug.SetFont(sf);
+
 
             // Gameplay manager must be called after all content is loaded
             _gameplayManager = new GameplayManager();
-            _debugModes[0] = new PlayerDebug(sf, _gameplayManager);
-            _debugModes[1] = new MapDebug(sf, _gameplayManager);
-            MapUtils.Initialize(this, _gameplayManager);
 
+            MapUtils.Initialize(this, _gameplayManager);
+            GlobalDebug.Initialize();
+            _debugModes[0] = new PlayerDebug(_gameplayManager);
+            _debugModes[1] = new MapDebug(_gameplayManager);
             //Load buttons
             LoadButtons();
         }
@@ -167,10 +167,12 @@ namespace MakeEveryDayRecount
                     break;
                 case GameState.Pause:
                     _gameplayManager.Draw(_spriteBatch);
+                    DisplayDebug();
                     DrawPause(_spriteBatch);
                     break;
                 case GameState.Level:
                     _gameplayManager.Draw(_spriteBatch);
+                    DisplayDebug();
                     break;
                 case GameState.Cutscene:
                     break;
@@ -179,6 +181,19 @@ namespace MakeEveryDayRecount
                 default:
                     break;
             }
+
+            //End the sprite batch
+
+            _spriteBatch.End();
+
+            base.Draw(gameTime);
+        }
+
+        /// <summary>
+        /// Draw the current debug display to the screen
+        /// </summary>
+        private void DisplayDebug()
+        {
             switch (_debugState)
             {
                 case DebugState.Global:
@@ -191,12 +206,6 @@ namespace MakeEveryDayRecount
                     _debugModes[1].Draw(_spriteBatch);
                     break;
             }
-
-            //End the sprite batch
-
-            _spriteBatch.End();
-
-            base.Draw(gameTime);
         }
 
         /// <summary>

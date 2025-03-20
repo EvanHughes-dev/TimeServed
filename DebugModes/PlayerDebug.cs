@@ -22,8 +22,8 @@ namespace MakeEveryDayRecount.DebugModes
         /// </summary>
         /// <param name="spriteFont">The font used for debug text.</param>
         /// <param name="gameplayManager">Reference to the game's manager for accessing player data.</param>
-        public PlayerDebug(SpriteFont spriteFont, GameplayManager gameplayManager)
-            : base(spriteFont, gameplayManager)
+        public PlayerDebug(GameplayManager gameplayManager)
+            : base(gameplayManager)
         {
             _player = gameplayManager.PlayerObject;
             AddPlayerDebugInfo();

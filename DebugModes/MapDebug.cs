@@ -18,8 +18,8 @@ namespace MakeEveryDayRecount.DebugModes
         /// </summary>
         /// <param name="sf">Sprite font to draw debug text</param>
         /// <param name="gameplayManager">Gameplay manager to pull data from</param>
-        public MapDebug(SpriteFont sf, GameplayManager gameplayManager)
-            : base(sf, gameplayManager)
+        public MapDebug(GameplayManager gameplayManager)
+            : base(gameplayManager)
         {
             _map = gameplayManager.Map;
             _currentRoom = _map.CurrentRoom;

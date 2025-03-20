@@ -37,6 +37,8 @@ namespace MakeEveryDayRecount.DebugModes
         public static void Initialize()
         {
             _objectsToDisplay = new Dictionary<string, Func<object>>();
+            _spriteFont = AssetManager.TimesNewRoman20;
+            _yAxisIncrement = _spriteFont.LineSpacing;
         }
 
         /// <summary>
@@ -64,16 +66,6 @@ namespace MakeEveryDayRecount.DebugModes
                 sb.DrawString(_spriteFont, displayValue, drawPoint, Color.Black);
                 drawPoint.Y += _yAxisIncrement;
             }
-        }
-
-        /// <summary>
-        /// Sets the font used for rendering debug text.
-        /// </summary>
-        /// <param name="sf">The SpriteFont to use for rendering debug text</param>
-        public static void SetFont(SpriteFont sf)
-        {
-            _spriteFont = sf;
-            _yAxisIncrement = sf.LineSpacing;
         }
 
         /// <summary>

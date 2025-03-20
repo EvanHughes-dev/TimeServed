@@ -74,8 +74,6 @@ namespace MakeEveryDayRecount
             _gameplayManager = gameplayManager;
             _animationFrame = 0;
             _playerSize = new Point(sprite.Width / 4, sprite.Height / 4);
-            DebugModes.GlobalDebug.AddObject("Player size", () => _playerSize);
-            DebugModes.GlobalDebug.AddObject("Player Rect", () => _playerFrameRectangle);
         }
 
         /// <summary>
