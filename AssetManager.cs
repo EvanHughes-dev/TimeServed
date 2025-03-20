@@ -37,7 +37,7 @@ namespace MakeEveryDayRecount
         public static Texture2D DebugNotWalkableTile { get; private set; }
 
         /// <summary>
-        /// The size of each tile, in pixels in pixels
+        /// The size of each tile, in pixels
         /// </summary>
         public static Point TileSize { get; private set; }
 
