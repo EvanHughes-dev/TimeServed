@@ -110,15 +110,18 @@ namespace MakeEveryDayRecount.Map
             int screenMaxX = (worldToScreen.X + MapUtils.ScreenSize.X) / TileSize.X;
             int screenMaxY = (worldToScreen.Y + MapUtils.ScreenSize.Y) / TileSize.Y;
 
-            // Display all tiles that are on screen
+            Point pixelOffset = MapUtils.PixelOffset();
+
+            // Display all tiles that are on screen by looping between the screenMin and screenMax on each axis
             for (int xTile = screenMinX; xTile <= screenMaxX; xTile++)
             {
                 for (int yTile = screenMinY; yTile <= screenMaxY; yTile++)
                 {
-                    if (xTile >= _map.GetLength(0) || yTile >= _map.GetLength(1))
+                    if (xTile >= _map.GetLength(0) || yTile >= _map.GetLength(1) || xTile < 0 || yTile < 0)
                         continue;
                     Tile currentTile = _map[xTile, yTile];
-                    Point screenPos = MapUtils.TileToWorld(xTile, yTile) - worldToScreen;
+                    Point screenPos =
+                        MapUtils.TileToWorld(xTile, yTile) - worldToScreen + pixelOffset;
                     sb.Draw(
                         AssetManager.TileMap[currentTile.SpriteIndex],
                         new Rectangle(screenPos, TileSize),
@@ -133,15 +136,18 @@ namespace MakeEveryDayRecount.Map
                 Point propPosition = propToDraw.Location;
 
                 if (
-                    propPosition.X > screenMinX
-                    && propPosition.X < screenMaxX
-                    && propPosition.Y > screenMinY
-                    && propPosition.Y < screenMaxY
+                    propPosition.X >= screenMinX
+                    && propPosition.X <= screenMaxX
+                    && propPosition.Y >= screenMinY
+                    && propPosition.Y <= screenMaxY
                 )
                 {
                     sb.Draw(
                         propToDraw.Sprite,
-                        new Rectangle(MapUtils.TileToWorld(propPosition) - worldToScreen, TileSize),
+                        new Rectangle(
+                            MapUtils.TileToWorld(propPosition) - worldToScreen + pixelOffset,
+                            TileSize
+                        ),
                         Color.White
                     );
                 }
@@ -153,15 +159,15 @@ namespace MakeEveryDayRecount.Map
                 Point propPosition = doorToDraw.Location;
 
                 if (
-                    propPosition.X > screenMinX
-                    && propPosition.X < screenMaxX
-                    && propPosition.Y > screenMinY
-                    && propPosition.Y < screenMaxY
+                    propPosition.X >= screenMinX
+                    && propPosition.X <= screenMaxX
+                    && propPosition.Y >= screenMinY
+                    && propPosition.Y <= screenMaxY
                 )
                 {
                     sb.Draw(
                         doorToDraw.Sprite,
-                        new Rectangle(MapUtils.TileToWorld(propPosition) - worldToScreen, TileSize),
+                        new Rectangle(MapUtils.TileToWorld(propPosition) - worldToScreen + pixelOffset, TileSize),
                         Color.White
                     );
                 }
