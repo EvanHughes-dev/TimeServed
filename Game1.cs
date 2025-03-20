@@ -97,6 +97,7 @@ namespace MakeEveryDayRecount
                 case GameState.Level:
                     //On level end
                     //_state = GameState.Cutscene;
+                    _gameplayManager.Update(gameTime);
 
                     //Pause button can change, figured escape makes the most sense
                     if (InputManager.GetKeyPress(Keys.Escape))
@@ -121,7 +122,6 @@ namespace MakeEveryDayRecount
             }
 
             InputManager.Update();
-            _gameplayManager.Update(gameTime);
             // TODO: Add your update logic here
 
             base.Update(gameTime);
@@ -132,7 +132,6 @@ namespace MakeEveryDayRecount
             GraphicsDevice.Clear(Color.Black);
 
             _spriteBatch.Begin();
-            _gameplayManager.Draw(_spriteBatch);
             // TODO: Add your drawing code here
             switch (_state)
             {
@@ -140,10 +139,11 @@ namespace MakeEveryDayRecount
                     DrawMenu(_spriteBatch);
                     break;
                 case GameState.Pause:
+                    _gameplayManager.Draw(_spriteBatch);
                     DrawPause(_spriteBatch);
                     break;
                 case GameState.Level:
-
+                    _gameplayManager.Draw(_spriteBatch);
                     break;
                 case GameState.Cutscene:
                     break;
