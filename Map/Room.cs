@@ -314,6 +314,30 @@ namespace MakeEveryDayRecount.Map
         }
 
         /// <summary>
+        /// Verifies that the tile the player is looking at contains an interactable item
+        /// </summary>
+        /// <param name="playerFacing">The location of the tile the player is facing</param>
+        /// <returns></returns>
+        public Prop VerifyInteractable(Point playerFacing)
+        {
+            foreach(Item prop in _itemsInRoom)
+            {
+                if (playerFacing == prop.Location)
+                {
+                    return prop;
+                }
+            }
+            foreach(Door door in _doors)
+            {
+                if(playerFacing == door.Location)
+                {
+                    return door;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
         /// Remove an object from the room's inventory
         /// </summary>
         /// <param name="itemToRemove">Item to remove</param>
