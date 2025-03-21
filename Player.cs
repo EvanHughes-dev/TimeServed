@@ -201,7 +201,7 @@ namespace MakeEveryDayRecount
 
         public void Interact() 
         {
-            Prop thing; //change the name of this variable later
+            Prop objectToInteract;
 
             switch (_playerCurrentDirection)
             {
