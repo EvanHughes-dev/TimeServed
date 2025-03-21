@@ -222,6 +222,11 @@ namespace MakeEveryDayRecount
 
         #endregion
 
+        /// <summary>
+        /// Determines if the player's inventory contains a key of the specified type
+        /// </summary>
+        /// <param name="keyType">The key type to look for</param>
+        /// <returns>True if a suitable key is found, false otherwise</returns>
         public bool ContainsKey(Door.DoorKeyType keyType)
         {
             foreach (Item item in _inventory.Contents)
@@ -235,6 +240,10 @@ namespace MakeEveryDayRecount
             return false;
         }
 
+        /// <summary>
+        /// Adds an item to the player's inventory
+        /// </summary>
+        /// <param name="item">The item to add to the inventory</param>
         public void PickUpItem(Item item)
         {
             //add the item to your inventory
