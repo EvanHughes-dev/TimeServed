@@ -1,6 +1,4 @@
-﻿// Ignore Spelling: gameplay
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using MakeEveryDayRecount.GameObjects;
 using MakeEveryDayRecount.GameObjects.Props;
@@ -28,10 +26,30 @@ namespace MakeEveryDayRecount
             Left = 3
         }
 
+        /// <summary>
+        /// Player's current position on the screen
+        /// </summary>
         public Point PlayerScreenPosition { get; private set; }
+
 
         private Direction _playerCurrentDirection;
         private PlayerState _playerState;
+        /// <summary>
+        /// Get the player's current state
+        /// </summary>
+        public PlayerState CurrentPlayerState
+        {
+            get { return _playerState; }
+        }
+
+        /// <summary>
+        /// Get the direction the player is facing
+        /// </summary>
+        public Direction PlayerCurrentDirection
+        {
+            get { return _playerCurrentDirection; }
+        }
+
 
         private const float SecondsPerTile = .2f;
         private float _walkingSeconds;
@@ -203,9 +221,10 @@ namespace MakeEveryDayRecount
             return new Rectangle(
                 new Point(
                     _playerSize.X * (int)_playerCurrentDirection,
-                    _playerSize.Y * _animationFrame
+                    _playerSize.Y * _animationFrame + (_animationFrame != 0 ? 1 : 0)
+                // Add the one to offset to the right tile. Otherwise you get 1 pixel from the image above
                 ),
-                _playerSize
+                _playerSize + (_animationFrame != 0 ? new Point(0, -1) : Point.Zero)
             );
         }
 

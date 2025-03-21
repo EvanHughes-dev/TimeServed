@@ -20,7 +20,7 @@ namespace MakeEveryDayRecount
         public static Texture2D[] InventoryBoxes { get; private set; }
 
         /// <summary>
-        /// Spritesheet for the player
+        /// Sprite sheet for the player
         /// </summary>
         public static Texture2D PlayerTexture { get; private set; }
 
@@ -28,6 +28,26 @@ namespace MakeEveryDayRecount
         /// Texture for the door
         /// </summary>
         public static Texture2D DoorTexture { get; private set; }
+
+        /// <summary>
+        /// Array of the assets for the props in the game
+        /// </summary>
+        public static Texture2D[] PropTextures { get; private set; }
+
+        /// <summary>
+        /// Texture for the debug tile for walkable tiles
+        /// </summary>
+        public static Texture2D DebugWalkableTile { get; private set; }
+
+        /// <summary>
+        /// Texture for the debug tile for not walkable tiles
+        /// </summary>
+        public static Texture2D DebugNotWalkableTile { get; private set; }
+
+        /// <summary>
+        /// Default font for debugging
+        /// </summary>
+        public static SpriteFont TimesNewRoman20 { get; private set; }
 
         /// <summary>
         /// The size of each tile, in pixels
@@ -56,6 +76,10 @@ namespace MakeEveryDayRecount
                 content.Load<Texture2D>("InventoryBox_selected")
             };
             PlayerTexture = content.Load<Texture2D>("player");
+
+            DebugWalkableTile = content.Load<Texture2D>("DebugAssets/WALKABLE");
+            DebugNotWalkableTile = content.Load<Texture2D>("DebugAssets/NOT_WALKABLE");
+            TimesNewRoman20 = content.Load<SpriteFont>("Arial20");
 
             TileSize = new Point(TileMap[0].Width, TileMap[0].Height);
         }

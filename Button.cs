@@ -2,10 +2,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MakeEveryDayRecount
 {
@@ -30,7 +26,7 @@ namespace MakeEveryDayRecount
         }
         public bool Hovered
         {
-            get 
+            get
             {
                 MouseState ms = InputManager.CurrentMouseState;
                 return (ms.X >= _rectangle.Left && ms.X <= _rectangle.Right &&
@@ -72,7 +68,7 @@ namespace MakeEveryDayRecount
         /// If the button is hovered over and clicked, invokes its OnClick method
         /// </summary>
         public void Click()
-        {   
+        {
             if (Hovered && InputManager.GetMousePress(MouseButtonState.Left) && _active)
                 OnClick?.Invoke();
         }
