@@ -267,7 +267,9 @@ namespace MakeEveryDayRecount.Map
 
                             Item newItemInRoom = new Item(
                                 new Point(posX, posY),
-                                AssetManager.PropTextures[propIndex]
+                                AssetManager.PropTextures[propIndex],
+                                "TEMP_NAME",
+                                Door.DoorKeyType.None
                             );
                             // When this item is picked up, remove it from this room
                             newItemInRoom.OnItemPickup += RemoveGameObject;
@@ -320,16 +322,16 @@ namespace MakeEveryDayRecount.Map
         /// <returns></returns>
         public Prop VerifyInteractable(Point playerFacing)
         {
-            foreach(Item prop in _itemsInRoom)
+            foreach (Item prop in _itemsInRoom)
             {
                 if (playerFacing == prop.Location)
                 {
                     return prop;
                 }
             }
-            foreach(Door door in _doors)
+            foreach (Door door in _doors)
             {
-                if(playerFacing == door.Location)
+                if (playerFacing == door.Location)
                 {
                     return door;
                 }
