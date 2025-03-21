@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework.Input;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +8,17 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MakeEveryDayRecount
-{
+{   
+    //Enum for different mouse button states
+    //JAMES NOTE
+    //I think it needs a better name
+    public enum MouseButtonState
+    {
+        Left,
+        Right,
+        Middle
+    }
+    
     /// <summary>
     /// James Young
     /// Holds keyboard state for this frame and keyboard state for the prior frame.
@@ -14,19 +26,23 @@ namespace MakeEveryDayRecount
     /// </summary>
     public static class InputManager
     {        
-        private static KeyboardState PriorState { get; set; }
-        private static KeyboardState CurrentState { get; set; }
+        private static KeyboardState PriorKeyboardState { get; set; }
+        private static KeyboardState CurrentKeyboardState { get; set; }
+        private static MouseState PriorMouseState { get; set; }
+        public static MouseState CurrentMouseState { get; set; }
 
         /// <summary>
-        /// Updates prior and current state.
+        /// Updates prior and current states.
         /// </summary>
         public static void Update()
         {
-            //Set the Prior state to the current state
-            PriorState = CurrentState;
+            //Set the Prior states to the current states
+            PriorKeyboardState = CurrentKeyboardState;
+            PriorMouseState = CurrentMouseState;
 
-            //Get the current Keyboard state
-            CurrentState = Keyboard.GetState();
+            //Get the current states
+            CurrentKeyboardState = Keyboard.GetState();
+            CurrentMouseState = Mouse.GetState();
         }
 
         /// <summary>
@@ -36,7 +52,7 @@ namespace MakeEveryDayRecount
         /// <returns>True if CurrentState is down and PriorState is up, false otherwise</returns>
         public static bool GetKeyPress(Keys key)
         {
-            return CurrentState.IsKeyDown(key) && PriorState.IsKeyUp(key);
+            return CurrentKeyboardState.IsKeyDown(key) && PriorKeyboardState.IsKeyUp(key);
         }
 
         /// <summary>
@@ -46,7 +62,7 @@ namespace MakeEveryDayRecount
         /// <returns>True if CurrentState is up and PriorState is down, false otherwise</returns>
         public static bool GetKeyRelease(Keys key)
         {
-            return CurrentState.IsKeyUp(key) && PriorState.IsKeyDown(key);
+            return CurrentKeyboardState.IsKeyUp(key) && PriorKeyboardState.IsKeyDown(key);
         }
 
         /// <summary>
@@ -54,10 +70,84 @@ namespace MakeEveryDayRecount
         /// </summary>
         /// <param name="key">Key being checked</param>
         /// <returns>True if the key is down, false otherwise</returns>
-        /// <exception cref="NotImplementedException"></exception>
         public static bool GetKeyStatus(Keys key)
         {
-            return CurrentState.IsKeyDown(key);
+            return CurrentKeyboardState.IsKeyDown(key);
+        }
+
+        /// <summary>
+        /// Returns a boolean related to the current mouse state
+        /// </summary>
+        /// <param name="mouseState">Mouse state being checked</param>
+        /// <returns>True if the given mouse state was started this frame, false otherwise</returns>
+        public static bool GetMousePress(MouseButtonState mbs)
+        {
+            switch (mbs)
+            {
+                case MouseButtonState.Left:
+                    return CurrentMouseState.LeftButton == ButtonState.Pressed &&
+                        PriorMouseState.LeftButton == ButtonState.Released;
+                case MouseButtonState.Right:
+                    return CurrentMouseState.RightButton == ButtonState.Pressed &&
+                        PriorMouseState.RightButton == ButtonState.Released;
+                case MouseButtonState.Middle:
+                    return CurrentMouseState.MiddleButton == ButtonState.Pressed &&
+                        PriorMouseState.MiddleButton == ButtonState.Released;
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Returns a boolean related to the current mouse state
+        /// </summary>
+        /// <param name="mbs">Mouse state being checked</param>
+        /// <returns>True if the given mouse state was ended this frame, false otherwise</returns>
+        public static bool GetMouseRelease(MouseButtonState mbs)
+        {
+            switch (mbs)
+            {
+                case MouseButtonState.Left:
+                    return CurrentMouseState.LeftButton == ButtonState.Released &&
+                        PriorMouseState.LeftButton == ButtonState.Pressed;
+                case MouseButtonState.Right:
+                    return CurrentMouseState.RightButton == ButtonState.Released &&
+                        PriorMouseState.RightButton == ButtonState.Pressed;
+                case MouseButtonState.Middle:
+                    return CurrentMouseState.MiddleButton == ButtonState.Released &&
+                        PriorMouseState.MiddleButton == ButtonState.Pressed;
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Returns a boolean related to the current mouse state
+        /// </summary>
+        /// <param name="mbs">Mouse state being checked</param>
+        /// <returns>True if the given mouse state is active, false otherwise</returns>
+        public static bool GetMouseStatus(MouseButtonState mbs)
+        {
+            switch (mbs)
+            {
+                case MouseButtonState.Left:
+                    return CurrentMouseState.LeftButton == ButtonState.Pressed;
+                case MouseButtonState.Right:
+                    return CurrentMouseState.RightButton == ButtonState.Pressed;
+                case MouseButtonState.Middle:
+                    return CurrentMouseState.MiddleButton == ButtonState.Pressed;
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Returns a point with the mouse's current X and Y positions
+        /// </summary>
+        /// <returns>A point with the mouse's current X and Y positions</returns>
+        public static Point GetMousePosition()
+        {
+            return new Point(CurrentMouseState.X, CurrentMouseState.Y);
         }
     }
 }
