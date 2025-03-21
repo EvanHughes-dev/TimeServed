@@ -98,6 +98,8 @@ namespace MakeEveryDayRecount
                     //On level end
                     //_state = GameState.Cutscene;
 
+                    _gameplayManager.Update(gameTime);
+
                     //Pause button can change, figured escape makes the most sense
                     if (InputManager.GetKeyPress(Keys.Escape))
                         _state = GameState.Pause;
@@ -121,7 +123,6 @@ namespace MakeEveryDayRecount
             }
 
             InputManager.Update();
-            _gameplayManager.Update(gameTime);
             // TODO: Add your update logic here
 
             base.Update(gameTime);
@@ -129,21 +130,23 @@ namespace MakeEveryDayRecount
 
         protected override void Draw(GameTime gameTime)
         {
+            
             GraphicsDevice.Clear(Color.Black);
 
             _spriteBatch.Begin();
-            _gameplayManager.Draw(_spriteBatch);
-            // TODO: Add your drawing code here
             switch (_state)
             {
                 case GameState.Menu:
                     DrawMenu(_spriteBatch);
                     break;
                 case GameState.Pause:
+                    //Eventually, blue the gameplay in the background.
+                    //Not sure how to do that yet, so for now it's just drawn.
+                    _gameplayManager.Draw(_spriteBatch);
                     DrawPause(_spriteBatch);
                     break;
                 case GameState.Level:
-
+                    _gameplayManager.Draw(_spriteBatch);
                     break;
                 case GameState.Cutscene:
                     break;
@@ -154,7 +157,6 @@ namespace MakeEveryDayRecount
             }
 
             //End the sprite batch
-
             _spriteBatch.End();
 
             base.Draw(gameTime);
@@ -199,7 +201,7 @@ namespace MakeEveryDayRecount
 
             Rectangle menuQuitRect = new Rectangle(400, 340, 100, 40);
             Button menuQuit = new Button(defaultButtonTexture, defaultButtonTexture, menuQuitRect, true);
-            //menuQuit.OnClick += the method that closes the game
+            menuQuit.OnClick += MakeExitGameAction();
             menuButtons.Add(menuQuit);
 
         }
@@ -270,6 +272,15 @@ namespace MakeEveryDayRecount
             {
                 _state = state;
             };
+        }
+
+        /// <summary>
+        /// Creates an Action delegate to quit the game.
+        /// </summary>
+        /// <returns>An Action that quits the game when the ACTION is called.</returns>
+        public Action MakeExitGameAction()
+        {
+            return () => Exit();
         }
     }
 }
