@@ -70,7 +70,6 @@ namespace MakeEveryDayRecount
         /// </summary>
         /// <param name="key">Key being checked</param>
         /// <returns>True if the key is down, false otherwise</returns>
-        /// <exception cref="NotImplementedException"></exception>
         public static bool GetKeyStatus(Keys key)
         {
             return CurrentKeyboardState.IsKeyDown(key);

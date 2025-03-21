@@ -39,9 +39,22 @@ namespace MakeEveryDayRecount.Map
         public int RoomIndex { get; private set; }
 
         /// <summary>
+        /// Get the path to this room's file
+        /// </summary>
+        public string FilePath { get; private set; }
+
+        /// <summary>
         /// Get the room's name
         /// </summary>
         public string RoomName { get; private set; }
+
+        /// <summary>
+        /// Get the number of items in the current room
+        /// </summary>
+        public int ItemCount
+        {
+            get => _itemsInRoom.Count;
+        }
         private Tile[,] _map;
         private List<Item> _itemsInRoom;
         private readonly List<Door> _doors;
@@ -173,6 +186,8 @@ namespace MakeEveryDayRecount.Map
         {
             if (File.Exists(filePath))
             {
+                // save the file path for debug uses
+                FilePath = filePath;
                 BinaryReader binaryReader = null;
                 try
                 {
