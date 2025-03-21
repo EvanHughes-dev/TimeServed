@@ -6,6 +6,9 @@ namespace MakeEveryDayRecount.GameObjects
 {
     internal abstract class GameObject
     {
+        /// <summary>
+        /// Current location of the object in tile space
+        /// </summary>
         public Point Location { get; protected set; }
         public Texture2D Sprite { get; private set; }
 
