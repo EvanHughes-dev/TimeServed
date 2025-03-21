@@ -66,7 +66,7 @@ namespace MakeEveryDayRecount
             DebugWalkableTile = content.Load<Texture2D>("DebugAssets/WALKABLE");
             DebugNotWalkableTile = content.Load<Texture2D>("DebugAssets/NOT_WALKABLE");
             TimesNewRoman20 = content.Load<SpriteFont>("Arial20");
-
+            DoorTexture = content.Load<Texture2D>("TempDoor");
             TileSize = new Point(TileMap[0].Width, TileMap[0].Height);
         }
     }

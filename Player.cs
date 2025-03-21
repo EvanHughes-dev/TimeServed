@@ -243,5 +243,15 @@ namespace MakeEveryDayRecount
             }
             return false;
         }
+
+        /// <summary>
+        /// Assign the new location in the new room
+        /// </summary>
+        /// <param name="newLocation">New tile position</param>
+        public void ChangeRooms(Point newLocation)
+        {
+            //TODO eventually i want an animation of the player walking into the door and the screen fading to black
+            Location = newLocation;
+        }
     }
 }
