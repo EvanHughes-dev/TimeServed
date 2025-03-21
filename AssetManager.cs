@@ -1,6 +1,8 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Media;
+using System.Reflection.Emit;
 
 namespace MakeEveryDayRecount
 {
@@ -31,6 +33,11 @@ namespace MakeEveryDayRecount
         /// </summary>
         public static Point TileSize { get; private set; }
 
+        /// <summary>
+        /// Array of all background tracks in the game
+        /// </summary>
+        public static Song[] BackgroundMusic { get; private set; }
+
         public static void LoadContent(ContentManager content)
         {
             PropTextures = new Texture2D[]
@@ -49,6 +56,11 @@ namespace MakeEveryDayRecount
             PlayerTexture = content.Load<Texture2D>("player");
 
             TileSize = new Point(TileMap[0].Width, TileMap[0].Height);
+
+            BackgroundMusic = new Song[]
+            {
+                content.Load<Song>("Sneaky Snitch")
+            };
         }
-    }
+    } 
 }

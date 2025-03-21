@@ -13,6 +13,18 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin Default Button.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Default Button.png
+
 #begin item_hook.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -94,6 +106,12 @@
 /processorParam:TextureFormat=Color
 /build:player.png
 
+#begin Sneaky Snitch.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sneaky Snitch.mp3
+
 #begin tile_testWalkable.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -117,16 +135,4 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:tile_testWall.png
-
-#begin Default Button.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Default Button.png;Default Button.png
 

@@ -33,6 +33,8 @@ namespace MakeEveryDayRecount
 
         private GameplayManager _gameplayManager;
 
+        private SoundManager _soundManager;
+
         /// <summary>
         /// Access the current size of the screen on pixels
         /// </summary>
@@ -74,6 +76,7 @@ namespace MakeEveryDayRecount
             AssetManager.LoadContent(Content);
             // Gameplay manager must be called after all content is loaded
             _gameplayManager = new GameplayManager();
+            _soundManager = new SoundManager();
             MapUtils.Initialize(this, _gameplayManager);
 
             //Load buttons
@@ -92,6 +95,12 @@ namespace MakeEveryDayRecount
 
                 case GameState.Pause:
                     CheckButtonClicks(pauseButtons);
+
+                    if (InputManager.GetKeyPress(Keys.Escape))
+                    {
+                        _state = GameState.Level;
+                        _soundManager.ResumeBGM();
+                    }
                     break;
 
                 case GameState.Level:
@@ -100,9 +109,12 @@ namespace MakeEveryDayRecount
 
                     _gameplayManager.Update(gameTime);
 
-                    //Pause button can change, figured escape makes the most sense
                     if (InputManager.GetKeyPress(Keys.Escape))
+                    {
                         _state = GameState.Pause;
+                        _soundManager.PauseBGM();
+                    }
+
                     break;
 
                 case GameState.Cutscene:
@@ -123,7 +135,6 @@ namespace MakeEveryDayRecount
             }
 
             InputManager.Update();
-            // TODO: Add your update logic here
 
             base.Update(gameTime);
         }
@@ -180,6 +191,7 @@ namespace MakeEveryDayRecount
             Rectangle pauseContinueRect = new Rectangle(200, 200, 400, 100);
             Button pauseContinue = new Button(defaultButtonTexture, defaultButtonTexture, pauseContinueRect, true);
             pauseContinue.OnClick += MakeSwitchStateAction(GameState.Level);
+            pauseContinue.OnClick += MakeResumeMusicAction();
             pauseButtons.Add(pauseContinue);
 
             Rectangle pauseLastCheckpointRect = new Rectangle(200, 320, 400, 100);
@@ -196,6 +208,7 @@ namespace MakeEveryDayRecount
             Rectangle menuPlayRect = new Rectangle(400, 200, 300, 100);
             Button menuPlay = new Button(defaultButtonTexture, defaultButtonTexture, menuPlayRect, true);
             menuPlay.OnClick += MakeSwitchStateAction(GameState.Level);
+            menuPlay.OnClick += MakePlayMusicAction(_gameplayManager.Level);
             menuButtons.Add(menuPlay);
 
             Rectangle menuQuitRect = new Rectangle(400, 340, 100, 40);
@@ -280,6 +293,24 @@ namespace MakeEveryDayRecount
         public Action MakeExitGameAction()
         {
             return () => Exit();
+        }
+
+        /// <summary>
+        /// Creates an Action delegate to play music for the current level.
+        /// </summary>
+        /// <returns>An Action that plays music for the current level when the ACTION is called.</returns>
+        public Action MakePlayMusicAction(int level)
+        {
+            return () => _soundManager.PlayBGM(level);
+        }
+
+        /// <summary>
+        /// Creates an Action delegate to resume music.
+        /// </summary>
+        /// <returns>An Action that resumes the music when the ACTION is called.</returns>
+        public Action MakeResumeMusicAction()
+        {
+            return () => _soundManager.ResumeBGM();
         }
     }
 }

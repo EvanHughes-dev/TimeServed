@@ -2,6 +2,7 @@
 using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace MakeEveryDayRecount
 {
@@ -49,6 +50,9 @@ namespace MakeEveryDayRecount
         {
             //Update Player
             PlayerObject.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+
+            //Check for pause
+            
         }
 
         /// <summary>
