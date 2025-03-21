@@ -38,6 +38,7 @@ namespace MakeEveryDayRecount
             }
         }
 
+        public Texture2D Image { set { _image = value; } }
         /// <summary>
         /// Creates a button
         /// </summary>
@@ -61,7 +62,7 @@ namespace MakeEveryDayRecount
         /// <param name="sb">sprite batch used for drawing the button</param>
         public void Draw(SpriteBatch sb)
         {   
-            if (Hovered)
+            if (Active && Hovered)
                 sb.Draw(_hoverImage, _rectangle, Color.White);
             else
                 sb.Draw(_image, _rectangle, Color.White);

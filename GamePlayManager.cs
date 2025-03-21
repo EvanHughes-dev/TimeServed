@@ -36,7 +36,6 @@ namespace MakeEveryDayRecount
         /// <summary>
         /// Initialize GameplayManager
         /// </summary>
-        /// <param name="screenSize">Size of the screen</param>
         public GameplayManager()
         {
             Level = 1;
