@@ -302,6 +302,12 @@ namespace MakeEveryDayRecount.Map
         {
             return _map[pointToCheck.X, pointToCheck.Y].IsWalkable;
         }
+
+        /// <summary>
+        /// Verifies that the tile the player is looking at contains an interactable item
+        /// </summary>
+        /// <param name="playerFacing">The location of the tile the player is facing</param>
+        /// <returns></returns>
         public Prop VerifyInteractable(Point playerFacing)
         {
             foreach(Item prop in _itemsInRoom)

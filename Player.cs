@@ -198,7 +198,10 @@ namespace MakeEveryDayRecount
         {
             throw new NotImplementedException();
         }
-
+        /// <summary>
+        /// Player asks map manager to check if the tile it's looking at has an interactable object
+        /// If so, the player then interacts with that thing.
+        /// </summary>
         public void Interact() 
         {
             Prop objectToInteract;
@@ -206,14 +209,18 @@ namespace MakeEveryDayRecount
             switch (_playerCurrentDirection)
             {
                 case Direction.Left:
-                    //thing = .CheckInteractable(Location + new Point(-1, 0));
+                    objectToInteract = MapManager.CheckInteractable(Location + new Point(-1, 0));
                     break;
                 case Direction.Up:
+                    objectToInteract = MapManager.CheckInteractable(Location + new Point(0, -1));
                     break;
                 case Direction.Right:
+                    objectToInteract = MapManager.CheckInteractable(Location + new Point(1, 0));
                     break;
                 case Direction.Down:
+                    objectToInteract = MapManager.CheckInteractable(Location + new Point(0, 1));
                     break;
+            //add code that makes the interaction happen
             }
         }
     }

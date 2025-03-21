@@ -59,6 +59,12 @@ namespace MakeEveryDayRecount
         {
             return _currentRoom.VerifyWalkable(playerDest);
         }
+
+        /// <summary>
+        /// Check if the tile in front of the player contains an interactable item
+        /// </summary>
+        /// <param name="playerFacing">The tile the player wants to interact with</param>
+        /// <returns></returns>
         public Prop CheckInteractable(Point playerFacing) 
         {
             return _currentRoom.VerifyInteractable(playerFacing);
