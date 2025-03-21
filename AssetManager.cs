@@ -5,11 +5,19 @@ using Microsoft.Xna.Framework.Graphics;
 namespace MakeEveryDayRecount
 {
     public static class AssetManager
-    {
+    { 
+        /// <summary>
+        /// Array of the assets for the props in the game
+        /// </summary>
+        public static Texture2D[] PropTextures { get; private set; }
         /// <summary>
         /// Array with every type of tile asset we have in the game
         /// </summary>
         public static Texture2D[] TileMap { get; private set; }
+        /// <summary>
+        /// Array of the textures for an inventory box in different states
+        /// </summary>
+        public static Texture2D[] InventoryBoxes { get; private set; }
 
         /// <summary>
         /// Sprite sheet for the player
@@ -60,6 +68,12 @@ namespace MakeEveryDayRecount
             {
                 content.Load<Texture2D>("tile_testWall"),
                 content.Load<Texture2D>("tile_testWalkable")
+            };
+            InventoryBoxes = new Texture2D[]
+            {
+                content.Load<Texture2D>("InventoryBox_idle"),
+                content.Load<Texture2D>("InventoryBox_hover"),
+                content.Load<Texture2D>("InventoryBox_selected")
             };
             PlayerTexture = content.Load<Texture2D>("player");
 
