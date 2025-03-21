@@ -39,7 +39,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// </summary>
         public int DestDoor { get; private set; }
 
-        public event DoorTransition DoorInteracted;
+        public event DoorTransition OnDoorInteract;
 
         /// <summary>
         ///Create the door object
@@ -74,7 +74,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         {
             if (_keyType != DoorKeyType.None && player.ContainsKey(_keyType))
             {
-                DoorInteracted(this);
+                OnDoorInteract?.Invoke(this);
             }
         }
     }

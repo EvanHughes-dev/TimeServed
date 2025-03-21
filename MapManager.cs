@@ -8,12 +8,28 @@ using Microsoft.Xna.Framework.Graphics;
 namespace MakeEveryDayRecount
 {
     /// <summary>
+    /// Call to update the current room that is active on the map
+    /// </summary>
+    /// <param name="newRoom">Room that is now active</param>
+    delegate void OnRoomUpdate(Room newRoom);
+
+    /// <summary>
     /// Keep track of the room the player is currently
     /// in and load the needed map
     /// </summary>
     internal class MapManager
     {
+        public event OnRoomUpdate OnRoomUpdate;
+
         private Room _currentRoom;
+
+        /// <summary>
+        /// Get the current room on the map
+        /// </summary>
+        public Room CurrentRoom
+        {
+            get => _currentRoom;
+        }
         private Room[] _rooms;
 
         private readonly GameplayManager _gameplayManager;
@@ -27,7 +43,7 @@ namespace MakeEveryDayRecount
             _gameplayManager = gameplayManager;
             _rooms = LoadMapData(_gameplayManager.Level);
             _currentRoom = _rooms[0];
-
+            OnRoomUpdate?.Invoke(_currentRoom);
             foreach (Room room in _rooms)
             {
                 room.DoorTransition += TransitionRoom;
@@ -37,6 +53,7 @@ namespace MakeEveryDayRecount
         public void TransitionRoom(Door transDoor)
         {
             _currentRoom = _rooms[transDoor.DestRoom];
+            OnRoomUpdate?.Invoke(_currentRoom);
             // Figure out how to update the player's position
             throw new NotImplementedException("TransitionRoom not been created yet in MapManager");
         }
@@ -47,7 +64,7 @@ namespace MakeEveryDayRecount
         /// <param name="batch">Batch of sprites to add to</param>
         public void Draw(SpriteBatch batch)
         {
-            _currentRoom.Draw(batch, _gameplayManager.PlayerObject, _gameplayManager.ScreenSize);
+            _currentRoom.Draw(batch);
         }
 
         /// <summary>
