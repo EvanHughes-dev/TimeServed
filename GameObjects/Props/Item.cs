@@ -35,7 +35,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         public override void Interact(Player player)
         {
             //This tells the map manager to remove the item from the room
-            OnItemPickup(this);
+            OnItemPickup?.Invoke(this);
             //Since it can't return itself because then it wouldn't be an override of GameObject.Interact, this instead calls a method in the player which adds it to the player's inventory
             player.PickUpItem(this);
         }
