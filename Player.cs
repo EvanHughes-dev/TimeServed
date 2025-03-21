@@ -46,7 +46,8 @@ namespace MakeEveryDayRecount
         //to the map which lets the player know what's near them
         private readonly GameplayManager _gameplayManager;
 
-        private List<GameObject> _inventory;
+        //The player's inventory
+        private Inventory _inventory;
 
         public Player(Point location, Texture2D sprite, GameplayManager gameplayManager)
             : base(location, sprite)
@@ -55,6 +56,8 @@ namespace MakeEveryDayRecount
             _gameplayManager = gameplayManager;
             _animationFrame = 0;
             _playerSize = new Point(sprite.Width / 4, sprite.Height / 4);
+            //Create an inventory
+            _inventory = new Inventory();
         }
 
         /// <summary>
@@ -147,12 +150,17 @@ namespace MakeEveryDayRecount
         /// <param name="sb">The instance of spritebatch to be used to draw the player</param>
         public void Draw(SpriteBatch sb)
         {
+
             sb.Draw(
                 Sprite,
                 new Rectangle(PlayerScreenPosition, AssetManager.TileSize),
                 _playerFrameRectangle,
                 Color.White
             );
+
+            //Draw the inventory. If the player were to ever overlap the inventory it will disppear behind it
+            //Because nothing in the game should be drawn on top of the UI
+            _inventory.Draw(sb);
         }
 
         /// <summary>
@@ -214,9 +222,32 @@ namespace MakeEveryDayRecount
 
         #endregion
 
+        /// <summary>
+        /// Determines if the player's inventory contains a key of the specified type
+        /// </summary>
+        /// <param name="keyType">The key type to look for</param>
+        /// <returns>True if a suitable key is found, false otherwise</returns>
         public bool ContainsKey(Door.DoorKeyType keyType)
         {
-            throw new NotImplementedException();
+            foreach (Item item in _inventory.Contents)
+            {
+                if (item.ItemKeyType == keyType)
+                {
+                    return true;
+                }
+            }
+            //if we check the whole inventory and don't find anything
+            return false;
+        }
+
+        /// <summary>
+        /// Adds an item to the player's inventory
+        /// </summary>
+        /// <param name="item">The item to add to the inventory</param>
+        public void PickUpItem(Item item)
+        {
+            //add the item to your inventory
+            _inventory.Contents.Add(item);
         }
     }
 }
