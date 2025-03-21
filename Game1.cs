@@ -140,8 +140,7 @@ namespace MakeEveryDayRecount
                     DrawMenu(_spriteBatch);
                     break;
                 case GameState.Pause:
-                    //Eventually, blue the gameplay in the background.
-                    //Not sure how to do that yet, so for now it's just drawn.
+                    //TODO: Blur the gameplay in the background.
                     _gameplayManager.Draw(_spriteBatch);
                     DrawPause(_spriteBatch);
                     break;
