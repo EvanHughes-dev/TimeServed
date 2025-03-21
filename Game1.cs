@@ -159,8 +159,6 @@ namespace MakeEveryDayRecount
             CheckKeyboardInput();
 
             InputManager.Update();
-            // TODO: Add your update logic here
-            // TODO: Add your update logic here
 
             base.Update(gameTime);
         }
@@ -168,27 +166,23 @@ namespace MakeEveryDayRecount
 
         protected override void Draw(GameTime gameTime)
         {
-            // TODO: Add your drawing code here
-
             GraphicsDevice.Clear(Color.Black);
 
             _spriteBatch.Begin();
-            _gameplayManager.Draw(_spriteBatch);
-                    //TODO: Blur the gameplay in the background.
-                    _gameplayManager.Draw(_spriteBatch);
-                    DisplayDebug();
-            // TODO: Add your drawing code here
+            
             switch (_state)
             {
-                    _gameplayManager.Draw(_spriteBatch);
-                    DisplayDebug();
+                case GameState.Menu:
                     DrawMenu(_spriteBatch);
                     break;
                 case GameState.Pause:
                     DrawPause(_spriteBatch);
                     break;
                 case GameState.Level:
-
+                    CheckKeyboardInput();
+                    //TODO: Blur the gameplay in the background.
+                    _gameplayManager.Draw(_spriteBatch);
+                    DisplayDebug();
                     break;
                 case GameState.Cutscene:
                     break;
@@ -309,7 +303,6 @@ namespace MakeEveryDayRecount
             {
                 menuButtons[i].Draw(sb);
             }
-
         }
 
         /// <summary>
