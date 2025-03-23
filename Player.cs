@@ -284,7 +284,7 @@ namespace MakeEveryDayRecount
                     objectToInteract = _gameplayManager.Map.CheckInteractable(Location + new Point(-1, 0));
                     break;
                 case Direction.Up:
-                    objectToInteract = _gameplayManager.Map.CheckIntractable(Location + new Point(0, -1));
+                    objectToInteract = _gameplayManager.Map.CheckInteractable(Location + new Point(0, -1));
                     break;
                 case Direction.Right:
                     objectToInteract = _gameplayManager.Map.CheckIntractable(Location + new Point(1, 0));
