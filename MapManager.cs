@@ -88,7 +88,7 @@ namespace MakeEveryDayRecount
         /// </summary>
         /// <param name="playerFacing">The tile the player wants to interact with</param>
         /// <returns></returns>
-        public Prop CheckIntractable(Point playerFacing)
+        public Prop CheckInteractable(Point playerFacing)
         {
             return _currentRoom.VerifyIntractable(playerFacing);
         }
