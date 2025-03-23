@@ -275,16 +275,16 @@ namespace MakeEveryDayRecount
             switch (_playerCurrentDirection)
             {
                 case Direction.Left:
-                    objectToInteract = _gameplayManager.Map.CheckIntractable(Location + new Point(-1, 0));
+                    objectToInteract = _gameplayManager.Map.CheckInteractable(Location + new Point(-1, 0));
                     break;
                 case Direction.Up:
-                    objectToInteract = _gameplayManager.Map.CheckIntractable(Location + new Point(0, -1));
+                    objectToInteract = _gameplayManager.Map.CheckInteractable(Location + new Point(0, -1));
                     break;
                 case Direction.Right:
-                    objectToInteract = _gameplayManager.Map.CheckIntractable(Location + new Point(1, 0));
+                    objectToInteract = _gameplayManager.Map.CheckInteractable(Location + new Point(1, 0));
                     break;
                 case Direction.Down:
-                    objectToInteract = _gameplayManager.Map.CheckIntractable(Location + new Point(0, 1));
+                    objectToInteract = _gameplayManager.Map.CheckInteractable(Location + new Point(0, 1));
                     break;
                     //add code that makes the interaction happen
             }
@@ -295,6 +295,10 @@ namespace MakeEveryDayRecount
             objectToInteract.Interact(this);
         }
 
+        /// <summary>
+        /// Called to update the player's location in the new room
+        /// </summary>
+        /// <param name="new_location">New location for the player</param>
         public void ChangeRoom(Point new_location)
         {
             Location = new_location;

@@ -316,11 +316,11 @@ namespace MakeEveryDayRecount.Map
         /// <summary>
         /// Transition the player from one room to another
         /// </summary>
-        /// <param name="interactedDoor"></param>
+        /// <param name="doorToTravelTo">Door that the player will exit</param>
         /// <param name="destRoom">Destination room </param>
-        private void TransitionPlayer(Door interactedDoor, int destRoom)
+        private void TransitionPlayer(Door doorToTravelTo, int destRoom)
         {
-            DoorTransition(interactedDoor, destRoom);
+            DoorTransition(doorToTravelTo, destRoom);
         }
 
         /// <summary>
@@ -338,7 +338,7 @@ namespace MakeEveryDayRecount.Map
         /// </summary>
         /// <param name="playerFacing">The location of the tile the player is facing</param>
         /// <returns></returns>
-        public Prop VerifyIntractable(Point playerFacing)
+        public Prop VerifyInteractable(Point playerFacing)
         {
             foreach (Item prop in _itemsInRoom)
             {
