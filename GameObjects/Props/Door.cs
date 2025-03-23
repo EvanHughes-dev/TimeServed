@@ -45,7 +45,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// </summary>
         public event DoorTransition OnDoorInteract;
 
-        private Door DestDoor;
+        private Door _destDoor;
 
         /// <summary>
         ///Create the door object
