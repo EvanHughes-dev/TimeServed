@@ -281,7 +281,7 @@ namespace MakeEveryDayRecount
             switch (_playerCurrentDirection)
             {
                 case Direction.Left:
-                    objectToInteract = _gameplayManager.Map.CheckIntractable(Location + new Point(-1, 0));
+                    objectToInteract = _gameplayManager.Map.CheckInteractable(Location + new Point(-1, 0));
                     break;
                 case Direction.Up:
                     objectToInteract = _gameplayManager.Map.CheckIntractable(Location + new Point(0, -1));
