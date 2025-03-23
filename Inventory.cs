@@ -21,10 +21,7 @@ namespace MakeEveryDayRecount
 
         public Inventory()
         {
-            //for (int i = 0; i < inventory.Length; i++)
-            //{
-            //    create a button and offset the x
-            //}
+            _contents=new List<Item>();
         }
         public void Draw(SpriteBatch sb)
         {

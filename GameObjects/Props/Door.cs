@@ -16,9 +16,9 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// </summary>
         public enum DoorKeyType
         {
-            None,
-            Screwdriver,
-            Card
+            None = 0,
+            Screwdriver = 1,
+            Card = 2
         }
 
         private DoorKeyType _keyType;
