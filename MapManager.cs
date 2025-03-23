@@ -90,7 +90,7 @@ namespace MakeEveryDayRecount
         /// <returns></returns>
         public Prop CheckInteractable(Point playerFacing)
         {
-            return _currentRoom.VerifyIntractable(playerFacing);
+            return _currentRoom.VerifyInteractable(playerFacing);
         }
 
         /// <summary>
@@ -145,7 +145,7 @@ namespace MakeEveryDayRecount
                 // Assign corresponding doors efficiently
                 foreach (Door door in doorLookup.Values)
                 {
-                    if (doorLookup.TryGetValue((door.DestRoom, door.DestDoorIndex), out Door matchingDoor))
+                    if (doorLookup.TryGetValue((door.DestRoom, door.DoorIndex), out Door matchingDoor))
                     {
                         door.AssignDoor(matchingDoor);
                     }

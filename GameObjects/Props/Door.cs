@@ -38,7 +38,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// <summary>
         /// Get the door this door leads to
         /// </summary>
-        public int DestDoorIndex { get; private set; }
+        public int _destDoorIndex { get; private set; }
 
         /// <summary>
         /// Called when the player successfully interacts with a door
@@ -52,7 +52,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// </summary>
         /// <param name="sourceDoor">This door's index</param>
         /// <param name="destRoom">Room index that this door leads to</param>
-        /// <param name="destDoor">Door's index that this door goes to</param>
+        /// <param name="_destDoor">Door's index that this door goes to</param>
         /// <param name="keyType">Type of key this door leads to</param>
         /// <param name="location">Position in room</param>
         /// <param name="sprite">Sprite to display</param>
@@ -60,7 +60,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
             Point outPosition,
             int sourceDoor,
             int destRoom,
-            int destDoor,
+            int _destDoor,
             DoorKeyType keyType,
             Point location,
             Texture2D sprite
@@ -69,7 +69,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         {
             DoorIndex = sourceDoor;
             DestRoom = destRoom;
-            DestDoorIndex = destDoor;
+            _destDoorIndex = _destDoor;
             DestinationTile = outPosition + location;
             _keyType = keyType;
         }
@@ -82,7 +82,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         {
             if (_keyType == DoorKeyType.None || player.ContainsKey(_keyType))
             {
-                OnDoorInteract?.Invoke(DestDoor, DestRoom);
+                OnDoorInteract?.Invoke(_destDoor, DestRoom);
             }
         }
 
@@ -92,7 +92,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// <param name="doorAssignment">Door this door leads to</param>
         public void AssignDoor(Door doorAssignment)
         {
-            DestDoor = doorAssignment;
+            _destDoor = doorAssignment;
         }
     }
 }
