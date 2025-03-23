@@ -20,6 +20,18 @@
 /processorParam:TextureFormat=Compressed
 /build:Arial20.spritefont
 
+#begin Audio/Music/Sneaky Snitch.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Audio/Music/Sneaky Snitch.mp3
+
+#begin Audio/Sound Effects/Player Step.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/Sound Effects/Player Step.wav
+
 #begin DebugAssets/NOT_WALKABLE.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -161,12 +173,6 @@
 #begin level1/TestRoom2.room
 /copy:level1/TestRoom2.room
 
-#begin Player Step.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:Player Step.wav
-
 #begin player.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -178,12 +184,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:player.png
-
-#begin Sneaky Snitch.mp3
-/importer:Mp3Importer
-/processor:SongProcessor
-/processorParam:Quality=Best
-/build:Sneaky Snitch.mp3
 
 #begin tile_testWalkable.png
 /importer:TextureImporter

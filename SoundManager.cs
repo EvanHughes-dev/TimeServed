@@ -13,6 +13,9 @@ using System.Threading.Tasks;
 
 namespace MakeEveryDayRecount
 {
+    /// <summary>
+    /// Manages all sounds in the game (music, sound effects).
+    /// </summary>
     public static class SoundManager
     {
         //Fields
@@ -40,10 +43,10 @@ namespace MakeEveryDayRecount
         {
             BackgroundMusic = new Song[]
             {
-                content.Load<Song>("Sneaky Snitch")
+                content.Load<Song>("Audio/Music/Sneaky Snitch")
             };
 
-            PlayerStepSound = content.Load<SoundEffect>("Player Step");
+            PlayerStepSound = content.Load<SoundEffect>("Audio/Sound Effects/Player Step");
         }
 
         /// <summary>
