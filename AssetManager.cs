@@ -23,6 +23,10 @@ namespace MakeEveryDayRecount
         /// Sprite sheet for the player
         /// </summary>
         public static Texture2D PlayerTexture { get; private set; }
+        /// <summary>
+        /// Sprite sheet for the player when disguised
+        /// </summary>
+        public static Texture2D PlayerDisguisedTexture { get; private set; }
 
         /// <summary>
         /// Texture for the doors. Indexed in order top, right, bottom, left
@@ -71,7 +75,7 @@ namespace MakeEveryDayRecount
                 content.Load<Texture2D>("InventoryBox_selected")
             };
             PlayerTexture = content.Load<Texture2D>("player");
-
+            PlayerDisguisedTexture = content.Load<Texture2D>("player_disguised");
             DebugWalkableTile = content.Load<Texture2D>("DebugAssets/WALKABLE");
             DebugNotWalkableTile = content.Load<Texture2D>("DebugAssets/NOT_WALKABLE");
             TimesNewRoman20 = content.Load<SpriteFont>("Arial20");
