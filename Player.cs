@@ -136,6 +136,7 @@ namespace MakeEveryDayRecount
                 _readyToMove = false;
                 if (_playerState == PlayerState.Standing)
                     _playerState = PlayerState.Walking;
+                SoundManager.PlaySFX(SoundManager.PlayerStepSound);
             }
 
             // Update the player's walking state if needed

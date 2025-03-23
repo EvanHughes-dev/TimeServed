@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -12,28 +13,52 @@ using System.Threading.Tasks;
 
 namespace MakeEveryDayRecount
 {
-    class SoundManager
+    public static class SoundManager
     {
         //Fields
 
 
         //Properties
 
+        /// <summary>
+        /// Array of all background tracks in the game
+        /// </summary>
+        public static Song[] BackgroundMusic { get; private set; }
+
+        /// <summary>
+        /// Sound effect used for when the player moves.
+        /// </summary>
+        public static SoundEffect PlayerStepSound { get; private set; }
+
         //Methods
+
+        /// <summary>
+        /// Louds all music and sound effects.
+        /// </summary>
+        /// <param name="content">Content manager used to load all music and sound effects.</param>
+        public static void LoadContent(ContentManager content)
+        {
+            BackgroundMusic = new Song[]
+            {
+                content.Load<Song>("Sneaky Snitch")
+            };
+
+            PlayerStepSound = content.Load<SoundEffect>("Player Step");
+        }
 
         /// <summary>
         /// Plays background music for the requested level
         /// </summary>
         /// <param name="level">Level for which background music is being played</param>
-        public void PlayBGM(int level)
+        public static void PlayBGM(int level)
         {
-            MediaPlayer.Play(AssetManager.BackgroundMusic[level - 1]);
+            MediaPlayer.Play(BackgroundMusic[level - 1]);
         }
 
         /// <summary>
         /// Pauses the background music.
         /// </summary>
-        public void PauseBGM()
+        public static void PauseBGM()
         {
             MediaPlayer.Pause();
         }
@@ -41,9 +66,18 @@ namespace MakeEveryDayRecount
         /// <summary>
         /// Resumes the background music.
         /// </summary>
-        public void ResumeBGM()
+        public static void ResumeBGM()
         {
             MediaPlayer.Resume();
+        }
+
+        /// <summary>
+        /// Plays a sound effect.
+        /// </summary>
+        /// <param name="soundEffect">Sound effect to be played</param>
+        public static void PlaySFX(SoundEffect soundEffect)
+        {
+            soundEffect.Play();
         }
     }
 }

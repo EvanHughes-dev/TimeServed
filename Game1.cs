@@ -42,7 +42,6 @@ namespace MakeEveryDayRecount
 
         private GameplayManager _gameplayManager;
 
-        private SoundManager _soundManager;
 
         /// <summary>
         /// Access the current size of the screen in pixels
@@ -92,11 +91,10 @@ namespace MakeEveryDayRecount
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             AssetManager.LoadContent(Content);
-
+            SoundManager.LoadContent(Content);
 
             // Gameplay manager must be called after all content is loaded
             _gameplayManager = new GameplayManager();
-            _soundManager = new SoundManager();
 
             MapUtils.Initialize(this, _gameplayManager);
             GlobalDebug.Initialize();
@@ -122,7 +120,7 @@ namespace MakeEveryDayRecount
                     if (InputManager.GetKeyPress(Keys.Escape))
                     {
                         _state = GameState.Level;
-                        _soundManager.ResumeBGM();
+                        SoundManager.ResumeBGM();
                     }
                     break;
 
@@ -134,7 +132,7 @@ namespace MakeEveryDayRecount
                     if (InputManager.GetKeyPress(Keys.Escape))
                     {
                         _state = GameState.Pause;
-                        _soundManager.PauseBGM();
+                        SoundManager.PauseBGM();
                     }
 
                     break;
@@ -364,7 +362,7 @@ namespace MakeEveryDayRecount
         /// <returns>An Action that plays music for the current level when the ACTION is called.</returns>
         public Action MakePlayMusicAction(int level)
         {
-            return () => _soundManager.PlayBGM(level);
+            return () => SoundManager.PlayBGM(level);
         }
 
         /// <summary>
@@ -373,7 +371,7 @@ namespace MakeEveryDayRecount
         /// <returns>An Action that resumes the music when the ACTION is called.</returns>
         public Action MakeResumeMusicAction()
         {
-            return () => _soundManager.ResumeBGM();
+            return () => SoundManager.ResumeBGM();
         }
     }
 }
