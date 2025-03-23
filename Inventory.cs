@@ -34,7 +34,10 @@ namespace MakeEveryDayRecount
         /// Returns the list of the items currently in the inventory
         /// </summary>
         public List<Item> Contents { get { return _contents; } }
-
+        /// <summary>
+        /// Creates an inventory with a button array of size 4
+        /// </summary>
+        /// <param name="screenSize">The size of the screen</param>
         public Inventory(Point screenSize)
         {
             for (int i = 0; i < _inventoryUI.Length; i++)
@@ -48,7 +51,9 @@ namespace MakeEveryDayRecount
                 _inventoryUI[i].OnClick += () => Select(copyOfIndex);
             }
         }
-
+        /// <summary>
+        /// Updates the inventory array
+        /// </summary>
         public void Update()
         {
             for (int i = 0; i < _inventoryUI.Length; i++)
@@ -69,6 +74,10 @@ namespace MakeEveryDayRecount
             }
 
         }
+        /// <summary>
+        /// Selects and deselects the inventory box when it is pressed
+        /// </summary>
+        /// <param name="index"></param>
         public void Select(int index) {
             if (indexOfSelected == index)
             {
@@ -78,14 +87,17 @@ namespace MakeEveryDayRecount
             }
             else
             {
+                //if currectly a box is already selected
                 if (indexOfSelected != -1)
                 {
+                    //deselect the box
                     _inventoryUI[indexOfSelected].Image = AssetManager.InventoryBoxes[0];
                     _inventoryUI[indexOfSelected].Active = true;
                 }
-
+                //update the selected index
                 indexOfSelected = index;
 
+                //select the new one
                 _inventoryUI[indexOfSelected].Image = AssetManager.InventoryBoxes[2];
                 _inventoryUI[indexOfSelected].Active = false;
             }
