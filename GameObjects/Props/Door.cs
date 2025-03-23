@@ -1,5 +1,4 @@
-﻿using System;
-using MakeEveryDayRecount.Map;
+﻿using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -23,12 +22,14 @@ namespace MakeEveryDayRecount.GameObjects.Props
         }
 
         private DoorKeyType _keyType;
-
         /// <summary>
-        /// Get the position of this door
+        /// Get the direction the player will be outputted in when entering this door 
         /// </summary>
-        public int SourceDoor { get; private set; }
-
+        public Point DestinationTile { get; private set; }
+        /// <summary>
+        /// Get the index of this door
+        /// </summary>
+        public int DoorIndex { get; private set; }
         /// <summary>
         /// Get the room this door leads to
         /// </summary>
@@ -37,32 +38,39 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// <summary>
         /// Get the door this door leads to
         /// </summary>
-        public int DestDoor { get; private set; }
+        public int _destDoorIndex { get; private set; }
 
+        /// <summary>
+        /// Called when the player successfully interacts with a door
+        /// </summary>
         public event DoorTransition OnDoorInteract;
+
+        private Door _destDoor;
 
         /// <summary>
         ///Create the door object
         /// </summary>
         /// <param name="sourceDoor">This door's index</param>
         /// <param name="destRoom">Room index that this door leads to</param>
-        /// <param name="destDoor">Door's index that this door goes to</param>
+        /// <param name="_destDoor">Door's index that this door goes to</param>
         /// <param name="keyType">Type of key this door leads to</param>
         /// <param name="location">Position in room</param>
         /// <param name="sprite">Sprite to display</param>
         public Door(
+            Point outPosition,
             int sourceDoor,
             int destRoom,
-            int destDoor,
+            int _destDoor,
             DoorKeyType keyType,
             Point location,
             Texture2D sprite
         )
             : base(location, sprite)
         {
-            SourceDoor = sourceDoor;
+            DoorIndex = sourceDoor;
             DestRoom = destRoom;
-            DestDoor = destDoor;
+            _destDoorIndex = _destDoor;
+            DestinationTile = outPosition + location;
             _keyType = keyType;
         }
 
@@ -72,10 +80,19 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// <returns>If the door can be interacted</returns>
         public override void Interact(Player player)
         {
-            if (_keyType != DoorKeyType.None && player.ContainsKey(_keyType))
+            if (_keyType == DoorKeyType.None || player.ContainsKey(_keyType))
             {
-                OnDoorInteract?.Invoke(this);
+                OnDoorInteract?.Invoke(_destDoor, DestRoom);
             }
+        }
+
+        /// <summary>
+        /// Assign the door this door leads to
+        /// </summary>
+        /// <param name="doorAssignment">Door this door leads to</param>
+        public void AssignDoor(Door doorAssignment)
+        {
+            _destDoor = doorAssignment;
         }
     }
 }

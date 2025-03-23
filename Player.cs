@@ -31,7 +31,6 @@ namespace MakeEveryDayRecount
         /// </summary>
         public Point PlayerScreenPosition { get; private set; }
 
-
         private Direction _playerCurrentDirection;
         private PlayerState _playerState;
         /// <summary>
@@ -120,6 +119,9 @@ namespace MakeEveryDayRecount
                 _walkingSeconds = 0;
                 //but don't change the direction you're facing
             }
+
+            if (InputManager.GetKeyPress(Keys.E))
+                Interact();
         }
 
         /// <summary>
@@ -275,7 +277,7 @@ namespace MakeEveryDayRecount
         /// </summary>
         public void Interact()
         {
-            Prop objectToInteract;
+            Prop objectToInteract = null;
 
             switch (_playerCurrentDirection)
             {
@@ -293,6 +295,20 @@ namespace MakeEveryDayRecount
                     break;
                     //add code that makes the interaction happen
             }
+
+            if (objectToInteract == null)
+                return;
+
+            objectToInteract.Interact(this);
+        }
+
+        /// <summary>
+        /// Called to update the player's location in the new room
+        /// </summary>
+        /// <param name="new_location">New location for the player</param>
+        public void ChangeRoom(Point new_location)
+        {
+            Location = new_location;
         }
     }
 }

@@ -12,8 +12,9 @@ namespace MakeEveryDayRecount.Map
     /// <summary>
     /// Transition from one room to another
     /// </summary>
-    /// <param name="interactedDoor">Door that was interacted with</param>
-    delegate void DoorTransition(Door interactedDoor);
+    /// <param name="destinationDoor">Door that was interacted with</param>
+    /// <param name="destRoomIndex">Destination room</param>
+    delegate void DoorTransition(Door destinationDoor, int destRoomIndex);
 
     /// <summary>
     /// Pickup an object from the room
@@ -57,7 +58,7 @@ namespace MakeEveryDayRecount.Map
         }
         private Tile[,] _map;
         private List<Item> _itemsInRoom;
-        private readonly List<Door> _doors;
+        public List<Door> Doors { get; private set; }
 
         /// <summary>
         /// Size of current map
@@ -77,7 +78,7 @@ namespace MakeEveryDayRecount.Map
 
             _map = new Tile[,] { };
             _itemsInRoom = new List<Item> { };
-            _doors = new List<Door> { };
+            Doors = new List<Door> { };
             ParseData(filePath);
         }
 
@@ -154,7 +155,7 @@ namespace MakeEveryDayRecount.Map
             }
 
             // Display all doors
-            foreach (Door doorToDraw in _doors)
+            foreach (Door doorToDraw in Doors)
             {
                 Point propPosition = doorToDraw.Location;
 
@@ -210,6 +211,11 @@ namespace MakeEveryDayRecount.Map
                     *
                     *   boolean isDoor
                     *   if True
+                    *       int facing
+                    *           0 = North/Up
+                    *           1 = East/Right
+                    *           2 = South/Down
+                    *           3 = West/Left
                     *       int entranceIndex
                     *       int destRoom
                     *       int destDoor
@@ -237,7 +243,9 @@ namespace MakeEveryDayRecount.Map
                     // Define the number of GameObjects in the room
                     // Could be a door
                     int numberOfGameObjects = binaryReader.ReadInt32();
-
+                    Dictionary<int, Point> direction = new Dictionary<int, Point> { { 0, new Point(0, -1) }, { 1, new Point(1, 0) }, { 2, new Point(0, 1) }, { 3, new Point(-1, 0) } };
+                    if (numberOfGameObjects > 0)
+                        numberOfGameObjects = 1;
                     // Parse all needed GameObjects from the file
                     while (numberOfGameObjects > 0)
                     {
@@ -250,16 +258,17 @@ namespace MakeEveryDayRecount.Map
                             // Parse a door from the file
                             // Next three values correspond to the needed data
                             Door doorFromFile = new Door(
+                                direction[binaryReader.ReadInt32()],
                                 binaryReader.ReadInt32(),
                                 binaryReader.ReadInt32(),
                                 binaryReader.ReadInt32(),
                                 Door.DoorKeyType.None,
                                 new Point(posX, posY),
-                                AssetManager.PropTextures[propIndex]
+                                AssetManager.DoorTexture[propIndex]
                             );
                             // When this door is interacted with, transition the player
                             doorFromFile.OnDoorInteract += TransitionPlayer;
-                            _doors.Add(doorFromFile);
+                            Doors.Add(doorFromFile);
                         }
                         else
                         {
@@ -281,7 +290,7 @@ namespace MakeEveryDayRecount.Map
                 }
                 catch (Exception e)
                 {
-                    System.Diagnostics.Debug.Write(e);
+                    System.Diagnostics.Debug.Write(e.Message);
                 }
                 finally
                 {
@@ -299,10 +308,11 @@ namespace MakeEveryDayRecount.Map
         /// <summary>
         /// Transition the player from one room to another
         /// </summary>
-        /// <param name="interactedDoor"></param>
-        private void TransitionPlayer(Door interactedDoor)
+        /// <param name="doorToTravelTo">Door that the player will exit</param>
+        /// <param name="destRoom">Destination room </param>
+        private void TransitionPlayer(Door doorToTravelTo, int destRoom)
         {
-            DoorTransition(interactedDoor);
+            DoorTransition(doorToTravelTo, destRoom);
         }
 
         /// <summary>
@@ -329,7 +339,7 @@ namespace MakeEveryDayRecount.Map
                     return prop;
                 }
             }
-            foreach (Door door in _doors)
+            foreach (Door door in Doors)
             {
                 if (playerFacing == door.Location)
                 {
