@@ -74,6 +74,7 @@ namespace MakeEveryDayRecount
             {
                 OnInventorySpaceSelected?.Invoke(this);
                 _spaceSelected = true;
+                _isInteractive = false;
             }
         }
 
@@ -97,6 +98,7 @@ namespace MakeEveryDayRecount
         public void DeselectItem()
         {
             _spaceSelected = false;
+            _isInteractive = true;
         }
     }
 }

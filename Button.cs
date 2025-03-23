@@ -14,15 +14,15 @@ namespace MakeEveryDayRecount
         private Texture2D _image;
         private Texture2D _hoverImage;
         private Rectangle _rectangle;
-        private bool _isHoverable;
+        protected bool _isInteractive;
 
         public event Action OnClick;
 
         //Properties
         public bool Active
         {
-            get { return _isHoverable; }
-            set { _isHoverable = value; }
+            get { return _isInteractive; }
+            set { _isInteractive = value; }
         }
         public bool Hovered
         {
@@ -53,7 +53,7 @@ namespace MakeEveryDayRecount
             _image = image;
             _hoverImage = hoverImage;
             _rectangle = rectangle;
-            _isHoverable = isHoverable;
+            _isInteractive = isHoverable;
         }
 
         //Methods
