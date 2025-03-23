@@ -71,7 +71,7 @@ namespace MakeEveryDayRecount
                 content.Load<Texture2D>("InventoryBox_hover"),
                 content.Load<Texture2D>("InventoryBox_selected")
             };
-            PlayerTexture = content.Load<Texture2D>("player");
+            PlayerTexture = content.Load<Texture2D>("player_disguised");
 
             DebugWalkableTile = content.Load<Texture2D>("DebugAssets/WALKABLE");
             DebugNotWalkableTile = content.Load<Texture2D>("DebugAssets/NOT_WALKABLE");
