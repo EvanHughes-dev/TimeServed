@@ -31,7 +31,6 @@ namespace MakeEveryDayRecount
         /// </summary>
         public Point PlayerScreenPosition { get; private set; }
 
-
         private Direction _playerCurrentDirection;
         private PlayerState _playerState;
         /// <summary>
@@ -120,6 +119,9 @@ namespace MakeEveryDayRecount
                 _walkingSeconds = 0;
                 //but don't change the direction you're facing
             }
+
+            if (InputManager.GetKeyPress(Keys.E))
+                Interact();
         }
 
         /// <summary>
@@ -249,15 +251,8 @@ namespace MakeEveryDayRecount
         /// <returns>True if a suitable key is found, false otherwise</returns>
         public bool ContainsKey(Door.DoorKeyType keyType)
         {
-            foreach (Item item in _inventory.Contents)
-            {
-                if (item.ItemKeyType == keyType)
-                {
-                    return true;
-                }
-            }
-            //if we check the whole inventory and don't find anything
-            return false;
+            return _inventory.SelectedItem != null
+                && _inventory.SelectedItem.ItemKeyType == keyType;
         }
 
         /// <summary>
@@ -267,7 +262,7 @@ namespace MakeEveryDayRecount
         public void PickUpItem(Item item)
         {
             //add the item to your inventory
-            _inventory.Contents.Add(item);
+            _inventory.AddItemToInventory(item);
         }
         /// <summary>
         /// Player asks map manager to check if the tile it's looking at has an interactable object
@@ -275,7 +270,7 @@ namespace MakeEveryDayRecount
         /// </summary>
         public void Interact()
         {
-            Prop objectToInteract;
+            Prop objectToInteract = null;
 
             switch (_playerCurrentDirection)
             {
@@ -293,6 +288,20 @@ namespace MakeEveryDayRecount
                     break;
                     //add code that makes the interaction happen
             }
+
+            if (objectToInteract == null)
+                return;
+
+            objectToInteract.Interact(this);
+        }
+
+        /// <summary>
+        /// Called to update the player's location in the new room
+        /// </summary>
+        /// <param name="new_location">New location for the player</param>
+        public void ChangeRoom(Point new_location)
+        {
+            Location = new_location;
         }
     }
 }
