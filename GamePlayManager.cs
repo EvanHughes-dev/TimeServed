@@ -1,4 +1,5 @@
 ﻿using System;
+using MakeEveryDayRecount.GameObjects.Props;
 using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -33,6 +34,8 @@ namespace MakeEveryDayRecount
 
         public OnPlayerUpdate OnPlayerUpdate;
 
+        private Camera testCamera;
+
         /// <summary>
         /// Initialize GameplayManager
         /// </summary>
@@ -43,12 +46,17 @@ namespace MakeEveryDayRecount
             PlayerObject = new Player(new Point(3, 3), AssetManager.PlayerTexture, this);
             Map = new MapManager(this);
             OnPlayerUpdate?.Invoke(PlayerObject);
+
+            testCamera = new Camera(new Point(4, 0), AssetManager.PropTextures[4], new Vector2(5, 4), 0.1f);
         }
 
         public void Update(GameTime gameTime)
         {
             //Update Player
             PlayerObject.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+
+            //Update the camera >:>)
+            testCamera.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
         }
 
         /// <summary>
@@ -63,6 +71,9 @@ namespace MakeEveryDayRecount
 
             //Draw the player
             PlayerObject.Draw(sb);
+
+            //Draw the camera evilly
+            testCamera.Draw(sb);
         }
     }
 }

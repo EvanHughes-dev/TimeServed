@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -48,7 +49,11 @@ namespace MakeEveryDayRecount.GameObjects.Props
 
         public void Draw(SpriteBatch sb)
         {
-
+            sb.Draw(Sprite, new Rectangle(MapUtils.TileToWorld(Location) - MapUtils.WorldToScreen() + MapUtils.PixelOffset(), new Point(128, 128)), Color.White);
+            foreach (Point tile in _watchedTiles)
+            {
+                sb.Draw(AssetManager.PropTextures[3], new Rectangle(MapUtils.TileToWorld(tile) - MapUtils.WorldToScreen() + MapUtils.PixelOffset(), new Point(128, 128)), Color.White);
+            }
         }
 
         private void CheckRay(Vector2 ray)
@@ -57,25 +62,23 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //Step along that line in small intervals, checking what tile you're over at every step
             float dx = ray.X;
             float dy = ray.Y;
-            float D = 2 * dy - dx;
+            float error = 0;
             int y = Location.Y;
 
             for (int x = Location.X; x < Location.X + ray.X; x++)
             {
-                _watchedTiles.Add(new Point(x, y));
-                if (D > 0)
-                {
-                    y++;
-                    D = D - 2 * dx;
-                }
-                if (D == D+ 2* dy)
-                {
-                    break;
-                }
-            }
-            foreach (Point p in _watchedTiles)
-            {
-                Debug.WriteLine(p);
+                _watchedTiles.Add(new Point(x, Location.Y + (int)(dy*((x-Location.X)/dx))));
+                Debug.WriteLine("Added " + x + ", " + Location.Y + (int)(dy * (x / dx)));
+
+                //if (error > 1)
+                //{
+                //    y = y + 1;
+                //    error = error - 1;
+                //}
+                //if (error == error + 2 * dy)
+                //{
+                //    break;
+                //}
             }
         }
 

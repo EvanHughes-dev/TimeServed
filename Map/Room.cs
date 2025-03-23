@@ -43,7 +43,7 @@ namespace MakeEveryDayRecount.Map
         /// </summary>
         public string RoomName { get; private set; }
         private Tile[,] _map;
-        private List<Item> _itemsInRoom;
+        private List<Prop> _itemsInRoom;
         private readonly List<Door> _doors;
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace MakeEveryDayRecount.Map
             RoomName = roomName;
 
             _map = new Tile[,] { };
-            _itemsInRoom = new List<Item> { };
+            _itemsInRoom = new List<Prop> { };
             _doors = new List<Door> { };
             ParseData(filePath);
         }
@@ -248,8 +248,6 @@ namespace MakeEveryDayRecount.Map
                         }
                         else
                         {
-                            // Parse a prop from the file
-
                             Item newItemInRoom = new Item(
                                 new Point(posX, posY),
                                 AssetManager.PropTextures[propIndex]
