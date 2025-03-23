@@ -61,7 +61,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
             Point outPosition,
             int sourceDoor,
             int destRoom,
-            int destDoor,         
+            int destDoor,
             DoorKeyType keyType,
             Point location,
             Texture2D sprite
@@ -90,7 +90,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// <summary>
         /// Assign the door this door leads to
         /// </summary>
-        /// <param name="doorAssignment"></param>
+        /// <param name="doorAssignment">Door this door leads to</param>
         public void AssignDoor(Door doorAssignment)
         {
             DestDoor = doorAssignment;
