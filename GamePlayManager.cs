@@ -36,11 +36,10 @@ namespace MakeEveryDayRecount
         /// <summary>
         /// Initialize GameplayManager
         /// </summary>
-        /// <param name="screenSize">Size of the screen</param>
-        public GameplayManager()
+        public GameplayManager(Point screenSize)
         {
             Level = 1;
-            PlayerObject = new Player(new Point(3, 3), AssetManager.PlayerTexture, this);
+            PlayerObject = new Player(new Point(3, 3), AssetManager.PlayerTexture, this, screenSize);
             Map = new MapManager(this);
             OnPlayerUpdate?.Invoke(PlayerObject);
         }
@@ -56,13 +55,13 @@ namespace MakeEveryDayRecount
         /// </summary>
         /// <param name="sb">sprite batch used to draw</param>
         /// <exception cref="NotImplementedException"></exception>
-        public void Draw(SpriteBatch sb)
+        public void Draw(SpriteBatch sb, Point screenSize)
         {
             //Draw the map
             Map.Draw(sb);
 
             //Draw the player
-            PlayerObject.Draw(sb);
+            PlayerObject.Draw(sb, screenSize);
         }
     }
 }

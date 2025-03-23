@@ -33,7 +33,14 @@ namespace MakeEveryDayRecount
                 ms.Y >= _rectangle.Top && ms.Y <= _rectangle.Bottom);
             }
         }
-
+        /// <summary>
+        /// Allows the button's image to be changed
+        /// </summary>
+        public Texture2D Image { get { return _image; } set { _image = value; } }
+        /// <summary>
+        /// Allows the button's rectangle to be changed
+        /// </summary>
+        public Rectangle Rectangle { get { return _rectangle; } set { _rectangle = value; } }
         /// <summary>
         /// Creates a button
         /// </summary>
@@ -55,9 +62,9 @@ namespace MakeEveryDayRecount
         /// Draws the button, with the image changing when hovered over
         /// </summary>
         /// <param name="sb">sprite batch used for drawing the button</param>
-        public void Draw(SpriteBatch sb)
+        public virtual void Draw(SpriteBatch sb)
         {
-            if (Hovered)
+            if (Active && Hovered)
                 sb.Draw(_hoverImage, _rectangle, Color.White);
             else
                 sb.Draw(_image, _rectangle, Color.White);
@@ -66,9 +73,9 @@ namespace MakeEveryDayRecount
         /// <summary>
         /// If the button is hovered over and clicked, invokes its OnClick method
         /// </summary>
-        public void Click()
+        public virtual void Update()
         {
-            if (Hovered && InputManager.GetMousePress(MouseButtonState.Left) && _active)
+            if (Hovered && InputManager.GetMousePress(MouseButtonState.Left))
                 OnClick?.Invoke();
         }
     }
