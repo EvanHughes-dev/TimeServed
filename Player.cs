@@ -87,6 +87,7 @@ namespace MakeEveryDayRecount
             KeyboardInput(deltaTime);
             UpdatePlayerPos();
             _playerFrameRectangle = AnimationUpdate(deltaTime);
+            _inventory.Update();
         }
 
         #region Player Movement

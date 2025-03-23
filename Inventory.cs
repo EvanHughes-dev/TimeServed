@@ -44,7 +44,16 @@ namespace MakeEveryDayRecount
                     new Rectangle(screenSize.X/2 - (_boxSize * 2) + (_boxSize * i), 
                     screenSize.Y - (_boxSize + 30),
                     _boxSize, _boxSize), true);
-                _inventoryUI[i].OnClick += () => Select(i);
+                int copyOfIndex = i;
+                _inventoryUI[i].OnClick += () => Select(copyOfIndex);
+            }
+        }
+
+        public void Update()
+        {
+            for (int i = 0; i < _inventoryUI.Length; i++)
+            {
+                _inventoryUI[i].Update();
             }
         }
         /// <summary>
@@ -61,16 +70,25 @@ namespace MakeEveryDayRecount
 
         }
         public void Select(int index) {
-            if (indexOfSelected == index) 
+            if (indexOfSelected == index)
             {
                 indexOfSelected = -1;
                 _inventoryUI[index].Image = AssetManager.InventoryBoxes[0];
                 _inventoryUI[index].Active = true;
             }
+            else
+            {
+                if (indexOfSelected != -1)
+                {
+                    _inventoryUI[indexOfSelected].Image = AssetManager.InventoryBoxes[0];
+                    _inventoryUI[indexOfSelected].Active = true;
+                }
 
-            indexOfSelected = index;
-            _inventoryUI[index].Image = AssetManager.InventoryBoxes[2];
-            _inventoryUI[index].Active = false;
+                indexOfSelected = index;
+
+                _inventoryUI[indexOfSelected].Image = AssetManager.InventoryBoxes[2];
+                _inventoryUI[indexOfSelected].Active = false;
+            }
         }
     }
 }

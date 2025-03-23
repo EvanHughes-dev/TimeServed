@@ -277,7 +277,7 @@ namespace MakeEveryDayRecount
             for (int i = 0; i < list.Count; i++)
             {
                 //Invoke the button's on click effect if it has been clicked
-                list[i].Click();
+                list[i].Update();
             }
         }
 

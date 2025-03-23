@@ -73,9 +73,9 @@ namespace MakeEveryDayRecount
         /// <summary>
         /// If the button is hovered over and clicked, invokes its OnClick method
         /// </summary>
-        public void Click()
+        public void Update()
         {
-            if (Hovered && InputManager.GetMousePress(MouseButtonState.Left) && _active)
+            if (Hovered && InputManager.GetMousePress(MouseButtonState.Left))
                 OnClick?.Invoke();
         }
     }
