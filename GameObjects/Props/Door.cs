@@ -58,10 +58,10 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// <param name="location">Position in room</param>
         /// <param name="sprite">Sprite to display</param>
         public Door(
+            Point outPosition,
             int sourceDoor,
             int destRoom,
-            int destDoor,
-            Point outPosition,
+            int destDoor,         
             DoorKeyType keyType,
             Point location,
             Texture2D sprite
@@ -81,7 +81,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// <returns>If the door can be interacted</returns>
         public override void Interact(Player player)
         {
-            if (_keyType != DoorKeyType.None && player.ContainsKey(_keyType))
+            if (_keyType == DoorKeyType.None || player.ContainsKey(_keyType))
             {
                 OnDoorInteract?.Invoke(DestDoor, DestRoom);
             }

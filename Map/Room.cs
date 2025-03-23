@@ -258,13 +258,13 @@ namespace MakeEveryDayRecount.Map
                             // Parse a door from the file
                             // Next three values correspond to the needed data
                             Door doorFromFile = new Door(
-                                binaryReader.ReadInt32(),
-                                binaryReader.ReadInt32(),
-                                binaryReader.ReadInt32(),
                                 direction[binaryReader.ReadInt32()],
+                                binaryReader.ReadInt32(),
+                                binaryReader.ReadInt32(),
+                                binaryReader.ReadInt32(),
                                 Door.DoorKeyType.None,
                                 new Point(posX, posY),
-                                AssetManager.DoorTexture //TODO replace with an array of door textures
+                                AssetManager.DoorTexture[propIndex]
                             );
                             // When this door is interacted with, transition the player
                             doorFromFile.OnDoorInteract += TransitionPlayer;
@@ -276,7 +276,9 @@ namespace MakeEveryDayRecount.Map
 
                             Item newItemInRoom = new Item(
                                 new Point(posX, posY),
-                                AssetManager.PropTextures[propIndex]
+                                AssetManager.PropTextures[propIndex],
+                                "TEMP_NAME",
+                                Door.DoorKeyType.None
                             );
                             // When this item is picked up, remove it from this room
                             newItemInRoom.OnItemPickup += RemoveGameObject;
@@ -288,7 +290,7 @@ namespace MakeEveryDayRecount.Map
                 }
                 catch (Exception e)
                 {
-                    System.Diagnostics.Debug.Write(e);
+                    System.Diagnostics.Debug.Write(e.Message);
                 }
                 finally
                 {
@@ -321,6 +323,30 @@ namespace MakeEveryDayRecount.Map
         public bool VerifyWalkable(Point pointToCheck)
         {
             return _map[pointToCheck.X, pointToCheck.Y].IsWalkable;
+        }
+
+        /// <summary>
+        /// Verifies that the tile the player is looking at contains an interactable item
+        /// </summary>
+        /// <param name="playerFacing">The location of the tile the player is facing</param>
+        /// <returns></returns>
+        public Prop VerifyIntractable(Point playerFacing)
+        {
+            foreach (Item prop in _itemsInRoom)
+            {
+                if (playerFacing == prop.Location)
+                {
+                    return prop;
+                }
+            }
+            foreach (Door door in Doors)
+            {
+                if (playerFacing == door.Location)
+                {
+                    return door;
+                }
+            }
+            return null;
         }
 
         /// <summary>

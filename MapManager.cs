@@ -60,7 +60,7 @@ namespace MakeEveryDayRecount
         {
             _currentRoom = _rooms[destRoom];
             OnRoomUpdate?.Invoke(_currentRoom);
-            _gameplayManager.PlayerObject.ChangeRooms(transDoor.DestinationTile);
+            _gameplayManager.PlayerObject.ChangeRoom(transDoor.DestinationTile);
 
         }
 
@@ -81,6 +81,16 @@ namespace MakeEveryDayRecount
         public bool CheckPlayerCollision(Point playerDest)
         {
             return _currentRoom.VerifyWalkable(playerDest);
+        }
+
+        /// <summary>
+        /// Check if the tile in front of the player contains an interactable item
+        /// </summary>
+        /// <param name="playerFacing">The tile the player wants to interact with</param>
+        /// <returns></returns>
+        public Prop CheckIntractable(Point playerFacing)
+        {
+            return _currentRoom.VerifyIntractable(playerFacing);
         }
 
         /// <summary>

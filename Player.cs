@@ -63,10 +63,8 @@ namespace MakeEveryDayRecount
         //to the map which lets the player know what's near them
         private readonly GameplayManager _gameplayManager;
 
-        private List<Item> _inventory;
-
-        private Rectangle _sourceRectangle;
-        private Texture2D _playerTextures; //Probably a sprite sheet
+        //The player's inventory
+        private Inventory _inventory;
 
         public Player(Point location, Texture2D sprite, GameplayManager gameplayManager)
             : base(location, sprite)
@@ -75,6 +73,8 @@ namespace MakeEveryDayRecount
             _gameplayManager = gameplayManager;
             _animationFrame = 0;
             _playerSize = new Point(sprite.Width / 4, sprite.Height / 4);
+            //Create an inventory
+            _inventory = new Inventory();
         }
 
         /// <summary>
@@ -118,6 +118,9 @@ namespace MakeEveryDayRecount
                 _walkingSeconds = 0;
                 //but don't change the direction you're facing
             }
+
+            if (InputManager.GetKeyPress(Keys.E))
+                Interact();
         }
 
         /// <summary>
@@ -167,12 +170,17 @@ namespace MakeEveryDayRecount
         /// <param name="sb">The instance of spritebatch to be used to draw the player</param>
         public void Draw(SpriteBatch sb)
         {
+
             sb.Draw(
                 Sprite,
                 new Rectangle(PlayerScreenPosition, AssetManager.TileSize),
                 _playerFrameRectangle,
                 Color.White
             );
+
+            //Draw the inventory. If the player were to ever overlap the inventory it will disppear behind it
+            //Because nothing in the game should be drawn on top of the UI
+            _inventory.Draw(sb);
         }
 
         /// <summary>
@@ -235,23 +243,67 @@ namespace MakeEveryDayRecount
 
         #endregion
 
+        /// <summary>
+        /// Determines if the player's inventory contains a key of the specified type
+        /// </summary>
+        /// <param name="keyType">The key type to look for</param>
+        /// <returns>True if a suitable key is found, false otherwise</returns>
         public bool ContainsKey(Door.DoorKeyType keyType)
         {
-            foreach (Item currentItem in _inventory)
+            foreach (Item item in _inventory.Contents)
             {
-
+                if (item.ItemKeyType == keyType)
+                {
+                    return true;
+                }
             }
+            //if we check the whole inventory and don't find anything
             return false;
         }
 
         /// <summary>
-        /// Assign the new location in the new room
+        /// Adds an item to the player's inventory
         /// </summary>
-        /// <param name="newLocation">New tile position</param>
-        public void ChangeRooms(Point newLocation)
+        /// <param name="item">The item to add to the inventory</param>
+        public void PickUpItem(Item item)
         {
-            //TODO eventually i want an animation of the player walking into the door and the screen fading to black
-            Location = newLocation;
+            //add the item to your inventory
+            _inventory.Contents.Add(item);
+        }
+        /// <summary>
+        /// Player asks map manager to check if the tile it's looking at has an interactable object
+        /// If so, the player then interacts with that thing.
+        /// </summary>
+        public void Interact()
+        {
+            Prop objectToInteract = null;
+
+            switch (_playerCurrentDirection)
+            {
+                case Direction.Left:
+                    objectToInteract = _gameplayManager.Map.CheckIntractable(Location + new Point(-1, 0));
+                    break;
+                case Direction.Up:
+                    objectToInteract = _gameplayManager.Map.CheckIntractable(Location + new Point(0, -1));
+                    break;
+                case Direction.Right:
+                    objectToInteract = _gameplayManager.Map.CheckIntractable(Location + new Point(1, 0));
+                    break;
+                case Direction.Down:
+                    objectToInteract = _gameplayManager.Map.CheckIntractable(Location + new Point(0, 1));
+                    break;
+                    //add code that makes the interaction happen
+            }
+
+            if (objectToInteract == null)
+                return;
+
+            objectToInteract.Interact(this);
+        }
+
+        public void ChangeRoom(Point new_location)
+        {
+            Location = new_location;
         }
     }
 }
