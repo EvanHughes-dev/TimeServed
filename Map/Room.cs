@@ -267,7 +267,9 @@ namespace MakeEveryDayRecount.Map
 
                             Item newItemInRoom = new Item(
                                 new Point(posX, posY),
-                                AssetManager.PropTextures[propIndex]
+                                AssetManager.PropTextures[propIndex],
+                                "TEMP_NAME",
+                                Door.DoorKeyType.None
                             );
                             // When this item is picked up, remove it from this room
                             newItemInRoom.OnItemPickup += RemoveGameObject;
@@ -311,6 +313,30 @@ namespace MakeEveryDayRecount.Map
         public bool VerifyWalkable(Point pointToCheck)
         {
             return _map[pointToCheck.X, pointToCheck.Y].IsWalkable;
+        }
+
+        /// <summary>
+        /// Verifies that the tile the player is looking at contains an interactable item
+        /// </summary>
+        /// <param name="playerFacing">The location of the tile the player is facing</param>
+        /// <returns></returns>
+        public Prop VerifyInteractable(Point playerFacing)
+        {
+            foreach (Item prop in _itemsInRoom)
+            {
+                if (playerFacing == prop.Location)
+                {
+                    return prop;
+                }
+            }
+            foreach (Door door in _doors)
+            {
+                if (playerFacing == door.Location)
+                {
+                    return door;
+                }
+            }
+            return null;
         }
 
         /// <summary>

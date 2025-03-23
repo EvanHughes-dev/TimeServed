@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace MakeEveryDayRecount
 {
     public static class AssetManager
-    { 
+    {
         /// <summary>
         /// Array of the assets for the props in the game
         /// </summary>
@@ -28,6 +28,7 @@ namespace MakeEveryDayRecount
         /// Texture for the door
         /// </summary>
         public static Texture2D DoorTexture { get; private set; }
+
 
         /// <summary>
         /// Texture for the debug tile for walkable tiles
