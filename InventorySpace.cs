@@ -16,6 +16,10 @@ namespace MakeEveryDayRecount
         /// Get if this current inventory space has an item
         /// </summary>
         public bool ContainItem { get { return CurrentItem == null; } }
+
+        /// <summary>
+        /// Current item in the inventory
+        /// </summary>
         public Item CurrentItem { get; private set; }
 
         private Texture2D _selectedSpaceTexture;

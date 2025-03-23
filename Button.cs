@@ -14,15 +14,15 @@ namespace MakeEveryDayRecount
         private Texture2D _image;
         private Texture2D _hoverImage;
         private Rectangle _rectangle;
-        private bool _active;
+        private bool _isHoverable;
 
         public event Action OnClick;
 
         //Properties
         public bool Active
         {
-            get { return _active; }
-            set { _active = value; }
+            get { return _isHoverable; }
+            set { _isHoverable = value; }
         }
         public bool Hovered
         {
@@ -47,13 +47,13 @@ namespace MakeEveryDayRecount
         /// <param name="image">Image the button displays when not hovered over</param>
         /// <param name="hoverImage">Image the button displays when hovered over</param>
         /// <param name="rectangle">Rectangle corresponding to the position of the button</param>
-        /// <param name="active">Boolean determining if the button is active (can be clicked) or not</param>
-        public Button(Texture2D image, Texture2D hoverImage, Rectangle rectangle, bool active)
+        /// <param name="isHoverable">Boolean determining if the button is active (can be hovered) or not</param>
+        public Button(Texture2D image, Texture2D hoverImage, Rectangle rectangle, bool isHoverable)
         {
             _image = image;
             _hoverImage = hoverImage;
             _rectangle = rectangle;
-            _active = active;
+            _isHoverable = isHoverable;
         }
 
         //Methods
