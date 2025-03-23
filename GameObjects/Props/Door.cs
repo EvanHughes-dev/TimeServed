@@ -1,5 +1,4 @@
-﻿using System;
-using MakeEveryDayRecount.Map;
+﻿using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -46,7 +45,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// </summary>
         public event DoorTransition OnDoorInteract;
 
-        public Door DestDoor { get; private set; }
+        private Door DestDoor;
 
         /// <summary>
         ///Create the door object
