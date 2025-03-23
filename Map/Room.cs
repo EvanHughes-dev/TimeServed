@@ -330,7 +330,7 @@ namespace MakeEveryDayRecount.Map
         /// </summary>
         /// <param name="playerFacing">The location of the tile the player is facing</param>
         /// <returns></returns>
-        public Prop VerifyIntractable(Point playerFacing)
+        public Prop VerifyInteractable(Point playerFacing)
         {
             foreach (Item prop in _itemsInRoom)
             {
