@@ -1,33 +1,62 @@
-﻿using MakeEveryDayRecount.Map;
+﻿using System;
+using System.IO;
+using MakeEveryDayRecount.GameObjects.Props;
+using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using System;
-using MakeEveryDayRecount.GameObjects;
 
 namespace MakeEveryDayRecount
 {
     /// <summary>
-    /// Keep track of the room the player is currently 
+    /// Call to update the current room that is active on the map
+    /// </summary>
+    /// <param name="newRoom">Room that is now active</param>
+    delegate void OnRoomUpdate(Room newRoom);
+
+    /// <summary>
+    /// Keep track of the room the player is currently
     /// in and load the needed map
     /// </summary>
     internal class MapManager
     {
-        private Room _currentRoom;
-        private Room[] _rooms;
-        private Texture2D[] _tileSprites;
+        public event OnRoomUpdate OnRoomUpdate;
 
-        public MapManager(Texture2D[] tileSprites) { 
-            _tileSprites = tileSprites;
-            _rooms = LoadMapData();
+        private Room _currentRoom;
+
+        /// <summary>
+        /// Get the current room on the map
+        /// </summary>
+        public Room CurrentRoom
+        {
+            get => _currentRoom;
+        }
+        private Room[] _rooms;
+
+        private readonly GameplayManager _gameplayManager;
+
+        /// <summary>
+        /// Initialize the map manger and make rooms
+        /// </summary>
+        /// <param name="gameplayManager">Reference to the gamePlayManager</param>
+        public MapManager(GameplayManager gameplayManager)
+        {
+            _gameplayManager = gameplayManager;
+            _rooms = LoadMapData(_gameplayManager.Level);
+            _currentRoom = _rooms[0];
+            OnRoomUpdate?.Invoke(_currentRoom);
+            foreach (Room room in _rooms)
+            {
+                room.DoorTransition += TransitionRoom;
+            }
         }
 
-
-
-        public void TransitionRoom(Door transDoor) {
+        public void TransitionRoom(Door transDoor)
+        {
+            _currentRoom = _rooms[transDoor.DestRoom];
+            OnRoomUpdate?.Invoke(_currentRoom);
+            // Figure out how to update the player's position
             throw new NotImplementedException("TransitionRoom not been created yet in MapManager");
         }
-
 
         /// <summary>
         /// Draw the current room to the screen
@@ -35,7 +64,7 @@ namespace MakeEveryDayRecount
         /// <param name="batch">Batch of sprites to add to</param>
         public void Draw(SpriteBatch batch)
         {
-            throw new NotImplementedException("Draw has not been created yet in MapManager");
+            _currentRoom.Draw(batch);
         }
 
         /// <summary>
@@ -45,23 +74,70 @@ namespace MakeEveryDayRecount
         /// <returns>If the player is allowed to move there</returns>
         public bool CheckPlayerCollision(Point playerDest)
         {
-          throw new NotImplementedException("CheckPlayerCollision has not been created yet in MapManager");
+            return _currentRoom.VerifyWalkable(playerDest);
         }
 
         /// <summary>
-        /// Load all the needed data relating to each room 
-        /// from the corresponding files and format them
+        /// Check if the tile in front of the player contains an interactable item
         /// </summary>
-        /// <returns>Formated data loaded from files</returns>
-        private Room[] LoadMapData()
+        /// <param name="playerFacing">The tile the player wants to interact with</param>
+        /// <returns></returns>
+        public Prop CheckInteractable(Point playerFacing) 
         {
-
-            // only read binary data here
-            // each room is in charge of parsing itself
-            throw new NotImplementedException("LoadMapData has not been created yet in MapManager");
+            return _currentRoom.VerifyInteractable(playerFacing);
         }
 
+        /// <summary>
+        /// Load all the needed data relating to each room
+        /// from the corresponding files and format them
+        /// </summary>
+        /// <param name="currentLevel">Current level of the game</param>
+        /// <returns>Formatted data loaded from files</returns>
+        private Room[] LoadMapData(int currentLevel)
+        {
+            // only read binary data here
+            // each room is in charge of parsing itself
+            string folderPath = $"./Content/Level{currentLevel}";
 
+            // Level.level should exist in every Level folder
+            // Acts as a config file for the .room files
+            // File is structured in the following form:
 
+            /*
+            * int roomCount
+            *   Rooms:
+            *   string roomName
+            *   int roomIndex
+            *
+            * Loop through and pass path and index to a new room object
+            */
+            Room[] rooms = new Room[0];
+            if (File.Exists(folderPath + "/Level.level"))
+            {
+                Stream streamReader = File.OpenRead(folderPath + "/Level.level");
+                BinaryReader binaryReader = new BinaryReader(streamReader);
+
+                int roomCount = binaryReader.ReadInt32();
+                rooms = new Room[roomCount];
+
+                for (int currentRoom = 0; currentRoom < roomCount; currentRoom++)
+                {
+                    string roomName = binaryReader.ReadString();
+                    string roomFilePath = $"{folderPath}/{roomName}.room";
+                    int roomIndex = binaryReader.ReadInt32();
+                    rooms[currentRoom] = new Room(roomFilePath, roomName, roomIndex);
+                }
+
+                binaryReader.Close();
+            }
+            else
+            {
+                // Provide more details about what level the error occurred on
+                throw new FileNotFoundException(
+                    $"No Level.level file located for level {currentLevel}. File path: {folderPath}/Level.level"
+                );
+            }
+            return rooms;
+        }
     }
 }
