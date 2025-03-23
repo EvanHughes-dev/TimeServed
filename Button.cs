@@ -33,8 +33,14 @@ namespace MakeEveryDayRecount
                 ms.Y >= _rectangle.Top && ms.Y <= _rectangle.Bottom);
             }
         }
-
-        public Texture2D Image { set { _image = value; } }
+        /// <summary>
+        /// Allows the button's image to be changed
+        /// </summary>
+        public Texture2D Image { get { return _image; } set { _image = value; } }
+        /// <summary>
+        /// Allows the button's rectangle to be changed
+        /// </summary>
+        public Rectangle Rectangle { get { return _rectangle; } set { _rectangle = value; } }
         /// <summary>
         /// Creates a button
         /// </summary>

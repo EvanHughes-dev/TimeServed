@@ -67,7 +67,7 @@ namespace MakeEveryDayRecount
         //The player's inventory
         private Inventory _inventory;
 
-        public Player(Point location, Texture2D sprite, GameplayManager gameplayManager)
+        public Player(Point location, Texture2D sprite, GameplayManager gameplayManager, Point screenSize)
             : base(location, sprite)
         {
             _walkingSeconds = 0;
@@ -75,7 +75,7 @@ namespace MakeEveryDayRecount
             _animationFrame = 0;
             _playerSize = new Point(sprite.Width / 4, sprite.Height / 4);
             //Create an inventory
-            _inventory = new Inventory();
+            _inventory = new Inventory(screenSize);
         }
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace MakeEveryDayRecount
         /// Draws the player in the center of the screen
         /// </summary>
         /// <param name="sb">The instance of spritebatch to be used to draw the player</param>
-        public void Draw(SpriteBatch sb)
+        public void Draw(SpriteBatch sb, Point screenSize)
         {
 
             sb.Draw(
@@ -178,7 +178,7 @@ namespace MakeEveryDayRecount
 
             //Draw the inventory. If the player were to ever overlap the inventory it will disppear behind it
             //Because nothing in the game should be drawn on top of the UI
-            _inventory.Draw(sb);
+            _inventory.Draw(sb, screenSize);
         }
 
         /// <summary>

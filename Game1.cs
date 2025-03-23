@@ -93,7 +93,7 @@ namespace MakeEveryDayRecount
 
 
             // Gameplay manager must be called after all content is loaded
-            _gameplayManager = new GameplayManager();
+            _gameplayManager = new GameplayManager(ScreenSize);
 
             MapUtils.Initialize(this, _gameplayManager);
             GlobalDebug.Initialize();
@@ -166,12 +166,12 @@ namespace MakeEveryDayRecount
                     DrawMenu(_spriteBatch);
                     break;
                 case GameState.Pause:
-                    _gameplayManager.Draw(_spriteBatch);
+                    _gameplayManager.Draw(_spriteBatch, ScreenSize);
                     DisplayDebug();
                     DrawPause(_spriteBatch);
                     break;
                 case GameState.Level:
-                    _gameplayManager.Draw(_spriteBatch);
+                    _gameplayManager.Draw(_spriteBatch, ScreenSize);
                     DisplayDebug();
                     break;
                 case GameState.Cutscene:

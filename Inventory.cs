@@ -15,6 +15,7 @@ namespace MakeEveryDayRecount
 {
     internal class Inventory
     {
+        int _boxSize = AssetManager.InventoryBoxes[0].Width / 2;
         /// <summary>
         /// The index of the current selected item
         /// </summary>
@@ -34,16 +35,15 @@ namespace MakeEveryDayRecount
         /// </summary>
         public List<Item> Contents { get { return _contents; } }
 
-        public Inventory()
+        public Inventory(Point screenSize)
         {
             for (int i = 0; i < _inventoryUI.Length; i++)
             {
-                int boxSize = AssetManager.InventoryBoxes[0].Width;
                 //create a button and offset the x
                 _inventoryUI[i] = new Button(AssetManager.InventoryBoxes[0], AssetManager.InventoryBoxes[1],
-                    new Rectangle(MapUtils.ScreenSize.X/2 - (boxSize * 2) + (boxSize * i), 
-                    MapUtils.ScreenSize.Y - (boxSize + 30),
-                    boxSize, boxSize), true);
+                    new Rectangle(screenSize.X/2 - (_boxSize * 2) + (_boxSize * i), 
+                    screenSize.Y - (_boxSize + 30),
+                    _boxSize, _boxSize), true);
                 _inventoryUI[i].OnClick += () => Select(i);
             }
         }
@@ -51,11 +51,12 @@ namespace MakeEveryDayRecount
         /// Draws the inventory's UI using a button array 
         /// </summary>
         /// <param name="sb"></param>
-        public void Draw(SpriteBatch sb) 
+        public void Draw(SpriteBatch sb, Point screenSize) 
         {
-            foreach (Button button in _inventoryUI)
+            for (int i = 0; i < _inventoryUI.Length; i++)
             {
-                button.Draw(sb);
+                _inventoryUI[i].Rectangle= new Rectangle(screenSize.X / 2 - (_boxSize * 2) + (_boxSize * i), screenSize.Y - (_boxSize + 30), _boxSize, _boxSize);
+                _inventoryUI[i].Draw(sb);
             }
 
         }
