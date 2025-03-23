@@ -208,7 +208,14 @@ namespace MakeEveryDayRecount.Map
                     *   int propIndex
                     *   int positionX
                     *   int positionY
-                    *
+                    *    
+                    *   int keyType
+                    *       0 = None
+                    *       1 = Key card
+                    *       2 = Screwdriver
+                    *       For doors, this is the key that can unlock them
+                    *       For items, this is the key type they are
+                    * 
                     *   boolean isDoor
                     *   if True
                     *       int facing
@@ -244,14 +251,15 @@ namespace MakeEveryDayRecount.Map
                     // Could be a door
                     int numberOfGameObjects = binaryReader.ReadInt32();
                     Dictionary<int, Point> direction = new Dictionary<int, Point> { { 0, new Point(0, -1) }, { 1, new Point(1, 0) }, { 2, new Point(0, 1) }, { 3, new Point(-1, 0) } };
-                    if (numberOfGameObjects > 0)
-                        numberOfGameObjects = 1;
+
                     // Parse all needed GameObjects from the file
                     while (numberOfGameObjects > 0)
                     {
                         int propIndex = binaryReader.ReadInt32();
                         int posX = binaryReader.ReadInt32();
                         int posY = binaryReader.ReadInt32();
+
+                        Door.DoorKeyType keyType = (Door.DoorKeyType)binaryReader.ReadInt32();
 
                         if (binaryReader.ReadBoolean())
                         {
@@ -262,7 +270,7 @@ namespace MakeEveryDayRecount.Map
                                 binaryReader.ReadInt32(),
                                 binaryReader.ReadInt32(),
                                 binaryReader.ReadInt32(),
-                                Door.DoorKeyType.None,
+                                keyType,
                                 new Point(posX, posY),
                                 AssetManager.DoorTexture[propIndex]
                             );
@@ -278,7 +286,7 @@ namespace MakeEveryDayRecount.Map
                                 new Point(posX, posY),
                                 AssetManager.PropTextures[propIndex],
                                 "TEMP_NAME",
-                                Door.DoorKeyType.None
+                                keyType
                             );
                             // When this item is picked up, remove it from this room
                             newItemInRoom.OnItemPickup += RemoveGameObject;

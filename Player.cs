@@ -251,15 +251,8 @@ namespace MakeEveryDayRecount
         /// <returns>True if a suitable key is found, false otherwise</returns>
         public bool ContainsKey(Door.DoorKeyType keyType)
         {
-            foreach (Item item in _inventory.Contents)
-            {
-                if (item.ItemKeyType == keyType)
-                {
-                    return true;
-                }
-            }
-            //if we check the whole inventory and don't find anything
-            return false;
+            return _inventory.SelectedItem != null
+                && _inventory.SelectedItem.ItemKeyType == keyType;
         }
 
         /// <summary>
@@ -269,7 +262,7 @@ namespace MakeEveryDayRecount
         public void PickUpItem(Item item)
         {
             //add the item to your inventory
-            _inventory.Contents.Add(item);
+            _inventory.AddItemToInventory(item);
         }
         /// <summary>
         /// Player asks map manager to check if the tile it's looking at has an interactable object
