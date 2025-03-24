@@ -1,6 +1,7 @@
 ﻿using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MakeEveryDayRecount.Players;
 
 namespace MakeEveryDayRecount.GameObjects.Props
 {

@@ -2,7 +2,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace MakeEveryDayRecount
+namespace MakeEveryDayRecount.Managers
 {
     public static class AssetManager
     {
@@ -42,6 +42,10 @@ namespace MakeEveryDayRecount
         /// Texture for the debug tile for not walkable tiles
         /// </summary>
         public static Texture2D DebugNotWalkableTile { get; private set; }
+        /// <summary>
+        /// Default texture for all buttons
+        /// </summary>
+        public static Texture2D DefaultButton { get; private set; }
 
         /// <summary>
         /// Default font for debugging
@@ -57,35 +61,42 @@ namespace MakeEveryDayRecount
         {
             PropTextures = new Texture2D[]
             {
-                content.Load<Texture2D>("item_idCard"),
-                content.Load<Texture2D>("item_screwdriver"),
-                content.Load<Texture2D>("item_wireCutters"),
-                content.Load<Texture2D>("item_hook"),
-                content.Load<Texture2D>("item_hookAndRope")
+                content.Load<Texture2D>("Items/idCard"),
+                content.Load<Texture2D>("Items/screwdriver"),
+                content.Load<Texture2D>("Items/wireCutters"),
+                content.Load<Texture2D>("Items/hook"),
+                content.Load<Texture2D>("Items/hookAndRope")
             };
+
             TileMap = new Texture2D[]
             {
-                content.Load<Texture2D>("tile_testWall"),
-                content.Load<Texture2D>("tile_testWalkable")
+                content.Load<Texture2D>("Tiles/testWall"),
+                content.Load<Texture2D>("Tiles/testWalkable")
             };
+
             InventoryBoxes = new Texture2D[]
             {
-                content.Load<Texture2D>("InventoryBox_idle"),
-                content.Load<Texture2D>("InventoryBox_hover"),
-                content.Load<Texture2D>("InventoryBox_selected")
+                content.Load<Texture2D>("Player/Inventory/InventoryBox_idle"),
+                content.Load<Texture2D>("Player/Inventory/InventoryBox_hover"),
+                content.Load<Texture2D>("Player/Inventory/InventoryBox_selected")
             };
-            PlayerTexture = content.Load<Texture2D>("player");
-            PlayerDisguisedTexture = content.Load<Texture2D>("player_disguised");
+
+            PlayerTexture = content.Load<Texture2D>("Player/player");
+            PlayerDisguisedTexture = content.Load<Texture2D>("Player/player_disguised");
+
             DebugWalkableTile = content.Load<Texture2D>("DebugAssets/WALKABLE");
             DebugNotWalkableTile = content.Load<Texture2D>("DebugAssets/NOT_WALKABLE");
-            TimesNewRoman20 = content.Load<SpriteFont>("Arial20");
+
+            TimesNewRoman20 = content.Load<SpriteFont>("Fonts/Arial20");
 
             DoorTexture = new Texture2D[4];
-
             DoorTexture[0] = content.Load<Texture2D>("Doors/TempDoor-Top");
             DoorTexture[1] = content.Load<Texture2D>("Doors/TempDoor-Right");
             DoorTexture[2] = content.Load<Texture2D>("Doors/TempDoor-Bottom");
             DoorTexture[3] = content.Load<Texture2D>("Doors/TempDoor-Left");
+
+            DefaultButton = content.Load<Texture2D>("UI/DefaultButton");
+
             TileSize = new Point(TileMap[0].Width, TileMap[0].Height);
         }
     }

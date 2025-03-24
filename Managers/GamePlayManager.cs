@@ -2,8 +2,10 @@
 using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MakeEveryDayRecount.Players;
 
-namespace MakeEveryDayRecount
+
+namespace MakeEveryDayRecount.Managers
 {
     /// <summary>
     /// Called when the player object is updated in memory

@@ -1,17 +1,11 @@
-﻿using MakeEveryDayRecount.GameObjects;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using System;
 using System.Collections.Generic;
 using MakeEveryDayRecount.GameObjects.Props;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MakeEveryDayRecount.GameObjects.Props;
-using MakeEveryDayRecount.Map;
+using MakeEveryDayRecount.Managers;
 
-namespace MakeEveryDayRecount
+
+namespace MakeEveryDayRecount.Players.InventoryFiles
 {
     internal class Inventory
     {

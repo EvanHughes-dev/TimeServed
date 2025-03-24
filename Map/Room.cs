@@ -6,6 +6,7 @@ using MakeEveryDayRecount.GameObjects.Props;
 using MakeEveryDayRecount.Map.Tiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MakeEveryDayRecount.Managers;
 
 namespace MakeEveryDayRecount.Map
 {

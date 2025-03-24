@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using MakeEveryDayRecount.Managers;
 
 namespace MakeEveryDayRecount
 {
@@ -89,8 +90,8 @@ namespace MakeEveryDayRecount
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            AssetManager.LoadContent(Content);
 
+            AssetManager.LoadContent(Content);
 
             // Gameplay manager must be called after all content is loaded
             _gameplayManager = new GameplayManager(ScreenSize);
@@ -239,7 +240,7 @@ namespace MakeEveryDayRecount
         private void LoadButtons()
         {
             //Load button textures
-            defaultButtonTexture = Content.Load<Texture2D>("Default Button");
+            defaultButtonTexture = AssetManager.DefaultButton;
             //... and more, when we have them
 
             //Fill pause buttons list with buttons

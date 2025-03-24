@@ -7,7 +7,7 @@ using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace MakeEveryDayRecount
+namespace MakeEveryDayRecount.Managers
 {
     /// <summary>
     /// Call to update the current room that is active on the map
