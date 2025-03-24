@@ -19,6 +19,10 @@ namespace MakeEveryDayRecount.GameObjects.Props
         //TODO: Maybe these should be changed into points?
         private Vector2[] _rays;
 
+        //The rays don't project from inside of the wall, where the camera is technically drawn
+        //All the rays come out from the point on the floor right "in front of" the camera
+        private Point _rayBase;
+
         private float _spread;
 
         private List<Point> _watchedTiles;
@@ -38,6 +42,9 @@ namespace MakeEveryDayRecount.GameObjects.Props
             _active = true;
             _centerRay = centerRay;
             _spread = spread;
+            //TODO: Write a check to figure out the raybase here
+            //NOTE: for testing the camera is in the top wall, so the raybase is one down from the camera's location
+            _rayBase = new Point(Location.X, Location.Y + 1);
         }
         //TODO: add an alternative constructor that takes a point as the center of the vision cone and constructs a vector from that
 
@@ -58,17 +65,28 @@ namespace MakeEveryDayRecount.GameObjects.Props
 
         private void CheckRay(Vector2 ray)
         {
+
             //create a parametric line using the point and the vector
             //Step along that line in small intervals, checking what tile you're over at every step
             float dx = ray.X;
             float dy = ray.Y;
             float error = 0;
-            int y = Location.Y;
+            int y = _rayBase.Y;
 
-            for (int x = Location.X; x < Location.X + ray.X; x++)
+            for (int x = 0; x <= ray.X; x++)
             {
-                _watchedTiles.Add(new Point(x, Location.Y + (int)(dy*((x-Location.X)/dx))));
-                Debug.WriteLine("Added " + x + ", " + Location.Y + (int)(dy * (x / dx)));
+                _watchedTiles.Add(new Point(x + Location.X, y));
+                Debug.WriteLine("Added " + (x + Location.X) + ", " + y);
+
+                if (error >= 0.5)
+                {
+                    error = error - 1;
+                    y = y + 1;
+                }
+                else
+                {
+                    error = error + (_rayBase.Y * ray.X) + (x * ray.Y) - (y * ray.X);
+                }
 
                 //if (error > 1)
                 //{
