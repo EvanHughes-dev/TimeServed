@@ -7,8 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MakeEveryDayRecount
-{   
+namespace MakeEveryDayRecount.Managers
+{
     //Enum for different mouse button states
     //JAMES NOTE
     //I think it needs a better name
@@ -18,14 +18,14 @@ namespace MakeEveryDayRecount
         Right,
         Middle
     }
-    
+
     /// <summary>
     /// James Young
     /// Holds keyboard state for this frame and keyboard state for the prior frame.
     /// Methods allow checking if a key was pressed or released this frame, or what state a key is right now.
     /// </summary>
     public static class InputManager
-    {        
+    {
         private static KeyboardState PriorKeyboardState { get; set; }
         private static KeyboardState CurrentKeyboardState { get; set; }
         private static MouseState PriorMouseState { get; set; }

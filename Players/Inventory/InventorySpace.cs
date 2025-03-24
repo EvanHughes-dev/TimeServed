@@ -2,8 +2,9 @@
 using MakeEveryDayRecount.GameObjects.Props;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MakeEveryDayRecount.Managers;
 
-namespace MakeEveryDayRecount
+namespace MakeEveryDayRecount.Players.InventoryFiles
 {
     delegate void OnInventoryChange(InventorySpace inventorySpace);
 

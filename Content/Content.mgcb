@@ -13,12 +13,12 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin Arial20.spritefont
+#begin Fonts/Arial20.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
-/build:Arial20.spritefont
+/build:Fonts/Arial20.spritefont
 
 #begin DebugAssets/NOT_WALKABLE.png
 /importer:TextureImporter
@@ -44,7 +44,7 @@
 /processorParam:TextureFormat=Color
 /build:DebugAssets/WALKABLE.png
 
-#begin Default Button.png
+#begin UI/DefaultButton.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -54,7 +54,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Default Button.png
+/build:UI/DefaultButton.png
 
 #begin Doors/TempDoor-Bottom.png
 /importer:TextureImporter
@@ -104,7 +104,7 @@
 /processorParam:TextureFormat=Color
 /build:Doors/TempDoor-Top.png
 
-#begin InventoryBox_hover.png
+#begin Player/Inventory/InventoryBox_hover.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -114,9 +114,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:InventoryBox_hover.png
+/build:Player/Inventory/InventoryBox_hover.png
 
-#begin InventoryBox_idle.png
+#begin Player/Inventory/InventoryBox_idle.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -126,9 +126,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:InventoryBox_idle.png
+/build:Player/Inventory/InventoryBox_idle.png
 
-#begin InventoryBox_selected.png
+#begin Player/Inventory/InventoryBox_selected.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -138,9 +138,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:InventoryBox_selected.png
+/build:Player/Inventory/InventoryBox_selected.png
 
-#begin item_hook.png
+#begin Items/hook.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -150,9 +150,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:item_hook.png
+/build:Items/hook.png
 
-#begin item_hookAndRope.png
+#begin Items/hookAndRope.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -162,9 +162,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:item_hookAndRope.png
+/build:Items/hookAndRope.png
 
-#begin item_idCard.png
+#begin Items/idCard.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -174,9 +174,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:item_idCard.png
+/build:Items/idCard.png
 
-#begin item_screwdriver.png
+#begin Items/screwdriver.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -186,9 +186,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:item_screwdriver.png
+/build:Items/screwdriver.png
 
-#begin item_wireCutters.png
+#begin Items/wireCutters.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -198,7 +198,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:item_wireCutters.png
+/build:Items/wireCutters.png
 
 #begin level1/Level.level
 /copy:level1/Level.level
@@ -209,7 +209,7 @@
 #begin level1/TestRoom2.room
 /copy:level1/TestRoom2.room
 
-#begin player_disguised.png
+#begin Player/player_disguised.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -219,9 +219,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:player_disguised.png
+/build:Player/player_disguised.png
 
-#begin player.png
+#begin Player/player.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -231,9 +231,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:player.png
+/build:Player/player.png
 
-#begin player.png
+#begin Tiles/testWalkable.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -243,9 +243,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:player.png
+/build:Tiles/testWalkable.png
 
-#begin tile_testWalkable.png
+#begin Tiles/testWall.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -255,24 +255,4 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:tile_testWalkable.png
-
-#begin tile_testWall.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:tile_testWall.png
-
-#begin TimesNewRoman12.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:TimesNewRoman12.spritefont
-
+/build:Tiles/testWall.png

@@ -1,5 +1,6 @@
 using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework.Graphics;
+using MakeEveryDayRecount.Managers;
 
 namespace MakeEveryDayRecount.DebugModes
 {
