@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using MakeEveryDayRecount.Managers;
 
 namespace MakeEveryDayRecount
 {
@@ -90,11 +91,12 @@ namespace MakeEveryDayRecount
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+
             AssetManager.LoadContent(Content);
             SoundManager.LoadContent(Content);
 
             // Gameplay manager must be called after all content is loaded
-            _gameplayManager = new GameplayManager();
+            _gameplayManager = new GameplayManager(ScreenSize);
 
             MapUtils.Initialize(this, _gameplayManager);
             GlobalDebug.Initialize();
@@ -174,12 +176,14 @@ namespace MakeEveryDayRecount
                     DrawMenu(_spriteBatch);
                     break;
                 case GameState.Pause:
+                    _gameplayManager.Draw(_spriteBatch, ScreenSize);
+                    DisplayDebug();
                     DrawPause(_spriteBatch);
                     break;
                 case GameState.Level:
                     CheckKeyboardInput();
                     //TODO: Blur the gameplay in the background.
-                    _gameplayManager.Draw(_spriteBatch);
+                    _gameplayManager.Draw(_spriteBatch, ScreenSize);
                     DisplayDebug();
                     break;
                 case GameState.Cutscene:
@@ -246,7 +250,7 @@ namespace MakeEveryDayRecount
         private void LoadButtons()
         {
             //Load button textures
-            defaultButtonTexture = Content.Load<Texture2D>("Default Button");
+            defaultButtonTexture = AssetManager.DefaultButton;
             //... and more, when we have them
 
             //Fill pause buttons list with buttons
@@ -286,7 +290,7 @@ namespace MakeEveryDayRecount
             for (int i = 0; i < list.Count; i++)
             {
                 //Invoke the button's on click effect if it has been clicked
-                list[i].Click();
+                list[i].Update();
             }
         }
 
