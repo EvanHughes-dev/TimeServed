@@ -53,7 +53,7 @@ namespace MakeEveryDayRecount
         /// <param name="level">Level for which background music is being played</param>
         public static void PlayBGM(int level)
         {
-            //MediaPlayer.Play(BackgroundMusic[level - 1]);
+            MediaPlayer.Play(BackgroundMusic[level - 1]);
         }
 
         /// <summary>
