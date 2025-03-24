@@ -1,164 +1,199 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Class Name="MakeEveryDayRecount.DebugModes.BaseDebug" Collapsed="true">
-    <Position X="4.75" Y="7.25" Width="1.5" />
+    <Position X="5.75" Y="7.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAgAAhAAAAAAABAAAAAAAAQAAAAAAAAAAAA=</HashCode>
       <FileName>DebugModes\BaseDebug.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="MakeEveryDayRecount.DebugModes.GlobalDebug" Collapsed="true">
-    <Position X="13" Y="4.25" Width="1.5" />
+    <Position X="19.25" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAACAAAAAAAxAAAAAAABAABAAAAAQAAAAAAAAAAAA=</HashCode>
       <FileName>DebugModes\GlobalDebug.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="MakeEveryDayRecount.DebugModes.MapDebug" Collapsed="true">
-    <Position X="3.5" Y="8.5" Width="1.5" />
+    <Position X="4.5" Y="8.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAgAAAAAAAAAEAAAAEAAAAEAAAAIAAAA=</HashCode>
       <FileName>DebugModes\MapDebug.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="MakeEveryDayRecount.DebugModes.PlayerDebug" Collapsed="true">
-    <Position X="5.75" Y="8.5" Width="1.5" />
+    <Position X="6.75" Y="8.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AEAAAAAAEAAEAgAAAAEACAAAAAAAABAAAAAAAAAAAAA=</HashCode>
       <FileName>DebugModes\PlayerDebug.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="MakeEveryDayRecount.GameObjects.Props.Camera" Collapsed="true">
-    <Position X="8.25" Y="6" Width="1.5" />
+    <Position X="9.25" Y="6.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>GameObjects\Props\Camera.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="MakeEveryDayRecount.GameObjects.Props.Door" Collapsed="true">
-    <Position X="3.75" Y="6" Width="1.5" />
+    <Position X="11.5" Y="6.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAEAAAAAAAAAAAAAAAQAAIAAAAAAAQIAoAABAAAA=</HashCode>
       <FileName>GameObjects\Props\Door.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="MakeEveryDayRecount.GameObjects.Props.Item" Collapsed="true">
-    <Position X="6" Y="6" Width="1.5" />
+    <Position X="7" Y="6.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAEgAAAAAAAAAAAAAAAgAAAIAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>GameObjects\Props\Item.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="MakeEveryDayRecount.GameObjects.Props.Prop" Collapsed="true">
-    <Position X="6" Y="4.5" Width="1.5" />
+    <Position X="9.25" Y="4.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>GameObjects\Props\Prop.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="MakeEveryDayRecount.GameObjects.GameObject" Collapsed="true">
-    <Position X="7" Y="3.25" Width="1.5" />
+    <Position X="8" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAQAAAAAAAAAAA=</HashCode>
       <FileName>GameObjects\GameObject.cs</FileName>
     </TypeIdentifier>
   </Class>
+  <Class Name="MakeEveryDayRecount.Managers.AssetManager" Collapsed="true">
+    <Position X="14" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEiAABABBCAAAAEAAAAAAAgAAAAAAAAAAAAAAAAKAAQ=</HashCode>
+      <FileName>Managers\AssetManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MakeEveryDayRecount.Managers.GameplayManager" Collapsed="true">
+    <Position X="17.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAABAAABAAAgAAAAAAAAAAAAAAAAADAAAAAAAAAAA=</HashCode>
+      <FileName>Managers\GamePlayManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MakeEveryDayRecount.Managers.InputManager" Collapsed="true">
+    <Position X="14" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAwAAEEAAJAAAABAgACAAAAAAAAAABAAAAAAAQAAAEA=</HashCode>
+      <FileName>Managers\InputManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MakeEveryDayRecount.Managers.MapManager" Collapsed="true">
+    <Position X="17.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAAgAAggAAAAAAAAAAAAAEhAAAgAAAICAAAA=</HashCode>
+      <FileName>Managers\MapManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
   <Class Name="MakeEveryDayRecount.Map.Tiles.Tile" Collapsed="true">
-    <Position X="16.5" Y="5.25" Width="1.5" />
+    <Position X="15.75" Y="5.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAA=</HashCode>
       <FileName>Map\Tiles\Tile.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="MakeEveryDayRecount.Map.MapUtils" Collapsed="true">
-    <Position X="13" Y="5.25" Width="1.5" />
+    <Position X="19.25" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAQIAgAAAAIQgACAIECCBAAAAAECAAAAAIAAAAAAA=</HashCode>
       <FileName>Map\MapUtils.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="MakeEveryDayRecount.Map.Room" Collapsed="true">
-    <Position X="14.75" Y="5.25" Width="1.5" />
+    <Position X="14" Y="5.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAgAAEAAAAAAgEAAAAAAAAAAAAAAACQgkBBAlAEAAA=</HashCode>
       <FileName>Map\Room.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="MakeEveryDayRecount.AssetManager" Collapsed="true">
-    <Position X="13" Y="3.25" Width="1.5" />
+  <Class Name="MakeEveryDayRecount.Players.InventoryFiles.Inventory" Collapsed="true">
+    <Position X="15.75" Y="4.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>AssetManager.cs</FileName>
+      <HashCode>AAQAAAQAAAAAAggBAAAAAAAAAAABAACAABAAAAAAAAE=</HashCode>
+      <FileName>Players\Inventory\Inventory.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MakeEveryDayRecount.Players.InventoryFiles.InventorySpace" Collapsed="true">
+    <Position X="9.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQCABAAAAAAEgAQAAAAAAAAAABAAAAAAgAACAAAAAA=</HashCode>
+      <FileName>Players\Inventory\InventorySpace.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MakeEveryDayRecount.Players.Player" Collapsed="true">
+    <Position X="4.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQggAAIAAgESgGAAgAAEIAAIAIAAAGAghAAACAAEAA=</HashCode>
+      <FileName>Players\Player.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MakeEveryDayRecount.Button" Collapsed="true">
+    <Position X="9.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAEAQAAAAAAgAAAAAAAAACAAQgQRAgAAAAAAAAAAA=</HashCode>
+      <FileName>Button.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="MakeEveryDayRecount.Game1" Collapsed="true">
-    <Position X="14.75" Y="3.25" Width="1.5" />
+    <Position X="15.75" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>IBQAAQEAAAqKAwBABAIAKAAAACAAAAgCAIQAACABAAQ=</HashCode>
       <FileName>Game1.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="MakeEveryDayRecount.GameplayManager" Collapsed="true">
-    <Position X="16.5" Y="3.25" Width="1.5" />
+  <Enum Name="MakeEveryDayRecount.Managers.MouseButtonState" Collapsed="true">
+    <Position X="15.75" Y="6.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>GamePlayManager.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACQAAAAAAA=</HashCode>
+      <FileName>Managers\InputManager.cs</FileName>
     </TypeIdentifier>
-  </Class>
-  <Class Name="MakeEveryDayRecount.Managers.InputManager" Collapsed="true">
-    <Position X="14.75" Y="4.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAwAAEEAAJAAAABAgACAAAAAAAAAABAAAAAAAQAAAEA=</HashCode>
-      <FileName>InputManager.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="MakeEveryDayRecount.MapManager" Collapsed="true">
-    <Position X="16.5" Y="4.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>MapManager.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="MakeEveryDayRecount.Player" Collapsed="true">
-    <Position X="10.5" Y="4.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAQggAAIAAgESgGAAgAAEIAAIAIAAAGAghAAACAAEAA=</HashCode>
-      <FileName>Player.cs</FileName>
-    </TypeIdentifier>
-  </Class>
+  </Enum>
   <Enum Name="MakeEveryDayRecount.GameState" Collapsed="true">
-    <Position X="13" Y="6.5" Width="1.5" />
+    <Position X="14" Y="6.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAgAAAAAAAAAAAAAAAAAACAAAAIAgABAAAAAAAAAAA=</HashCode>
       <FileName>Game1.cs</FileName>
     </TypeIdentifier>
   </Enum>
+  <Delegate Name="MakeEveryDayRecount.Managers.OnPlayerUpdate" Collapsed="true">
+    <Position X="19.25" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAA=</HashCode>
+      <FileName>Managers\GamePlayManager.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Delegate Name="MakeEveryDayRecount.Managers.OnRoomUpdate" Collapsed="true">
+    <Position X="14" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>Managers\MapManager.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
   <Delegate Name="MakeEveryDayRecount.Map.DoorTransition" Collapsed="true">
-    <Position X="13" Y="7.5" Width="1.5" />
+    <Position X="14" Y="7.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>ABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAA=</HashCode>
       <FileName>Map\Room.cs</FileName>
     </TypeIdentifier>
   </Delegate>
   <Delegate Name="MakeEveryDayRecount.Map.ItemPickup" Collapsed="true">
-    <Position X="14.75" Y="7.5" Width="1.5" />
+    <Position X="15.75" Y="7.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Map\Room.cs</FileName>
     </TypeIdentifier>
   </Delegate>
-  <Delegate Name="MakeEveryDayRecount.OnPlayerUpdate" Collapsed="true">
-    <Position X="16.5" Y="7.5" Width="1.5" />
+  <Delegate Name="MakeEveryDayRecount.Players.InventoryFiles.OnInventoryChange" Collapsed="true">
+    <Position X="17.5" Y="7.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>GamePlayManager.cs</FileName>
-    </TypeIdentifier>
-  </Delegate>
-  <Delegate Name="MakeEveryDayRecount.OnRoomUpdate" Collapsed="true">
-    <Position X="13" Y="8.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>MapManager.cs</FileName>
+      <HashCode>AAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Players\Inventory\InventorySpace.cs</FileName>
     </TypeIdentifier>
   </Delegate>
   <Font Name="Segoe UI" Size="9" />
