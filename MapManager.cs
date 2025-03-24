@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using MakeEveryDayRecount.GameObjects.Props;
 using MakeEveryDayRecount.Map;
@@ -49,13 +51,17 @@ namespace MakeEveryDayRecount
                 room.DoorTransition += TransitionRoom;
             }
         }
-
-        public void TransitionRoom(Door transDoor)
+        /// <summary>
+        /// Transition the player to the new room
+        /// </summary>
+        /// <param name="transDoor">Door to transition from</param>
+        /// <param name="destRoom"> Destination room for transition </param>
+        public void TransitionRoom(Door transDoor, int destRoom)
         {
-            _currentRoom = _rooms[transDoor.DestRoom];
+            _currentRoom = _rooms[destRoom];
             OnRoomUpdate?.Invoke(_currentRoom);
-            // Figure out how to update the player's position
-            throw new NotImplementedException("TransitionRoom not been created yet in MapManager");
+            _gameplayManager.PlayerObject.ChangeRoom(transDoor.DestinationTile);
+
         }
 
         /// <summary>
@@ -75,6 +81,16 @@ namespace MakeEveryDayRecount
         public bool CheckPlayerCollision(Point playerDest)
         {
             return _currentRoom.VerifyWalkable(playerDest);
+        }
+
+        /// <summary>
+        /// Check if the tile in front of the player contains an interactable item
+        /// </summary>
+        /// <param name="playerFacing">The tile the player wants to interact with</param>
+        /// <returns></returns>
+        public Prop CheckInteractable(Point playerFacing)
+        {
+            return _currentRoom.VerifyInteractable(playerFacing);
         }
 
         /// <summary>
@@ -104,6 +120,7 @@ namespace MakeEveryDayRecount
             Room[] rooms = new Room[0];
             if (File.Exists(folderPath + "/Level.level"))
             {
+                Dictionary<(int roomIndex, int doorIndex), Door> doorLookup = new Dictionary<(int roomIndex, int doorIndex), Door>();
                 Stream streamReader = File.OpenRead(folderPath + "/Level.level");
                 BinaryReader binaryReader = new BinaryReader(streamReader);
 
@@ -115,10 +132,24 @@ namespace MakeEveryDayRecount
                     string roomName = binaryReader.ReadString();
                     string roomFilePath = $"{folderPath}/{roomName}.room";
                     int roomIndex = binaryReader.ReadInt32();
-                    rooms[currentRoom] = new Room(roomFilePath, roomName, roomIndex);
+                    Room room = new Room(roomFilePath, roomName, roomIndex);
+                    rooms[currentRoom] = room;
+                    // Store doors in lookup for fast access
+                    foreach (Door door in room.Doors)
+                    {
+                        doorLookup[(roomIndex, door.DoorIndex)] = door;
+                    }
                 }
 
                 binaryReader.Close();
+                // Assign corresponding doors efficiently
+                foreach (Door door in doorLookup.Values)
+                {
+                    if (doorLookup.TryGetValue((door.DestRoom, door.DoorIndex), out Door matchingDoor))
+                    {
+                        door.AssignDoor(matchingDoor);
+                    }
+                }
             }
             else
             {
