@@ -19,9 +19,7 @@ namespace MakeEveryDayRecount
     public static class SoundManager
     {
         //Fields
-
-
-        //Properties
+        static Random rng = new Random();
 
         /// <summary>
         /// Array of all background tracks in the game
@@ -36,7 +34,7 @@ namespace MakeEveryDayRecount
         //Methods
 
         /// <summary>
-        /// Louds all music and sound effects.
+        /// Loads all music and sound effects.
         /// </summary>
         /// <param name="content">Content manager used to load all music and sound effects.</param>
         public static void LoadContent(ContentManager content)
@@ -55,7 +53,7 @@ namespace MakeEveryDayRecount
         /// <param name="level">Level for which background music is being played</param>
         public static void PlayBGM(int level)
         {
-            MediaPlayer.Play(BackgroundMusic[level - 1]);
+            //MediaPlayer.Play(BackgroundMusic[level - 1]);
         }
 
         /// <summary>
@@ -81,6 +79,17 @@ namespace MakeEveryDayRecount
         public static void PlaySFX(SoundEffect soundEffect)
         {
             soundEffect.Play();
+        }
+
+        /// <summary>
+        /// Plays a sound effect with randomly modulated pitch.
+        /// </summary>
+        /// <param name="soundEffect">Sound effect to be played</param>
+        /// <param name="minPitch">Minimum pitch modulation for the sound, cannot be lower than -100</param>
+        /// <param name="maxPitch">Maximum pitch modulation for the sound, cannot be higher than 100</param>
+        public static void PlaySFX(SoundEffect soundEffect, int minPitch, int maxPitch)
+        {
+            soundEffect.Play(1, 0.01f * rng.Next(minPitch, maxPitch), 0);
         }
     }
 }
