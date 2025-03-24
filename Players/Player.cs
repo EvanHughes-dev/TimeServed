@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using MakeEveryDayRecount.GameObjects;
+﻿using MakeEveryDayRecount.GameObjects;
 using MakeEveryDayRecount.GameObjects.Props;
 using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MakeEveryDayRecount.Managers;
+using MakeEveryDayRecount.Players.InventoryFiles;
 
-namespace MakeEveryDayRecount
+namespace MakeEveryDayRecount.Players
 {
     internal class Player : GameObject
     {
@@ -179,7 +179,7 @@ namespace MakeEveryDayRecount
                 Color.White
             );
 
-            //Draw the inventory. If the player were to ever overlap the inventory it will disppear behind it
+            //Draw the inventory. If the player were to ever overlap the inventory it will disappear behind it
             //Because nothing in the game should be drawn on top of the UI
             _inventory.Draw(sb, screenSize);
         }
