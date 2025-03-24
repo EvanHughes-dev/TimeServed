@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace LevelEditor
 {
+    /// <summary>
+    /// A static class of whatever extension methods happen to be useful for this project.
+    /// </summary>
     public static class Extensions
     {
         /// <summary>

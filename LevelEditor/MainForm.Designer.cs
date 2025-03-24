@@ -59,7 +59,7 @@
             // 
             buttonAddNewRoom.Location = new Point(3, 3);
             buttonAddNewRoom.Name = "buttonAddNewRoom";
-            buttonAddNewRoom.Size = new Size(139, 80);
+            buttonAddNewRoom.Size = new Size(140, 80);
             buttonAddNewRoom.TabIndex = 0;
             buttonAddNewRoom.Text = "Add New Room";
             buttonAddNewRoom.UseVisualStyleBackColor = true;
@@ -84,34 +84,35 @@
             // newLevelToolStripMenuItem
             // 
             newLevelToolStripMenuItem.Name = "newLevelToolStripMenuItem";
-            newLevelToolStripMenuItem.Size = new Size(123, 22);
+            newLevelToolStripMenuItem.Size = new Size(180, 22);
             newLevelToolStripMenuItem.Text = "New";
             newLevelToolStripMenuItem.Click += newLevelToolStripMenuItem_Click;
             // 
             // loadLevelToolStripMenuItem
             // 
             loadLevelToolStripMenuItem.Name = "loadLevelToolStripMenuItem";
-            loadLevelToolStripMenuItem.Size = new Size(123, 22);
+            loadLevelToolStripMenuItem.Size = new Size(180, 22);
             loadLevelToolStripMenuItem.Text = "Open";
             loadLevelToolStripMenuItem.Click += loadLevelToolStripMenuItem_Click;
             // 
             // saveLevelToolStripMenuItem
             // 
             saveLevelToolStripMenuItem.Name = "saveLevelToolStripMenuItem";
-            saveLevelToolStripMenuItem.Size = new Size(123, 22);
+            saveLevelToolStripMenuItem.Size = new Size(180, 22);
             saveLevelToolStripMenuItem.Text = "Save";
+            saveLevelToolStripMenuItem.Click += saveLevelToolStripMenuItem_Click;
             // 
             // saveLevelAsToolStripMenuItem
             // 
             saveLevelAsToolStripMenuItem.Name = "saveLevelAsToolStripMenuItem";
-            saveLevelAsToolStripMenuItem.Size = new Size(123, 22);
+            saveLevelAsToolStripMenuItem.Size = new Size(180, 22);
             saveLevelAsToolStripMenuItem.Text = "Save As...";
             // 
             // tilesToolStripMenuItem
             // 
             tilesToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { reloadTilesToolStripMenuItem });
             tilesToolStripMenuItem.Name = "tilesToolStripMenuItem";
-            tilesToolStripMenuItem.Size = new Size(42, 20);
+            tilesToolStripMenuItem.Size = new Size(43, 20);
             tilesToolStripMenuItem.Text = "Tiles";
             // 
             // reloadTilesToolStripMenuItem
@@ -131,7 +132,7 @@
             labelNoLevelOpen.AutoSize = true;
             labelNoLevelOpen.Location = new Point(180, 195);
             labelNoLevelOpen.Name = "labelNoLevelOpen";
-            labelNoLevelOpen.Size = new Size(415, 15);
+            labelNoLevelOpen.Size = new Size(414, 15);
             labelNoLevelOpen.TabIndex = 1;
             labelNoLevelOpen.Text = "No level open. Use the Level tab to create a new level or open an existing one!";
             // 

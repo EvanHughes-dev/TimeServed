@@ -9,8 +9,13 @@ namespace LevelEditor
     /// </summary>
     public partial class NewRoomForm : Form
     {
+        // A reference to the MainForm
         private MainForm _mainForm;
 
+        /// <summary>
+        /// Creates a new NewRoomForm.
+        /// </summary>
+        /// <param name="mainForm">A reference to the MainForm.</param>
         public NewRoomForm(MainForm mainForm)
         {
             InitializeComponent();
@@ -43,7 +48,7 @@ namespace LevelEditor
 
             if (result == DialogResult.OK)
             {
-                EditorForm editor = new(_mainForm, openFileDialog.FileName);
+                EditorForm editor = new(_mainForm, FileIOHelpers.LoadRoom(openFileDialog.FileName, _mainForm.Tiles));
 
                 Close();
 
@@ -58,6 +63,8 @@ namespace LevelEditor
         {
             /* Validate user inputs */
 
+            string name = textBoxName.Text;
+
             bool widthIsParsable = int.TryParse(textBoxWidth.Text, out int width);
             bool heightIsParsable = int.TryParse(textBoxHeight.Text, out int height);
 
@@ -67,23 +74,9 @@ namespace LevelEditor
             // Both the height and width must be integers between 10 and 30 (inclusive)
             if (!widthIsParsable)
                 errors.Add("Cannot parse width.");
-            else
-            {
-                if (width > 30)
-                    errors.Add("Width too big. Must be at most 30.");
-                else if (width < 10)
-                    errors.Add("Width too small. Must be at least 10.");
-            }
 
             if (!heightIsParsable)
                 errors.Add("Cannot parse height.");
-            else
-            {
-                if (height > 30)
-                    errors.Add("Height too big. Must be at most 30.");
-                else if (height < 10)
-                    errors.Add("Height too small. Must be at least 10.");
-            }
 
             if (errors.Count > 0)
             {
@@ -101,7 +94,7 @@ namespace LevelEditor
 
             /* Create new EditorForm with given dimensions */
 
-            EditorForm editor = new(_mainForm, width, height);
+            EditorForm editor = new(_mainForm, name, width, height);
 
             Close();
 

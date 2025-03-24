@@ -12,46 +12,80 @@ namespace LevelEditor
 {
     public partial class MainForm : Form
     {
+        /// <summary>
+        /// The gospel determining what Tiles have what corresponding indexes.
+        /// </summary>
         public IReadOnlyCollection<Tile> Tiles { get; private set; }
 
         private Level _level;
-        public Level Level { get => _level; private set
+
+        /// <summary>
+        /// Gets or sets the Level being edited currently.
+        /// </summary>
+        private Level Level
+        {
+            get => _level; set
             {
                 if (value == null)
                 {
                     labelNoLevelOpen.Visible = true;
                     flowLayoutPanelRooms.Visible = false;
-                } else
+                }
+                else
                 {
                     labelNoLevelOpen.Visible = false;
                     flowLayoutPanelRooms.Visible = true;
                 }
 
                 _level = value!;
-            } }
+            }
+        }
 
+        /// <summary>
+        /// Called whenever a new level is loaded or created.
+        /// </summary>
+        private event Action OnNewLevelLoaded;
+
+        /// <summary>
+        /// The folder containing the .level file currently being edited.
+        /// </summary>
+        public string Folder { get; private set; }
+
+        /// <summary>
+        /// Creates a new MainForm.
+        /// </summary>
         public MainForm()
         {
             InitializeComponent();
 
             _level = null!;
             Tiles = null!;
+
+            Folder = null!;
         }
 
+        /// <summary>
+        /// Loads the tile files upon the form finishing loading.
+        /// </summary>
         private void MainForm_Load(object sender, EventArgs e)
         {
             LoadTiles();
 
+            // In case LoadTiles creating a MessageBox, activating this window will ensure it still becomes
+            //   the center of attention afterwards
             Activate();
         }
 
+        /// <summary>
+        /// Loads all of the tile sprites and initializes the tile array, displaying a MessageBox
+        /// if loading the tiles fails.
+        /// </summary>
         private void LoadTiles()
         {
-            const string tilePath = "./Tiles";
-
             try
             {
                 Tile[] tiles = [
+                    FileIOHelpers.LoadTile("void.png", false),
                     FileIOHelpers.LoadTile("testWalkable.png", true),
                     FileIOHelpers.LoadTile("testWall.png", false)
                     ];
@@ -85,6 +119,9 @@ namespace LevelEditor
             }
         }
 
+        /// <summary>
+        /// Creates a new level and saves it to a user-chosen location.
+        /// </summary>
         private void CreateNewLevel()
         {
             DialogResult response = saveFileDialog.ShowDialog();
@@ -92,13 +129,45 @@ namespace LevelEditor
             switch (response)
             {
                 case DialogResult.OK:
-                    Level = new();
+                    // Only actually do anything if the user hits OK! Otherwise we should do nothing at all
+                    Level newLevel = new();
 
-                    FileIOHelpers.SaveLevel(Level, saveFileDialog.FileName);
+                    string fullPath = saveFileDialog.FileName;
+                    try
+                    {
+                        Folder = Path.GetDirectoryName(fullPath)!;
+
+                        FileIOHelpers.SaveLevel(newLevel, Folder, Tiles);
+                        Level = newLevel;
+
+                        OnNewLevelLoaded?.Invoke();
+                    }
+                    catch (Exception ex)
+                    {
+                        DialogResult errResponse = MessageBox.Show($"Could not create the new level: {ex.Message}",
+                            "Error",
+                            MessageBoxButtons.RetryCancel,
+                            MessageBoxIcon.Error);
+
+                        switch (errResponse)
+                        {
+                            case DialogResult.Cancel:
+                                // Do nothing!
+                                break;
+
+                            case DialogResult.Retry:
+                                // This will re-prompt the user to select the save location... but that's fine
+                                CreateNewLevel();
+                                break;
+                        }
+                    }
                     break;
             }
         }
 
+        /// <summary>
+        /// Opens an existing level file, as chosen by the user.
+        /// </summary>
         private void OpenLevel()
         {
             DialogResult response = openFileDialog.ShowDialog();
@@ -106,11 +175,22 @@ namespace LevelEditor
             switch (response)
             {
                 case DialogResult.OK:
-                    if (File.Exists(openFileDialog.FileName))
+                    // Only do anything if the user hits OK!
+                    string fullPath = openFileDialog.FileName;
+                    if (File.Exists(fullPath))
                     {
                         try
                         {
-                            Level = FileIOHelpers.LoadLevel(openFileDialog.FileName);
+                            Level = FileIOHelpers.LoadLevel(fullPath, Tiles);
+
+                            Folder = Path.GetDirectoryName(fullPath)!;
+
+                            OnNewLevelLoaded?.Invoke();
+
+                            foreach (Room room in Level.Rooms)
+                            {
+                                CreateRoomButton(room);
+                            }
                         }
                         catch (Exception ex)
                         {
@@ -132,31 +212,81 @@ namespace LevelEditor
             }
         }
 
-        private void OpenNewRoomForm()
+        /// <summary>
+        /// Creates a new button in the UI that edits the given room when clicked.
+        /// </summary>
+        /// <param name="room">The Room to create the button for.</param>
+        private void CreateRoomButton(Room room)
         {
-            NewRoomForm newRoomForm = new(this);
+            Button roomButton = new()
+            {
+                Size = new(140, 80),
+                TextAlign = ContentAlignment.MiddleCenter,
+                Text = room.Name,
+                Parent = flowLayoutPanelRooms
+            };
 
-            newRoomForm.ShowDialog(this);
+            roomButton.Click += (object? sender, EventArgs e) =>
+            {
+                EditorForm editor = new(this, room);
+                editor.Show();
+            };
+
+            // When a new level is loaded, we have to delete all of the old buttons
+            //   There's probably a cleaner way to do this than an event... but this works
+            OnNewLevelLoaded += roomButton.Dispose;
         }
 
+        /// <summary>
+        /// Adds a new room to the level's list of rooms and creates its corresponding button
+        /// on the MainForm.
+        /// </summary>
+        /// <param name="room">The room to add.</param>
+        public void AddNewRoom(Room room)
+        {
+            Level.Rooms.Add(room);
+
+            CreateRoomButton(room);
+        }
+
+        /// <summary>
+        /// Loads the tiles when clicked.
+        /// </summary>
         private void reloadTilesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             LoadTiles();
         }
 
+        /// <summary>
+        /// Opens a NewRoomForm when clicked.
+        /// </summary>
         private void buttonAddNewRoom_Click(object sender, EventArgs e)
         {
-            OpenNewRoomForm();
+            new NewRoomForm(this).Show();
         }
 
+        /// <summary>
+        /// Creates a new level when clicked.
+        /// </summary>
         private void newLevelToolStripMenuItem_Click(object sender, EventArgs e)
         {
             CreateNewLevel();
         }
 
+        /// <summary>
+        /// Opens an existing level when clicked.
+        /// </summary>
         private void loadLevelToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenLevel();
+        }
+
+        /// <summary>
+        /// Saves the level when clicked.
+        /// </summary>
+        private void saveLevelToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FileIOHelpers.SaveLevel(Level, Folder, Tiles);
         }
     }
 }

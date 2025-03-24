@@ -14,10 +14,12 @@ namespace LevelEditor
     {
         /// <summary>
         /// Saves a given level to the given path.
+        /// This method is UNSAFE and MUST be called within a TRY-CATCH!
         /// </summary>
         /// <param name="level">The level to save.</param>
-        /// <param name="filePath">The path to save to.</param>
-        public static void SaveLevel(Level level, string filePath)
+        /// <param name="folderPath">The path to save to.</param>
+        /// <param name="allTiles">All possible tiles, so this method can save the rooms with the proper tile indexes.</param>
+        public static void SaveLevel(Level level, string folderPath, IEnumerable<Tile> allTiles)
         {
             /*
              * THE .level FILE FORMAT:
@@ -27,7 +29,10 @@ namespace LevelEditor
              *    - int roomID
              */
 
-            BinaryWriter writer = new(new FileStream(filePath, FileMode.Create));
+            // Path.Join is technically safer than $"{folderPath}/level.level" since different OSs use different path join characters
+            // Does that *really* matter for this program's use case? Not really! But it's good practice
+            string levelPath = Path.Join(folderPath, "level.level");
+            BinaryWriter writer = new(new FileStream(levelPath, FileMode.Create));
 
             int roomCount = level.Rooms.Count;
 
@@ -40,14 +45,86 @@ namespace LevelEditor
             }
 
             writer.Close();
+
+            // A level can't really be played without its rooms, so it seems good to just save those too
+            foreach (var room in level.Rooms)
+            {
+                SaveRoom(room, folderPath, allTiles);
+            }
         }
 
         /// <summary>
-        /// Saves a given level to the given path.
+        /// Saves a room file to a given folder.
+        /// This method is UNSAFE and MUST be called within a TRY-CATCH!
         /// </summary>
-        /// <param name="level">The level to save.</param>
-        /// <param name="filePath">The path to save to.</param>
-        public static Level LoadLevel(string filePath)
+        /// <param name="room">The room to save.</param>
+        /// <param name="folderPath">The folder to save it in.</param>
+        /// <param name="allTiles">All possible tiles, so this method can save the room with the proper tile indexes.</param>
+        public static void SaveRoom(Room room, string folderPath, IEnumerable<Tile> allTiles)
+        {
+            /*
+             * THE .room FILE FORMAT:
+             *  - int width
+             *  - int height
+             *  - Several tiles, with the following format:
+             *    - bool isWalkable
+             *    - int tileIndex
+             *  - int numOfProps
+             *  - Several props, with the following format:
+             *    - int propIndex
+             *    - int positionX
+             *    - int positionY
+             *    - bool isDoor
+             *    - If it is a door, then the following is also included:
+             *      - int facing
+             *        - 0 = North
+             *        - 1 = East
+             *        - 2 = South
+             *        - 3 = West
+             *      - int entranceIndex
+             *      - int destinationRoom
+             *      - int destinationDoor
+             */
+
+            Tile[] tilesArray = [.. allTiles];
+
+
+            string roomPath = Path.Join(folderPath, $"{room.Name}.room");
+            BinaryWriter writer = new(new FileStream(roomPath, FileMode.Create));
+
+            int height = room.Tiles.GetLength(0);
+            int width = room.Tiles.GetLength(1);
+
+            writer.Write(width);
+            writer.Write(height);
+
+            // Tiles are written in rows, from the top to the bottom and left to right
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    Tile toWrite = room.Tiles[y, x];
+                    writer.Write(toWrite.IsWalkable);
+                    writer.Write(Array.IndexOf(tilesArray, toWrite));
+                }
+            }
+
+            // TEMPORARY
+            // For now, the level editor doesn't support placing props, so we always will write a zero here
+            //   ... but that won't be the case forever!
+            writer.Write(0);
+
+            writer.Close();
+        }
+
+        /// <summary>
+        /// Loads the level at the given file path and returns it.
+        /// This method is UNSAFE and MUST be called within a TRY-CATCH!
+        /// </summary>
+        /// <param name="filePath">The path to the .level file.</param>
+        /// <param name="allTiles">A reference to the tile array, so the rooms can be loaded properly.</param>
+        /// <returns>The loaded level, including all of its contained rooms.</returns>
+        public static Level LoadLevel(string filePath, IEnumerable<Tile> allTiles)
         {
             /*
              * THE .level FILE FORMAT:
@@ -65,8 +142,11 @@ namespace LevelEditor
             for (int i = 0; i < roomCount; i++)
             {
                 string roomName = reader.ReadString();
+                string folder = Path.GetDirectoryName(filePath)!;
 
-                level.Rooms.Add(LoadRoom($"./{roomName}.room"));
+                level.Rooms.Add(
+                    LoadRoom(Path.Join(folder, $"{roomName}.room"), allTiles)
+                    );
             }
 
             reader.Close();
@@ -74,40 +154,78 @@ namespace LevelEditor
             return level;
         }
 
-        public static bool SaveRoom(Room room, string filePath)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static Room LoadRoom(string filePath)
-        {
-            throw new NotImplementedException();
-        }
-
         /// <summary>
-        /// Loads all PNG images within a given folder. Does not look in any child folders.
+        /// Loads the room at the given file path.
         /// This method is UNSAFE and MUST be called within a TRY-CATCH!
         /// </summary>
-        /// <param name="folderPath">A relative or absolute path to the files to load.</param>
-        /// <returns>An array of the loaded images.</returns>
-        public static Image[] LoadImages(string folderPath)
+        /// <param name="filePath">The path to the .room file.</param>
+        /// <param name="allTiles">A reference to the tile array, so it can be loaded properly.</param>
+        /// <returns>The loaded room.</returns>
+        /// <exception cref="NotImplementedException">Thrown for any .room file that includes a Prop.</exception>
+        public static Room LoadRoom(string filePath, IEnumerable<Tile> allTiles)
         {
-            // In theory, I don't think there's anything stopping me from adding support for
-            //   loading other image formats as well (as long as they are supported by Image.FromFile),
-            //   but I am lazy and I'm pretty sure we're only going to be using PNGs
-            string[] imagePaths = Directory.GetFiles(folderPath, "*.png");
+            /*
+             * THE .room FILE FORMAT:
+             *  - int width
+             *  - int height
+             *  - Several tiles, with the following format:
+             *    - bool isWalkable
+             *    - int tileIndex
+             *  - int numOfProps
+             *  - Several props, with the following format:
+             *    - int propIndex
+             *    - int positionX
+             *    - int positionY
+             *    - bool isDoor
+             *    - If it is a door, then the following is also included:
+             *      - int facing
+             *        - 0 = North
+             *        - 1 = East
+             *        - 2 = South
+             *        - 3 = West
+             *      - int entranceIndex
+             *      - int destinationRoom
+             *      - int destinationDoor
+             */
 
-            Image[] images = new Image[imagePaths.Length];
-            for (int i = 0; i < imagePaths.Length; i++)
+            BinaryReader reader = new(new FileStream(filePath, FileMode.Open));
+
+            int width = reader.ReadInt32();
+            int height = reader.ReadInt32();
+
+            string roomName = Path.GetFileNameWithoutExtension(filePath);
+
+            Room room = new(roomName, width, height);
+
+            for (int y = 0; y < height; y++)
             {
-                images[i] = Image.FromFile(imagePaths[i]);
+                for (int x = 0; x < width; x++)
+                {
+                    // For loading the tiles, we actually don't care whether they were saved
+                    //   as being walkable or not. We treat the tile array as gospel!
+                    _ = reader.ReadBoolean();
+
+                    int tileIndex = reader.ReadInt32();
+                    Tile tile = allTiles.ElementAt(tileIndex);
+
+                    room.Tiles[y, x] = tile;
+                }
             }
 
-            return images;
+            // TODO: ADD LOADING OF PROPS
+            // For now, if a room has any props, we'll just throw an error
+            int numOfProps = reader.ReadInt32();
+            if (numOfProps > 0)
+                throw new NotImplementedException("LoadRoom() does not support loading of props!");
+
+            reader.Close();
+
+            return room;
         }
 
         /// <summary>
         /// Loads a tile from disk given the name of the sprite file in the Tiles folder and whether that tile is walkable.
+        /// This method is UNSAFE and MUST be called within a TRY-CATCH!
         /// </summary>
         /// <param name="spriteName">The name of the sprite file in the Tiles folder, including file extension.</param>
         /// <param name="isWalkable">Whether this tile should be allowed to be walked on.</param>

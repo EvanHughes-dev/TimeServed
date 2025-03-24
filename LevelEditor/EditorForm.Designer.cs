@@ -28,9 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            vScrollBarTiles = new VScrollBar();
-            buttonSave = new Button();
-            buttonLoad = new Button();
             groupBoxMap = new GroupBox();
             openFileDialog = new OpenFileDialog();
             saveFileDialog = new SaveFileDialog();
@@ -38,35 +35,7 @@
             tabPageTiles = new TabPage();
             tabPageProps = new TabPage();
             tabControlTilesProps.SuspendLayout();
-            tabPageTiles.SuspendLayout();
             SuspendLayout();
-            // 
-            // vScrollBarTiles
-            // 
-            vScrollBarTiles.Location = new Point(154, 0);
-            vScrollBarTiles.Name = "vScrollBarTiles";
-            vScrollBarTiles.Size = new Size(16, 423);
-            vScrollBarTiles.TabIndex = 0;
-            // 
-            // buttonSave
-            // 
-            buttonSave.Location = new Point(16, 469);
-            buttonSave.Name = "buttonSave";
-            buttonSave.Size = new Size(80, 33);
-            buttonSave.TabIndex = 1;
-            buttonSave.Text = "Save File";
-            buttonSave.UseVisualStyleBackColor = true;
-            buttonSave.Click += buttonSave_Click;
-            // 
-            // buttonLoad
-            // 
-            buttonLoad.Location = new Point(106, 469);
-            buttonLoad.Name = "buttonLoad";
-            buttonLoad.Size = new Size(80, 33);
-            buttonLoad.TabIndex = 1;
-            buttonLoad.Text = "Load File";
-            buttonLoad.UseVisualStyleBackColor = true;
-            buttonLoad.Click += buttonLoad_Click;
             // 
             // groupBoxMap
             // 
@@ -95,15 +64,14 @@
             tabControlTilesProps.Location = new Point(12, 12);
             tabControlTilesProps.Name = "tabControlTilesProps";
             tabControlTilesProps.SelectedIndex = 0;
-            tabControlTilesProps.Size = new Size(178, 451);
+            tabControlTilesProps.Size = new Size(178, 490);
             tabControlTilesProps.TabIndex = 0;
             // 
             // tabPageTiles
             // 
-            tabPageTiles.Controls.Add(vScrollBarTiles);
             tabPageTiles.Location = new Point(4, 24);
             tabPageTiles.Name = "tabPageTiles";
-            tabPageTiles.Size = new Size(170, 423);
+            tabPageTiles.Size = new Size(170, 462);
             tabPageTiles.TabIndex = 0;
             tabPageTiles.Text = "Tiles";
             tabPageTiles.UseVisualStyleBackColor = true;
@@ -112,7 +80,7 @@
             // 
             tabPageProps.Location = new Point(4, 24);
             tabPageProps.Name = "tabPageProps";
-            tabPageProps.Size = new Size(170, 423);
+            tabPageProps.Size = new Size(170, 462);
             tabPageProps.TabIndex = 0;
             tabPageProps.Text = "Props";
             tabPageProps.UseVisualStyleBackColor = true;
@@ -123,24 +91,19 @@
             ClientSize = new Size(492, 514);
             Controls.Add(tabControlTilesProps);
             Controls.Add(groupBoxMap);
-            Controls.Add(buttonLoad);
-            Controls.Add(buttonSave);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
             Name = "EditorForm";
             Text = "Level Editor";
+            Load += EditorForm_Load;
             tabControlTilesProps.ResumeLayout(false);
-            tabPageTiles.ResumeLayout(false);
             ResumeLayout(false);
         }
 
         #endregion
-        private Button buttonSave;
-        private Button buttonLoad;
         private GroupBox groupBoxMap;
         private OpenFileDialog openFileDialog;
         private SaveFileDialog saveFileDialog;
-        private VScrollBar vScrollBarTiles;
         private TabControl tabControlTilesProps;
         private TabPage tabPageTiles;
         private TabPage tabPageProps;

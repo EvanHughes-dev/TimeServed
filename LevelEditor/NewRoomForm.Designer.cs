@@ -36,6 +36,8 @@
             labelWidth = new Label();
             buttonLoad = new Button();
             openFileDialog = new OpenFileDialog();
+            labelName = new Label();
+            textBoxName = new TextBox();
             groupBoxNew.SuspendLayout();
             SuspendLayout();
             // 
@@ -43,19 +45,21 @@
             // 
             groupBoxNew.Controls.Add(buttonCreate);
             groupBoxNew.Controls.Add(textBoxHeight);
+            groupBoxNew.Controls.Add(textBoxName);
             groupBoxNew.Controls.Add(textBoxWidth);
+            groupBoxNew.Controls.Add(labelName);
             groupBoxNew.Controls.Add(labelHeight);
             groupBoxNew.Controls.Add(labelWidth);
             groupBoxNew.Location = new Point(12, 93);
             groupBoxNew.Name = "groupBoxNew";
-            groupBoxNew.Size = new Size(277, 192);
+            groupBoxNew.Size = new Size(277, 230);
             groupBoxNew.TabIndex = 1;
             groupBoxNew.TabStop = false;
             groupBoxNew.Text = "Create New Room";
             // 
             // buttonCreate
             // 
-            buttonCreate.Location = new Point(23, 101);
+            buttonCreate.Location = new Point(23, 149);
             buttonCreate.Name = "buttonCreate";
             buttonCreate.Size = new Size(229, 75);
             buttonCreate.TabIndex = 4;
@@ -65,14 +69,14 @@
             // 
             // textBoxHeight
             // 
-            textBoxHeight.Location = new Point(100, 62);
+            textBoxHeight.Location = new Point(100, 110);
             textBoxHeight.Name = "textBoxHeight";
             textBoxHeight.Size = new Size(171, 23);
             textBoxHeight.TabIndex = 3;
             // 
             // textBoxWidth
             // 
-            textBoxWidth.Location = new Point(100, 22);
+            textBoxWidth.Location = new Point(100, 70);
             textBoxWidth.Name = "textBoxWidth";
             textBoxWidth.Size = new Size(171, 23);
             textBoxWidth.TabIndex = 1;
@@ -80,7 +84,7 @@
             // labelHeight
             // 
             labelHeight.AutoSize = true;
-            labelHeight.Location = new Point(6, 65);
+            labelHeight.Location = new Point(6, 113);
             labelHeight.Name = "labelHeight";
             labelHeight.Size = new Size(88, 15);
             labelHeight.TabIndex = 2;
@@ -89,7 +93,7 @@
             // labelWidth
             // 
             labelWidth.AutoSize = true;
-            labelWidth.Location = new Point(10, 25);
+            labelWidth.Location = new Point(10, 73);
             labelWidth.Name = "labelWidth";
             labelWidth.Size = new Size(84, 15);
             labelWidth.TabIndex = 0;
@@ -111,10 +115,27 @@
             openFileDialog.Filter = "Level Files|*.level";
             openFileDialog.Title = "Open a level file";
             // 
+            // labelName
+            // 
+            labelName.AutoSize = true;
+            labelName.Location = new Point(55, 35);
+            labelName.Name = "labelName";
+            labelName.Size = new Size(39, 15);
+            labelName.TabIndex = 0;
+            labelName.Text = "Name";
+            labelName.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // textBoxName
+            // 
+            textBoxName.Location = new Point(100, 32);
+            textBoxName.Name = "textBoxName";
+            textBoxName.Size = new Size(171, 23);
+            textBoxName.TabIndex = 1;
+            // 
             // NewRoomForm
             // 
             AutoScaleMode = AutoScaleMode.None;
-            ClientSize = new Size(301, 290);
+            ClientSize = new Size(301, 335);
             Controls.Add(buttonLoad);
             Controls.Add(groupBoxNew);
             FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -136,5 +157,7 @@
         private Button buttonCreate;
         private Button buttonLoad;
         private OpenFileDialog openFileDialog;
+        private TextBox textBoxName;
+        private Label labelName;
     }
 }
