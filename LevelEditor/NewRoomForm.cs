@@ -48,7 +48,11 @@ namespace LevelEditor
 
             if (result == DialogResult.OK)
             {
-                EditorForm editor = new(_mainForm, FileIOHelpers.LoadRoom(openFileDialog.FileName, _mainForm.Tiles));
+                Room room = FileIOHelpers.LoadRoom(openFileDialog.FileName, _mainForm.Tiles);
+
+                _mainForm.AddNewRoom(room);
+
+                EditorForm editor = new(_mainForm, room);
 
                 Close();
 

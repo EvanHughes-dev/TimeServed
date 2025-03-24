@@ -31,13 +31,13 @@
             groupBoxNew = new GroupBox();
             buttonCreate = new Button();
             textBoxHeight = new TextBox();
+            textBoxName = new TextBox();
             textBoxWidth = new TextBox();
+            labelName = new Label();
             labelHeight = new Label();
             labelWidth = new Label();
             buttonLoad = new Button();
             openFileDialog = new OpenFileDialog();
-            labelName = new Label();
-            textBoxName = new TextBox();
             groupBoxNew.SuspendLayout();
             SuspendLayout();
             // 
@@ -74,12 +74,29 @@
             textBoxHeight.Size = new Size(171, 23);
             textBoxHeight.TabIndex = 3;
             // 
+            // textBoxName
+            // 
+            textBoxName.Location = new Point(100, 32);
+            textBoxName.Name = "textBoxName";
+            textBoxName.Size = new Size(171, 23);
+            textBoxName.TabIndex = 1;
+            // 
             // textBoxWidth
             // 
             textBoxWidth.Location = new Point(100, 70);
             textBoxWidth.Name = "textBoxWidth";
             textBoxWidth.Size = new Size(171, 23);
             textBoxWidth.TabIndex = 1;
+            // 
+            // labelName
+            // 
+            labelName.AutoSize = true;
+            labelName.Location = new Point(55, 35);
+            labelName.Name = "labelName";
+            labelName.Size = new Size(39, 15);
+            labelName.TabIndex = 0;
+            labelName.Text = "Name";
+            labelName.TextAlign = ContentAlignment.MiddleRight;
             // 
             // labelHeight
             // 
@@ -111,26 +128,9 @@
             // 
             // openFileDialog
             // 
-            openFileDialog.FileName = "myLevel";
-            openFileDialog.Filter = "Level Files|*.level";
+            openFileDialog.FileName = "myRoom";
+            openFileDialog.Filter = "Room Files|*.room";
             openFileDialog.Title = "Open a level file";
-            // 
-            // labelName
-            // 
-            labelName.AutoSize = true;
-            labelName.Location = new Point(55, 35);
-            labelName.Name = "labelName";
-            labelName.Size = new Size(39, 15);
-            labelName.TabIndex = 0;
-            labelName.Text = "Name";
-            labelName.TextAlign = ContentAlignment.MiddleRight;
-            // 
-            // textBoxName
-            // 
-            textBoxName.Location = new Point(100, 32);
-            textBoxName.Name = "textBoxName";
-            textBoxName.Size = new Size(171, 23);
-            textBoxName.TabIndex = 1;
             // 
             // NewRoomForm
             // 
