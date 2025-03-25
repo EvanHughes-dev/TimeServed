@@ -221,8 +221,8 @@ namespace MakeEveryDayRecount.Map
                     *   int objectType 
                     *       0 = Item
                     *       1 = Camera
-                    *       2 = Door
-                    *       3 = Box 
+                    *       2 = Box
+                    *       3 = Door 
                     * 
                     *   if objectType == 0 || objectType == 3
                     *   int keyType
