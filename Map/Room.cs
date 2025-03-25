@@ -382,7 +382,7 @@ namespace MakeEveryDayRecount.Map
                 {
                     if (playerFacing == prop.Location)
                     {
-                        return (Prop)prop;
+                        return prop;
                     }
                 }
             }
