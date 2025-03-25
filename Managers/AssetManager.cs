@@ -46,7 +46,14 @@ namespace MakeEveryDayRecount.Managers
         /// Default texture for all buttons
         /// </summary>
         public static Texture2D DefaultButton { get; private set; }
-
+        /// <summary>
+        /// An array of all camera textures
+        /// </summary>
+        public static Texture2D[] Cameras { get; private set; }
+        /// <summary>
+        /// An array of all box textures
+        /// </summary>
+        public static Texture2D[] Boxes { get; private set; }
         /// <summary>
         /// Default font for debugging
         /// </summary>
@@ -96,6 +103,9 @@ namespace MakeEveryDayRecount.Managers
             DoorTexture[3] = content.Load<Texture2D>("Doors/TempDoor-Left");
 
             DefaultButton = content.Load<Texture2D>("UI/DefaultButton");
+
+            Boxes = new Texture2D[1];
+            Boxes[0] = content.Load<Texture2D>("Items/Box");
 
             TileSize = new Point(TileMap[0].Width, TileMap[0].Height);
         }

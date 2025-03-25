@@ -23,6 +23,14 @@ namespace MakeEveryDayRecount.Map
     /// <param name="objectToPickup">Object that was picked up</param>
     delegate void ItemPickup(Item objectToPickup);
 
+    public enum ObjectTypes
+    {
+        Item = 0,
+        Camera = 1,
+        Box = 2,
+        Door = 3
+    }
+
     /// <summary>
     /// Hold all the information relating to what should be
     /// draw in each given room. Also controls which room should
@@ -58,8 +66,9 @@ namespace MakeEveryDayRecount.Map
             get => _itemsInRoom.Count;
         }
         private Tile[,] _map;
-        private List<Item> _itemsInRoom;
-        public List<Door> Doors { get; private set; }
+        private List<Prop> _itemsInRoom;
+        public List<Door> Doors
+        { get; private set; }
 
         /// <summary>
         /// Size of current map
@@ -78,7 +87,7 @@ namespace MakeEveryDayRecount.Map
             RoomName = roomName;
 
             _map = new Tile[,] { };
-            _itemsInRoom = new List<Item> { };
+            _itemsInRoom = new List<Prop> { };
             Doors = new List<Door> { };
             ParseData(filePath);
         }
@@ -209,7 +218,13 @@ namespace MakeEveryDayRecount.Map
                     *   int propIndex
                     *   int positionX
                     *   int positionY
-                    *    
+                    *   int objectType 
+                    *       0 = Item
+                    *       1 = Camera
+                    *       2 = Door
+                    *       3 = Box 
+                    * 
+                    *   if objectType == 0 || objectType == 3
                     *   int keyType
                     *       0 = None
                     *       1 = Key card
@@ -217,8 +232,7 @@ namespace MakeEveryDayRecount.Map
                     *       For doors, this is the key that can unlock them
                     *       For items, this is the key type they are
                     * 
-                    *   boolean isDoor
-                    *   if True
+                    *   if objectType == 3
                     *       int facing
                     *           0 = North/Up
                     *           1 = East/Right
@@ -260,40 +274,51 @@ namespace MakeEveryDayRecount.Map
                         int posX = binaryReader.ReadInt32();
                         int posY = binaryReader.ReadInt32();
 
-                        Door.DoorKeyType keyType = (Door.DoorKeyType)binaryReader.ReadInt32();
-
-                        if (binaryReader.ReadBoolean())
+                        ObjectTypes objectType = (ObjectTypes)binaryReader.ReadInt32();
+                        if (objectType == ObjectTypes.Item|| objectType == ObjectTypes.Door)
                         {
-                            // Parse a door from the file
-                            // Next three values correspond to the needed data
-                            Door doorFromFile = new Door(
-                                direction[binaryReader.ReadInt32()],
-                                binaryReader.ReadInt32(),
-                                binaryReader.ReadInt32(),
-                                binaryReader.ReadInt32(),
-                                keyType,
-                                new Point(posX, posY),
-                                AssetManager.DoorTexture[propIndex]
-                            );
-                            // When this door is interacted with, transition the player
-                            doorFromFile.OnDoorInteract += TransitionPlayer;
-                            Doors.Add(doorFromFile);
+                            Door.DoorKeyType keyType = (Door.DoorKeyType)binaryReader.ReadInt32();
+
+                            if (objectType == ObjectTypes.Door)
+                            {
+                                // Parse a door from the file
+                                // Next three values correspond to the needed data
+                                Door doorFromFile = new Door(
+                                    direction[binaryReader.ReadInt32()],
+                                    binaryReader.ReadInt32(),
+                                    binaryReader.ReadInt32(),
+                                    binaryReader.ReadInt32(),
+                                    keyType,
+                                    new Point(posX, posY),
+                                    AssetManager.DoorTexture[propIndex]
+                                );
+                                // When this door is interacted with, transition the player
+                                doorFromFile.OnDoorInteract += TransitionPlayer;
+                                Doors.Add(doorFromFile);
+                            }
+                            else
+                            {
+                                // Parse a prop from the file
+
+                                Item newItemInRoom = new Item(
+                                    new Point(posX, posY),
+                                    AssetManager.PropTextures[propIndex],
+                                    "TEMP_NAME",
+                                    keyType
+                                );
+                                // When this item is picked up, remove it from this room
+                                newItemInRoom.OnItemPickup += RemoveGameObject;
+                                _itemsInRoom.Add(newItemInRoom);
+                            }
                         }
-                        else
+                        else if (objectType == ObjectTypes.Camera)
                         {
-                            // Parse a prop from the file
-
-                            Item newItemInRoom = new Item(
-                                new Point(posX, posY),
-                                AssetManager.PropTextures[propIndex],
-                                "TEMP_NAME",
-                                keyType
-                            );
-                            // When this item is picked up, remove it from this room
-                            newItemInRoom.OnItemPickup += RemoveGameObject;
-                            _itemsInRoom.Add(newItemInRoom);
+                            _itemsInRoom.Add(new Camera(new Point(posX, posY), AssetManager.Cameras[propIndex]));
                         }
-
+                        else if (objectType == ObjectTypes.Box)
+                        {
+                            _itemsInRoom.Add(new Box(new Point(posX, posY), AssetManager.Boxes[propIndex]));
+                        }
                         numberOfGameObjects--;
                     }
                 }
@@ -341,11 +366,14 @@ namespace MakeEveryDayRecount.Map
         /// <returns></returns>
         public Prop VerifyInteractable(Point playerFacing)
         {
-            foreach (Item prop in _itemsInRoom)
+            foreach (GameObject prop in _itemsInRoom)
             {
-                if (playerFacing == prop.Location)
+                if (prop is Prop)
                 {
-                    return prop;
+                    if (playerFacing == prop.Location)
+                    {
+                        return (Prop)prop;
+                    }
                 }
             }
             foreach (Door door in Doors)

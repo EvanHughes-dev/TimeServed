@@ -62,6 +62,7 @@ namespace MakeEveryDayRecount
             IsMouseVisible = true;
             Window.AllowUserResizing = true; // Enable user resizing
 
+
             _debugState = DebugState.None;
 
             _debugModes = new BaseDebug[2];
@@ -76,6 +77,7 @@ namespace MakeEveryDayRecount
             _graphics.PreferredBackBufferHeight =
                 GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2;
             _graphics.ApplyChanges();
+
 
             //Initialize button lists
             pauseButtons = new List<Button>();
