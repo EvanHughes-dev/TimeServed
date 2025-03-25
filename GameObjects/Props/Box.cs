@@ -23,7 +23,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         }
 
         /// <summary>
-        /// The direction the location of the box relative to the player
+        /// The direction of the location of the box relative to the player
         /// </summary>
         public Point AttachmentPoint { get; private set; }
 
