@@ -43,6 +43,7 @@ namespace MakeEveryDayRecount
 
         private GameplayManager _gameplayManager;
 
+
         /// <summary>
         /// Access the current size of the screen in pixels
         /// </summary>
@@ -94,6 +95,7 @@ namespace MakeEveryDayRecount
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             AssetManager.LoadContent(Content);
+            SoundManager.LoadContent(Content);
 
             // Gameplay manager must be called after all content is loaded
             _gameplayManager = new GameplayManager(ScreenSize);
@@ -118,16 +120,25 @@ namespace MakeEveryDayRecount
 
                 case GameState.Pause:
                     CheckButtonClicks(pauseButtons);
+
+                    if (InputManager.GetKeyPress(Keys.Escape))
+                    {
+                        _state = GameState.Level;
+                        SoundManager.ResumeBGM();
+                    }
                     break;
 
                 case GameState.Level:
-                    //On level end
+                    //TODO: On level end
                     //_state = GameState.Cutscene;
                     _gameplayManager.Update(gameTime);
 
-                    //Pause button can change, figured escape makes the most sense
                     if (InputManager.GetKeyPress(Keys.Escape))
+                    {
                         _state = GameState.Pause;
+                        SoundManager.PauseBGM();
+                    }
+
                     break;
 
                 case GameState.Cutscene:
@@ -150,19 +161,17 @@ namespace MakeEveryDayRecount
             CheckKeyboardInput();
 
             InputManager.Update();
-            // TODO: Add your update logic here
 
             base.Update(gameTime);
         }
+
 
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black);
 
             _spriteBatch.Begin();
-
-
-            // TODO: Add your drawing code here
+            
             switch (_state)
             {
                 case GameState.Menu:
@@ -174,6 +183,8 @@ namespace MakeEveryDayRecount
                     DrawPause(_spriteBatch);
                     break;
                 case GameState.Level:
+                    CheckKeyboardInput();
+                    //TODO: Blur the gameplay in the background.
                     _gameplayManager.Draw(_spriteBatch, ScreenSize);
                     DisplayDebug();
                     break;
@@ -186,7 +197,6 @@ namespace MakeEveryDayRecount
             }
 
             //End the sprite batch
-
             _spriteBatch.End();
 
             base.Draw(gameTime);
@@ -249,6 +259,7 @@ namespace MakeEveryDayRecount
             Rectangle pauseContinueRect = new Rectangle(200, 200, 400, 100);
             Button pauseContinue = new Button(defaultButtonTexture, defaultButtonTexture, pauseContinueRect, true);
             pauseContinue.OnClick += MakeSwitchStateAction(GameState.Level);
+            pauseContinue.OnClick += MakeResumeMusicAction();
             pauseButtons.Add(pauseContinue);
 
             Rectangle pauseLastCheckpointRect = new Rectangle(200, 320, 400, 100);
@@ -265,11 +276,12 @@ namespace MakeEveryDayRecount
             Rectangle menuPlayRect = new Rectangle(400, 200, 300, 100);
             Button menuPlay = new Button(defaultButtonTexture, defaultButtonTexture, menuPlayRect, true);
             menuPlay.OnClick += MakeSwitchStateAction(GameState.Level);
+            menuPlay.OnClick += MakePlayMusicAction(_gameplayManager.Level);
             menuButtons.Add(menuPlay);
 
             Rectangle menuQuitRect = new Rectangle(400, 340, 100, 40);
             Button menuQuit = new Button(defaultButtonTexture, defaultButtonTexture, menuQuitRect, true);
-            //menuQuit.OnClick += the method that closes the game
+            menuQuit.OnClick += MakeExitGameAction();
             menuButtons.Add(menuQuit);
 
         }
@@ -295,7 +307,6 @@ namespace MakeEveryDayRecount
             {
                 menuButtons[i].Draw(sb);
             }
-
         }
 
         /// <summary>
@@ -340,6 +351,33 @@ namespace MakeEveryDayRecount
             {
                 _state = state;
             };
+        }
+
+        /// <summary>
+        /// Creates an Action delegate to quit the game.
+        /// </summary>
+        /// <returns>An Action that quits the game when the ACTION is called.</returns>
+        public Action MakeExitGameAction()
+        {
+            return () => Exit();
+        }
+
+        /// <summary>
+        /// Creates an Action delegate to play music for the current level.
+        /// </summary>
+        /// <returns>An Action that plays music for the current level when the ACTION is called.</returns>
+        public Action MakePlayMusicAction(int level)
+        {
+            return () => SoundManager.PlayBGM(level);
+        }
+
+        /// <summary>
+        /// Creates an Action delegate to resume music.
+        /// </summary>
+        /// <returns>An Action that resumes the music when the ACTION is called.</returns>
+        public Action MakeResumeMusicAction()
+        {
+            return () => SoundManager.ResumeBGM();
         }
     }
 }

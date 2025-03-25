@@ -13,6 +13,18 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin Audio/Music/Sneaky Snitch.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Audio/Music/Sneaky Snitch.mp3
+
+#begin Audio/Sound Effects/Player Step.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/Sound Effects/Player Step.wav
+
 #begin DebugAssets/NOT_WALKABLE.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -91,6 +103,29 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:Fonts/Arial20.spritefont
+
+#begin Player/Inventory/InventoryBox_hover.png
+#begin UI/DefaultButton.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:UI/DefaultButton.png
+
+#begin Player/Inventory/InventoryBox_hover.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Player/Inventory/InventoryBox_hover.png
 
 #begin Items/Box.png
 /importer:TextureImporter
@@ -268,4 +303,3 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:UI/DefaultButton.png
-

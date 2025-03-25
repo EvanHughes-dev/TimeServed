@@ -214,6 +214,7 @@ namespace MakeEveryDayRecount.Players
                     _playerState = PlayerState.Walking;
                 if (HoldingBox)
                     _currentHeldBox.UpdatePosition(Location);
+                SoundManager.PlaySFX(SoundManager.PlayerStepSound, -20, 20);
             }
 
             // Update the player's walking state if needed
