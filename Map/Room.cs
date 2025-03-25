@@ -378,7 +378,7 @@ namespace MakeEveryDayRecount.Map
         {
             foreach (GameObject obj in _itemsInRoom)
             {
-                if (prop is Prop)
+                if (obj is Prop prop)
                 {
                     if (playerFacing == prop.Location)
                     {
