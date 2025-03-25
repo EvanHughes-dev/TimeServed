@@ -115,17 +115,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:UI/DefaultButton.png
-/build:UI/DefaultButton.png
-
-#begin Player/Inventory/InventoryBox_hover.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:Player/Inventory/InventoryBox_hover.png
 
 #begin Items/Box.png
 /importer:TextureImporter
