@@ -65,5 +65,13 @@ namespace MakeEveryDayRecount.GameObjects.Props
             AttachmentPoint = Location - player.Location;
             player.PickupBox(this);
         }
+
+        /// <summary>
+        /// This box has been dropped
+        /// </summary>
+        public void DropBox()
+        {
+            AttachmentPoint = Point.Zero;
+        }
     }
 }

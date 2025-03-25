@@ -134,11 +134,10 @@ namespace MakeEveryDayRecount.Players
                 {
                     // If the player tries to move in a direction that should cause them to drop the box
                     //drop the box but maintain the facing direction and do not move the player
-                    _currentHeldBox = null;
+                    DropBox();
                 }
                 else
                 {
-
                     PlayerMovement(deltaTime, new Point(-1, 0), HoldingBox ? holdingDirection : Direction.Left);
                 }
             }
@@ -148,7 +147,7 @@ namespace MakeEveryDayRecount.Players
                 {
                     // If the player tries to move in a direction that should cause them to drop the box
                     //drop the box but maintain the facing direction and do not move the player
-                    _currentHeldBox = null;
+                    DropBox();
                 }
                 else
                 {
@@ -161,7 +160,7 @@ namespace MakeEveryDayRecount.Players
                 {
                     // If the player tries to move in a direction that should cause them to drop the box
                     //drop the box but maintain the facing direction and do not move the player
-                    _currentHeldBox = null;
+                    DropBox();
                 }
                 else
                 {
@@ -174,7 +173,7 @@ namespace MakeEveryDayRecount.Players
                 {
                     // If the player tries to move in a direction that should cause them to drop the box
                     //drop the box but maintain the facing direction and do not move the player
-                    _currentHeldBox = null;
+                    DropBox();
                 }
                 else
                 {
@@ -347,7 +346,7 @@ namespace MakeEveryDayRecount.Players
         {
             if (HoldingBox)
             {
-                _currentHeldBox = null;
+                DropBox();
                 return;
             }
             Prop objectToInteract = null;
@@ -391,6 +390,15 @@ namespace MakeEveryDayRecount.Players
         public void PickupBox(Box boxToPickup)
         {
             _currentHeldBox = boxToPickup;
+        }
+
+        /// <summary>
+        /// Release the vox the player is holding
+        /// </summary>
+        private void DropBox()
+        {
+            _currentHeldBox.DropBox();
+            _currentHeldBox = null;
         }
 
         #endregion

@@ -275,7 +275,7 @@ namespace MakeEveryDayRecount.Map
                         int posY = binaryReader.ReadInt32();
 
                         ObjectTypes objectType = (ObjectTypes)binaryReader.ReadInt32();
-                        if (objectType == ObjectTypes.Item|| objectType == ObjectTypes.Door)
+                        if (objectType == ObjectTypes.Item || objectType == ObjectTypes.Door)
                         {
                             Door.DoorKeyType keyType = (Door.DoorKeyType)binaryReader.ReadInt32();
 
@@ -353,9 +353,19 @@ namespace MakeEveryDayRecount.Map
         /// Return if a tile can be walk on
         /// </summary>
         /// <param name="pointToCheck">Tile to check</param>
-        /// <returns>If the tile is walkable</returns>
+        /// <returns>If the tile is walkable. True means the tile is walkable</returns>
         public bool VerifyWalkable(Point pointToCheck)
         {
+            foreach (GameObject gameObject in _itemsInRoom)
+            {
+                // If the object is a box that is held and in the square, do not let the player enter it
+                if (gameObject is Box && ((Box)gameObject).AttachmentDirection == Players.Direction.None
+                 && gameObject.Location == pointToCheck)
+                {
+                    return false;
+                }
+            }
+
             return _map[pointToCheck.X, pointToCheck.Y].IsWalkable;
         }
 
