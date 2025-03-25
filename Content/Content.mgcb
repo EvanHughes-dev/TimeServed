@@ -116,8 +116,7 @@
 /processorParam:TextureFormat=Color
 /build:Doors/TempDoor-Top.png
 
-#begin Player/Inventory/InventoryBox_hover.png
-#begin Default Button.png
+#begin UI/DefaultButton.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -127,7 +126,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Default Button.png
+/build:UI/DefaultButton.png
 
 #begin InventoryBox_hover.png
 /importer:TextureImporter
@@ -269,13 +268,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Tiles/testWalkable.png
-
-#begin TimesNewRoman12.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:TimesNewRoman12.spritefont
 
 #begin Tiles/testWall.png
 /importer:TextureImporter

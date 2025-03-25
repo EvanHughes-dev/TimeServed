@@ -38,7 +38,7 @@ namespace MakeEveryDayRecount.DebugModes
         public static void Initialize()
         {
             _objectsToDisplay = new Dictionary<string, Func<object>>();
-            _spriteFont = AssetManager.TimesNewRoman20;
+            _spriteFont = AssetManager.Arial20;
             _yAxisIncrement = _spriteFont.LineSpacing;
         }
 

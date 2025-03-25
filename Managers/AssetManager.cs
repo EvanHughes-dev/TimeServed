@@ -50,7 +50,7 @@ namespace MakeEveryDayRecount.Managers
         /// <summary>
         /// Default font for debugging
         /// </summary>
-        public static SpriteFont TimesNewRoman20 { get; private set; }
+        public static SpriteFont Arial20 { get; private set; }
 
         /// <summary>
         /// The size of each tile, in pixels
@@ -87,7 +87,7 @@ namespace MakeEveryDayRecount.Managers
             DebugWalkableTile = content.Load<Texture2D>("DebugAssets/WALKABLE");
             DebugNotWalkableTile = content.Load<Texture2D>("DebugAssets/NOT_WALKABLE");
 
-            TimesNewRoman20 = content.Load<SpriteFont>("Fonts/Arial20");
+            Arial20 = content.Load<SpriteFont>("Fonts/Arial20");
 
             DoorTexture = new Texture2D[4];
             DoorTexture[0] = content.Load<Texture2D>("Doors/TempDoor-Top");
