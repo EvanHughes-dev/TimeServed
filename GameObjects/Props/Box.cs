@@ -3,7 +3,6 @@ using MakeEveryDayRecount.Players;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-
 namespace MakeEveryDayRecount.GameObjects.Props
 {
     /// <summary>
