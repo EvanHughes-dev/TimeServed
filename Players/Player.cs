@@ -7,10 +7,30 @@ using Microsoft.Xna.Framework.Input;
 using MakeEveryDayRecount.Managers;
 using MakeEveryDayRecount.Players.InventoryFiles;
 
+
 namespace MakeEveryDayRecount.Players
 {
+
+    /// <summary>
+    /// The direction of an object
+    /// </summary>
+    public enum Direction
+    {
+        Down = 0,
+        Right = 1,
+        Up = 2,
+        Left = 3,
+        None
+    }
+
+    /// <summary>
+    /// The player that can move around the map and interact
+    /// </summary>
     internal class Player : GameObject
     {
+        /// <summary>
+        /// The state the player is in
+        /// </summary>
         public enum PlayerState
         {
             Standing = 0,
@@ -18,13 +38,7 @@ namespace MakeEveryDayRecount.Players
             Interacting = 2
         }
 
-        public enum Direction
-        {
-            Down = 0,
-            Right = 1,
-            Up = 2,
-            Left = 3
-        }
+
 
         /// <summary>
         /// Player's current position on the screen
@@ -33,6 +47,7 @@ namespace MakeEveryDayRecount.Players
 
         private Direction _playerCurrentDirection;
         private PlayerState _playerState;
+
         /// <summary>
         /// Get the player's current state
         /// </summary>
@@ -48,7 +63,6 @@ namespace MakeEveryDayRecount.Players
         {
             get { return _playerCurrentDirection; }
         }
-
 
         private const float SecondsPerTile = .2f;
         private float _walkingSeconds;
@@ -66,6 +80,20 @@ namespace MakeEveryDayRecount.Players
         //The player's inventory
         private Inventory _inventory;
 
+        private Box _currentHeldBox;
+
+        /// <summary>
+        /// Get if the player is holing a box 
+        /// </summary>
+        private bool HoldingBox { get { return _currentHeldBox != null; } }
+
+        /// <summary>
+        /// Create the player with all the needed information
+        /// </summary>
+        /// <param name="location">Location of the player</param>
+        /// <param name="sprite">Image of the player</param>
+        /// <param name="gameplayManager">manager of the game</param>
+        /// <param name="screenSize">Size of the screen in pixels</param>
         public Player(Point location, Texture2D sprite, GameplayManager gameplayManager, Point screenSize)
             : base(location, sprite)
         {
@@ -75,6 +103,7 @@ namespace MakeEveryDayRecount.Players
             _playerSize = new Point(sprite.Width / 4, sprite.Height / 4);
             //Create an inventory
             _inventory = new Inventory(screenSize);
+            _currentHeldBox = null;
         }
 
         /// <summary>
@@ -96,21 +125,60 @@ namespace MakeEveryDayRecount.Players
         /// <param name="deltaTime">The elapsed time between frames in seconds</param>
         private void KeyboardInput(float deltaTime)
         {
+            Direction holdingDirection = Direction.None;
+            if (HoldingBox)
+                holdingDirection = _currentHeldBox.AttachmentDirection;
             if (InputManager.GetKeyStatus(Keys.Left) || InputManager.GetKeyStatus(Keys.A))
             {
-                PlayerMovement(deltaTime, new Point(-1, 0), Direction.Left);
+                if (holdingDirection == Direction.Down || holdingDirection == Direction.Up)
+                {
+                    // If the player tries to move in a direction that should cause them to drop the box
+                    //drop the box but maintain the facing direction and do not move the player
+                    DropBox();
+                }
+                else
+                {
+                    PlayerMovement(deltaTime, new Point(-1, 0), HoldingBox ? holdingDirection : Direction.Left);
+                }
             }
             else if (InputManager.GetKeyStatus(Keys.Right) || InputManager.GetKeyStatus(Keys.D))
             {
-                PlayerMovement(deltaTime, new Point(1, 0), Direction.Right);
+                if (holdingDirection == Direction.Down || holdingDirection == Direction.Up)
+                {
+                    // If the player tries to move in a direction that should cause them to drop the box
+                    //drop the box but maintain the facing direction and do not move the player
+                    DropBox();
+                }
+                else
+                {
+                    PlayerMovement(deltaTime, new Point(1, 0), HoldingBox ? holdingDirection : Direction.Right);
+                }
             }
             else if (InputManager.GetKeyStatus(Keys.Up) || InputManager.GetKeyStatus(Keys.W))
             {
-                PlayerMovement(deltaTime, new Point(0, -1), Direction.Up);
+                if (holdingDirection == Direction.Left || holdingDirection == Direction.Right)
+                {
+                    // If the player tries to move in a direction that should cause them to drop the box
+                    //drop the box but maintain the facing direction and do not move the player
+                    DropBox();
+                }
+                else
+                {
+                    PlayerMovement(deltaTime, new Point(0, -1), HoldingBox ? holdingDirection : Direction.Up);
+                }
             }
             else if (InputManager.GetKeyStatus(Keys.Down) || InputManager.GetKeyStatus(Keys.S))
             {
-                PlayerMovement(deltaTime, new Point(0, 1), Direction.Down);
+                if (holdingDirection == Direction.Left || holdingDirection == Direction.Right)
+                {
+                    // If the player tries to move in a direction that should cause them to drop the box
+                    //drop the box but maintain the facing direction and do not move the player
+                    DropBox();
+                }
+                else
+                {
+                    PlayerMovement(deltaTime, new Point(0, 1), HoldingBox ? holdingDirection : Direction.Down);
+                }
             }
             //if we were walking and we stop pressing a key, go back to standing
             else
@@ -135,12 +203,16 @@ namespace MakeEveryDayRecount.Players
         {
             if (!_readyToMove)
                 UpdateWalkingTime(deltaTime);
-            if (_readyToMove && _gameplayManager.Map.CheckPlayerCollision(Location + movement))
+            if (_readyToMove && _gameplayManager.Map.CheckPlayerCollision(Location + movement) &&
+                (!HoldingBox || _gameplayManager.Map.CheckPlayerCollision(_currentHeldBox.Location + movement)))
             {
+
                 Location += movement;
                 _readyToMove = false;
                 if (_playerState == PlayerState.Standing)
                     _playerState = PlayerState.Walking;
+                if (HoldingBox)
+                    _currentHeldBox.UpdatePosition(Location);
                 SoundManager.PlaySFX(SoundManager.PlayerStepSound, -20, 20);
             }
 
@@ -245,6 +317,7 @@ namespace MakeEveryDayRecount.Players
 
         #endregion
 
+        #region Interaction
         /// <summary>
         /// Determines if the player's inventory contains a key of the specified type
         /// </summary>
@@ -271,6 +344,11 @@ namespace MakeEveryDayRecount.Players
         /// </summary>
         public void Interact()
         {
+            if (HoldingBox)
+            {
+                DropBox();
+                return;
+            }
             Prop objectToInteract = null;
 
             switch (_playerCurrentDirection)
@@ -304,5 +382,25 @@ namespace MakeEveryDayRecount.Players
         {
             Location = new_location;
         }
+
+        /// <summary>
+        /// Pickup this box and attach it to the player
+        /// </summary>
+        /// <param name="boxToPickup">Box to attach</param>
+        public void PickupBox(Box boxToPickup)
+        {
+            _currentHeldBox = boxToPickup;
+        }
+
+        /// <summary>
+        /// Release the vox the player is holding
+        /// </summary>
+        private void DropBox()
+        {
+            _currentHeldBox.DropBox();
+            _currentHeldBox = null;
+        }
+
+        #endregion
     }
 }
