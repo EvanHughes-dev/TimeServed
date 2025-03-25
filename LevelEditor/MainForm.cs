@@ -62,6 +62,8 @@ namespace LevelEditor
             Tiles = null!;
 
             Folder = null!;
+
+            FileIOHelpers.UpdateContentMGCB();
         }
 
         /// <summary>

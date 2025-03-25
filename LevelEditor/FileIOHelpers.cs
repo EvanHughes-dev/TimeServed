@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
+using static System.Windows.Forms.LinkLabel;
 
 namespace LevelEditor
 {
@@ -235,6 +237,78 @@ namespace LevelEditor
             const string TileFolderPath = "./Tiles";
 
             return new(Image.FromFile(Path.Join(TileFolderPath, spriteName)), isWalkable);
+        }
+
+        /// <summary>
+        /// Automatically update the Content.MGCB file to contain ALL files inside the Levels
+        /// folder to be included in the build. This function assumes that the folder locations 
+        /// for the Level Editor, Content.MGCB, and Levels folder do not change.
+        /// </summary>
+        public static void UpdateContentMGCB()
+        {
+            string pathToContent = "../../../../Content/";
+            string levelsPath = Path.Combine(pathToContent, "Levels");
+            string contentFilePath = Path.Combine(pathToContent, "Content.mgcb");
+
+            List<string> fileLines = new List<string>(File.ReadAllLines(contentFilePath));
+            List<string> existingEntries = new List<string>();
+            List<int> commentLines = new List<int>();
+
+            // Collect existing level references and mark their line positions
+            for (int i = 0; i < fileLines.Count; i++)
+            {
+                string line = fileLines[i].TrimStart();
+                if (line.StartsWith("#begin Levels"))
+                {
+                    commentLines.Add(i);
+                    existingEntries.Add(line);
+                }
+            }
+
+            // Iterate through all level folders and files
+            foreach (string folder in Directory.GetDirectories(levelsPath).Select(Path.GetFileName)!)
+            {
+                foreach (string fileName in FindAllFiles(Path.Combine(levelsPath, folder!)))
+                {
+                    string entry = $"#begin Levels/{folder}/{fileName}";
+
+                    if (!existingEntries.Contains(entry))
+                    {
+                        fileLines.Add("");
+                        fileLines.Add(entry);
+                        fileLines.Add($"/copy:Levels/{folder}/{fileName}");
+                    }
+                    else
+                    {
+                        commentLines.RemoveAll(index => fileLines[index] == entry);
+                    }
+                }
+            }
+
+            // Remove obsolete entries
+            for (int i = commentLines.Count - 1; i >= 0; i--)
+            {
+                int index = commentLines[i];
+                if (index + 1 < fileLines.Count && fileLines[index + 1].StartsWith("/copy:"))
+                {
+                    fileLines.RemoveAt(index + 1);
+                }
+                fileLines.RemoveAt(index);
+            }
+
+            // Save the updated file
+            File.WriteAllLines(contentFilePath, fileLines);
+        }
+        /// <summary>
+        /// Find all the *.level and *.room files in a folder
+        /// </summary>
+        /// <param name="folderPath">Path to the folder</param>
+        /// <returns>List<string> with all the file names</returns>
+        private static List<string> FindAllFiles(string folderPath)
+        {
+            return Directory.GetFiles(folderPath, "*.level").Concat(Directory.GetFiles(folderPath, "*.room"))
+                            .Select(Path.GetFileName)
+                            .ToList()!;
         }
     }
 }

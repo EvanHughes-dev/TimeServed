@@ -152,17 +152,6 @@
 /processorParam:TextureFormat=Color
 /build:Items/wireCutters.png
 
-#begin level1/Level.level
-/copy:level1/Level.level
-
-#begin level1/TestRoom1.room
-/copy:level1/TestRoom1.room
-
-#begin level1/TestRoom2.room
-/copy:level1/TestRoom2.room
-
-#begin Levels/Level0/level.level
-/copy:Levels/Level0/level.level
 
 #begin Levels/Level1/level.level
 /copy:Levels/Level1/level.level
@@ -278,3 +267,5 @@
 /processorParam:TextureFormat=Color
 /build:UI/DefaultButton.png
 
+#begin Levels/Level1/Room2.room
+/copy:Levels/Level1/Room2.room

@@ -71,21 +71,21 @@
             // 
             textBoxHeight.Location = new Point(100, 110);
             textBoxHeight.Name = "textBoxHeight";
-            textBoxHeight.Size = new Size(171, 23);
+            textBoxHeight.Size = new Size(171, 47);
             textBoxHeight.TabIndex = 3;
             // 
             // textBoxName
             // 
             textBoxName.Location = new Point(100, 32);
             textBoxName.Name = "textBoxName";
-            textBoxName.Size = new Size(171, 23);
+            textBoxName.Size = new Size(171, 47);
             textBoxName.TabIndex = 1;
             // 
             // textBoxWidth
             // 
             textBoxWidth.Location = new Point(100, 70);
             textBoxWidth.Name = "textBoxWidth";
-            textBoxWidth.Size = new Size(171, 23);
+            textBoxWidth.Size = new Size(171, 47);
             textBoxWidth.TabIndex = 1;
             // 
             // labelName
@@ -93,7 +93,7 @@
             labelName.AutoSize = true;
             labelName.Location = new Point(55, 35);
             labelName.Name = "labelName";
-            labelName.Size = new Size(39, 15);
+            labelName.Size = new Size(97, 41);
             labelName.TabIndex = 0;
             labelName.Text = "Name";
             labelName.TextAlign = ContentAlignment.MiddleRight;
@@ -103,7 +103,7 @@
             labelHeight.AutoSize = true;
             labelHeight.Location = new Point(6, 113);
             labelHeight.Name = "labelHeight";
-            labelHeight.Size = new Size(88, 15);
+            labelHeight.Size = new Size(218, 41);
             labelHeight.TabIndex = 2;
             labelHeight.Text = "Height (in tiles)";
             // 
@@ -112,7 +112,7 @@
             labelWidth.AutoSize = true;
             labelWidth.Location = new Point(10, 73);
             labelWidth.Name = "labelWidth";
-            labelWidth.Size = new Size(84, 15);
+            labelWidth.Size = new Size(209, 41);
             labelWidth.TabIndex = 0;
             labelWidth.Text = "Width (in tiles)";
             // 
