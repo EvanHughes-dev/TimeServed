@@ -376,7 +376,7 @@ namespace MakeEveryDayRecount.Map
         /// <returns></returns>
         public Prop VerifyInteractable(Point playerFacing)
         {
-            foreach (GameObject prop in _itemsInRoom)
+            foreach (GameObject obj in _itemsInRoom)
             {
                 if (prop is Prop)
                 {
