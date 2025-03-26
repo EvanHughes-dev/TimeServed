@@ -51,7 +51,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         public void Update(float deltaTime)
         {
             //Add a check to see if there's a box directly in front of the camera, and if so don't check any of the rays
-            CheckRay(new Vector2(5, 4));
+            CheckRay(new Vector2(5, 2));
         }
 
         public void Draw(SpriteBatch sb)
@@ -70,22 +70,27 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //Step along that line in small intervals, checking what tile you're over at every step
             float dx = ray.X;
             float dy = ray.Y;
+            //error is thew slope error. We assume it starts exactly right
             float error = 0;
-            int y = _rayBase.Y;
+            int y = 0;
 
             for (int x = 0; x <= ray.X; x++)
             {
-                _watchedTiles.Add(new Point(x + Location.X, y));
-                Debug.WriteLine("Added " + (x + Location.X) + ", " + y);
+                //Add the current point to the line
+                //This first time this runs, this will always be the raybase
+                _watchedTiles.Add(new Point(x + _rayBase.X, y + _rayBase.Y));
+                Debug.WriteLine("Added " + (x + _rayBase.X) + ", " + (y + _rayBase.Y) );
 
+                //Then check error for the next point along
+                //Debug.WriteLine("Evaluated: " + ((_rayBase.Y * ray.X) + ((x) * ray.Y) - ((y + 0.5) * ray.X)));
+                error = error + (y * ray.X) + ((x + 1) * ray.Y) - (y * ray.X);
+
+                //And figure out if it should go up or not
+                Debug.WriteLine("Error is: " + error);
                 if (error >= 0.5)
                 {
                     error = error - 1;
                     y = y + 1;
-                }
-                else
-                {
-                    error = error + (_rayBase.Y * ray.X) + (x * ray.Y) - (y * ray.X);
                 }
 
                 //if (error > 1)
