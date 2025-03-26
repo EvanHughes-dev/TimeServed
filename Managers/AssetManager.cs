@@ -47,6 +47,11 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static Texture2D DefaultButton { get; private set; }
         /// <summary>
+        /// UI desplay for tiles the camera can see
+        /// </summary>
+        public static Texture2D CameraSight { get; private set; }
+
+        /// <summary>
         /// An array of all camera textures
         /// </summary>
         public static Texture2D[] Cameras { get; private set; }
@@ -72,7 +77,9 @@ namespace MakeEveryDayRecount.Managers
                 content.Load<Texture2D>("Items/screwdriver"),
                 content.Load<Texture2D>("Items/wireCutters"),
                 content.Load<Texture2D>("Items/hook"),
-                content.Load<Texture2D>("Items/hookAndRope")
+                content.Load<Texture2D>("Items/hookAndRope"),
+                content.Load<Texture2D>("Items/prop_cameraOn"),
+                content.Load<Texture2D>("Itens/prop_cameraOff")
             };
 
             TileMap = new Texture2D[]
@@ -105,6 +112,7 @@ namespace MakeEveryDayRecount.Managers
             };
 
             DefaultButton = content.Load<Texture2D>("UI/DefaultButton");
+            CameraSight = content.Load<Texture2D>("UI/UI_cameraSight");
 
             Boxes = new Texture2D[]{
                 content.Load<Texture2D>("Items/Box")
