@@ -146,9 +146,17 @@ namespace LevelEditor
                 string roomName = reader.ReadString();
                 string folder = Path.GetDirectoryName(filePath)!;
 
-                level.Rooms.Add(
-                    LoadRoom(Path.Join(folder, $"{roomName}.room"), allTiles)
-                    );
+                string roomPath = Path.Join(folder, $"{roomName}.room");
+
+                // If the room doesn't exist... actually just don't try and load it
+                //   This way, you can easily remove rooms by just deleting their .room file
+                if (File.Exists(roomPath))
+                {
+                    level.Rooms.Add(
+                        LoadRoom(roomPath, allTiles)
+                        );
+                }
+
             }
 
             reader.Close();
