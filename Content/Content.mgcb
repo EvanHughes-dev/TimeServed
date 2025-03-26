@@ -200,14 +200,12 @@
 /processorParam:TextureFormat=Color
 /build:Items/wireCutters.png
 
-#begin level1/Level.level
-/copy:level1/Level.level
 
-#begin level1/TestRoom1.room
-/copy:level1/TestRoom1.room
+#begin Levels/Level1/level.level
+/copy:Levels/Level1/level.level
 
-#begin level1/TestRoom2.room
-/copy:level1/TestRoom2.room
+#begin Levels/Level1/test.room
+/copy:Levels/Level1/test.room
 
 #begin Player/Inventory/InventoryBox_hover.png
 /importer:TextureImporter
@@ -293,6 +291,18 @@
 /processorParam:TextureFormat=Color
 /build:Tiles/testWall.png
 
+#begin Tiles/void.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Tiles/void.png
+
 #begin UI/DefaultButton.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -317,3 +327,6 @@
 /processorParam:TextureFormat=Color
 /build:UI/UI_cameraSight.png
 
+
+#begin Levels/Level1/Room2.room
+/copy:Levels/Level1/Room2.room

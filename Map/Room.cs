@@ -251,16 +251,18 @@ namespace MakeEveryDayRecount.Map
 
                     _map = new Tile[tileMapWidth, tileMapHeight];
                     MapSize = new Point(tileMapWidth, tileMapHeight);
-                    for (int tileXIndex = 0; tileXIndex < tileMapWidth; tileXIndex++)
+                    for (int tileYIndex = 0; tileYIndex < tileMapHeight; tileYIndex++)
                     {
-                        for (int tileYIndex = 0; tileYIndex < tileMapHeight; tileYIndex++)
+                        for (int tileXIndex = 0; tileXIndex < tileMapWidth; tileXIndex++)
                         {
                             _map[tileXIndex, tileYIndex] = new Tile(
                                 binaryReader.ReadBoolean(),
                                 binaryReader.ReadInt32()
                             );
+
                         }
                     }
+
 
                     // Define the number of GameObjects in the room
                     // Could be a door
