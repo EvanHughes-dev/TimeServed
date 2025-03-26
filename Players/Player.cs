@@ -125,64 +125,25 @@ namespace MakeEveryDayRecount.Players
         /// <param name="deltaTime">The elapsed time between frames in seconds</param>
         private void KeyboardInput(float deltaTime)
         {
-            Direction holdingDirection = Direction.None;
-            if (HoldingBox)
-                holdingDirection = _currentHeldBox.AttachmentDirection;
             if (InputManager.GetKeyStatus(Keys.Left) || InputManager.GetKeyStatus(Keys.A))
             {
-                if (holdingDirection == Direction.Down || holdingDirection == Direction.Up)
-                {
-                    // If the player tries to move in a direction that should cause them to drop the box
-                    //drop the box but maintain the facing direction and do not move the player
-                    DropBox();
-                }
-                else
-                {
-                    PlayerMovement(deltaTime, new Point(-1, 0), HoldingBox ? holdingDirection : Direction.Left);
-                }
+                PlayerMovement(deltaTime, new Point(-1, 0), Direction.Left);
             }
             else if (InputManager.GetKeyStatus(Keys.Right) || InputManager.GetKeyStatus(Keys.D))
             {
-                if (holdingDirection == Direction.Down || holdingDirection == Direction.Up)
-                {
-                    // If the player tries to move in a direction that should cause them to drop the box
-                    //drop the box but maintain the facing direction and do not move the player
-                    DropBox();
-                }
-                else
-                {
-                    PlayerMovement(deltaTime, new Point(1, 0), HoldingBox ? holdingDirection : Direction.Right);
-                }
+                PlayerMovement(deltaTime, new Point(1, 0), Direction.Right);
             }
             else if (InputManager.GetKeyStatus(Keys.Up) || InputManager.GetKeyStatus(Keys.W))
             {
-                if (holdingDirection == Direction.Left || holdingDirection == Direction.Right)
-                {
-                    // If the player tries to move in a direction that should cause them to drop the box
-                    //drop the box but maintain the facing direction and do not move the player
-                    DropBox();
-                }
-                else
-                {
-                    PlayerMovement(deltaTime, new Point(0, -1), HoldingBox ? holdingDirection : Direction.Up);
-                }
+                PlayerMovement(deltaTime, new Point(0, -1), Direction.Up);
             }
             else if (InputManager.GetKeyStatus(Keys.Down) || InputManager.GetKeyStatus(Keys.S))
             {
-                if (holdingDirection == Direction.Left || holdingDirection == Direction.Right)
-                {
-                    // If the player tries to move in a direction that should cause them to drop the box
-                    //drop the box but maintain the facing direction and do not move the player
-                    DropBox();
-                }
-                else
-                {
-                    PlayerMovement(deltaTime, new Point(0, 1), HoldingBox ? holdingDirection : Direction.Down);
-                }
+                PlayerMovement(deltaTime, new Point(0, 1), Direction.Down);
             }
-            //if we were walking and we stop pressing a key, go back to standing
             else
             {
+                //if we were walking and we stop pressing a key, go back to standing
                 _playerState = PlayerState.Standing;
                 _walkingSeconds = 0;
                 //but don't change the direction you're facing
@@ -190,6 +151,21 @@ namespace MakeEveryDayRecount.Players
 
             if (InputManager.GetKeyPress(Keys.E))
                 Interact();
+        }
+
+        /// <summary>
+        /// Get if two directions are perpendicular to each other
+        /// </summary>
+        /// <param name="directionToCheck">First direction</param>
+        /// <param name="directionToCheckAgainst">Second direction</param>
+        /// <returns>If the directions are at right angles</returns>
+        private bool IsPerpendicular(Direction directionToCheck, Direction directionToCheckAgainst)
+        {
+            if (directionToCheck == Direction.None || directionToCheckAgainst == Direction.None)
+                return false;
+            // Directions Up and Down % 2 = 0, while Left and Right return 1
+            // If the modulus values are different than they are perpendicular
+            return (int)directionToCheck % 2 != (int)directionToCheckAgainst % 2;
         }
 
         /// <summary>
@@ -201,8 +177,18 @@ namespace MakeEveryDayRecount.Players
         /// <param name="directionMove">Direction of movement</param>
         private void PlayerMovement(float deltaTime, Point movement, Direction directionMove)
         {
+            // Drop the box if the player is holding it and they attempt to move a direction the 
+            // box can't be moved in
+            if (HoldingBox && IsPerpendicular(directionMove, _currentHeldBox.AttachmentDirection))
+                DropBox();
+
+            // Stop the player from turing around if they're holding the box
+            if (HoldingBox)
+                directionMove = _currentHeldBox.AttachmentDirection;
+
             if (!_readyToMove)
                 UpdateWalkingTime(deltaTime);
+
             if (_readyToMove && _gameplayManager.Map.CheckPlayerCollision(Location + movement) &&
                 (!HoldingBox || _gameplayManager.Map.CheckPlayerCollision(_currentHeldBox.Location + movement)))
             {

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using MakeEveryDayRecount.GameObjects.Props;
 using MakeEveryDayRecount.Map;
@@ -87,7 +85,7 @@ namespace MakeEveryDayRecount.Managers
         /// Check if the tile in front of the player contains an interactable item
         /// </summary>
         /// <param name="playerFacing">The tile the player wants to interact with</param>
-        /// <returns></returns>
+        /// <returns>Current item to interact with in the provided tile</returns>
         public Prop CheckInteractable(Point playerFacing)
         {
             return _currentRoom.VerifyInteractable(playerFacing);
