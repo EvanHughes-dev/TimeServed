@@ -46,11 +46,18 @@ namespace MakeEveryDayRecount.Managers
         /// Default texture for all buttons
         /// </summary>
         public static Texture2D DefaultButton { get; private set; }
-
+        /// <summary>
+        /// An array of all camera textures
+        /// </summary>
+        public static Texture2D[] Cameras { get; private set; }
+        /// <summary>
+        /// An array of all box textures
+        /// </summary>
+        public static Texture2D[] Boxes { get; private set; }
         /// <summary>
         /// Default font for debugging
         /// </summary>
-        public static SpriteFont TimesNewRoman20 { get; private set; }
+        public static SpriteFont Arial20 { get; private set; }
 
         /// <summary>
         /// The size of each tile, in pixels
@@ -88,15 +95,21 @@ namespace MakeEveryDayRecount.Managers
             DebugWalkableTile = content.Load<Texture2D>("DebugAssets/WALKABLE");
             DebugNotWalkableTile = content.Load<Texture2D>("DebugAssets/NOT_WALKABLE");
 
-            TimesNewRoman20 = content.Load<SpriteFont>("Fonts/Arial20");
+            Arial20 = content.Load<SpriteFont>("Fonts/Arial20");
 
-            DoorTexture = new Texture2D[4];
-            DoorTexture[0] = content.Load<Texture2D>("Doors/TempDoor-Top");
-            DoorTexture[1] = content.Load<Texture2D>("Doors/TempDoor-Right");
-            DoorTexture[2] = content.Load<Texture2D>("Doors/TempDoor-Bottom");
-            DoorTexture[3] = content.Load<Texture2D>("Doors/TempDoor-Left");
+            DoorTexture = new Texture2D[]
+            {
+                content.Load<Texture2D>("Doors/TempDoor-Top"),
+                content.Load<Texture2D>("Doors/TempDoor-Right"),
+                content.Load<Texture2D>("Doors/TempDoor-Bottom"),
+                content.Load<Texture2D>("Doors/TempDoor-Left")
+            };
 
             DefaultButton = content.Load<Texture2D>("UI/DefaultButton");
+
+            Boxes = new Texture2D[]{
+                content.Load<Texture2D>("Items/Box")
+            };
 
             TileSize = new Point(TileMap[0].Width, TileMap[0].Height);
         }

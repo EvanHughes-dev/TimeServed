@@ -26,7 +26,7 @@ namespace MakeEveryDayRecount.DebugModes
         /// <param name="gameplayManager">Reference to the game's manager for accessing player data</param>
         public BaseDebug(GameplayManager gameplayManager)
         {
-            _spriteFont = AssetManager.TimesNewRoman20;
+            _spriteFont = AssetManager.Arial20;
             _gameplayManager = gameplayManager;
             _yAxisIncrement = _spriteFont.LineSpacing;
             _objectsToDisplay = new Dictionary<string, Func<object>> { };
