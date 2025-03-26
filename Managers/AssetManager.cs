@@ -86,7 +86,7 @@ namespace MakeEveryDayRecount.Managers
             };
             CameraTextures = new Texture2D[]
             {
-                content.Load<Texture2D>("Itens/prop_cameraOff"),
+                content.Load<Texture2D>("Items/prop_cameraOff"),
                 content.Load<Texture2D>("Items/prop_cameraOn")
             };
 
