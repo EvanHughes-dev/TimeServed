@@ -11,6 +11,10 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static Texture2D[] PropTextures { get; private set; }
         /// <summary>
+        /// Array of camera assets (off = 0, on = 1)
+        /// </summary>
+        public static Texture2D[] CameraTextures { get; private set; }
+        /// <summary>
         /// Array with every type of tile asset we have in the game
         /// </summary>
         public static Texture2D[] TileMap { get; private set; }
@@ -78,8 +82,12 @@ namespace MakeEveryDayRecount.Managers
                 content.Load<Texture2D>("Items/wireCutters"),
                 content.Load<Texture2D>("Items/hook"),
                 content.Load<Texture2D>("Items/hookAndRope"),
-                content.Load<Texture2D>("Items/prop_cameraOn"),
-                content.Load<Texture2D>("Itens/prop_cameraOff")
+                
+            };
+            CameraTextures = new Texture2D[]
+            {
+                content.Load<Texture2D>("Itens/prop_cameraOff"),
+                content.Load<Texture2D>("Items/prop_cameraOn")
             };
 
             TileMap = new Texture2D[]
