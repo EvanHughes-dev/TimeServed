@@ -170,7 +170,8 @@ namespace MakeEveryDayRecount
         {
             GraphicsDevice.Clear(Color.Black);
 
-            _spriteBatch.Begin();
+            // "Point" sampling means that our chunky pixels won't get blurred
+            _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
             
             switch (_state)
             {
