@@ -77,8 +77,9 @@ namespace MakeEveryDayRecount.Managers
 
             TileMap = new Texture2D[]
             {
+                content.Load<Texture2D>("Tiles/void"),
+                content.Load<Texture2D>("Tiles/testWalkable"),
                 content.Load<Texture2D>("Tiles/testWall"),
-                content.Load<Texture2D>("Tiles/testWalkable")
             };
 
             InventoryBoxes = new Texture2D[]

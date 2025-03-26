@@ -138,6 +138,7 @@ namespace LevelEditor
                         Folder = Path.GetDirectoryName(fullPath)!;
 
                         FileIOHelpers.SaveLevel(newLevel, Folder, Tiles);
+                        FileIOHelpers.UpdateContentMGCB();
                         Level = newLevel;
 
                         OnNewLevelLoaded?.Invoke();
@@ -287,6 +288,7 @@ namespace LevelEditor
         private void saveLevelToolStripMenuItem_Click(object sender, EventArgs e)
         {
             FileIOHelpers.SaveLevel(Level, Folder, Tiles);
+            FileIOHelpers.UpdateContentMGCB();
         }
     }
 }

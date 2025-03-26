@@ -103,7 +103,7 @@ namespace MakeEveryDayRecount.Managers
         {
             // only read binary data here
             // each room is in charge of parsing itself
-            string folderPath = $"./Content/Level{currentLevel}";
+            string folderPath = $"./Content/Levels/Level{currentLevel}";
 
             // Level.level should exist in every Level folder
             // Acts as a config file for the .room files
@@ -118,10 +118,10 @@ namespace MakeEveryDayRecount.Managers
             * Loop through and pass path and index to a new room object
             */
             Room[] rooms = new Room[0];
-            if (File.Exists(folderPath + "/Level.level"))
+            if (File.Exists(folderPath + "/level.level"))
             {
                 Dictionary<(int roomIndex, int doorIndex), Door> doorLookup = new Dictionary<(int roomIndex, int doorIndex), Door>();
-                Stream streamReader = File.OpenRead(folderPath + "/Level.level");
+                Stream streamReader = File.OpenRead(folderPath + "/level.level");
                 BinaryReader binaryReader = new BinaryReader(streamReader);
 
                 int roomCount = binaryReader.ReadInt32();
@@ -155,7 +155,7 @@ namespace MakeEveryDayRecount.Managers
             {
                 // Provide more details about what level the error occurred on
                 throw new FileNotFoundException(
-                    $"No Level.level file located for level {currentLevel}. File path: {folderPath}/Level.level"
+                    $"No Level.level file located for level {currentLevel}. File path: {folderPath}/level.level"
                 );
             }
             return rooms;
