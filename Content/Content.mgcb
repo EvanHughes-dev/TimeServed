@@ -204,8 +204,6 @@
 #begin Levels/Level1/level.level
 /copy:Levels/Level1/level.level
 
-#begin Levels/Level1/test.room
-/copy:Levels/Level1/test.room
 
 #begin Player/Inventory/InventoryBox_hover.png
 /importer:TextureImporter
@@ -328,5 +326,6 @@
 /build:UI/UI_cameraSight.png
 
 
-#begin Levels/Level1/Room2.room
-/copy:Levels/Level1/Room2.room
+
+#begin Levels/Level1/test_1.room
+/copy:Levels/Level1/test_1.room

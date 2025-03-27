@@ -142,7 +142,7 @@ namespace MakeEveryDayRecount.Map
             }
 
             // Display all GameObjects on screen
-            foreach (GameObject propToDraw in _itemsInRoom)
+            foreach (Prop propToDraw in _itemsInRoom)
             {
                 Point propPosition = propToDraw.Location;
 
@@ -153,14 +153,7 @@ namespace MakeEveryDayRecount.Map
                     && propPosition.Y <= screenMaxY
                 )
                 {
-                    sb.Draw(
-                        propToDraw.Sprite,
-                        new Rectangle(
-                            MapUtils.TileToWorld(propPosition) - worldToScreen + pixelOffset,
-                            TileSize
-                        ),
-                        Color.White
-                    );
+                    propToDraw.Draw(sb, worldToScreen, pixelOffset);
                 }
             }
 
@@ -176,11 +169,7 @@ namespace MakeEveryDayRecount.Map
                     && propPosition.Y <= screenMaxY
                 )
                 {
-                    sb.Draw(
-                        doorToDraw.Sprite,
-                        new Rectangle(MapUtils.TileToWorld(propPosition) - worldToScreen + pixelOffset, TileSize),
-                        Color.White
-                    );
+                    doorToDraw.Draw(sb, worldToScreen, pixelOffset);
                 }
             }
         }
@@ -195,12 +184,15 @@ namespace MakeEveryDayRecount.Map
         /// <exception cref="FileNotFoundException">File path could not be found</exception>
         private void ParseData(string filePath)
         {
-            if (File.Exists(filePath))
+            if (!File.Exists(filePath))
+                throw new FileNotFoundException($"File not found: {filePath}");
+
+            // save the file path for debug uses
+            FilePath = filePath;
+
+            try
             {
-                // save the file path for debug uses
-                FilePath = filePath;
-                BinaryReader binaryReader = null;
-                try
+                using (BinaryReader binaryReader = new BinaryReader(File.OpenRead(filePath)))
                 {
                     /*
                     * Form of the room data is as follows
@@ -234,16 +226,14 @@ namespace MakeEveryDayRecount.Map
                     * 
                     *   if objectType == 3
                     *       int facing
-                    *           0 = North/Up
-                    *           1 = East/Right
-                    *           2 = South/Down
-                    *           3 = West/Left
+                    *           0 = South/Down
+                    *           1 = West/Left
+                    *           2 = North/Up
+                    *           3 = East/Right
                     *       int entranceIndex
                     *       int destRoom
                     *       int destDoor
                     */
-                    Stream stream = File.OpenRead(filePath);
-                    binaryReader = new BinaryReader(stream);
 
                     // Define the size of the current room and loop to populate tiles
                     int tileMapWidth = binaryReader.ReadInt32();
@@ -263,7 +253,6 @@ namespace MakeEveryDayRecount.Map
                         }
                     }
 
-
                     // Define the number of GameObjects in the room
                     // Could be a door
                     int numberOfGameObjects = binaryReader.ReadInt32();
@@ -273,8 +262,8 @@ namespace MakeEveryDayRecount.Map
                     while (numberOfGameObjects > 0)
                     {
                         int propIndex = binaryReader.ReadInt32();
-                        int posX = binaryReader.ReadInt32();
-                        int posY = binaryReader.ReadInt32();
+
+                        Point tileLocation = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
 
                         ObjectTypes objectType = (ObjectTypes)binaryReader.ReadInt32();
                         if (objectType == ObjectTypes.Item || objectType == ObjectTypes.Door)
@@ -286,12 +275,12 @@ namespace MakeEveryDayRecount.Map
                                 // Parse a door from the file
                                 // Next three values correspond to the needed data
                                 Door doorFromFile = new Door(
-                                    direction[binaryReader.ReadInt32()],
-                                    binaryReader.ReadInt32(),
-                                    binaryReader.ReadInt32(),
-                                    binaryReader.ReadInt32(),
+                                    direction[binaryReader.ReadInt32()], // Direction door is facing
+                                    binaryReader.ReadInt32(), // The index of this door
+                                    binaryReader.ReadInt32(), // The index of the destination room
+                                    binaryReader.ReadInt32(), // The index of the destination door
                                     keyType,
-                                    new Point(posX, posY),
+                                    tileLocation,
                                     AssetManager.DoorTexture[propIndex]
                                 );
                                 // When this door is interacted with, transition the player
@@ -303,7 +292,7 @@ namespace MakeEveryDayRecount.Map
                                 // Parse a prop from the file
 
                                 Item newItemInRoom = new Item(
-                                    new Point(posX, posY),
+                                    tileLocation,
                                     AssetManager.PropTextures[propIndex],
                                     "TEMP_NAME",
                                     keyType
@@ -315,31 +304,23 @@ namespace MakeEveryDayRecount.Map
                         }
                         else if (objectType == ObjectTypes.Camera)
                         {
-                            _itemsInRoom.Add(new Camera(new Point(posX, posY), AssetManager.Cameras[propIndex]));
+                            _itemsInRoom.Add(new Camera(tileLocation, AssetManager.Cameras[propIndex]));
                         }
                         else if (objectType == ObjectTypes.Box)
                         {
-                            _itemsInRoom.Add(new Box(new Point(posX, posY), AssetManager.Boxes[propIndex]));
+                            _itemsInRoom.Add(new Box(tileLocation, AssetManager.Boxes[propIndex]));
                         }
                         numberOfGameObjects--;
                     }
                 }
-                catch (Exception e)
-                {
-                    System.Diagnostics.Debug.Write(e.Message);
-                }
-                finally
-                {
-                    binaryReader.Close();
-                }
             }
-            else
+            catch (Exception e)
             {
-                throw new FileNotFoundException(
-                    $"File could not be found when loading room {RoomName}. File path {filePath}"
-                );
+                System.Diagnostics.Debug.Write(e.Message);
             }
         }
+
+
 
         /// <summary>
         /// Transition the player from one room to another
@@ -378,7 +359,7 @@ namespace MakeEveryDayRecount.Map
         /// <returns></returns>
         public Prop VerifyInteractable(Point playerFacing)
         {
-            foreach (GameObject obj in _itemsInRoom)
+            foreach (Prop obj in _itemsInRoom)
             {
                 if (obj is Prop prop)
                 {

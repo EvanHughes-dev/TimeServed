@@ -74,11 +74,14 @@ namespace MakeEveryDayRecount
         {
             // Set default window size to half the screen size
             _graphics.PreferredBackBufferWidth =
-                GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2;
+                GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
             _graphics.PreferredBackBufferHeight =
-                GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2;
-            _graphics.ApplyChanges();
+                GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
 
+            _graphics.HardwareModeSwitch = true;
+            _graphics.IsFullScreen = true;
+
+            _graphics.ApplyChanges();
 
             //Initialize button lists
             pauseButtons = new List<Button>();
@@ -172,7 +175,7 @@ namespace MakeEveryDayRecount
 
             // "Point" sampling means that our chunky pixels won't get blurred
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-            
+
             switch (_state)
             {
                 case GameState.Menu:
