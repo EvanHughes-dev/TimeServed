@@ -104,8 +104,6 @@ namespace MakeEveryDayRecount
             GlobalDebug.Initialize();
             _debugModes[0] = new PlayerDebug(_gameplayManager);
             _debugModes[1] = new MapDebug(_gameplayManager);
-            GlobalDebug.AddObject("Map offset", () => MapUtils.WorldToScreen());
-
             //Load buttons
             LoadButtons();
         }
