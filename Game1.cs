@@ -219,7 +219,7 @@ namespace MakeEveryDayRecount
                     DisplayDebug();
                     break;
             }
-            _spriteBatch.Draw(AssetManager.CursorTexture, new Rectangle(InputManager.GetMousePosition(), new Point(64, 64)), Color.White);
+            _spriteBatch.Draw(AssetManager.CursorTexture, new Rectangle(InputManager.GetMousePosition()-new Point(32,32), new Point(64, 64)), Color.White );
             //End the sprite batch
             _spriteBatch.End();
 
