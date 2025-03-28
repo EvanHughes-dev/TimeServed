@@ -59,6 +59,12 @@ namespace MakeEveryDayRecount.Managers
         /// An array of all camera textures
         /// </summary>
         public static Texture2D[] Cameras { get; private set; }
+
+        /// <summary>
+        /// Get the current cursor texture
+        /// </summary>
+        public static Texture2D CursorTexture { get; private set; }
+
         /// <summary>
         /// An array of all box textures
         /// </summary>
@@ -82,7 +88,7 @@ namespace MakeEveryDayRecount.Managers
                 content.Load<Texture2D>("Items/wireCutters"),
                 content.Load<Texture2D>("Items/hook"),
                 content.Load<Texture2D>("Items/hookAndRope"),
-                
+
             };
             CameraTextures = new Texture2D[]
             {
@@ -126,6 +132,8 @@ namespace MakeEveryDayRecount.Managers
             Boxes = new Texture2D[]{
                 content.Load<Texture2D>("Items/Box")
             };
+
+            CursorTexture = content.Load<Texture2D>("UI/Mouse");
 
             TileSize = new Point(TileMap[0].Width, TileMap[0].Height);
         }

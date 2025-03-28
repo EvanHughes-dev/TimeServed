@@ -92,5 +92,20 @@ namespace MakeEveryDayRecount.Players.InventoryFiles
             _selectedSpace?.DeselectItem();
             _selectedSpace = inventorySpace;
         }
+
+        /// <summary>
+        /// Clear the player's inventory
+        /// </summary>
+        public void ClearInventory()
+        {
+            _contents.Clear();
+            foreach (InventorySpace space in _inventoryUI)
+            {
+                space.ReplaceItem(null);
+                space.DeselectItem();
+            }
+
+            SelectedItem = null;
+        }
     }
 }
