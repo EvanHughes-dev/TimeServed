@@ -116,7 +116,7 @@ namespace MakeEveryDayRecount.Managers
 
         public static void LoadContent(ContentManager content)
         {
-           
+
             //LOAD PLAYER ASSETS
 
             PlayerTexture = content.Load<Texture2D>("Player/player");
@@ -143,26 +143,26 @@ namespace MakeEveryDayRecount.Managers
             DebugWalkableTile = content.Load<Texture2D>("DebugAssets/WALKABLE");
             DebugNotWalkableTile = content.Load<Texture2D>("DebugAssets/NOT_WALKABLE");
 
-            
-           //LOAD UI ASSETS
 
-           InventoryBoxes = new Texture2D[]
-            {
+            //LOAD UI ASSETS
+
+            InventoryBoxes = new Texture2D[]
+             {
                 content.Load<Texture2D>("Player/Inventory/InventoryBox_idle"),
                 content.Load<Texture2D>("Player/Inventory/InventoryBox_hover"),
                 content.Load<Texture2D>("Player/Inventory/InventoryBox_selected")
-            };
+             };
 
             DefaultButton = content.Load<Texture2D>("UI/DefaultButton");
             CameraSight = content.Load<Texture2D>("UI/UI_cameraSight");
             CursorStates = new Texture2D[]
             {
                 content.Load<Texture2D>("UI/ui_cursor"),
-                content.Load<Texture2D>("UI/ui_cursorHovered") 
+                content.Load<Texture2D>("UI/ui_cursorHover")
             };
 
             //LOAD PROP ASSETS
-            
+
             PropTextures = new Texture2D[]
             {
                 content.Load<Texture2D>("Items/idCard"),
@@ -170,7 +170,7 @@ namespace MakeEveryDayRecount.Managers
                 content.Load<Texture2D>("Items/wireCutters"),
                 content.Load<Texture2D>("Items/hook"),
                 content.Load<Texture2D>("Items/hookAndRope"),
-                
+
             };
             CameraTextures = new Texture2D[]
             {
@@ -180,7 +180,7 @@ namespace MakeEveryDayRecount.Managers
             Boxes = new Texture2D[]{
                 content.Load<Texture2D>("Items/Box")
             };
-            
+
             //FONT STUFF
             Arial20 = content.Load<SpriteFont>("Fonts/Arial20");
 
