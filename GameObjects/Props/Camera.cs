@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -50,8 +51,10 @@ namespace MakeEveryDayRecount.GameObjects.Props
 
         public void Update(float deltaTime)
         {
+            //TimeSpan startTime = DateTime.Now.TimeOfDay;
             //Add a check to see if there's a box directly in front of the camera, and if so don't check any of the rays
-            CheckRay(new Vector2(5, 2));
+            CheckRay(new Vector2(8, 3));
+            //Debug.WriteLine(DateTime.Now.TimeOfDay - startTime);
         }
 
         public void Draw(SpriteBatch sb)
@@ -74,8 +77,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
 
         }
 
-
-
+        /**
         private void CheckRay(Vector2 ray)
         {
 
@@ -83,84 +85,53 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //Step along that line in small intervals, checking what tile you're over at every step
             float dx = ray.X;
             float dy = ray.Y;
-            //This is a constant added to all the calculations. We find it at the beginning of the loop
-            float c;
             //error is the slope error. We assume it starts exactly right
             float error = 0;
             int y = 0;
 
-            
-            //If the line is in an up or down octet
-            if (Math.Abs(dy) > Math.Abs(dx))
+            //All this is old.Take this out before I make the pull request
+            for (int x = 0; x <= ray.X; x++)
             {
-                throw new NotImplementedException("We can't handle up/down lines yet");
+                //Add the current point to the line
+                //This first time this runs, this will always be the raybase
+                _watchedTiles.Add(new Point(x + _rayBase.X, y + _rayBase.Y));
+                //Debug.WriteLine("Added " + (x + _rayBase.X) + ", " + (y + _rayBase.Y));
+
+                //Then check error for the next point along
+                //Debug.WriteLine("Evaluated: " + ((_rayBase.Y * ray.X) + ((x) * ray.Y) - ((y + 0.5) * ray.X)));
+                error = error + (ray.Y / ray.X) * (x - _rayBase.X) + _rayBase.Y  - y;
+
+                //And figure out if it should go up or not
+                //Debug.WriteLine("Error is: " + error);
+                if (error >= 0.5)
+                {
+                    error = error - 1;
+                    y = y + 1;
+                }
+
+                //if (error > 1)
+                //{
+                //    y = y + 1;
+                //    error = error - 1;
+                //}
+                //if (error == error + 2 * dy)
+                //{
+                //    break;
+                //}
             }
-            else
+        }
+        **/
+
+        private void CheckRay(Vector2 ray)
+        {
+            for (int x = _rayBase.X; x <= _rayBase.X + ray.X; x++)
             {
-                //If the line is going from right to left, we switch the start and end point so it can be drawn left to right
-                if (dx < 0)
-                {
-                    _rayBase.X = _rayBase.X + (int)dx;
-                    _rayBase.Y = _rayBase.Y + (int)dy;
-
-                    dx = dx * -1;
-                    dy = dy * -1;
-                }
-                //If Y is decreasing
-                if (dy < 0)
-                {
-                    throw new NotImplementedException("We can't handle decreasing Y yet");
-                }
-
-                //Now that we're ready, we can calculate the constant that gets added to every equation
-                c = (2 * dy) - dx;
-                //pretend that X and Y both start at 0 while we're drawing the line
-                //We add offsets later to correct this
-                for (int x = 0; x <= dx; x++)
-                {
-                    //Add the current point to the line
-                    _watchedTiles.Add(new Point(x + _rayBase.X, y + _rayBase.Y));
-                    Debug.WriteLine("Added " + (x + _rayBase.X) + ", " + (y + _rayBase.Y));
-
-                    Debug.WriteLine($"Calculated {2 * dy * (x )} - {2 * dx * y} + {c} = {(2 * dy * (x )) - (2 * dx * y) + c}");
-                    //Now look at the next point along and see if it should go up or not
-                    if ((2*dy*(x)) - (2*dx*y) + c < 0)
-                    {
-                        y += 1;
-                    }
-                }
+                //y = mx + b
+                double yValue = (ray.Y / ray.X) * (x-_rayBase.X) + _rayBase.Y;
+                int yCoord;
+                yCoord = (int)Math.Round(yValue);
+                _watchedTiles.Add( new Point(x, yCoord) );
             }
-
-            //All this is old. Take this out before I make the pull request
-            //for (int x = 0; x <= ray.X; x++)
-            //{
-            //    //Add the current point to the line
-            //    //This first time this runs, this will always be the raybase
-            //    _watchedTiles.Add(new Point(x + _rayBase.X, y + _rayBase.Y));
-            //    Debug.WriteLine("Added " + (x + _rayBase.X) + ", " + (y + _rayBase.Y) );
-
-            //    //Then check error for the next point along
-            //    //Debug.WriteLine("Evaluated: " + ((_rayBase.Y * ray.X) + ((x) * ray.Y) - ((y + 0.5) * ray.X)));
-            //    error = error + (y * ray.X) + ((x + 1) * ray.Y) - (y * ray.X);
-
-            //    //And figure out if it should go up or not
-            //    Debug.WriteLine("Error is: " + error);
-            //    if (error >= 0.5)
-            //    {
-            //        error = error - 1;
-            //        y = y + 1;
-            //    }
-
-            //    //if (error > 1)
-            //    //{
-            //    //    y = y + 1;
-            //    //    error = error - 1;
-            //    //}
-            //    //if (error == error + 2 * dy)
-            //    //{
-            //    //    break;
-            //    //}
-            //}
         }
 
         private void LookForPlayer()
