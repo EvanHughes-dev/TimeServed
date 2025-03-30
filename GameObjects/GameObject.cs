@@ -11,7 +11,6 @@ namespace MakeEveryDayRecount.GameObjects
         /// </summary>
         public Point Location { get; protected set; }
         public Texture2D Sprite { get; private set; }
-
         public GameObject(Point location, Texture2D sprite)
         {
             Location = location;

@@ -228,7 +228,7 @@ namespace MakeEveryDayRecount.Players
         /// Draws the player in the center of the screen
         /// </summary>
         /// <param name="sb">The instance of spritebatch to be used to draw the player</param>
-        public void Draw(SpriteBatch sb, Point screenSize)
+        public void Draw(SpriteBatch sb)
         {
 
             sb.Draw(
@@ -240,7 +240,7 @@ namespace MakeEveryDayRecount.Players
 
             //Draw the inventory. If the player were to ever overlap the inventory it will disappear behind it
             //Because nothing in the game should be drawn on top of the UI
-            _inventory.Draw(sb, screenSize);
+            _inventory.Draw(sb, MapUtils.ScreenSize);
         }
 
         /// <summary>
@@ -283,10 +283,9 @@ namespace MakeEveryDayRecount.Players
             return new Rectangle(
                 new Point(
                     _playerSize.X * (int)_playerCurrentDirection,
-                    _playerSize.Y * _animationFrame + (_animationFrame != 0 ? 1 : 0)
-                // Add the one to offset to the right tile. Otherwise you get 1 pixel from the image above
+                    _playerSize.Y * _animationFrame
                 ),
-                _playerSize + (_animationFrame != 0 ? new Point(0, -1) : Point.Zero)
+                _playerSize
             );
         }
 
@@ -379,14 +378,26 @@ namespace MakeEveryDayRecount.Players
         }
 
         /// <summary>
-        /// Release the vox the player is holding
+        /// Release the box the player is holding
         /// </summary>
         private void DropBox()
         {
-            _currentHeldBox.DropBox();
+            if(HoldingBox)
+             _currentHeldBox.DropBox();
             _currentHeldBox = null;
         }
 
         #endregion
+
+        /// <summary>
+        /// Reset player to default states
+        /// </summary>
+        public void ClearStates()
+        {
+            _playerCurrentDirection = Direction.Down;
+            _playerState = PlayerState.Standing;
+            DropBox();
+            _inventory.ClearInventory();
+        }
     }
 }

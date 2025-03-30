@@ -52,6 +52,8 @@ namespace MakeEveryDayRecount.Managers
         /// <param name="level">Level for which background music is being played</param>
         public static void PlayBGM(int level)
         {
+            if (MediaPlayer.State == MediaState.Playing)
+                MediaPlayer.Stop();
             MediaPlayer.Play(BackgroundMusic[level - 1]);
             PlayingMusic = true;
         }

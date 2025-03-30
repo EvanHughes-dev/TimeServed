@@ -80,14 +80,14 @@ namespace MakeEveryDayRecount
             _debugModes = new BaseDebug[2];
 
             //Initialize button lists
-            pauseButtons = new List<Button>();
-            menuButtons = new List<Button>();
+        
             InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.MainMenu;
             InterfaceManager.gameStateChange += SwitchState;
             InterfaceManager.exitGame += ExitGame;
+
+            ReplayManager.Initialize();
             //Set initial GameState
             _state = GameState.Menu;
-
             base.Initialize();
         }
 
@@ -114,7 +114,8 @@ namespace MakeEveryDayRecount
 
         protected override void Update(GameTime gameTime)
         {
-            InputManager.Update();
+            if (_state != GameState.Playback)
+                InputManager.Update();
 
             switch (_state)
             {
@@ -134,13 +135,23 @@ namespace MakeEveryDayRecount
                 case GameState.Level:
                     //TODO: On level end
                     //_state = GameState.Cutscene;
-                    _gameplayManager.Update(gameTime);
 
                     if (InputManager.GetKeyPress(Keys.Escape))
                     {
                         _state = GameState.Pause;
                         SoundManager.PauseBGM();
                         InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.PauseMenu;
+                        // Don't call anything after the game has paused
+                        break;
+                    }
+
+                    _gameplayManager.Update(gameTime);
+                    // Save the current state of the keyboard
+                    ReplayManager.SaveState();
+                    if (InputManager.GetKeyPress(Keys.Tab))
+                    {
+                        ReplayManager.SaveData(1, 1);
+                        _state = GameState.Playback;
                     }
 
                     break;
@@ -154,11 +165,26 @@ namespace MakeEveryDayRecount
                     break;
 
                 case GameState.Playback:
-                    //When playback is finished
-                    //_state = GameState.Menu;
-                    break;
+                    // If the replay has not been started yet, start the replay
+                    // This will auto assign the first frame of input and allow the
+                    // input manager to work. For rest of the frames, call the next 
+                    // frame of the ReplayManager and check if you have read all frames
+                    if (!ReplayManager.PlayingReplay)
+                    {
+                        ReplayManager.BeginReplay();
+                        _gameplayManager.ReplayMode();
+                    }
+                    else if (!ReplayManager.NextFrame())
+                    {
+                        _state = GameState.Menu;
+                        ReplayManager.EndReplay();
+                        InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.MainMenu;
 
-                default:
+                    }
+
+                    InputManager.ReplayUpdate();
+                    _gameplayManager.Update(gameTime);
+
                     break;
             }
 
@@ -177,26 +203,27 @@ namespace MakeEveryDayRecount
             // "Point" sampling means that our chunky pixels won't get blurred
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
 
+
             switch (_state)
             {
                 case GameState.Menu:
                     // DrawMenu(_spriteBatch);
                     break;
                 case GameState.Pause:
-                    _gameplayManager.Draw(_spriteBatch, ScreenSize);
+                    //TODO: Blur the gameplay in the background.
+
+                    _gameplayManager.Draw(_spriteBatch);
                     DisplayDebug();
                     break;
                 case GameState.Level:
-                    CheckKeyboardInput();
-                    //TODO: Blur the gameplay in the background.
-                    _gameplayManager.Draw(_spriteBatch, ScreenSize);
+                    _gameplayManager.Draw(_spriteBatch);
                     DisplayDebug();
                     break;
                 case GameState.Cutscene:
                     break;
                 case GameState.Playback:
-                    break;
-                default:
+                    _gameplayManager.Draw(_spriteBatch);
+                    DisplayDebug();
                     break;
             }
 
