@@ -7,9 +7,7 @@ using System;
 namespace MakeEveryDayRecount.Managers
 {
     delegate void GameStateChange(GameState gameState);
-    delegate void HoverChange(UserMouse.MouseHover newHover);
-
-
+    delegate void ExitGame();
     /// <summary>
     /// A manager that controls all UI features and creates all UI screen
     /// </summary>
@@ -25,30 +23,66 @@ namespace MakeEveryDayRecount.Managers
             SettingsMenu,
         }
 
+        /// <summary>
+        /// Get and set the current menu mode
+        /// </summary>
         public static MenuModes CurrentMenu { get; set; }
 
         private static Menu _mainMenu;
         private static Menu _pauseMenu;
         private static Menu _levelMenu;
         public static event GameStateChange gameStateChange;
+        public static event ExitGame exitGame;
         private static UserMouse _mouse;
 
+
+        /// <summary>
+        /// Initialize all needed menus for the game
+        /// </summary>
         public static void Initialize()
         {
 
             _mouse = new UserMouse();
-            Rectangle menuPlayRect = new Rectangle(400, 200, 300, 100);
-            Button menuPlay = new Button(menuPlayRect, AssetManager.DefaultButton, AssetManager.DefaultButton, true);
-            menuPlay.OnClick += GameStateChange(GameState.Level);
-            menuPlay.OnClick += MenuChange(MenuModes.Level);
-            List<Button> buttons = new List<Button>
-            {
-                menuPlay
-            };
 
-            foreach (Button btn in buttons)
-                btn.OnHoverChange += HoverModeChange;
-            _mainMenu = new Menu(null, buttons);
+            {
+                Rectangle menuPlayRect = new Rectangle(400, 200, 300, 100);
+                Button menuPlay = new Button(menuPlayRect, AssetManager.DefaultButton, AssetManager.DefaultButton, true, "Play", AssetManager.Arial20);
+                menuPlay.OnClick += GameStateChange(GameState.Level);
+                menuPlay.OnClick += MenuChange(MenuModes.Level);
+
+                Rectangle menuQuitRect = new Rectangle(400, 340, 100, 40);
+                Button menuQuit = new Button(menuQuitRect, AssetManager.DefaultButton, AssetManager.DefaultButton, true, "Exit", AssetManager.Arial20);
+                menuQuit.OnClick += ExitGame();
+
+                List<Button> buttons = new List<Button>
+                {
+                    menuPlay,
+                    menuQuit
+                };
+
+                _mainMenu = new Menu(null, buttons);
+            }
+            {
+                Rectangle pauseContinueRect = new Rectangle(200, 200, 400, 100);
+                Button pauseContinue = new Button(pauseContinueRect, AssetManager.DefaultButton, AssetManager.DefaultButton, true, "Resume", AssetManager.Arial20);
+                pauseContinue.OnClick += GameStateChange(GameState.Level);
+                pauseContinue.OnClick += MenuChange(MenuModes.Level);
+
+                Rectangle pauseQuitRect = new Rectangle(200, 440, 400, 100);
+                Button pauseQuit = new Button(pauseQuitRect, AssetManager.DefaultButton, AssetManager.DefaultButton, true, "Exit", AssetManager.Arial20);
+                pauseQuit.OnClick += GameStateChange(GameState.Menu);
+                pauseQuit.OnClick += MenuChange(MenuModes.MainMenu);
+
+                List<Button> buttons = new List<Button>
+                {
+                    pauseContinue,
+                    pauseQuit
+                };
+
+                _pauseMenu = new Menu(null, buttons);
+            }
+
+
         }
 
         /// <summary>
@@ -69,6 +103,8 @@ namespace MakeEveryDayRecount.Managers
                     _pauseMenu.Update();
                     break;
                 case MenuModes.SettingsMenu:
+                    break;
+                case MenuModes.Level:
                     break;
             }
         }
@@ -93,6 +129,8 @@ namespace MakeEveryDayRecount.Managers
                     _pauseMenu.Draw(sb);
                     break;
                 case MenuModes.SettingsMenu:
+                    break;
+                case MenuModes.Level:
                     break;
             }
 
@@ -126,10 +164,22 @@ namespace MakeEveryDayRecount.Managers
         }
 
         /// <summary>
+        /// Called when an exit game button is pressed
+        /// </summary>
+        /// <returns>Action to exit game</returns>
+        private static Action ExitGame()
+        {
+            return () =>
+            {
+                exitGame?.Invoke();
+            };
+        }
+
+        /// <summary>
         /// Update the hover state of the mouse
         /// </summary>
         /// <param name="newState">New hover state of the mouse</param>
-        private static void HoverModeChange(UserMouse.MouseHover newState)
+        public static void HoverModeChange(UserMouse.MouseHover newState)
         {
             _mouse.UpdateHoverState(newState);
         }

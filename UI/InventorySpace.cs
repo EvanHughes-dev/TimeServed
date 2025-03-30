@@ -77,6 +77,7 @@ namespace MakeEveryDayRecount.UI
                 _spaceSelected = true;
                 _isInteractive = false;
             }
+            base.Update();
         }
 
         /// <summary>

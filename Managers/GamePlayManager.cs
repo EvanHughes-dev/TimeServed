@@ -51,9 +51,6 @@ namespace MakeEveryDayRecount.Managers
         {
             //Update Player
             PlayerObject.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
-
-            //Check for pause
-            
         }
 
         /// <summary>

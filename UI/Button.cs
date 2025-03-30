@@ -18,8 +18,9 @@ namespace MakeEveryDayRecount.UI
         private bool _isHovered;
         protected bool _isInteractive;
 
+        private Text _displayText;
+
         public event Action OnClick;
-        public event HoverChange OnHoverChange;
         //Properties
 
         /// <summary>
@@ -53,15 +54,32 @@ namespace MakeEveryDayRecount.UI
         /// <param name="image">Image the button displays when not hovered over</param>
         /// <param name="hoverImage">Image the button displays when hovered over</param>
         /// <param name="isHoverable">Boolean determining if the button is active (can be hovered) or not</param>
+        /// <param name="textElement">Text to display on button</param>
+        public Button(Rectangle rectangle, Texture2D image, Color color, Texture2D hoverImage, bool isHoverable, Text textElement) : base(rectangle, color)
+        {
+            _image = image;
+            _hoverImage = hoverImage;
+            _isInteractive = isHoverable;
+            _isHovered = false;
+            _displayText = textElement;
+        }
+
+        /// <summary>
+        /// Creates a button with a rectangle, color, image, hover image and is hoverable state without a text field
+        /// </summary>
+        /// <param name="rectangle">Rectangle corresponding to the position of the button</param>
+        /// <param name="color">Color of the button</param>
+        /// <param name="image">Image the button displays when not hovered over</param>
+        /// <param name="hoverImage">Image the button displays when hovered over</param>
+        /// <param name="isHoverable">Boolean determining if the button is active (can be hovered) or not</param>
         public Button(Rectangle rectangle, Texture2D image, Color color, Texture2D hoverImage, bool isHoverable) : base(rectangle, color)
         {
             _image = image;
             _hoverImage = hoverImage;
             _isInteractive = isHoverable;
             _isHovered = false;
-
+            _displayText = null;
         }
-
         /// <summary>
         /// Creates a button with a rectangle, image, hover image and is hoverable state. Color defaulted to white
         /// </summary> 
@@ -75,6 +93,26 @@ namespace MakeEveryDayRecount.UI
             _hoverImage = hoverImage;
             _isInteractive = isHoverable;
             _isHovered = false;
+            _displayText = null;
+        }
+
+        /// <summary>
+        /// Creates a button with a rectangle, image, hover image and is hoverable state. Color defaulted to white
+        /// </summary> 
+        /// <param name="rectangle">Rectangle corresponding to the position of the button</param>
+        /// <param name="image">Image the button displays when not hovered over</param>
+        /// <param name="hoverImage">Image the button displays when hovered over</param>
+        /// <param name="isHoverable">Boolean determining if the button is active (can be hovered) or not</param>
+        public Button(Rectangle rectangle, Texture2D image, Texture2D hoverImage, bool isHoverable, string text, SpriteFont sf) : base(rectangle)
+        {
+            _image = image;
+            _hoverImage = hoverImage;
+            _isInteractive = isHoverable;
+            _isHovered = false;
+            _displayText = null;
+
+            Vector2 textPoint = rectangle.Location.ToVector2() + ((rectangle.Size.ToVector2() - sf.MeasureString(text)) / 2);
+            _displayText = new Text(textPoint.ToPoint(), text, sf);
         }
 
         //Methods
@@ -89,6 +127,8 @@ namespace MakeEveryDayRecount.UI
                 sb.Draw(_hoverImage, DisplayRect, Color.White);
             else
                 sb.Draw(_image, DisplayRect, Color.White);
+
+            _displayText?.Draw(sb);
         }
 
         /// <summary>
@@ -96,24 +136,22 @@ namespace MakeEveryDayRecount.UI
         /// </summary>
         public virtual void Update()
         {
-            if (Hovered && Active && !_isHovered)
+            if (Hovered && Active)
             {
                 _isHovered = true;
-                OnHoverChange?.Invoke(UserMouse.MouseHover.Hovered);
+                InterfaceManager.HoverModeChange(UserMouse.MouseHover.Hovered);
             }
             else if (!Hovered && _isHovered)
             {
                 _isHovered = false;
-                OnHoverChange?.Invoke(UserMouse.MouseHover.UnHovered);
+                InterfaceManager.HoverModeChange(UserMouse.MouseHover.UnHovered);
             }
 
             if (_isHovered && InputManager.GetMousePress(MouseButtonState.Left))
             {
-                OnHoverChange?.Invoke(UserMouse.MouseHover.UnHovered);
+                InterfaceManager.HoverModeChange(UserMouse.MouseHover.UnHovered);
                 OnClick?.Invoke();
             }
-
-
         }
     }
 }

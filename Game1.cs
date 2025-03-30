@@ -84,6 +84,7 @@ namespace MakeEveryDayRecount
             menuButtons = new List<Button>();
             InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.MainMenu;
             InterfaceManager.gameStateChange += SwitchState;
+            InterfaceManager.exitGame += ExitGame;
             //Set initial GameState
             _state = GameState.Menu;
 
@@ -109,9 +110,6 @@ namespace MakeEveryDayRecount
             _debugModes[1] = new MapDebug(_gameplayManager);
 
             InterfaceManager.Initialize();
-
-            //Load buttons
-            LoadButtons();
         }
 
         protected override void Update(GameTime gameTime)
@@ -129,6 +127,7 @@ namespace MakeEveryDayRecount
                     {
                         _state = GameState.Level;
                         SoundManager.ResumeBGM();
+                        InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.Level;
                     }
                     break;
 
@@ -141,6 +140,7 @@ namespace MakeEveryDayRecount
                     {
                         _state = GameState.Pause;
                         SoundManager.PauseBGM();
+                        InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.PauseMenu;
                     }
 
                     break;
@@ -185,7 +185,6 @@ namespace MakeEveryDayRecount
                 case GameState.Pause:
                     _gameplayManager.Draw(_spriteBatch, ScreenSize);
                     DisplayDebug();
-                    DrawPause(_spriteBatch);
                     break;
                 case GameState.Level:
                     CheckKeyboardInput();
@@ -248,102 +247,12 @@ namespace MakeEveryDayRecount
                 _debugState = DebugState.Room;
         }
 
-        private void DisplayPauseMenu(SpriteBatch sb) { }
-
-        private void DisplayMainMenu(SpriteBatch sb) { }
-
         /// <summary>
-        /// Creates all buttons and fills their respective lists them with them.
+        /// Exit the game when button is clicked
         /// </summary>
-        private void LoadButtons()
+        private void ExitGame()
         {
-            //Load button textures
-            defaultButtonTexture = AssetManager.DefaultButton;
-            //... and more, when we have them
-
-            //Fill pause buttons list with buttons
-            Rectangle pauseContinueRect = new Rectangle(200, 200, 400, 100);
-            Button pauseContinue = new Button(pauseContinueRect, defaultButtonTexture, defaultButtonTexture, true);
-            //pauseContinue.OnClick += MakeSwitchStateAction(GameState.Level);
-            pauseContinue.OnClick += MakeResumeMusicAction();
-            pauseButtons.Add(pauseContinue);
-
-            Rectangle pauseLastCheckpointRect = new Rectangle(200, 320, 400, 100);
-            Button pauseLastCheckpoint = new Button(pauseLastCheckpointRect, defaultButtonTexture, defaultButtonTexture, true);
-            //pauseLastCheckpoint += the method that brings you back to your last checkpoint
-            pauseButtons.Add(pauseLastCheckpoint);
-
-            Rectangle pauseQuitRect = new Rectangle(200, 440, 400, 100);
-            Button pauseQuit = new Button(pauseQuitRect, defaultButtonTexture, defaultButtonTexture, true);
-            //pauseQuit.OnClick += MakeSwitchStateAction(GameState.Menu);
-            pauseButtons.Add(pauseQuit);
-
-            //Fill menu buttons list with buttons
-            Rectangle menuPlayRect = new Rectangle(400, 200, 300, 100);
-            Button menuPlay = new Button(menuPlayRect, defaultButtonTexture, defaultButtonTexture, true);
-            //menuPlay.OnClick += MakeSwitchStateAction(GameState.Level);
-            menuPlay.OnClick += MakePlayMusicAction(_gameplayManager.Level);
-            menuButtons.Add(menuPlay);
-
-            Rectangle menuQuitRect = new Rectangle(400, 340, 100, 40);
-            Button menuQuit = new Button(menuQuitRect, defaultButtonTexture, defaultButtonTexture, true);
-            menuQuit.OnClick += MakeExitGameAction();
-            menuButtons.Add(menuQuit);
-
-        }
-
-        private void CheckButtonClicks(List<Button> list)
-        {
-
-            for (int i = 0; i < list.Count; i++)
-            {
-                //Invoke the button's on click effect if it has been clicked
-                list[i].Update();
-            }
-        }
-
-        /// <summary>
-        /// Draws the main menu.
-        /// </summary>
-        /// <param name="sb">sprite batch used to draw</param>
-        private void DrawMenu(SpriteBatch sb)
-        {
-            //Draw the buttons
-            for (int i = 0; i < menuButtons.Count; i++)
-            {
-                menuButtons[i].Draw(sb);
-            }
-        }
-
-        /// <summary>
-        /// Draws the pause menu.
-        /// </summary>
-        /// <param name="sb">sprite batch used to draw</param>
-        private void DrawPause(SpriteBatch sb)
-        {
-            //Draw the buttons
-            for (int i = 0; i < pauseButtons.Count; i++)
-            {
-                pauseButtons[i].Draw(sb);
-            }
-        }
-
-        /// <summary>
-        /// Draws the cutscene.
-        /// </summary>
-        /// <param name="sb">sprite batch used to draw</param>
-        private void DrawCutscene(SpriteBatch sb)
-        {
-
-        }
-
-        /// <summary>
-        /// Draws the playback.
-        /// </summary>
-        /// <param name="sb">sprite batch used to draw</param>
-        private void DrawPlayback(SpriteBatch sb)
-        {
-
+            Exit();
         }
 
         /// <summary>
@@ -353,34 +262,14 @@ namespace MakeEveryDayRecount
         /// <returns>An Action that sets the game state to the provided state when the ACTION is called.</returns>
         public void SwitchState(GameState state)
         {
+            if (state == GameState.Level)
+            {
+                if (SoundManager.PlayingMusic)
+                    SoundManager.ResumeBGM();
+                else
+                    SoundManager.PlayBGM(_gameplayManager.Level);
+            }
             _state = state;
-        }
-
-        /// <summary>
-        /// Creates an Action delegate to quit the game.
-        /// </summary>
-        /// <returns>An Action that quits the game when the ACTION is called.</returns>
-        public Action MakeExitGameAction()
-        {
-            return () => Exit();
-        }
-
-        /// <summary>
-        /// Creates an Action delegate to play music for the current level.
-        /// </summary>
-        /// <returns>An Action that plays music for the current level when the ACTION is called.</returns>
-        public Action MakePlayMusicAction(int level)
-        {
-            return () => SoundManager.PlayBGM(level);
-        }
-
-        /// <summary>
-        /// Creates an Action delegate to resume music.
-        /// </summary>
-        /// <returns>An Action that resumes the music when the ACTION is called.</returns>
-        public Action MakeResumeMusicAction()
-        {
-            return () => SoundManager.ResumeBGM();
         }
     }
 }
