@@ -9,15 +9,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Update="Tiles\testWalkable.png">
+    <None Update="Sprites\Tiles\testWalkable.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Tiles\testWall.png">
+    <None Update="Sprites\Tiles\testWall.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Tiles\void.png">
+    <None Update="Sprites\Tiles\void.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Sprites\Props\" />
   </ItemGroup>
 
 </Project>

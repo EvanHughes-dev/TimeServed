@@ -16,7 +16,16 @@ namespace LevelEditor.Classes.Props
         /// </summary>
         /// <exception cref="NotImplementedException">ALWAYS THROWN.</exception>
         public Camera()
-            : base(null!, default)
+            : base(null!, null)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// UNIMPLEMENTED CLASS. DO NOT USE.
+        /// </summary>
+        /// <exception cref="NotImplementedException">ALWAYS THROWN.</exception>
+        public override Prop Instantiate(Point position)
         {
             throw new NotImplementedException();
         }

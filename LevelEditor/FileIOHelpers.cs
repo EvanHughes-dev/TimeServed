@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.IO;
 using static System.Windows.Forms.LinkLabel;
 using LevelEditor.Classes;
+using LevelEditor.Classes.Props;
 
 namespace LevelEditor
 {
@@ -255,14 +256,57 @@ namespace LevelEditor
         /// Loads a tile from disk given the name of the sprite file in the Tiles folder and whether that tile is walkable.
         /// This method is UNSAFE and MUST be called within a TRY-CATCH!
         /// </summary>
-        /// <param name="spriteName">The name of the sprite file in the Tiles folder, including file extension.</param>
+        /// <param name="spriteName">The name of the sprite file in the Sprites/Tiles folder, including file extension.</param>
         /// <param name="isWalkable">Whether this tile should be allowed to be walked on.</param>
         /// <returns>The loaded tile.</returns>
         public static Tile LoadTile(string spriteName, bool isWalkable)
         {
-            const string TileFolderPath = "./Tiles";
+            const string TileFolderPath = "./Sprites/Tiles";
 
             return new(Image.FromFile(Path.Join(TileFolderPath, spriteName)), isWalkable);
+        }
+
+        /// <summary>
+        /// UNIMPLEMENTED
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public static Camera LoadCamera() => throw new NotImplementedException("CAMERAS ARE NOT IMPLEMENTED YELL AT LEAH");
+
+        /// <summary>
+        /// Loads a door from disk given the name of the sprite file and the necessary data about the door.
+        /// </summary>
+        /// <param name="spriteName">The name of the sprite file in the Sprites/Props folder, including file extension.</param>
+        /// <param name="keyToOpen">The type of key necessary to open this door, if any.</param>
+        /// <param name="facing">The direction that this door is facing (a north-facing door would be placed on a south wall).</param>
+        /// <returns>The loaded door.</returns>
+        public static Door LoadDoor(string spriteName, KeyType keyToOpen, Orientation facing)
+        {
+            // These loaded props are fundamentally positionless -- they aren't in a room!
+            return new Door(keyToOpen, facing, LoadPropSprite(spriteName), null);
+        }
+
+        /// <summary>
+        /// Loads an item from disk given the name of the sprite file and the necessary data about the item.
+        /// </summary>
+        /// <param name="spriteName">The name of the sprite file in the Sprites/Props folder, including file extension.</param>
+        /// <param name="keyType">The type of key that this item is, if any.</param>
+        /// <returns>The loaded item.</returns>
+        public static Item LoadItem(string spriteName, KeyType keyType)
+        {
+            return new Item(keyType, LoadPropSprite(spriteName), null);
+        }
+
+        /// <summary>
+        /// Loads a sprite with a given name from the folder containing the prop sprites.
+        /// </summary>
+        /// <param name="spriteName">The file name of the sprite to load, including file extension (e.g. sprite.png)</param>
+        /// <returns>The loaded image.</returns>
+        private static Image LoadPropSprite(string spriteName)
+        {
+            const string PropFolderPath = "./Sprites/Props";
+
+            return Image.FromFile(Path.Join(PropFolderPath, spriteName));
         }
 
         /// <summary>

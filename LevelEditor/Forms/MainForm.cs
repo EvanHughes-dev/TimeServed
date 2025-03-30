@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using LevelEditor.Classes;
+using LevelEditor.Classes.Props;
 
 namespace LevelEditor
 {
@@ -18,6 +19,12 @@ namespace LevelEditor
         /// </summary>
         public IReadOnlyCollection<Tile> Tiles { get; private set; }
 
+        /// <summary>
+        /// The gospel determining what Props have what corresponding indexes.
+        /// </summary>
+        public IReadOnlyCollection<Prop> Props { get; private set; }
+
+        // The level currently being edited
         private Level _level;
 
         /// <summary>
@@ -92,6 +99,50 @@ namespace LevelEditor
                     ];
 
                 Tiles = tiles.AsReadOnly();
+            }
+            catch (Exception ex)
+            {
+                Tiles = [];
+
+                DialogResult response = MessageBox.Show($"Could not load tiles: {ex.Message}",
+                    "Error",
+                    MessageBoxButtons.AbortRetryIgnore,
+                    MessageBoxIcon.Error);
+
+                switch (response)
+                {
+                    case DialogResult.Abort:
+                        Close();
+                        break;
+
+                    case DialogResult.Retry:
+                        LoadTiles();
+                        break;
+
+                    case DialogResult.Cancel:
+                    case DialogResult.Ignore:
+                        // Do nothing! Assume that it's fine that nothing could be loaded!
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Loads all of the prop sprites and initializes the prop array, displaying a MessageBox
+        /// if loading the props fails.
+        /// </summary>
+        private void LoadProps()
+        {
+            try
+            {
+                Prop[] props = [
+                    // WHAT I WAS LAST WORKING ON: REPLACING THESE CALLS
+                    FileIOHelpers.LoadTile("void.png", false),
+                    FileIOHelpers.LoadTile("testWalkable.png", true),
+                    FileIOHelpers.LoadTile("testWall.png", false)
+                    ];
+
+                Props = props.AsReadOnly();
             }
             catch (Exception ex)
             {
