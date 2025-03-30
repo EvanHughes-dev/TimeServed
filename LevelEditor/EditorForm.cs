@@ -31,6 +31,7 @@ namespace LevelEditor
         /// Gets the palette of tiles the user may select from.
         /// </summary>
         private Tile[,] Palette { get; }
+        private 
 
         /// <summary>
         /// Creates a new EditorForm, editing an existing room.
@@ -95,6 +96,33 @@ namespace LevelEditor
         /// Creates the color selection buttons corresponding with the palette. Should only be run once!
         /// </summary>
         private void CreatePaletteTileBoxes()
+        {
+            // Shortcut variables for the width and height
+            int height = Palette.GetLength(0);
+            int width = Palette.GetLength(1);
+
+            // 5-unit padding on each side and 20-unit padding on the top just happens to look nice
+            Rectangle paletteBounds = PadRectInwards(tabPageTiles.ClientRectangle, 5, 5, 20, 5);
+
+            // Give it 5 units of padding between each button just because it happens to look nice
+            TileBox[,] swatches = GenerateGrid<TileBox>(width, height, paletteBounds, 5, tabPageTiles);
+
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    // We're going to store the color associated with each button in its back color, and then read the back color
+                    //   when the button is clicked. Ideally we would track a color index so we could dramatically reduce the
+                    //   file size of the saved maps, but again that's hard and not necessary
+                    swatches[y, x].Tile = Palette[y, x];
+                    swatches[y, x].Click += Swatch_Click;
+                }
+            }
+        }
+        /// <summary>
+        /// Creates the prop selection buttons corresponding with the &*%*@^(^#_. Should only be run once!
+        /// </summary>
+        private void CreatePropBoxes()
         {
             // Shortcut variables for the width and height
             int height = Palette.GetLength(0);
