@@ -29,7 +29,7 @@ namespace MakeEveryDayRecount
         {
             get
             {
-                MouseState ms = InputManager.CurrentMouseState;
+                Point ms = InputManager.GetMousePosition();
                 return (ms.X >= _rectangle.Left && ms.X <= _rectangle.Right &&
                 ms.Y >= _rectangle.Top && ms.Y <= _rectangle.Bottom);
             }
