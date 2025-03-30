@@ -283,10 +283,9 @@ namespace MakeEveryDayRecount.Players
             return new Rectangle(
                 new Point(
                     _playerSize.X * (int)_playerCurrentDirection,
-                    _playerSize.Y * _animationFrame + (_animationFrame != 0 ? 1 : 0)
-                // Add the one to offset to the right tile. Otherwise you get 1 pixel from the image above
+                    _playerSize.Y * _animationFrame
                 ),
-                _playerSize + (_animationFrame != 0 ? new Point(0, -1) : Point.Zero)
+                _playerSize
             );
         }
 
