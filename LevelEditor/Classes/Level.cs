@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace LevelEditor.Classes
 {
+    /// <summary>
+    /// Represents one full level for the player to play through, with several interconnected rooms.
+    /// </summary>
     public class Level
     {
         /// <summary>
