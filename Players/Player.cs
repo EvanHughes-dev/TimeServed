@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MakeEveryDayRecount.Managers;
 using MakeEveryDayRecount.Players.InventoryFiles;
+using MakeEveryDayRecount.GameObjects.Triggers;
 
 
 namespace MakeEveryDayRecount.Players
@@ -208,6 +209,13 @@ namespace MakeEveryDayRecount.Players
             {
 
                 Location += movement;
+
+                //Check for triggers
+                Trigger trigger = null;
+                trigger = _gameplayManager.Map.CheckTrigger(Location);
+                if (trigger != null)
+                    trigger.Activate(this);
+
                 _readyToMove = false;
                 if (_playerState == PlayerState.Standing)
                     _playerState = PlayerState.Walking;

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using MakeEveryDayRecount.GameObjects.Props;
+using MakeEveryDayRecount.GameObjects.Triggers;
 using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -91,6 +92,11 @@ namespace MakeEveryDayRecount.Managers
         public Prop CheckInteractable(Point playerFacing)
         {
             return _currentRoom.VerifyInteractable(playerFacing);
+        }
+
+        public Trigger CheckTrigger(Point playerPosition)
+        {
+            return _currentRoom.VerifyTrigger(playerPosition);
         }
 
         /// <summary>

@@ -7,6 +7,7 @@ using MakeEveryDayRecount.Map.Tiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Managers;
+using MakeEveryDayRecount.GameObjects.Triggers;
 
 namespace MakeEveryDayRecount.Map
 {
@@ -28,7 +29,8 @@ namespace MakeEveryDayRecount.Map
         Item = 0,
         Camera = 1,
         Box = 2,
-        Door = 3
+        Door = 3,
+        Checkpoint = 4
     }
 
     /// <summary>
@@ -67,6 +69,7 @@ namespace MakeEveryDayRecount.Map
         }
         private Tile[,] _map;
         private List<Prop> _itemsInRoom;
+        private List<Trigger> _triggersInRoom;
         public List<Door> Doors
         { get; private set; }
 
@@ -88,8 +91,12 @@ namespace MakeEveryDayRecount.Map
 
             _map = new Tile[,] { };
             _itemsInRoom = new List<Prop> { };
+            _triggersInRoom = new List<Trigger> { };
             Doors = new List<Door> { };
             ParseData(filePath);
+
+            //SUPER TEST CODE DELETE AT ONCE
+            _triggersInRoom.Add(new Checkpoint(new Point(3, 3), null, 1, 5, 1));
         }
 
         #region  Drawing Logic
@@ -223,6 +230,7 @@ namespace MakeEveryDayRecount.Map
                     *       1 = Camera
                     *       2 = Box
                     *       3 = Door 
+                    *       4 = Checkpoint
                     * 
                     *   if objectType == 0 || objectType == 3
                     *   int keyType
@@ -319,6 +327,11 @@ namespace MakeEveryDayRecount.Map
                         {
                             _itemsInRoom.Add(new Box(new Point(posX, posY), AssetManager.Boxes[propIndex]));
                         }
+                        else if (objectType == ObjectTypes.Checkpoint)
+                        {
+                            //TODO: Properly assign the checkpoint's index, width, and height
+                            _triggersInRoom.Add(new Checkpoint(new Point(posX, posY), null, 1, 1, 1));
+                        }
                         numberOfGameObjects--;
                     }
                 }
@@ -392,6 +405,23 @@ namespace MakeEveryDayRecount.Map
                 {
                     return door;
                 }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Checks if the tile the player is currently standing on is a trigger.
+        /// </summary>
+        /// <param name="playerPosition">Player's current position</param>
+        /// <returns>The trigger the player is standing on, or null if no such trigger exists.</returns>
+        public Trigger VerifyTrigger(Point playerPosition)
+        {
+            foreach (Trigger trigger in _triggersInRoom)
+            {
+                //TODO: scale trigger width to tile size properly
+                if (playerPosition.X >= trigger.Location.X && playerPosition.X < trigger.Location.X + trigger.Width &&
+                    playerPosition.Y >= trigger.Location.Y && playerPosition.Y < trigger.Location.Y + trigger.Height)
+                    return trigger;
             }
             return null;
         }
