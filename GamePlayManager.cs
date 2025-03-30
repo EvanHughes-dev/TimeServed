@@ -47,7 +47,7 @@ namespace MakeEveryDayRecount
             Map = new MapManager(this);
             OnPlayerUpdate?.Invoke(PlayerObject);
 
-            testCamera = new Camera(new Point(5, 0), AssetManager.PropTextures[4], new Vector2(5, 4), 0.1f);
+            testCamera = new Camera(new Point(12, 0), AssetManager.PropTextures[4], new Vector2(5, 4), 0.1f);
         }
 
         public void Update(GameTime gameTime)

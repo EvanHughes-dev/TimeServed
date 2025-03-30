@@ -53,7 +53,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         {
             //TimeSpan startTime = DateTime.Now.TimeOfDay;
             //Add a check to see if there's a box directly in front of the camera, and if so don't check any of the rays
-            CheckRay(new Vector2(8, 3));
+            CheckRay(new Vector2(-5, 3));
             //Debug.WriteLine(DateTime.Now.TimeOfDay - startTime);
         }
 
@@ -78,7 +78,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         }
 
         /**
-        private void CheckRay(Vector2 ray)
+        private void ExperimentalCheckRay(Vector2 ray)
         {
 
             //create a parametric line using the point and the vector
@@ -124,13 +124,35 @@ namespace MakeEveryDayRecount.GameObjects.Props
 
         private void CheckRay(Vector2 ray)
         {
-            for (int x = _rayBase.X; x <= _rayBase.X + ray.X; x++)
+            float dx = ray.X;
+            float dy = ray.Y;
+            int y = 0;
+
+            if (Math.Abs(dy) > Math.Abs(dx))
             {
-                //y = mx + b
-                double yValue = (ray.Y / ray.X) * (x-_rayBase.X) + _rayBase.Y;
-                int yCoord;
-                yCoord = (int)Math.Round(yValue);
-                _watchedTiles.Add( new Point(x, yCoord) );
+                throw new NotImplementedException("We can't handle up/down lines yet");
+            }
+            else
+            {
+                //If the line is going from right to left, we switch the start and end point so it can be drawn left to right
+                if (dx < 0)
+                {
+                    _rayBase.X = _rayBase.X + (int)dx;
+                    _rayBase.Y = _rayBase.Y + (int)dy;
+
+                    dx = dx * -1;
+                    dy = dy * -1;
+                    _watchedTiles.Add(_rayBase);
+                }
+
+                for (int x = _rayBase.X; x <= _rayBase.X + ray.X; x++)
+                {
+                    //y = mx + b
+                    double yValue = (ray.Y / ray.X) * (x - _rayBase.X) + _rayBase.Y;
+                    int yCoord;
+                    yCoord = (int)Math.Round(yValue);
+                    _watchedTiles.Add(new Point(x, yCoord));
+                }
             }
         }
 
