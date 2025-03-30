@@ -2,6 +2,8 @@
 // 2/9/25
 // The MainForm, a small window with a "load file" button, height and width text boxes, and a "create new" button. Creates a new EditorForm after either button is clicked
 
+using LevelEditor.Classes;
+
 namespace LevelEditor
 {
     /// <summary>
