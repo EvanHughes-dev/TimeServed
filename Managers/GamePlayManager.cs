@@ -1,10 +1,6 @@
-﻿using System;
-using MakeEveryDayRecount.Map;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Players;
-using Microsoft.Xna.Framework.Input;
-
 
 namespace MakeEveryDayRecount.Managers
 {
@@ -37,7 +33,7 @@ namespace MakeEveryDayRecount.Managers
         public OnPlayerUpdate OnPlayerUpdate;
 
         /// <summary>
-        /// Initialize GameplayManager
+        /// Initialize GameplayManager to create the player and map
         /// </summary>
         public GameplayManager(Point screenSize)
         {
@@ -52,22 +48,32 @@ namespace MakeEveryDayRecount.Managers
             //Update Player
             PlayerObject.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
 
-            //Check for pause
-            
+            //Update MapManager
+
         }
 
         /// <summary>
         /// Draws the map and the player.
         /// </summary>
         /// <param name="sb">sprite batch used to draw</param>
-        /// <exception cref="NotImplementedException"></exception>
-        public void Draw(SpriteBatch sb, Point screenSize)
+        public void Draw(SpriteBatch sb)
         {
             //Draw the map
             Map.Draw(sb);
 
             //Draw the player
-            PlayerObject.Draw(sb, screenSize);
+            PlayerObject.Draw(sb);
+        }
+
+        /// <summary>
+        /// Enter replay mode
+        /// </summary>
+        public void ReplayMode()
+        {
+            Level = 1;
+            Map.ChangeLevel();
+            PlayerObject.ChangeRoom(new Point(5, 5));
+            PlayerObject.ClearStates();
         }
     }
 }

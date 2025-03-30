@@ -158,7 +158,7 @@ namespace MakeEveryDayRecount.Managers
             CursorStates = new Texture2D[]
             {
                 content.Load<Texture2D>("UI/ui_cursor"),
-                content.Load<Texture2D>("UI/ui_cursorHovered") 
+                content.Load<Texture2D>("UI/ui_cursorHover") 
             };
 
             //LOAD PROP ASSETS
