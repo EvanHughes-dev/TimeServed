@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using MakeEveryDayRecount.Managers;
+using MakeEveryDayRecount.UI;
 
 namespace MakeEveryDayRecount
 {
@@ -62,12 +63,7 @@ namespace MakeEveryDayRecount
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
             Window.AllowUserResizing = true; // Enable user resizing
-
-
-            _debugState = DebugState.None;
-
-            _debugModes = new BaseDebug[2];
-
+            IsMouseVisible = false;
         }
 
         protected override void Initialize()
@@ -79,11 +75,15 @@ namespace MakeEveryDayRecount
                 GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2;
             _graphics.ApplyChanges();
 
+            _debugState = DebugState.None;
+
+            _debugModes = new BaseDebug[2];
 
             //Initialize button lists
             pauseButtons = new List<Button>();
             menuButtons = new List<Button>();
-
+            InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.MainMenu;
+            InterfaceManager.gameStateChange += SwitchState;
             //Set initial GameState
             _state = GameState.Menu;
 
@@ -97,13 +97,19 @@ namespace MakeEveryDayRecount
             AssetManager.LoadContent(Content);
             SoundManager.LoadContent(Content);
 
-            // Gameplay manager must be called after all content is loaded
+            // Initialize all items that need assets to be loaded 
+
             _gameplayManager = new GameplayManager(ScreenSize);
 
             MapUtils.Initialize(this, _gameplayManager);
+
             GlobalDebug.Initialize();
+
             _debugModes[0] = new PlayerDebug(_gameplayManager);
             _debugModes[1] = new MapDebug(_gameplayManager);
+
+            InterfaceManager.Initialize();
+
             //Load buttons
             LoadButtons();
         }
@@ -115,11 +121,9 @@ namespace MakeEveryDayRecount
             switch (_state)
             {
                 case GameState.Menu:
-                    CheckButtonClicks(menuButtons);
                     break;
 
                 case GameState.Pause:
-                    CheckButtonClicks(pauseButtons);
 
                     if (InputManager.GetKeyPress(Keys.Escape))
                     {
@@ -160,7 +164,7 @@ namespace MakeEveryDayRecount
 
             CheckKeyboardInput();
 
-            InputManager.Update();
+            InterfaceManager.Update();
 
             base.Update(gameTime);
         }
@@ -172,11 +176,11 @@ namespace MakeEveryDayRecount
 
             // "Point" sampling means that our chunky pixels won't get blurred
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-            
+
             switch (_state)
             {
                 case GameState.Menu:
-                    DrawMenu(_spriteBatch);
+                    // DrawMenu(_spriteBatch);
                     break;
                 case GameState.Pause:
                     _gameplayManager.Draw(_spriteBatch, ScreenSize);
@@ -197,9 +201,10 @@ namespace MakeEveryDayRecount
                     break;
             }
 
+            InterfaceManager.Draw(_spriteBatch);
+
             //End the sprite batch
             _spriteBatch.End();
-
             base.Draw(gameTime);
         }
 
@@ -258,30 +263,30 @@ namespace MakeEveryDayRecount
 
             //Fill pause buttons list with buttons
             Rectangle pauseContinueRect = new Rectangle(200, 200, 400, 100);
-            Button pauseContinue = new Button(defaultButtonTexture, defaultButtonTexture, pauseContinueRect, true);
-            pauseContinue.OnClick += MakeSwitchStateAction(GameState.Level);
+            Button pauseContinue = new Button(pauseContinueRect, defaultButtonTexture, defaultButtonTexture, true);
+            //pauseContinue.OnClick += MakeSwitchStateAction(GameState.Level);
             pauseContinue.OnClick += MakeResumeMusicAction();
             pauseButtons.Add(pauseContinue);
 
             Rectangle pauseLastCheckpointRect = new Rectangle(200, 320, 400, 100);
-            Button pauseLastCheckpoint = new Button(defaultButtonTexture, defaultButtonTexture, pauseLastCheckpointRect, true);
+            Button pauseLastCheckpoint = new Button(pauseLastCheckpointRect, defaultButtonTexture, defaultButtonTexture, true);
             //pauseLastCheckpoint += the method that brings you back to your last checkpoint
             pauseButtons.Add(pauseLastCheckpoint);
 
             Rectangle pauseQuitRect = new Rectangle(200, 440, 400, 100);
-            Button pauseQuit = new Button(defaultButtonTexture, defaultButtonTexture, pauseQuitRect, true);
-            pauseQuit.OnClick += MakeSwitchStateAction(GameState.Menu);
+            Button pauseQuit = new Button(pauseQuitRect, defaultButtonTexture, defaultButtonTexture, true);
+            //pauseQuit.OnClick += MakeSwitchStateAction(GameState.Menu);
             pauseButtons.Add(pauseQuit);
 
             //Fill menu buttons list with buttons
             Rectangle menuPlayRect = new Rectangle(400, 200, 300, 100);
-            Button menuPlay = new Button(defaultButtonTexture, defaultButtonTexture, menuPlayRect, true);
-            menuPlay.OnClick += MakeSwitchStateAction(GameState.Level);
+            Button menuPlay = new Button(menuPlayRect, defaultButtonTexture, defaultButtonTexture, true);
+            //menuPlay.OnClick += MakeSwitchStateAction(GameState.Level);
             menuPlay.OnClick += MakePlayMusicAction(_gameplayManager.Level);
             menuButtons.Add(menuPlay);
 
             Rectangle menuQuitRect = new Rectangle(400, 340, 100, 40);
-            Button menuQuit = new Button(defaultButtonTexture, defaultButtonTexture, menuQuitRect, true);
+            Button menuQuit = new Button(menuQuitRect, defaultButtonTexture, defaultButtonTexture, true);
             menuQuit.OnClick += MakeExitGameAction();
             menuButtons.Add(menuQuit);
 
@@ -346,12 +351,9 @@ namespace MakeEveryDayRecount
         /// </summary>
         /// <param name="state">The state that should be applied when the delegate is called.</param>
         /// <returns>An Action that sets the game state to the provided state when the ACTION is called.</returns>
-        public Action MakeSwitchStateAction(GameState state)
+        public void SwitchState(GameState state)
         {
-            return () =>
-            {
-                _state = state;
-            };
+            _state = state;
         }
 
         /// <summary>

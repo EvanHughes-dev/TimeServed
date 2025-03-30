@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Managers;
 
-namespace MakeEveryDayRecount.Players.InventoryFiles
+namespace MakeEveryDayRecount.UI
 {
     delegate void OnInventoryChange(InventorySpace inventorySpace);
 
@@ -36,7 +36,7 @@ namespace MakeEveryDayRecount.Players.InventoryFiles
         /// <param name="active">If the button is active</param>
         /// <param name="selectedTile">Tile to overlay if this is selected</param>
         public InventorySpace(Texture2D image, Texture2D hoverImage, Rectangle rectangle, bool active, Texture2D selectedTile)
-        : base(image, hoverImage, rectangle, active)
+        : base(rectangle, image, hoverImage, active)
         {
             _selectedSpaceTexture = selectedTile;
             _spaceSelected = false;
@@ -87,9 +87,9 @@ namespace MakeEveryDayRecount.Players.InventoryFiles
         {
             base.Draw(sb);
             if (CurrentItem != null)
-                sb.Draw(CurrentItem.Sprite, Rectangle, Color.White);
+                sb.Draw(CurrentItem.Sprite, DisplayRect, Color.White);
             if (_spaceSelected)
-                sb.Draw(_selectedSpaceTexture, Rectangle, Color.White);
+                sb.Draw(_selectedSpaceTexture, DisplayRect, Color.White);
 
         }
 
