@@ -56,10 +56,19 @@ namespace MakeEveryDayRecount.Managers
         /// <param name="destRoom"> Destination room for transition </param>
         public void TransitionRoom(Door transDoor, int destRoom)
         {
-            _currentRoom = _rooms[destRoom];
-            OnRoomUpdate?.Invoke(_currentRoom);
+            ChangeRoom(destRoom);
             _gameplayManager.PlayerObject.ChangeRoom(transDoor.DestinationTile);
 
+        }
+
+        /// <summary>
+        /// Change to the given room
+        /// </summary>
+        /// <param name="destRoom">Room index to change to</param>
+        public void ChangeRoom(int destRoom)
+        {
+            _currentRoom = _rooms[destRoom];
+            OnRoomUpdate?.Invoke(_currentRoom);
         }
 
         /// <summary>
@@ -85,7 +94,7 @@ namespace MakeEveryDayRecount.Managers
         /// Check if the tile in front of the player contains an interactable item
         /// </summary>
         /// <param name="playerFacing">The tile the player wants to interact with</param>
-        /// <returns></returns>
+        /// <returns>Current item to interact with in the provided tile</returns>
         public Prop CheckInteractable(Point playerFacing)
         {
             return _currentRoom.VerifyInteractable(playerFacing);
@@ -157,6 +166,19 @@ namespace MakeEveryDayRecount.Managers
                 );
             }
             return rooms;
+        }
+
+        /// <summary>
+        /// Switch to the level in gameplayManager
+        /// </summary>
+        public void ChangeLevel()
+        {
+            _rooms = LoadMapData(_gameplayManager.Level);
+            ChangeRoom(0);
+            foreach (Room room in _rooms)
+            {
+                room.DoorTransition += TransitionRoom;
+            }
         }
     }
 }

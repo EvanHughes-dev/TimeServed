@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using MakeEveryDayRecount.GameObjects.Props;
 using MakeEveryDayRecount.Managers;
-
+using MakeEveryDayRecount.UI;
 
 namespace MakeEveryDayRecount.Players.InventoryFiles
 {
@@ -61,12 +61,12 @@ namespace MakeEveryDayRecount.Players.InventoryFiles
         /// <summary>
         /// Draws the inventory's UI using a button array 
         /// </summary>
-        /// <param name="sb"></param>
+        /// <param name="sb">SpriteBatch to draw with</param>
         public void Draw(SpriteBatch sb, Point screenSize)
         {
             for (int i = 0; i < _inventoryUI.Length; i++)
             {
-                _inventoryUI[i].Rectangle = new Rectangle(screenSize.X / 2 - (_boxSize * 2) + (_boxSize * i), screenSize.Y - (_boxSize + 30), _boxSize, _boxSize);
+                _inventoryUI[i].ChangeOrigin(new Point(screenSize.X / 2 - (_boxSize * 2) + (_boxSize * i), screenSize.Y - (_boxSize + 30)));
                 _inventoryUI[i].Draw(sb);
             }
 
@@ -91,6 +91,21 @@ namespace MakeEveryDayRecount.Players.InventoryFiles
             SelectedItem = inventorySpace.CurrentItem;
             _selectedSpace?.DeselectItem();
             _selectedSpace = inventorySpace;
+        }
+
+        /// <summary>
+        /// Clear the player's inventory
+        /// </summary>
+        public void ClearInventory()
+        {
+            _contents.Clear();
+            foreach (InventorySpace space in _inventoryUI)
+            {
+                space.ReplaceItem(null);
+                space.DeselectItem();
+            }
+
+            SelectedItem = null;
         }
     }
 }
