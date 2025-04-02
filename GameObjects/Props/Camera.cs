@@ -45,7 +45,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
             _spread = spread;
             //TODO: Write a check to figure out the raybase here
             //NOTE: for testing the camera is in the top wall, so the raybase is one down from the camera's location
-            _rayBase = new Point(Location.X, Location.Y + 1);
+            _rayBase = new Point(Location.X, Location.Y - 1);
         }
         //TODO: add an alternative constructor that takes a point as the center of the vision cone and constructs a vector from that
 
@@ -53,7 +53,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         {
             //TimeSpan startTime = DateTime.Now.TimeOfDay;
             //Add a check to see if there's a box directly in front of the camera, and if so don't check any of the rays
-            CheckRay(new Vector2(-5, 3));
+            CheckRay(new Vector2(3, -4));
             //Debug.WriteLine(DateTime.Now.TimeOfDay - startTime);
         }
 
@@ -126,32 +126,60 @@ namespace MakeEveryDayRecount.GameObjects.Props
         {
             float dx = ray.X;
             float dy = ray.Y;
-            int y = 0;
+            //Create a local raybase for this particular vector so we can move it for this ray if necessarry
+            //Without messing up the other rays
+            Point rayBase = _rayBase;
 
             if (Math.Abs(dy) > Math.Abs(dx))
             {
-                throw new NotImplementedException("We can't handle up/down lines yet");
+                //X is the dependant variable
+                int x = 0;
+
+                //If the line is going from down to up, switch the start and end points so we can draw it from top to bottom
+                if (dy < 0)
+                {
+                    rayBase.Y = rayBase.Y + (int)dy;
+                    rayBase.X = rayBase.X + (int)dx;
+
+                    dy = dy * -1;
+                    dx = dx * -1;
+                }
+
+                for (int y = rayBase.Y; y <= rayBase.Y + dy; y++)
+                {
+                    //get this, x = my + b
+                    double xValue = (ray.X / ray.Y) * (y - rayBase.Y) + rayBase.X;
+                    int xCoord;
+                    xCoord = (int)Math.Round(xValue);
+                    _watchedTiles.Add(new Point(xCoord, y));
+                    Debug.WriteLine($"Added {xCoord}, {y}");
+                }
             }
             else
             {
+                //Y is the dependant variable
+                int y = 0;
+
                 //If the line is going from right to left, we switch the start and end point so it can be drawn left to right
                 if (dx < 0)
                 {
-                    _rayBase.X = _rayBase.X + (int)dx;
-                    _rayBase.Y = _rayBase.Y + (int)dy;
+                    rayBase.X = rayBase.X + (int)dx;
+                    rayBase.Y = rayBase.Y + (int)dy;
 
                     dx = dx * -1;
                     dy = dy * -1;
-                    _watchedTiles.Add(_rayBase);
+                    //_watchedTiles.Add(_rayBase);
+                    //Debug.WriteLine($"Okay, raybase is at {rayBase.X}, {rayBase.Y} --- DX is {dx} and DY is {dy}");
                 }
 
-                for (int x = _rayBase.X; x <= _rayBase.X + ray.X; x++)
+                for (int x = rayBase.X; x <= rayBase.X + dx; x++)
                 {
                     //y = mx + b
-                    double yValue = (ray.Y / ray.X) * (x - _rayBase.X) + _rayBase.Y;
+                    double yValue = (ray.Y / ray.X) * (x - rayBase.X) + rayBase.Y;
                     int yCoord;
                     yCoord = (int)Math.Round(yValue);
                     _watchedTiles.Add(new Point(x, yCoord));
+                    Debug.WriteLine($"Added {x}, {yCoord}");
                 }
             }
         }
