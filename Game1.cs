@@ -61,8 +61,6 @@ namespace MakeEveryDayRecount
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            IsMouseVisible = true;
-            Window.AllowUserResizing = true; // Enable user resizing
             IsMouseVisible = false;
         }
 
@@ -74,9 +72,11 @@ namespace MakeEveryDayRecount
             _graphics.PreferredBackBufferHeight =
                 GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
 
-            _graphics.HardwareModeSwitch = true;
-            _graphics.IsFullScreen = true;
+            //_graphics.PreferredBackBufferWidth = 640;
+            //_graphics.PreferredBackBufferHeight = 360;
 
+            _graphics.HardwareModeSwitch = false;
+            _graphics.IsFullScreen = true;
             _graphics.ApplyChanges();
 
             _debugState = DebugState.None;
@@ -84,7 +84,7 @@ namespace MakeEveryDayRecount
             _debugModes = new BaseDebug[2];
 
             //Initialize button lists
-
+            InterfaceManager.InitializeScaling(ScreenSize);
             InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.MainMenu;
             InterfaceManager.gameStateChange += SwitchState;
             InterfaceManager.exitGame += ExitGame;
@@ -104,16 +104,18 @@ namespace MakeEveryDayRecount
 
             // Initialize all items that need assets to be loaded 
 
-            _gameplayManager = new GameplayManager(ScreenSize);
 
+            InterfaceManager.InitializeMenus(ScreenSize);
+
+            _gameplayManager = new GameplayManager(ScreenSize);
             MapUtils.Initialize(this, _gameplayManager);
+
 
             GlobalDebug.Initialize();
 
             _debugModes[0] = new PlayerDebug(_gameplayManager);
             _debugModes[1] = new MapDebug(_gameplayManager);
 
-            InterfaceManager.Initialize();
         }
 
         protected override void Update(GameTime gameTime)
@@ -289,7 +291,6 @@ namespace MakeEveryDayRecount
         /// Creates an Action delegate to set the state to the given GameState. DOES NOT CHANGE THE STATE ITSELF!
         /// </summary>
         /// <param name="state">The state that should be applied when the delegate is called.</param>
-        /// <returns>An Action that sets the game state to the provided state when the ACTION is called.</returns>
         public void SwitchState(GameState state)
         {
             if (state == GameState.Level)

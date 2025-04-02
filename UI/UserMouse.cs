@@ -26,11 +26,11 @@ namespace MakeEveryDayRecount.UI
         /// <summary>
         /// Create a mouse object to display the mouse location
         /// </summary>
-        public UserMouse()
+        public UserMouse(int mouseSize)
         {
             _mouseSprites = AssetManager.CursorStates;
             _mouseState = MouseHover.UnHovered;
-            _mouseCursorSize = new Point(64, 64);
+            _mouseCursorSize = new Point(mouseSize, mouseSize);
         }
 
         /// <summary>
