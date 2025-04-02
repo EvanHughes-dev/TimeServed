@@ -16,6 +16,10 @@ namespace LevelEditor
         /// Gets or sets the color the user currently has selected from the palette.
         /// </summary>
         private Tile SelectedTile { get; set; }
+        /// <summary>
+        /// Gets or sets the porp texture the user currently has selected from the palette.
+        /// </summary>
+        private Tile SelectedProp { get; set; }
 
         /// <summary>
         /// Gets or sets the 2D array of grid tiles the user can draw on.
@@ -31,7 +35,7 @@ namespace LevelEditor
         /// Gets the palette of tiles the user may select from.
         /// </summary>
         private Tile[,] Palette { get; }
-        private 
+        //private Prop[,]
 
         /// <summary>
         /// Creates a new EditorForm, editing an existing room.
@@ -122,17 +126,17 @@ namespace LevelEditor
         /// <summary>
         /// Creates the prop selection buttons corresponding with the &*%*@^(^#_. Should only be run once!
         /// </summary>
-        private void CreatePropBoxes()
+        private void CreatePropTileBoxes() //this will be difficult to implement until I have tile info
         {
             // Shortcut variables for the width and height
             int height = Palette.GetLength(0);
             int width = Palette.GetLength(1);
 
             // 5-unit padding on each side and 20-unit padding on the top just happens to look nice
-            Rectangle paletteBounds = PadRectInwards(tabPageTiles.ClientRectangle, 5, 5, 20, 5);
+            Rectangle paletteBounds = PadRectInwards(tabPageProps.ClientRectangle, 5, 5, 20, 5);
 
             // Give it 5 units of padding between each button just because it happens to look nice
-            TileBox[,] swatches = GenerateGrid<TileBox>(width, height, paletteBounds, 5, tabPageTiles);
+            TileBox[,] swatches = GenerateGrid<TileBox>(width, height, paletteBounds, 5, tabPageProps);
 
             for (int x = 0; x < width; x++)
             {
@@ -142,7 +146,7 @@ namespace LevelEditor
                     //   when the button is clicked. Ideally we would track a color index so we could dramatically reduce the
                     //   file size of the saved maps, but again that's hard and not necessary
                     swatches[y, x].Tile = Palette[y, x];
-                    swatches[y, x].Click += Swatch_Click;
+                    swatches[y, x].Click += ;
                 }
             }
         }
@@ -166,6 +170,16 @@ namespace LevelEditor
             if (sender is not TileBox swatch) throw new Exception();
 
             SelectedTile = swatch.Tile;
+        }
+        /// <summary>
+        /// When a prop button is clicked, select its color.
+        /// </summary>
+        /// <exception cref="Exception">Thrown when this method is called with a non-Button sender.</exception>
+        private void PropSwatch_Click(object? sender, EventArgs e)
+        {
+            if (sender is not TileBox prop) throw new Exception();
+
+            SelectedProp = prop.Tile;
         }
 
         /// <summary>
