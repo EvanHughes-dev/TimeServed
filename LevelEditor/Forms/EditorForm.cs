@@ -3,6 +3,7 @@
 // The EditorForm, with a palette, selected color, save and load buttons, and a grid of PictureBoxes the user can draw on
 
 using LevelEditor.Classes;
+using LevelEditor.Classes.Props;
 using LevelEditor.Controls;
 
 namespace LevelEditor
@@ -16,15 +17,6 @@ namespace LevelEditor
         private readonly MainForm _mainForm;
 
         /// <summary>
-        /// Gets or sets the color the user currently has selected from the palette.
-        /// </summary>
-        private Tile SelectedTile { get; set; }
-        /// <summary>
-        /// Gets or sets the porp texture the user currently has selected from the palette.
-        /// </summary>
-        private Tile SelectedProp { get; set; }
-
-        /// <summary>
         /// Gets or sets the 2D array of grid tiles the user can draw on.
         /// </summary>
         private TileBox[,] TileGrid { get; set; }
@@ -34,11 +26,23 @@ namespace LevelEditor
         /// </summary>
         private Room Room { get; set; }
 
+/       // <summary>
+        /// Gets or sets the color the user currently has selected from the palette.
+        /// </summary>
+        private Tile SelectedTile { get; set; }
         /// <summary>
         /// Gets the palette of tiles the user may select from.
         /// </summary>
         private Tile[,] Palette { get; }
-        //private Prop[,]
+
+        /// <summary>
+        /// Gets or sets the porp texture the user currently has selected from the palette.
+        /// </summary>
+        private Prop SelectedProp { get; set; }
+        /// <summary>
+        /// Gets the palette of props the user may select from
+        /// </summary>
+        private Prop[,] PropPalette { get;}
 
         /// <summary>
         /// Creates a new EditorForm, editing an existing room.
@@ -51,13 +55,13 @@ namespace LevelEditor
 
             int numOfTiles = _mainForm.Tiles.Count;
 
-            int numOfRows = (int)Math.Ceiling((float)numOfTiles / 4);
-            Palette = new Tile[numOfRows, 4];
+            int numOfRows = (int)Math.Ceiling((float)numOfTiles / 2);
+            Palette = new Tile[numOfRows, 2];
 
             for (int i = 0; i < numOfTiles; i++)
             {
-                int y = (int)Math.Floor((float)i / 4);
-                int x = i % 4;
+                int y = (int)Math.Floor((float)i / 2);
+                int x = i % 2;
 
                 Palette[y, x] = _mainForm.Tiles.ElementAt(i);
             }
@@ -132,8 +136,8 @@ namespace LevelEditor
         private void CreatePropTileBoxes() //this will be difficult to implement until I have tile info
         {
             // Shortcut variables for the width and height
-            int height = Palette.GetLength(0);
-            int width = Palette.GetLength(1);
+            int height = PropPalette.GetLength(0);
+            int width = PropPalette.GetLength(1);
 
             // 5-unit padding on each side and 20-unit padding on the top just happens to look nice
             Rectangle paletteBounds = PadRectInwards(tabPageProps.ClientRectangle, 5, 5, 20, 5);
@@ -149,7 +153,7 @@ namespace LevelEditor
                     //   when the button is clicked. Ideally we would track a color index so we could dramatically reduce the
                     //   file size of the saved maps, but again that's hard and not necessary
                     swatches[y, x].Tile = Palette[y, x];
-                    swatches[y, x].Click += ;
+                    swatches[y, x].Click += PropSwatch_Click;
                 }
             }
         }
@@ -182,7 +186,7 @@ namespace LevelEditor
         {
             if (sender is not TileBox prop) throw new Exception();
 
-            SelectedProp = prop.Tile;
+            
         }
 
         /// <summary>

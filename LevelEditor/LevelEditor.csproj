@@ -6,7 +6,14 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+	<ForceDesignerDPIUnaware>true</ForceDesignerDPIUnaware>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Update="Controls\PropBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+  </ItemGroup>
 
   <ItemGroup>
     <None Update="Tiles\testWalkable.png">
