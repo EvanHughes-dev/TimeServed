@@ -101,7 +101,7 @@ namespace MakeEveryDayRecount.Managers
         /// Default font for debugging
         /// </summary>
         public static SpriteFont Arial20 { get; private set; }
-
+        public static SpriteFont[] ArialFonts;
         #endregion
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace MakeEveryDayRecount.Managers
                 content.Load<Texture2D>("Doors/TempDoor-Bottom"),
                 content.Load<Texture2D>("Doors/TempDoor-Left")
             };
-            TileSize = new Point(TileMap[0].Width, TileMap[0].Height);
+            TileSize = InterfaceManager.ScalePointUniform(new Point(TileMap[0].Width / 2, TileMap[0].Height / 2));
 
             //LOAD DEBUG ASSETS
             DebugWalkableTile = content.Load<Texture2D>("DebugAssets/WALKABLE");
@@ -179,6 +179,13 @@ namespace MakeEveryDayRecount.Managers
 
             //FONT STUFF
             Arial20 = content.Load<SpriteFont>("Fonts/Arial20");
+
+            ArialFonts = new SpriteFont[]{
+                content.Load<SpriteFont>("Fonts/Arial5"),
+                content.Load<SpriteFont>("Fonts/Arial10"),
+                content.Load<SpriteFont>("Fonts/Arial20"),
+                content.Load<SpriteFont>("Fonts/Arial30"),
+            };
 
         }
     }

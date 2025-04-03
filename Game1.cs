@@ -61,8 +61,6 @@ namespace MakeEveryDayRecount
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            IsMouseVisible = true;
-            Window.AllowUserResizing = true; // Enable user resizing
             IsMouseVisible = false;
         }
 
@@ -70,9 +68,15 @@ namespace MakeEveryDayRecount
         {
             // Set default window size to half the screen size
             _graphics.PreferredBackBufferWidth =
-                GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2;
+                GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
             _graphics.PreferredBackBufferHeight =
-                GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2;
+                GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+
+            //_graphics.PreferredBackBufferWidth = 640;
+            //_graphics.PreferredBackBufferHeight = 360;
+
+            _graphics.HardwareModeSwitch = false;
+            _graphics.IsFullScreen = true;
             _graphics.ApplyChanges();
 
             _debugState = DebugState.None;
@@ -80,7 +84,7 @@ namespace MakeEveryDayRecount
             _debugModes = new BaseDebug[2];
 
             //Initialize button lists
-
+            InterfaceManager.InitializeScaling(ScreenSize);
             InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.MainMenu;
             InterfaceManager.gameStateChange += SwitchState;
             InterfaceManager.exitGame += ExitGame;
@@ -100,16 +104,18 @@ namespace MakeEveryDayRecount
 
             // Initialize all items that need assets to be loaded 
 
-            _gameplayManager = new GameplayManager(ScreenSize);
 
+            InterfaceManager.InitializeMenus(ScreenSize);
+
+            _gameplayManager = new GameplayManager(ScreenSize);
             MapUtils.Initialize(this, _gameplayManager);
+
 
             GlobalDebug.Initialize();
 
             _debugModes[0] = new PlayerDebug(_gameplayManager);
             _debugModes[1] = new MapDebug(_gameplayManager);
 
-            InterfaceManager.Initialize();
         }
 
         protected override void Update(GameTime gameTime)
@@ -202,7 +208,6 @@ namespace MakeEveryDayRecount
 
             // "Point" sampling means that our chunky pixels won't get blurred
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-
 
             switch (_state)
             {
