@@ -10,42 +10,75 @@ namespace MakeEveryDayRecount.GameObjects.Props
 {
     internal class Camera : Prop
     {
-        //Specify a line for the center of it's vision and the length of its vision, an angle in radians for the width of it's field of vision
+        //If the camera is on or off
         private bool _active;
+        //The direction in which the camera's sprite is facing
+        private enum CameraDirection
+        {
+            up,
+            down,
+            left,
+            right
+        }
 
+        //Specify a line for the center of it's vision and the length of its vision, an angle in radians for the width of it's field of vision
         //All the lines share the same parametric point (the camera's location), so only the vectors for each line are different
-        //The ray at the center of the vision cone
-        private Vector2 _centerRay;
+        //The point at the center of the vision cone
+        private Point _centerPoint;
+        private float _spread;
         //The camera will get a certain set of rays when it's created, and those rays will never change, even if they get blocked
         //TODO: Maybe these should be changed into points?
-        private Vector2[] _rays;
+        private Point[] _endPoints;
 
         //The rays don't project from inside of the wall, where the camera is technically drawn
         //All the rays come out from the point on the floor right "in front of" the camera
         private Point _rayBase;
-
-        private float _spread;
-
+        
         private List<Point> _watchedTiles;
+        //This is going to need a reference to the room that created it in order to check collision
+        private Room _room;
+        //It also needs a reference to the player to know if they step into the vision kite
+        private Player _player;
 
         /// <summary>
-        /// Makes a security camera that watches a certain vision cone to see if the player is inside it
+        /// Makes a security camera that watches a certain vision kite to see if the player is inside it
         /// </summary>
-        /// <param name="location">The location of the camera, from which the vision cone is projected</param>
+        /// <param name="location">The location of the camera, from which the vision kite is projected</param>
         /// <param name="sprite">The camera's sprite</param>
-        /// <param name="centerRay">The ray that forms the center of the camera's vision cone</param>
-        /// <param name="spread">The arc from the center of the vision cone to the edge, in radians</param>
-        public Camera(Point location, Texture2D sprite, Vector2 centerRay, float spread)
+        /// <param name="containingRoom">The room containing the camera. Used to check if tiles are walkable</param>
+        /// <param name="searchingPlayer">The player the camera is meant to search for</param>
+        /// <param name="centerPoint">The point that forms the center of the camera's vision kite</param>
+        /// <param name="spread">The arc from the center of the vision kite to the edge, in radians</param>
+        public Camera(Point location, Texture2D sprite, Room containingRoom, Player searchingPlayer, Point centerPoint, float spread)
             : base(location, sprite)
         {
             _watchedTiles = new List<Point>();
             //All cams start active
             _active = true;
-            _centerRay = centerRay;
+            _room = containingRoom;
+            _player = searchingPlayer;
+            _centerPoint = centerPoint;
             _spread = spread;
             //TODO: Write a check to figure out the raybase here
+            //Check the tiles on either side of the camera
+
             //NOTE: for testing the camera is in the top wall, so the raybase is one down from the camera's location
             _rayBase = new Point(Location.X, Location.Y - 1);
+
+            //-----Create the vision kite and figure out all the rays-----
+            //---Find the endpoints for the corners of the kite---
+            //Create a vector for the center from the raybase to the centerpoint
+
+            //Rotate that vector by spread in both directions
+
+            //Round the components of each vector
+
+            //Add the vectors to the raybase to find the corner endpoints
+
+            //Add those corners to the list of endpoints
+
+            //Rasterize between the corners and the centerpoint to get all the points we need to send out a ray to
+
         }
         //TODO: add an alternative constructor that takes a point as the center of the vision cone and constructs a vector from that
 
@@ -66,15 +99,41 @@ namespace MakeEveryDayRecount.GameObjects.Props
             }
         }
 
-        private void CheckRayPoint(Point p2)
+        private List<Point> Rasterize(Point p1, Point p2)
         {
-            int dx = p2.X - _rayBase.X;
-            int dy = p2.Y - _rayBase.Y;
-            int p ;
-            int x;
-            int y;
+            //If the line is going from right to left, we switch the start and end point so it can be drawn left to right
+            if (p1.X > p2.X)
+            {
+                //Store this so that we don't forget a point
+                Point swapPoint = p1;
+                p1 = p2;
+                p2 = swapPoint;
+            }
+            
+            int dx = p2.X - p1.X;
+            int dy = p2.Y - p1.Y;
+            int p = (2 * dy) - dx;
+            int x = p1.X;
+            int y = p1.Y;
 
+            //The array of points that will be returned. Length = change in the independent variable + 1
+            List<Point> returnPoints = new List<Point>();
 
+            for (; x <= p2.X; x++) //using x as loop variable
+            {
+                returnPoints.Add(new Point(x, y));
+                if (p < 0)
+                {
+                    p = p + (2 * dy);
+                }
+                else //If p >= 0
+                {
+                    p = p + (2 * dy) - (2 * dx);
+                    y = y + 1;
+                }
+            }
+            //Return the list of points
+            return returnPoints;
         }
 
         /**
@@ -122,13 +181,17 @@ namespace MakeEveryDayRecount.GameObjects.Props
         }
         **/
 
-        private void CheckRay(Vector2 ray)
+        private List<Point> CheckRay(Vector2 ray)
         {
-            float dx = ray.X;
-            float dy = ray.Y;
+            //None of the rays check the base, because all of the rays come from the base
+            //If the rays are a float, we're in the soup
+            int dx = (int)ray.X;
+            int dy = (int)ray.Y;
             //Create a local raybase for this particular vector so we can move it for this ray if necessarry
             //Without messing up the other rays
             Point rayBase = _rayBase;
+            //This is the array of points this will return
+            List<Point> intersectededPoints = new List<Point>();
 
             if (Math.Abs(dy) > Math.Abs(dx))
             {
@@ -138,12 +201,14 @@ namespace MakeEveryDayRecount.GameObjects.Props
                 //If the line is going from down to up, switch the start and end points so we can draw it from top to bottom
                 if (dy < 0)
                 {
-                    rayBase.Y = rayBase.Y + (int)dy;
-                    rayBase.X = rayBase.X + (int)dx;
+                    rayBase.Y = rayBase.Y + dy;
+                    rayBase.X = rayBase.X + dx;
 
                     dy = dy * -1;
                     dx = dx * -1;
                 }
+
+                //The length of the return array will be the change in the independent variable
 
                 for (int y = rayBase.Y; y <= rayBase.Y + dy; y++)
                 {
@@ -151,7 +216,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                     double xValue = (ray.X / ray.Y) * (y - rayBase.Y) + rayBase.X;
                     int xCoord;
                     xCoord = (int)Math.Round(xValue);
-                    _watchedTiles.Add(new Point(xCoord, y));
+                    intersectededPoints.Add(new Point(xCoord, y));
                     Debug.WriteLine($"Added {xCoord}, {y}");
                 }
             }
@@ -178,14 +243,16 @@ namespace MakeEveryDayRecount.GameObjects.Props
                     double yValue = (ray.Y / ray.X) * (x - rayBase.X) + rayBase.Y;
                     int yCoord;
                     yCoord = (int)Math.Round(yValue);
-                    _watchedTiles.Add(new Point(x, yCoord));
+                    intersectededPoints.Add(new Point(x, yCoord));
                     Debug.WriteLine($"Added {x}, {yCoord}");
                 }
             }
+            return intersectededPoints;
         }
 
         private void LookForPlayer()
         {
+            
             throw new NotImplementedException();
             //This can be optimized by making it only check the tiles on the outside edges of the "vision cone"
             //Meaning the two unblocked rays on either side with the furthest angle from the center ray, and the most extreme point of each ray
