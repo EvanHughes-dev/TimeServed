@@ -214,6 +214,20 @@ namespace LevelEditor
             *       int destRoomId
             *       int destX
             *       int destY
+            *       
+            * int triggerCount
+            * 
+            * Trigger:
+            *   int positionX
+            *   int positionY
+            *   Positions are of the top-left corner of the trigger
+            *   int width
+            *   int height
+            *   int triggerType
+            *     0 = Player spawn
+            *     1 = Checkpoint
+            *     
+            *     TODO: Checkpoint indexes
             */
 
             BinaryReader reader = new(new FileStream(filePath, FileMode.Open));
