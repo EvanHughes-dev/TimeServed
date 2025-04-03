@@ -1,10 +1,12 @@
-﻿using MakeEveryDayRecount.Map;
+﻿using MakeEveryDayRecount.DebugModes;
+using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using MakeEveryDayRecount.Managers;
+using MakeEveryDayRecount.UI;
 
 namespace MakeEveryDayRecount
 {
@@ -22,6 +24,14 @@ namespace MakeEveryDayRecount
 
     public class Game1 : Game
     {
+        private enum DebugState
+        {
+            None,
+            Global,
+            Player,
+            Room
+        }
+
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
@@ -34,75 +44,122 @@ namespace MakeEveryDayRecount
 
         private GameplayManager _gameplayManager;
 
+
         /// <summary>
-        /// Access the current size of the screen on pixels
+        /// Access the current size of the screen in pixels
         /// </summary>
         public Point ScreenSize
         {
             get { return new Point(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height); }
         }
 
+        private DebugState _debugState;
+
+        private BaseDebug[] _debugModes;
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            IsMouseVisible = true;
-            Window.AllowUserResizing = true; // Enable user resizing
+            IsMouseVisible = false;
         }
 
         protected override void Initialize()
         {
             // Set default window size to half the screen size
             _graphics.PreferredBackBufferWidth =
-                GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2;
+                GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
             _graphics.PreferredBackBufferHeight =
-                GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2;
+                GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+
+            //_graphics.PreferredBackBufferWidth = 640;
+            //_graphics.PreferredBackBufferHeight = 360;
+
+            _graphics.HardwareModeSwitch = false;
+            _graphics.IsFullScreen = true;
             _graphics.ApplyChanges();
 
-            //Initialize button lists
-            pauseButtons = new List<Button>();
-            menuButtons = new List<Button>();
+            _debugState = DebugState.None;
 
+            _debugModes = new BaseDebug[2];
+
+            //Initialize button lists
+            InterfaceManager.InitializeScaling(ScreenSize);
+            InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.MainMenu;
+            InterfaceManager.gameStateChange += SwitchState;
+            InterfaceManager.exitGame += ExitGame;
+
+            ReplayManager.Initialize();
             //Set initial GameState
             _state = GameState.Menu;
-
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+
             AssetManager.LoadContent(Content);
-            // Gameplay manager must be called after all content is loaded
-            _gameplayManager = new GameplayManager();
+            SoundManager.LoadContent(Content);
+
+            // Initialize all items that need assets to be loaded 
+
+
+            InterfaceManager.InitializeMenus(ScreenSize);
+
+            _gameplayManager = new GameplayManager(ScreenSize);
             MapUtils.Initialize(this, _gameplayManager);
 
-            //Load buttons
-            LoadButtons();
+
+            GlobalDebug.Initialize();
+
+            _debugModes[0] = new PlayerDebug(_gameplayManager);
+            _debugModes[1] = new MapDebug(_gameplayManager);
+
         }
 
         protected override void Update(GameTime gameTime)
         {
-            InputManager.Update();
+            if (_state != GameState.Playback)
+                InputManager.Update();
 
             switch (_state)
             {
                 case GameState.Menu:
-                    CheckButtonClicks(menuButtons);
                     break;
 
                 case GameState.Pause:
-                    CheckButtonClicks(pauseButtons);
+
+                    if (InputManager.GetKeyPress(Keys.Escape))
+                    {
+                        _state = GameState.Level;
+                        SoundManager.ResumeBGM();
+                        InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.Level;
+                    }
                     break;
 
                 case GameState.Level:
-                    //On level end
+                    //TODO: On level end
                     //_state = GameState.Cutscene;
-                    _gameplayManager.Update(gameTime);
 
-                    //Pause button can change, figured escape makes the most sense
                     if (InputManager.GetKeyPress(Keys.Escape))
+                    {
                         _state = GameState.Pause;
+                        SoundManager.PauseBGM();
+                        InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.PauseMenu;
+                        // Don't call anything after the game has paused
+                        break;
+                    }
+
+                    _gameplayManager.Update(gameTime);
+                    // Save the current state of the keyboard
+                    ReplayManager.SaveState();
+                    if (InputManager.GetKeyPress(Keys.Tab))
+                    {
+                        ReplayManager.SaveData(1, 1);
+                        _state = GameState.Playback;
+                    }
+
                     break;
 
                 case GameState.Cutscene:
@@ -114,163 +171,136 @@ namespace MakeEveryDayRecount
                     break;
 
                 case GameState.Playback:
-                    //When playback is finished
-                    //_state = GameState.Menu;
-                    break;
+                    // If the replay has not been started yet, start the replay
+                    // This will auto assign the first frame of input and allow the
+                    // input manager to work. For rest of the frames, call the next 
+                    // frame of the ReplayManager and check if you have read all frames
+                    if (!ReplayManager.PlayingReplay)
+                    {
+                        ReplayManager.BeginReplay();
+                        _gameplayManager.ReplayMode();
+                    }
+                    else if (!ReplayManager.NextFrame())
+                    {
+                        _state = GameState.Menu;
+                        ReplayManager.EndReplay();
+                        InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.MainMenu;
 
-                default:
+                    }
+
+                    InputManager.ReplayUpdate();
+                    _gameplayManager.Update(gameTime);
+
                     break;
             }
 
-            InputManager.Update();
-            // TODO: Add your update logic here
+            CheckKeyboardInput();
+
+            InterfaceManager.Update();
 
             base.Update(gameTime);
         }
+
 
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black);
 
-            _spriteBatch.Begin();
-            // TODO: Add your drawing code here
+            // "Point" sampling means that our chunky pixels won't get blurred
+            _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+
             switch (_state)
             {
                 case GameState.Menu:
-                    DrawMenu(_spriteBatch);
+                    // DrawMenu(_spriteBatch);
                     break;
                 case GameState.Pause:
+                    //TODO: Blur the gameplay in the background.
+
                     _gameplayManager.Draw(_spriteBatch);
-                    DrawPause(_spriteBatch);
+                    DisplayDebug();
                     break;
                 case GameState.Level:
                     _gameplayManager.Draw(_spriteBatch);
+                    DisplayDebug();
                     break;
                 case GameState.Cutscene:
                     break;
                 case GameState.Playback:
-                    break;
-                default:
+                    _gameplayManager.Draw(_spriteBatch);
+                    DisplayDebug();
                     break;
             }
 
+            InterfaceManager.Draw(_spriteBatch);
+
             //End the sprite batch
-
             _spriteBatch.End();
-
             base.Draw(gameTime);
         }
 
-        private void CheckKeyboardInput() { }
-
-        private void DisplayPauseMenu(SpriteBatch sb) { }
-
-        private void DisplayMainMenu(SpriteBatch sb) { }
-
         /// <summary>
-        /// Creates all buttons and fills their respective lists them with them.
+        /// Draw the current debug display to the screen
         /// </summary>
-        private void LoadButtons()
+        private void DisplayDebug()
         {
-            //Load button textures
-            defaultButtonTexture = Content.Load<Texture2D>("Default Button");
-            //... and more, when we have them
-
-            //Fill pause buttons list with buttons
-            Rectangle pauseContinueRect = new Rectangle(200, 200, 400, 100);
-            Button pauseContinue = new Button(defaultButtonTexture, defaultButtonTexture, pauseContinueRect, true);
-            pauseContinue.OnClick += MakeSwitchStateAction(GameState.Level);
-            pauseButtons.Add(pauseContinue);
-
-            Rectangle pauseLastCheckpointRect = new Rectangle(200, 320, 400, 100);
-            Button pauseLastCheckpoint = new Button(defaultButtonTexture, defaultButtonTexture, pauseLastCheckpointRect, true);
-            //pauseLastCheckpoint += the method that brings you back to your last checkpoint
-            pauseButtons.Add(pauseLastCheckpoint);
-
-            Rectangle pauseQuitRect = new Rectangle(200, 440, 400, 100);
-            Button pauseQuit = new Button(defaultButtonTexture, defaultButtonTexture, pauseQuitRect, true);
-            pauseQuit.OnClick += MakeSwitchStateAction(GameState.Menu);
-            pauseButtons.Add(pauseQuit);
-
-            //Fill menu buttons list with buttons
-            Rectangle menuPlayRect = new Rectangle(400, 200, 300, 100);
-            Button menuPlay = new Button(defaultButtonTexture, defaultButtonTexture, menuPlayRect, true);
-            menuPlay.OnClick += MakeSwitchStateAction(GameState.Level);
-            menuButtons.Add(menuPlay);
-
-            Rectangle menuQuitRect = new Rectangle(400, 340, 100, 40);
-            Button menuQuit = new Button(defaultButtonTexture, defaultButtonTexture, menuQuitRect, true);
-            //menuQuit.OnClick += the method that closes the game
-            menuButtons.Add(menuQuit);
-
-        }
-
-        private void CheckButtonClicks(List<Button> list)
-        {
-
-            for (int i = 0; i < list.Count; i++)
+            switch (_debugState)
             {
-                //Invoke the button's on click effect if it has been clicked
-                list[i].Click();
+                case DebugState.Global:
+                    GlobalDebug.Draw(_spriteBatch);
+                    break;
+                case DebugState.Player:
+                    _debugModes[0].Draw(_spriteBatch);
+                    break;
+                case DebugState.Room:
+                    _debugModes[1].Draw(_spriteBatch);
+                    break;
             }
         }
 
         /// <summary>
-        /// Draws the main menu.
+        /// Check for user input that affects the game state or debug
+        /// modes of the overall game
         /// </summary>
-        /// <param name="sb">sprite batch used to draw</param>
-        private void DrawMenu(SpriteBatch sb)
+        private void CheckKeyboardInput()
         {
-            //Draw the buttons
-            for (int i = 0; i < menuButtons.Count; i++)
-            {
-                menuButtons[i].Draw(sb);
-            }
-
+            // Use F1-F4 to control the Debug Modes
+            // We don't need to check if the function
+            // key is pressed or if the computer is in
+            // function lock since they have separate
+            // key codes and are sent to the OS separately
+            if (InputManager.GetKeyStatus(Keys.F1))
+                _debugState = DebugState.None;
+            else if (InputManager.GetKeyStatus(Keys.F2))
+                _debugState = DebugState.Global;
+            else if (InputManager.GetKeyStatus(Keys.F3))
+                _debugState = DebugState.Player;
+            else if (InputManager.GetKeyStatus(Keys.F4))
+                _debugState = DebugState.Room;
         }
 
         /// <summary>
-        /// Draws the pause menu.
+        /// Exit the game when button is clicked
         /// </summary>
-        /// <param name="sb">sprite batch used to draw</param>
-        private void DrawPause(SpriteBatch sb)
+        private void ExitGame()
         {
-            //Draw the buttons
-            for (int i = 0; i < pauseButtons.Count; i++)
-            {
-                pauseButtons[i].Draw(sb);
-            }
-        }
-
-        /// <summary>
-        /// Draws the cutscene.
-        /// </summary>
-        /// <param name="sb">sprite batch used to draw</param>
-        private void DrawCutscene(SpriteBatch sb)
-        {
-
-        }
-
-        /// <summary>
-        /// Draws the playback.
-        /// </summary>
-        /// <param name="sb">sprite batch used to draw</param>
-        private void DrawPlayback(SpriteBatch sb)
-        {
-
+            Exit();
         }
 
         /// <summary>
         /// Creates an Action delegate to set the state to the given GameState. DOES NOT CHANGE THE STATE ITSELF!
         /// </summary>
         /// <param name="state">The state that should be applied when the delegate is called.</param>
-        /// <returns>An Action that sets the game state to the provided state when the ACTION is called.</returns>
-        public Action MakeSwitchStateAction(GameState state)
+        public void SwitchState(GameState state)
         {
-            return () =>
+            if (state == GameState.Level)
             {
-                _state = state;
-            };
+                if (SoundManager.PlayingMusic)
+                    SoundManager.ResumeBGM();
+                else
+                    SoundManager.PlayBGM(_gameplayManager.Level);
+            }
+            _state = state;
         }
     }
 }

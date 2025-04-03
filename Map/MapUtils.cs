@@ -1,4 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
+using MakeEveryDayRecount.Managers;
+using MakeEveryDayRecount.Players;
 
 namespace MakeEveryDayRecount.Map
 {

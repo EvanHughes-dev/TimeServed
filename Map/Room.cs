@@ -6,20 +6,30 @@ using MakeEveryDayRecount.GameObjects.Props;
 using MakeEveryDayRecount.Map.Tiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MakeEveryDayRecount.Managers;
 
 namespace MakeEveryDayRecount.Map
 {
     /// <summary>
     /// Transition from one room to another
     /// </summary>
-    /// <param name="interactedDoor">Door that was interacted with</param>
-    delegate void DoorTransition(Door interactedDoor);
+    /// <param name="destinationDoor">Door that was interacted with</param>
+    /// <param name="destRoomIndex">Destination room</param>
+    delegate void DoorTransition(Door destinationDoor, int destRoomIndex);
 
     /// <summary>
     /// Pickup an object from the room
     /// </summary>
     /// <param name="objectToPickup">Object that was picked up</param>
     delegate void ItemPickup(Item objectToPickup);
+
+    public enum ObjectTypes
+    {
+        Item = 0,
+        Camera = 1,
+        Box = 2,
+        Door = 3
+    }
 
     /// <summary>
     /// Hold all the information relating to what should be
@@ -39,12 +49,26 @@ namespace MakeEveryDayRecount.Map
         public int RoomIndex { get; private set; }
 
         /// <summary>
+        /// Get the path to this room's file
+        /// </summary>
+        public string FilePath { get; private set; }
+
+        /// <summary>
         /// Get the room's name
         /// </summary>
         public string RoomName { get; private set; }
+
+        /// <summary>
+        /// Get the number of items in the current room
+        /// </summary>
+        public int ItemCount
+        {
+            get => _itemsInRoom.Count;
+        }
         private Tile[,] _map;
         private List<Prop> _itemsInRoom;
-        private readonly List<Door> _doors;
+        public List<Door> Doors
+        { get; private set; }
 
         /// <summary>
         /// Size of current map
@@ -64,7 +88,7 @@ namespace MakeEveryDayRecount.Map
 
             _map = new Tile[,] { };
             _itemsInRoom = new List<Prop> { };
-            _doors = new List<Door> { };
+            Doors = new List<Door> { };
             ParseData(filePath);
         }
 
@@ -118,7 +142,7 @@ namespace MakeEveryDayRecount.Map
             }
 
             // Display all GameObjects on screen
-            foreach (GameObject propToDraw in _itemsInRoom)
+            foreach (Prop propToDraw in _itemsInRoom)
             {
                 Point propPosition = propToDraw.Location;
 
@@ -129,19 +153,12 @@ namespace MakeEveryDayRecount.Map
                     && propPosition.Y <= screenMaxY
                 )
                 {
-                    sb.Draw(
-                        propToDraw.Sprite,
-                        new Rectangle(
-                            MapUtils.TileToWorld(propPosition) - worldToScreen + pixelOffset,
-                            TileSize
-                        ),
-                        Color.White
-                    );
+                    propToDraw.Draw(sb, worldToScreen, pixelOffset);
                 }
             }
 
             // Display all doors
-            foreach (Door doorToDraw in _doors)
+            foreach (Door doorToDraw in Doors)
             {
                 Point propPosition = doorToDraw.Location;
 
@@ -152,11 +169,7 @@ namespace MakeEveryDayRecount.Map
                     && propPosition.Y <= screenMaxY
                 )
                 {
-                    sb.Draw(
-                        doorToDraw.Sprite,
-                        new Rectangle(MapUtils.TileToWorld(propPosition) - worldToScreen + pixelOffset, TileSize),
-                        Color.White
-                    );
+                    doorToDraw.Draw(sb, worldToScreen, pixelOffset);
                 }
             }
         }
@@ -171,10 +184,15 @@ namespace MakeEveryDayRecount.Map
         /// <exception cref="FileNotFoundException">File path could not be found</exception>
         private void ParseData(string filePath)
         {
-            if (File.Exists(filePath))
+            if (!File.Exists(filePath))
+                throw new FileNotFoundException($"File not found: {filePath}");
+
+            // save the file path for debug uses
+            FilePath = filePath;
+
+            try
             {
-                BinaryReader binaryReader = null;
-                try
+                using (BinaryReader binaryReader = new BinaryReader(File.OpenRead(filePath)))
                 {
                     /*
                     * Form of the room data is as follows
@@ -192,15 +210,30 @@ namespace MakeEveryDayRecount.Map
                     *   int propIndex
                     *   int positionX
                     *   int positionY
-                    *
-                    *   boolean isDoor
-                    *   if True
+                    *   int objectType 
+                    *       0 = Item
+                    *       1 = Camera
+                    *       2 = Box
+                    *       3 = Door 
+                    * 
+                    *   if objectType == 0 || objectType == 3
+                    *   int keyType
+                    *       0 = None
+                    *       1 = Key card
+                    *       2 = Screwdriver
+                    *       For doors, this is the key that can unlock them
+                    *       For items, this is the key type they are
+                    * 
+                    *   if objectType == 3
+                    *       int facing
+                    *           0 = South/Down
+                    *           1 = West/Left
+                    *           2 = North/Up
+                    *           3 = East/Right
                     *       int entranceIndex
                     *       int destRoom
                     *       int destDoor
                     */
-                    Stream stream = File.OpenRead(filePath);
-                    binaryReader = new BinaryReader(stream);
 
                     // Define the size of the current room and loop to populate tiles
                     int tileMapWidth = binaryReader.ReadInt32();
@@ -208,92 +241,142 @@ namespace MakeEveryDayRecount.Map
 
                     _map = new Tile[tileMapWidth, tileMapHeight];
                     MapSize = new Point(tileMapWidth, tileMapHeight);
-                    for (int tileXIndex = 0; tileXIndex < tileMapWidth; tileXIndex++)
+                    for (int tileYIndex = 0; tileYIndex < tileMapHeight; tileYIndex++)
                     {
-                        for (int tileYIndex = 0; tileYIndex < tileMapHeight; tileYIndex++)
+                        for (int tileXIndex = 0; tileXIndex < tileMapWidth; tileXIndex++)
                         {
                             _map[tileXIndex, tileYIndex] = new Tile(
                                 binaryReader.ReadBoolean(),
                                 binaryReader.ReadInt32()
                             );
+
                         }
                     }
 
                     // Define the number of GameObjects in the room
                     // Could be a door
                     int numberOfGameObjects = binaryReader.ReadInt32();
+                    Dictionary<int, Point> direction = new Dictionary<int, Point> { { 0, new Point(0, -1) }, { 1, new Point(1, 0) }, { 2, new Point(0, 1) }, { 3, new Point(-1, 0) } };
 
                     // Parse all needed GameObjects from the file
                     while (numberOfGameObjects > 0)
                     {
                         int propIndex = binaryReader.ReadInt32();
-                        int posX = binaryReader.ReadInt32();
-                        int posY = binaryReader.ReadInt32();
 
-                        if (binaryReader.ReadBoolean())
-                        {
-                            // Parse a door from the file
-                            // Next three values correspond to the needed data
-                            Door doorFromFile = new Door(
-                                binaryReader.ReadInt32(),
-                                binaryReader.ReadInt32(),
-                                binaryReader.ReadInt32(),
-                                Door.DoorKeyType.None,
-                                new Point(posX, posY),
-                                AssetManager.PropTextures[propIndex]
-                            );
-                            // When this door is interacted with, transition the player
-                            doorFromFile.OnDoorInteract += TransitionPlayer;
-                            _doors.Add(doorFromFile);
-                        }
-                        else
-                        {
-                            Item newItemInRoom = new Item(
-                                new Point(posX, posY),
-                                AssetManager.PropTextures[propIndex]
-                            );
-                            // When this item is picked up, remove it from this room
-                            newItemInRoom.OnItemPickup += RemoveGameObject;
-                            _itemsInRoom.Add(newItemInRoom);
-                        }
+                        Point tileLocation = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
 
+                        ObjectTypes objectType = (ObjectTypes)binaryReader.ReadInt32();
+                        if (objectType == ObjectTypes.Item || objectType == ObjectTypes.Door)
+                        {
+                            Door.DoorKeyType keyType = (Door.DoorKeyType)binaryReader.ReadInt32();
+
+                            if (objectType == ObjectTypes.Door)
+                            {
+                                // Parse a door from the file
+                                // Next three values correspond to the needed data
+                                Door doorFromFile = new Door(
+                                    direction[binaryReader.ReadInt32()], // Direction door is facing
+                                    binaryReader.ReadInt32(), // The index of this door
+                                    binaryReader.ReadInt32(), // The index of the destination room
+                                    binaryReader.ReadInt32(), // The index of the destination door
+                                    keyType,
+                                    tileLocation,
+                                    AssetManager.DoorTexture[propIndex]
+                                );
+                                // When this door is interacted with, transition the player
+                                doorFromFile.OnDoorInteract += TransitionPlayer;
+                                Doors.Add(doorFromFile);
+                            }
+                            else
+                            {
+                                // Parse a prop from the file
+
+                                Item newItemInRoom = new Item(
+                                    tileLocation,
+                                    AssetManager.PropTextures[propIndex],
+                                    "TEMP_NAME",
+                                    keyType
+                                );
+                                // When this item is picked up, remove it from this room
+                                newItemInRoom.OnItemPickup += RemoveGameObject;
+                                _itemsInRoom.Add(newItemInRoom);
+                            }
+                        }
+                        else if (objectType == ObjectTypes.Camera)
+                        {
+                            _itemsInRoom.Add(new Camera(tileLocation, AssetManager.Cameras[propIndex]));
+                        }
+                        else if (objectType == ObjectTypes.Box)
+                        {
+                            _itemsInRoom.Add(new Box(tileLocation, AssetManager.Boxes[propIndex]));
+                        }
                         numberOfGameObjects--;
                     }
                 }
-                catch (Exception e)
-                {
-                    System.Diagnostics.Debug.Write(e);
-                }
-                finally
-                {
-                    binaryReader.Close();
-                }
             }
-            else
+            catch (Exception e)
             {
-                throw new FileNotFoundException(
-                    $"File could not be found when loading room {RoomName}. File path {filePath}"
-                );
+                System.Diagnostics.Debug.Write(e.Message);
             }
         }
+
+
 
         /// <summary>
         /// Transition the player from one room to another
         /// </summary>
-        /// <param name="interactedDoor"></param>
-        private void TransitionPlayer(Door interactedDoor)
+        /// <param name="doorToTravelTo">Door that the player will exit</param>
+        /// <param name="destRoom">Destination room </param>
+        private void TransitionPlayer(Door doorToTravelTo, int destRoom)
         {
-            DoorTransition(interactedDoor);
+            DoorTransition(doorToTravelTo, destRoom);
         }
 
         /// <summary>
         /// Return if a tile can be walk on
         /// </summary>
         /// <param name="pointToCheck">Tile to check</param>
-        /// <returns>If the tile is walkable</returns>
+        /// <returns>If the tile is walkable. True means the tile is walkable</returns>
         public bool VerifyWalkable(Point pointToCheck)
         {
+            foreach (GameObject gameObject in _itemsInRoom)
+            {
+                // If the object is a box that is held and in the square, do not let the player enter it
+                if (gameObject is Box && ((Box)gameObject).AttachmentDirection == Players.Direction.None
+                 && gameObject.Location == pointToCheck)
+                {
+                    return false;
+                }
+            }
+
             return _map[pointToCheck.X, pointToCheck.Y].IsWalkable;
+        }
+
+        /// <summary>
+        /// Verifies that the tile the player is looking at contains an interactable item
+        /// </summary>
+        /// <param name="playerFacing">The location of the tile the player is facing</param>
+        /// <returns></returns>
+        public Prop VerifyInteractable(Point playerFacing)
+        {
+            foreach (Prop obj in _itemsInRoom)
+            {
+                if (obj is Prop prop)
+                {
+                    if (playerFacing == prop.Location)
+                    {
+                        return prop;
+                    }
+                }
+            }
+            foreach (Door door in Doors)
+            {
+                if (playerFacing == door.Location)
+                {
+                    return door;
+                }
+            }
+            return null;
         }
 
         /// <summary>
