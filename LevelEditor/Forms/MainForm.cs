@@ -78,6 +78,7 @@ namespace LevelEditor
         private void MainForm_Load(object sender, EventArgs e)
         {
             LoadTiles();
+            LoadProps();
 
             // In case LoadTiles creating a MessageBox, activating this window will ensure it still becomes
             //   the center of attention afterwards
@@ -136,10 +137,12 @@ namespace LevelEditor
             try
             {
                 Prop[] props = [
-                    // WHAT I WAS LAST WORKING ON: REPLACING THESE CALLS
-                    FileIOHelpers.LoadTile("void.png", false),
-                    FileIOHelpers.LoadTile("testWalkable.png", true),
-                    FileIOHelpers.LoadTile("testWall.png", false)
+                    FileIOHelpers.LoadBox("Box.png"),
+                    FileIOHelpers.LoadItem("hook.png", KeyType.None),
+                    FileIOHelpers.LoadItem("hookAndRope.png", KeyType.None),
+                    FileIOHelpers.LoadItem("idCard.png", KeyType.KeyCard),
+                    FileIOHelpers.LoadItem("screwdriver.png", KeyType.Screwdriver),
+                    FileIOHelpers.LoadItem("wireCutters.png", KeyType.None),
                     ];
 
                 Props = props.AsReadOnly();
@@ -160,7 +163,7 @@ namespace LevelEditor
                         break;
 
                     case DialogResult.Retry:
-                        LoadTiles();
+                        LoadProps();
                         break;
 
                     case DialogResult.Cancel:
@@ -341,6 +344,14 @@ namespace LevelEditor
         {
             FileIOHelpers.SaveLevel(Level, Folder, Tiles);
             FileIOHelpers.UpdateContentMGCB();
+        }
+
+        /// <summary>
+        /// Loads the props when clicked.
+        /// </summary>
+        private void reloadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoadProps();
         }
     }
 }

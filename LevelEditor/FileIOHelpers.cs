@@ -298,6 +298,16 @@ namespace LevelEditor
         }
 
         /// <summary>
+        /// Loads a box from disk given the name of the sprite file.
+        /// </summary>
+        /// <param name="spriteName">The name of the sprite file in the Sprites/Props folder, including file extension.</param>
+        /// <returns>The loaded box.</returns>
+        public static Box LoadBox(string spriteName)
+        {
+            return new Box(LoadPropSprite(spriteName), null);
+        }
+
+        /// <summary>
         /// Loads a sprite with a given name from the folder containing the prop sprites.
         /// </summary>
         /// <param name="spriteName">The file name of the sprite to load, including file extension (e.g. sprite.png)</param>
