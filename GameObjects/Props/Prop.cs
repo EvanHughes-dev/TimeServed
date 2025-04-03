@@ -25,7 +25,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// <param name="player">Player interacting</param>
         public abstract void Interact(Player player);
         /// <summary>
-        /// Allow props to call themselves
+        /// Allow props to draw themselves
         /// </summary>
         /// <param name="sb">Spritebatch to draw with</param>
         /// <param name="worldToScreen">Pixel offset between the world position and screen position</param>

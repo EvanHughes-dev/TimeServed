@@ -89,7 +89,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         }
 
         /// <summary>
-        /// Assign the door this door leads 
+        /// Assign the door to which this door leads 
         /// </summary>
         /// <param name="doorAssignment">Door this door leads to</param>
         public void AssignDoor(Door doorAssignment)

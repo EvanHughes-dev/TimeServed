@@ -179,7 +179,6 @@ namespace MakeEveryDayRecount.Managers
                     break;
                 case MenuModes.SettingsMenu:
                     throw new NotImplementedException("Settings have not been implemented yet");
-
                     break;
                 case MenuModes.Level:
                     break;
