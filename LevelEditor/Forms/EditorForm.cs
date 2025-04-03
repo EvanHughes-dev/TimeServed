@@ -2,6 +2,9 @@
 // 2/9/25
 // The EditorForm, with a palette, selected color, save and load buttons, and a grid of PictureBoxes the user can draw on
 
+using LevelEditor.Classes;
+using LevelEditor.Controls;
+
 namespace LevelEditor
 {
     /// <summary>

@@ -6,36 +6,38 @@ namespace MakeEveryDayRecount.Managers
 {
     public static class AssetManager
     {
-        /// <summary>
-        /// Array of the assets for the props in the game
-        /// </summary>
-        public static Texture2D[] PropTextures { get; private set; }
-        /// <summary>
-        /// Array of camera assets (off = 0, on = 1)
-        /// </summary>
-        public static Texture2D[] CameraTextures { get; private set; }
-        /// <summary>
-        /// Array with every type of tile asset we have in the game
-        /// </summary>
-        public static Texture2D[] TileMap { get; private set; }
-        /// <summary>
-        /// Array of the textures for an inventory box in different states
-        /// </summary>
-        public static Texture2D[] InventoryBoxes { get; private set; }
+
+
+        //PLAYER ASSETS
+
 
         /// <summary>
         /// Sprite sheet for the player
         /// </summary>
         public static Texture2D PlayerTexture { get; private set; }
+
         /// <summary>
         /// Sprite sheet for the player when disguised
         /// </summary>
         public static Texture2D PlayerDisguisedTexture { get; private set; }
 
+
+        //MAP ASSETS
+
+
+        /// <summary>
+        /// Array with every type of tile asset we have in the game
+        /// </summary>
+        public static Texture2D[] TileMap { get; private set; }
+
         /// <summary>
         /// Texture for the doors. Indexed in order top, right, bottom, left
         /// </summary>
         public static Texture2D[] DoorTexture { get; private set; }
+
+
+        //DEBUG ASSETS
+
 
         /// <summary>
         /// Texture for the debug tile for walkable tiles
@@ -46,23 +48,58 @@ namespace MakeEveryDayRecount.Managers
         /// Texture for the debug tile for not walkable tiles
         /// </summary>
         public static Texture2D DebugNotWalkableTile { get; private set; }
+
+
+        //UI ASSETS
+
         /// <summary>
         /// Default texture for all buttons
         /// </summary>
         public static Texture2D DefaultButton { get; private set; }
+
+        /// <summary>
+        /// Array of the textures for an inventory box in different states
+        /// </summary>
+        public static Texture2D[] InventoryBoxes { get; private set; }
+
         /// <summary>
         /// UI desplay for tiles the camera can see
         /// </summary>
         public static Texture2D CameraSight { get; private set; }
 
         /// <summary>
+        /// Holds the textures of the cursor when idle (0) and hovering (1)
+        /// </summary>
+        public static Texture2D[] CursorStates { get; private set; }
+
+
+        //PROP ASSETS
+
+
+        /// <summary>
+        /// Array of the assets for the props in the game
+        /// </summary>
+        public static Texture2D[] PropTextures { get; private set; }
+
+        /// <summary>
+        /// Array of camera assets (off = 0, on = 1)
+        /// </summary>
+        public static Texture2D[] CameraTextures { get; private set; }
+
+        /// <summary>
         /// An array of all camera textures
         /// </summary>
         public static Texture2D[] Cameras { get; private set; }
+
         /// <summary>
         /// An array of all box textures
         /// </summary>
         public static Texture2D[] Boxes { get; private set; }
+
+
+        //FONT STUFF
+
+
         /// <summary>
         /// Default font for debugging
         /// </summary>
@@ -73,22 +110,19 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static Point TileSize { get; private set; }
 
+
+        //METHODS BEGIN
+
+
         public static void LoadContent(ContentManager content)
         {
-            PropTextures = new Texture2D[]
-            {
-                content.Load<Texture2D>("Items/idCard"),
-                content.Load<Texture2D>("Items/screwdriver"),
-                content.Load<Texture2D>("Items/wireCutters"),
-                content.Load<Texture2D>("Items/hook"),
-                content.Load<Texture2D>("Items/hookAndRope"),
-                
-            };
-            CameraTextures = new Texture2D[]
-            {
-                content.Load<Texture2D>("Items/prop_cameraOff"),
-                content.Load<Texture2D>("Items/prop_cameraOn")
-            };
+
+            //LOAD PLAYER ASSETS
+
+            PlayerTexture = content.Load<Texture2D>("Player/player");
+            PlayerDisguisedTexture = content.Load<Texture2D>("Player/player_disguised");
+
+            //LOAD MAP ASSETS
 
             TileMap = new Texture2D[]
             {
@@ -96,22 +130,6 @@ namespace MakeEveryDayRecount.Managers
                 content.Load<Texture2D>("Tiles/testWalkable"),
                 content.Load<Texture2D>("Tiles/testWall"),
             };
-
-            InventoryBoxes = new Texture2D[]
-            {
-                content.Load<Texture2D>("Player/Inventory/InventoryBox_idle"),
-                content.Load<Texture2D>("Player/Inventory/InventoryBox_hover"),
-                content.Load<Texture2D>("Player/Inventory/InventoryBox_selected")
-            };
-
-            PlayerTexture = content.Load<Texture2D>("Player/player");
-            PlayerDisguisedTexture = content.Load<Texture2D>("Player/player_disguised");
-
-            DebugWalkableTile = content.Load<Texture2D>("DebugAssets/WALKABLE");
-            DebugNotWalkableTile = content.Load<Texture2D>("DebugAssets/NOT_WALKABLE");
-
-            Arial20 = content.Load<SpriteFont>("Fonts/Arial20");
-
             DoorTexture = new Texture2D[]
             {
                 content.Load<Texture2D>("Doors/TempDoor-Top"),
@@ -119,15 +137,53 @@ namespace MakeEveryDayRecount.Managers
                 content.Load<Texture2D>("Doors/TempDoor-Bottom"),
                 content.Load<Texture2D>("Doors/TempDoor-Left")
             };
+            TileSize = new Point(TileMap[0].Width, TileMap[0].Height);
+
+            //LOAD DEBUG ASSETS
+            DebugWalkableTile = content.Load<Texture2D>("DebugAssets/WALKABLE");
+            DebugNotWalkableTile = content.Load<Texture2D>("DebugAssets/NOT_WALKABLE");
+
+
+            //LOAD UI ASSETS
+
+            InventoryBoxes = new Texture2D[]
+             {
+                content.Load<Texture2D>("Player/Inventory/InventoryBox_idle"),
+                content.Load<Texture2D>("Player/Inventory/InventoryBox_hover"),
+                content.Load<Texture2D>("Player/Inventory/InventoryBox_selected")
+             };
 
             DefaultButton = content.Load<Texture2D>("UI/DefaultButton");
             CameraSight = content.Load<Texture2D>("UI/UI_cameraSight");
+            CursorStates = new Texture2D[]
+            {
+                content.Load<Texture2D>("UI/ui_cursor"),
+                content.Load<Texture2D>("UI/ui_cursorHover")
+            };
 
+            //LOAD PROP ASSETS
+
+            PropTextures = new Texture2D[]
+            {
+                content.Load<Texture2D>("Items/idCard"),
+                content.Load<Texture2D>("Items/screwdriver"),
+                content.Load<Texture2D>("Items/wireCutters"),
+                content.Load<Texture2D>("Items/hook"),
+                content.Load<Texture2D>("Items/hookAndRope"),
+
+            };
+            CameraTextures = new Texture2D[]
+            {
+                content.Load<Texture2D>("Items/prop_cameraOff"),
+                content.Load<Texture2D>("Items/prop_cameraOn")
+            };
             Boxes = new Texture2D[]{
                 content.Load<Texture2D>("Items/Box")
             };
 
-            TileSize = new Point(TileMap[0].Width, TileMap[0].Height);
+            //FONT STUFF
+            Arial20 = content.Load<SpriteFont>("Fonts/Arial20");
+
         }
     }
 }

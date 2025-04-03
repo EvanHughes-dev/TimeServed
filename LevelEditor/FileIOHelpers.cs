@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using static System.Windows.Forms.LinkLabel;
+using LevelEditor.Classes;
 
 namespace LevelEditor
 {
@@ -175,28 +176,45 @@ namespace LevelEditor
         public static Room LoadRoom(string filePath, IEnumerable<Tile> allTiles)
         {
             /*
-             * THE .room FILE FORMAT:
-             *  - int width
-             *  - int height
-             *  - Several tiles, with the following format:
-             *    - bool isWalkable
-             *    - int tileIndex
-             *  - int numOfProps
-             *  - Several props, with the following format:
-             *    - int propIndex
-             *    - int positionX
-             *    - int positionY
-             *    - bool isDoor
-             *    - If it is a door, then the following is also included:
-             *      - int facing
-             *        - 0 = North
-             *        - 1 = East
-             *        - 2 = South
-             *        - 3 = West
-             *      - int entranceIndex
-             *      - int destinationRoom
-             *      - int destinationDoor
-             */
+            * Form of the room data is as follows
+            *
+            * int tileMapWidth
+            * int tileMapHeight
+            *
+            * Tiles:
+            *   bool isWalkable
+            *   int textureIndex
+            *
+            * int gameObjectCount
+            *
+            * GameObject:
+            *   int propIndex
+            *   int positionX
+            *   int positionY
+            *   int objectType 
+            *       0 = Item
+            *       1 = Camera
+            *       2 = Box
+            *       3 = Door 
+            * 
+            *   if objectType == 0 || objectType == 3
+            *   int keyType
+            *       0 = None
+            *       1 = Key card
+            *       2 = Screwdriver
+            *       For doors, this is the key that can unlock them
+            *       For items, this is the key type they are
+            * 
+            *   if objectType == 3
+            *       int facing
+            *           0 = North/Up
+            *           1 = East/Right
+            *           2 = South/Down
+            *           3 = West/Left
+            *       int destRoomId
+            *       int destX
+            *       int destY
+            */
 
             BinaryReader reader = new(new FileStream(filePath, FileMode.Open));
 

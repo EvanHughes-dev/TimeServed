@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LevelEditor.Classes.Props;
 
-namespace LevelEditor
+namespace LevelEditor.Classes
 {
     /// <summary>
     /// A Room, with a name, ID, and grid of tiles.
@@ -26,6 +27,11 @@ namespace LevelEditor
         public Tile[,] Tiles { get; }
 
         /// <summary>
+        /// The props that have been placed in this room.
+        /// </summary>
+        public List<Prop> Props { get; set; }
+
+        /// <summary>
         /// Creates a new Room with a name, dimensions, and optional Tile to fill the grid with.
         /// </summary>
         /// <param name="name">The room's name.</param>
@@ -35,7 +41,8 @@ namespace LevelEditor
         /// If provided, every tile in the Room will be set to this tile.
         /// Should only be excluded if you're planning to immediately set every tile manually!
         /// </param>
-        public Room(string name, int width, int height, Tile? bg = null) {
+        public Room(string name, int width, int height, Tile? bg = null)
+        {
             Name = name;
 
             Tiles = new Tile[height, width];
