@@ -16,6 +16,9 @@ namespace MakeEveryDayRecount.Managers
     /// </summary>
     internal static class InterfaceManager
     {
+        /// <summary>
+        /// The menu options
+        /// </summary>
         public enum MenuModes
         {
             None,
@@ -169,11 +172,14 @@ namespace MakeEveryDayRecount.Managers
                     _mainMenu.Draw(sb);
                     break;
                 case MenuModes.CheckpointMenu:
+                    throw new NotImplementedException("Checkpoints have not been implemented yet");
                     break;
                 case MenuModes.PauseMenu:
                     _pauseMenu.Draw(sb);
                     break;
                 case MenuModes.SettingsMenu:
+                    throw new NotImplementedException("Settings have not been implemented yet");
+
                     break;
                 case MenuModes.Level:
                     break;
