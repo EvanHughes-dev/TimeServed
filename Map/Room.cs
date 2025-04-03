@@ -434,5 +434,80 @@ namespace MakeEveryDayRecount.Map
         {
             _itemsInRoom.Remove(itemToRemove);
         }
+
+        public void SaveRoom(string filepath)
+        {
+            //DELETE THIS ONCE YOU'RE DONE IMPLEMENTING!!!!!!!!!
+            /*
+                    * Form of the room data is as follows
+                    *
+                    * int tileMapWidth
+                    * int tileMapHeight
+                    *
+                    * Tiles:
+                    *   bool isWalkable
+                    *   int textureIndex
+                    *
+                    * int gameObjectCount
+                    *
+                    * GameObject:
+                    *   int propIndex
+                    *   int positionX
+                    *   int positionY
+                    *   int objectType 
+                    *       0 = Item
+                    *       1 = Camera
+                    *       2 = Box
+                    *       3 = Door 
+                    *       4 = Checkpoint
+                    * 
+                    *   if objectType == 0 || objectType == 3
+                    *   int keyType
+                    *       0 = None
+                    *       1 = Key card
+                    *       2 = Screwdriver
+                    *       For doors, this is the key that can unlock them
+                    *       For items, this is the key type they are
+                    * 
+                    *   if objectType == 3
+                    *       int facing
+                    *           0 = North/Up
+                    *           1 = East/Right
+                    *           2 = South/Down
+                    *           3 = West/Left
+                    *       int entranceIndex
+                    *       int destRoom
+                    *       int destDoor
+                    */
+            BinaryWriter binaryWriter = null;
+            try
+            {
+                Stream stream = File.OpenWrite(filepath + "/" + RoomName);
+                binaryWriter = new BinaryWriter(stream);
+
+                //Write dimensions of room
+                binaryWriter.Write(MapSize.X);
+                binaryWriter.Write(MapSize.Y);
+
+                //Write out all the tiles
+                for (int x = 0; x < MapSize.X; x++)
+                {
+                    for (int y = 0; y < MapSize.Y; y++)
+                    {
+                        binaryWriter.Write(_map[x, y].IsWalkable);
+                        binaryWriter.Write(_map[x, y].SpriteIndex);
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                System.Diagnostics.Debug.Write(e.Message);
+            }
+            finally
+            {
+                binaryWriter.Close();
+            }
+            
+        }
     }
 }

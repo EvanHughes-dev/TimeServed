@@ -7,6 +7,9 @@ using MakeEveryDayRecount.GameObjects.Triggers;
 using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace MakeEveryDayRecount.Managers
 {
@@ -165,6 +168,27 @@ namespace MakeEveryDayRecount.Managers
                 );
             }
             return rooms;
+        }
+
+        public void SaveMap()
+        {
+            string BaseFolder = "./CheckpointData";
+            //TODO: Saves data about the map thus far
+            if (!Directory.Exists(BaseFolder))
+                Directory.CreateDirectory(BaseFolder);
+
+            //MAKE LEVEL FILE HERE!
+            //TODO: check if the level file exists
+
+            for (int i = 0; i < _rooms.Length; i++)
+            {
+                //TODO: call function in each room that saves it data (save room)
+                //Name of each room file should be the room's name property
+                //IMPORTANT: only work on saving tiles for right now. Props are being revamped, so worry about that afterwards
+                //Except for boxes, those will stay the same
+
+                _rooms[i].SaveRoom(BaseFolder);
+            }
         }
     }
 }
