@@ -243,6 +243,14 @@ namespace MakeEveryDayRecount.Managers
             return new Point(startingPoint.X, startingPoint.Y + offsetNumber * (buttonHeight + offset));
         }
 
+        /// <summary>
+        /// Find the first point to draw at
+        /// </summary>
+        /// <param name="buttonSize">Size of a button</param>
+        /// <param name="screenSize">Size of the screen</param>
+        /// <param name="buttonCount">Number of buttons</param>
+        /// <param name="buttonSpacing">Number of pixels between buttons</param>
+        /// <returns>Point to draw the first button</returns>
         private static Point FindFirstPoint(Point buttonSize, Point screenSize, int buttonCount, int buttonSpacing)
         {
             return new Point(screenSize.X / 2 - buttonSize.X / 2, screenSize.Y / 2 - buttonCount * (buttonSize.Y / 2) - buttonSpacing * buttonCount % 2);
