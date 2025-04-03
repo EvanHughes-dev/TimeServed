@@ -32,8 +32,6 @@ namespace MakeEveryDayRecount.Managers
 
         public OnPlayerUpdate OnPlayerUpdate;
 
-        private Camera testCamera;
-
         /// <summary>
         /// Initialize GameplayManager to create the player and map
         /// </summary>
@@ -43,17 +41,12 @@ namespace MakeEveryDayRecount.Managers
             PlayerObject = new Player(new Point(5, 5), AssetManager.PlayerTexture, this, screenSize);
             Map = new MapManager(this);
             OnPlayerUpdate?.Invoke(PlayerObject);
-
-            testCamera = new Camera(new Point(5, 10), AssetManager.PropTextures[4], new Vector2(5, 4), 0.1f);
         }
 
         public void Update(GameTime gameTime)
         {
             //Update Player
             PlayerObject.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
-
-            //Update the camera >:>)
-            testCamera.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
         }
 
         /// <summary>
@@ -67,9 +60,6 @@ namespace MakeEveryDayRecount.Managers
 
             //Draw the player
             PlayerObject.Draw(sb);
-
-            //Draw the camera evilly
-            testCamera.Draw(sb);
         }
 
         /// <summary>

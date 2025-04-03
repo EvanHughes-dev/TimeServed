@@ -6,6 +6,7 @@ using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Players;
+using MakeEveryDayRecount.Managers;
 
 namespace MakeEveryDayRecount.GameObjects.Props
 {
@@ -14,12 +15,12 @@ namespace MakeEveryDayRecount.GameObjects.Props
         //If the camera is on or off
         private bool _active;
         //The direction in which the camera's sprite is facing
-        private enum CameraDirection
+        private enum CameraDirections
         {
-            up,
-            down,
-            left,
-            right
+            Up,
+            Down,
+            Left,
+            Right
         }
 
         //Specify a line for the center of it's vision and the length of its vision, an angle in radians for the width of it's field of vision
@@ -30,6 +31,8 @@ namespace MakeEveryDayRecount.GameObjects.Props
         //The camera will get a certain set of rays when it's created, and those rays will never change, even if they get blocked
         //TODO: Maybe these should be changed into points?
         private Point[] _endPoints;
+        //To tell the cam which way to face
+        private CameraDirections _direction;
 
         //The rays don't project from inside of the wall, where the camera is technically drawn
         //All the rays come out from the point on the floor right "in front of" the camera
@@ -47,21 +50,80 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// <param name="location">The location of the camera, from which the vision kite is projected</param>
         /// <param name="sprite">The camera's sprite</param>
         /// <param name="containingRoom">The room containing the camera. Used to check if tiles are walkable</param>
-        /// <param name="searchingPlayer">The player the camera is meant to search for</param>
         /// <param name="centerPoint">The point that forms the center of the camera's vision kite</param>
         /// <param name="spread">The arc from the center of the vision kite to the edge, in radians</param>
-        public Camera(Point location, Texture2D sprite, Room containingRoom, Player searchingPlayer, Point centerPoint, float spread)
+        public Camera(Point location, Texture2D sprite, Room containingRoom, Point centerPoint, float spread)
             : base(location, sprite)
         {
             _watchedTiles = new List<Point>();
             //All cams start active
             _active = true;
             _room = containingRoom;
-            _player = searchingPlayer;
+            //_player = GameplayManager.PlayerObject;
             _centerPoint = centerPoint;
             _spread = spread;
-            //TODO: Write a check to figure out the raybase here
-            //Check the tiles on either side of the camera
+            //Check which way the ray for the camera is pointing
+            Vector2 centerRay = new Vector2(centerPoint.X-location.X, centerPoint.Y-location.Y); //base of this ray is at location
+            #region Raybase Check
+            //Please do not put the centerpoint on top of the camera it breaks everything
+            if (Math.Abs(centerRay.X) > Math.Abs(centerRay.Y)) //The ray is more horizontal
+            {
+                if (centerRay.X < 0 && containingRoom.VerifyWalkable(new Point(location.X - 1, location.Y))) //cam is pointing left
+                {
+                    _rayBase = new Point(location.X - 1, location.Y);
+                    _direction = CameraDirections.Left;
+                }
+                else if (containingRoom.VerifyWalkable(new Point(location.X + 1, location.Y)))//Cam is pointing right
+                {
+                    _rayBase = new Point(location.X + 1, location.Y);
+                    _direction = CameraDirections.Right;
+                }
+                //If both the left and right tiles aren't walkable, try to set the raybase either up or down
+                else
+                {
+                    if (centerRay.Y < 0 && containingRoom.VerifyWalkable(new Point(Location.X, Location.Y - 1)))
+                    {
+                        _rayBase = new Point(location.X, Location.Y - 1);
+                        _direction = CameraDirections.Up;
+                    }
+                    else //This will be fine unless the camera is deep in the wall or cameraRay is zero vector
+                    {
+                        _rayBase = new Point(location.X, Location.Y + 1);
+                        _direction = CameraDirections.Down;
+                    }
+                }
+            }
+
+            else //the ray is more vertical
+            {
+                if (centerRay.Y < 0 && containingRoom.VerifyWalkable(new Point(location.X, location.Y - 1))) //camera is pointing up
+                {
+                    _rayBase = new Point(Location.X, location.Y - 1);
+                    _direction = CameraDirections.Up;
+                }
+                else if (containingRoom.VerifyWalkable(new Point(location.X, location.Y + 1))) //camera is pointing down
+                {
+                    _rayBase = new Point(Location.X, location.Y + 1);
+                    _direction = CameraDirections.Down;
+                }
+                //If both the up and down tiles aren't walkable, try to set the raybase either left or right
+                else
+                {
+                    if (centerRay.X < 0 && containingRoom.VerifyWalkable(new Point(location.X - 1, location.Y)))
+                    {
+                        _rayBase = new Point(Location.X - 1, location.Y);
+                        _direction = CameraDirections.Left;
+                    }
+                    else //This will be fine unless the camera is deep in the wall or cameraRay is zero vector
+                    {
+                        _rayBase = new Point(Location.X + 1, Location.Y);
+                        _direction = CameraDirections.Right;
+                    }
+                }
+            }
+            //I intentionally wrote the above to prioritize up/down over left/right
+            //I don't think we need a special case for if camera ray X and Y are equal because that can only have an effect if the camera is on an outside corner 
+            #endregion
 
             //NOTE: for testing the camera is in the top wall, so the raybase is one down from the camera's location
             _rayBase = new Point(Location.X, Location.Y - 1);

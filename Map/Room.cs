@@ -304,7 +304,7 @@ namespace MakeEveryDayRecount.Map
                         }
                         else if (objectType == ObjectTypes.Camera)
                         {
-                            _itemsInRoom.Add(new Camera(tileLocation, AssetManager.Cameras[propIndex]));
+                            //_itemsInRoom.Add(new Camera(tileLocation, AssetManager.Cameras[propIndex], this, Player));
                         }
                         else if (objectType == ObjectTypes.Box)
                         {
