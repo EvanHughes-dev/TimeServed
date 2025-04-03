@@ -91,7 +91,7 @@ namespace MakeEveryDayRecount.Managers
 
                 Rectangle menuCheckPointRect = new Rectangle(IncrementScreenPos(drawPoint, 1, buttonSize.Y, buttonSpacing), buttonSize);
                 Button menuCheckPoint = new Button(menuCheckPointRect, AssetManager.DefaultButton, AssetManager.DefaultButton, true, "Checkpoints", font);
-                menuPlay.OnClick += MenuChange(MenuModes.CheckpointMenu);
+                //menuPlay.OnClick += MenuChange(MenuModes.CheckpointMenu);
 
 
                 Rectangle menuQuitRect = new Rectangle(IncrementScreenPos(drawPoint, 2, buttonSize.Y, buttonSpacing), buttonSize);
