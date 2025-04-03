@@ -6,10 +6,7 @@ namespace MakeEveryDayRecount.Managers
 {
     public static class AssetManager
     {
-
-
-        //PLAYER ASSETS
-
+        #region Player Assets
 
         /// <summary>
         /// Sprite sheet for the player
@@ -21,9 +18,9 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static Texture2D PlayerDisguisedTexture { get; private set; }
 
+        #endregion
 
-        //MAP ASSETS
-
+        #region Map Assets
 
         /// <summary>
         /// Array with every type of tile asset we have in the game
@@ -35,9 +32,9 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static Texture2D[] DoorTexture { get; private set; }
 
+        #endregion
 
-        //DEBUG ASSETS
-
+        #region Debug Assets
 
         /// <summary>
         /// Texture for the debug tile for walkable tiles
@@ -49,9 +46,9 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static Texture2D DebugNotWalkableTile { get; private set; }
 
+        #endregion
 
-        //UI ASSETS
-
+        #region UI Assets
         /// <summary>
         /// Default texture for all buttons
         /// </summary>
@@ -63,7 +60,7 @@ namespace MakeEveryDayRecount.Managers
         public static Texture2D[] InventoryBoxes { get; private set; }
 
         /// <summary>
-        /// UI desplay for tiles the camera can see
+        /// UI display for tiles the camera can see
         /// </summary>
         public static Texture2D CameraSight { get; private set; }
 
@@ -72,9 +69,9 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static Texture2D[] CursorStates { get; private set; }
 
+        #endregion
 
-        //PROP ASSETS
-
+        #region Prop Assets
 
         /// <summary>
         /// Array of the assets for the props in the game
@@ -96,23 +93,21 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static Texture2D[] Boxes { get; private set; }
 
+        #endregion
 
-        //FONT STUFF
-
+        #region Font Assets
 
         /// <summary>
         /// Default font for debugging
         /// </summary>
         public static SpriteFont Arial20 { get; private set; }
 
+        #endregion
+
         /// <summary>
         /// The size of each tile, in pixels
         /// </summary>
         public static Point TileSize { get; private set; }
-
-
-        //METHODS BEGIN
-
 
         public static void LoadContent(ContentManager content)
         {
@@ -155,6 +150,7 @@ namespace MakeEveryDayRecount.Managers
 
             DefaultButton = content.Load<Texture2D>("UI/DefaultButton");
             CameraSight = content.Load<Texture2D>("UI/UI_cameraSight");
+
             CursorStates = new Texture2D[]
             {
                 content.Load<Texture2D>("UI/ui_cursor"),

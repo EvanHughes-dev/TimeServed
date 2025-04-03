@@ -1,4 +1,4 @@
-﻿using MakeEveryDayRecount.Managers.Replay;
+using MakeEveryDayRecount.Managers.Replay;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 

@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using MakeEveryDayRecount.Managers;
+using MakeEveryDayRecount.UI;
 
 namespace MakeEveryDayRecount
 {
@@ -62,12 +63,7 @@ namespace MakeEveryDayRecount
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
             Window.AllowUserResizing = true; // Enable user resizing
-
-
-            _debugState = DebugState.None;
-
-            _debugModes = new BaseDebug[2];
-
+            IsMouseVisible = false;
         }
 
         protected override void Initialize()
@@ -79,12 +75,17 @@ namespace MakeEveryDayRecount
                 GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2;
             _graphics.ApplyChanges();
 
-            ReplayManager.Initialize();
+            _debugState = DebugState.None;
+
+            _debugModes = new BaseDebug[2];
 
             //Initialize button lists
-            pauseButtons = new List<Button>();
-            menuButtons = new List<Button>();
-            IsMouseVisible = false;
+
+            InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.MainMenu;
+            InterfaceManager.gameStateChange += SwitchState;
+            InterfaceManager.exitGame += ExitGame;
+
+            ReplayManager.Initialize();
             //Set initial GameState
             _state = GameState.Menu;
             base.Initialize();
@@ -97,15 +98,18 @@ namespace MakeEveryDayRecount
             AssetManager.LoadContent(Content);
             SoundManager.LoadContent(Content);
 
-            // Gameplay manager must be called after all content is loaded
+            // Initialize all items that need assets to be loaded 
+
             _gameplayManager = new GameplayManager(ScreenSize);
 
             MapUtils.Initialize(this, _gameplayManager);
+
             GlobalDebug.Initialize();
+
             _debugModes[0] = new PlayerDebug(_gameplayManager);
             _debugModes[1] = new MapDebug(_gameplayManager);
-            //Load buttons
-            LoadButtons();
+
+            InterfaceManager.Initialize();
         }
 
         protected override void Update(GameTime gameTime)
@@ -116,16 +120,15 @@ namespace MakeEveryDayRecount
             switch (_state)
             {
                 case GameState.Menu:
-                    CheckButtonClicks(menuButtons);
                     break;
 
                 case GameState.Pause:
-                    CheckButtonClicks(pauseButtons);
 
                     if (InputManager.GetKeyPress(Keys.Escape))
                     {
                         _state = GameState.Level;
                         SoundManager.ResumeBGM();
+                        InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.Level;
                     }
                     break;
 
@@ -137,7 +140,7 @@ namespace MakeEveryDayRecount
                     {
                         _state = GameState.Pause;
                         SoundManager.PauseBGM();
-                        _gameplayManager = null;
+                        InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.PauseMenu;
                         // Don't call anything after the game has paused
                         break;
                     }
@@ -175,6 +178,8 @@ namespace MakeEveryDayRecount
                     {
                         _state = GameState.Menu;
                         ReplayManager.EndReplay();
+                        InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.MainMenu;
+
                     }
 
                     InputManager.ReplayUpdate();
@@ -184,6 +189,8 @@ namespace MakeEveryDayRecount
             }
 
             CheckKeyboardInput();
+
+            InterfaceManager.Update();
 
             base.Update(gameTime);
         }
@@ -196,17 +203,17 @@ namespace MakeEveryDayRecount
             // "Point" sampling means that our chunky pixels won't get blurred
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
 
+
             switch (_state)
             {
                 case GameState.Menu:
-                    DrawMenu(_spriteBatch);
+                    // DrawMenu(_spriteBatch);
                     break;
                 case GameState.Pause:
                     //TODO: Blur the gameplay in the background.
 
                     _gameplayManager.Draw(_spriteBatch);
                     DisplayDebug();
-                    DrawPause(_spriteBatch);
                     break;
                 case GameState.Level:
                     _gameplayManager.Draw(_spriteBatch);
@@ -219,10 +226,11 @@ namespace MakeEveryDayRecount
                     DisplayDebug();
                     break;
             }
-            _spriteBatch.Draw(AssetManager.CursorStates[0], new Rectangle(InputManager.GetMousePosition()-new Point(32,32), new Point(64, 64)), Color.White );
+
+            InterfaceManager.Draw(_spriteBatch);
+
             //End the sprite batch
             _spriteBatch.End();
-
             base.Draw(gameTime);
         }
 
@@ -266,142 +274,28 @@ namespace MakeEveryDayRecount
                 _debugState = DebugState.Room;
         }
 
-        private void DisplayPauseMenu(SpriteBatch sb) { }
-
-        private void DisplayMainMenu(SpriteBatch sb) { }
-
         /// <summary>
-        /// Creates all buttons and fills their respective lists them with them.
+        /// Exit the game when button is clicked
         /// </summary>
-        private void LoadButtons()
+        private void ExitGame()
         {
-            //Load button textures
-            defaultButtonTexture = AssetManager.DefaultButton;
-            //... and more, when we have them
-
-            //Fill pause buttons list with buttons
-            Rectangle pauseContinueRect = new Rectangle(200, 200, 400, 100);
-            Button pauseContinue = new Button(defaultButtonTexture, defaultButtonTexture, pauseContinueRect, true);
-            pauseContinue.OnClick += MakeSwitchStateAction(GameState.Level);
-            pauseContinue.OnClick += MakeResumeMusicAction();
-            pauseButtons.Add(pauseContinue);
-
-            Rectangle pauseLastCheckpointRect = new Rectangle(200, 320, 400, 100);
-            Button pauseLastCheckpoint = new Button(defaultButtonTexture, defaultButtonTexture, pauseLastCheckpointRect, true);
-            //pauseLastCheckpoint += the method that brings you back to your last checkpoint
-            pauseButtons.Add(pauseLastCheckpoint);
-
-            Rectangle pauseQuitRect = new Rectangle(200, 440, 400, 100);
-            Button pauseQuit = new Button(defaultButtonTexture, defaultButtonTexture, pauseQuitRect, true);
-            pauseQuit.OnClick += MakeSwitchStateAction(GameState.Menu);
-            pauseButtons.Add(pauseQuit);
-
-            //Fill menu buttons list with buttons
-            Rectangle menuPlayRect = new Rectangle(400, 200, 300, 100);
-            Button menuPlay = new Button(defaultButtonTexture, defaultButtonTexture, menuPlayRect, true);
-            menuPlay.OnClick += MakeSwitchStateAction(GameState.Level);
-            menuPlay.OnClick += MakePlayMusicAction(_gameplayManager.Level);
-            menuButtons.Add(menuPlay);
-
-            Rectangle menuQuitRect = new Rectangle(400, 340, 100, 40);
-            Button menuQuit = new Button(defaultButtonTexture, defaultButtonTexture, menuQuitRect, true);
-            menuQuit.OnClick += MakeExitGameAction();
-            menuButtons.Add(menuQuit);
-
-        }
-
-        private void CheckButtonClicks(List<Button> list)
-        {
-
-            for (int i = 0; i < list.Count; i++)
-            {
-                //Invoke the button's on click effect if it has been clicked
-                list[i].Update();
-            }
-        }
-
-        /// <summary>
-        /// Draws the main menu.
-        /// </summary>
-        /// <param name="sb">sprite batch used to draw</param>
-        private void DrawMenu(SpriteBatch sb)
-        {
-            //Draw the buttons
-            for (int i = 0; i < menuButtons.Count; i++)
-            {
-                menuButtons[i].Draw(sb);
-            }
-        }
-
-        /// <summary>
-        /// Draws the pause menu.
-        /// </summary>
-        /// <param name="sb">sprite batch used to draw</param>
-        private void DrawPause(SpriteBatch sb)
-        {
-            //Draw the buttons
-            for (int i = 0; i < pauseButtons.Count; i++)
-            {
-                pauseButtons[i].Draw(sb);
-            }
-        }
-
-        /// <summary>
-        /// Draws the cutscene.
-        /// </summary>
-        /// <param name="sb">sprite batch used to draw</param>
-        private void DrawCutscene(SpriteBatch sb)
-        {
-
-        }
-
-        /// <summary>
-        /// Draws the playback.
-        /// </summary>
-        /// <param name="sb">sprite batch used to draw</param>
-        private void DrawPlayback(SpriteBatch sb)
-        {
-
+            Exit();
         }
 
         /// <summary>
         /// Creates an Action delegate to set the state to the given GameState. DOES NOT CHANGE THE STATE ITSELF!
         /// </summary>
         /// <param name="state">The state that should be applied when the delegate is called.</param>
-        /// <returns>An Action that sets the game state to the provided state when the ACTION is called.</returns>
-        public Action MakeSwitchStateAction(GameState state)
+        public void SwitchState(GameState state)
         {
-            return () =>
+            if (state == GameState.Level)
             {
-                _state = state;
-            };
-        }
-
-        /// <summary>
-        /// Creates an Action delegate to quit the game.
-        /// </summary>
-        /// <returns>An Action that quits the game when the ACTION is called.</returns>
-        public Action MakeExitGameAction()
-        {
-            return () => Exit();
-        }
-
-        /// <summary>
-        /// Creates an Action delegate to play music for the current level.
-        /// </summary>
-        /// <returns>An Action that plays music for the current level when the ACTION is called.</returns>
-        public Action MakePlayMusicAction(int level)
-        {
-            return () => SoundManager.PlayBGM(level);
-        }
-
-        /// <summary>
-        /// Creates an Action delegate to resume music.
-        /// </summary>
-        /// <returns>An Action that resumes the music when the ACTION is called.</returns>
-        public Action MakeResumeMusicAction()
-        {
-            return () => SoundManager.ResumeBGM();
+                if (SoundManager.PlayingMusic)
+                    SoundManager.ResumeBGM();
+                else
+                    SoundManager.PlayBGM(_gameplayManager.Level);
+            }
+            _state = state;
         }
     }
 }
