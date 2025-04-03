@@ -11,6 +11,9 @@ namespace MakeEveryDayRecount.UI
     /// </summary>
     internal class UserMouse
     {
+        /// <summary>
+        /// The mouse hover state
+        /// </summary>
         public enum MouseHover
         {
             UnHovered = 0,

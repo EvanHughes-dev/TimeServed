@@ -80,7 +80,7 @@ namespace MakeEveryDayRecount
             _debugModes = new BaseDebug[2];
 
             //Initialize button lists
-        
+
             InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.MainMenu;
             InterfaceManager.gameStateChange += SwitchState;
             InterfaceManager.exitGame += ExitGame;
@@ -286,7 +286,6 @@ namespace MakeEveryDayRecount
         /// Creates an Action delegate to set the state to the given GameState. DOES NOT CHANGE THE STATE ITSELF!
         /// </summary>
         /// <param name="state">The state that should be applied when the delegate is called.</param>
-        /// <returns>An Action that sets the game state to the provided state when the ACTION is called.</returns>
         public void SwitchState(GameState state)
         {
             if (state == GameState.Level)
