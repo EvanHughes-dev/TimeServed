@@ -23,6 +23,11 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static SoundEffect PlayerStepSound { get; private set; }
 
+        /// <summary>
+        /// If the background music has a track
+        /// </summary>
+        public static bool PlayingMusic { get; set; }
+
         //Methods
 
         /// <summary>
@@ -37,6 +42,8 @@ namespace MakeEveryDayRecount.Managers
             };
 
             PlayerStepSound = content.Load<SoundEffect>("Audio/Sound Effects/Player Step");
+
+            PlayingMusic = false;
         }
 
         /// <summary>
@@ -48,6 +55,7 @@ namespace MakeEveryDayRecount.Managers
             if (MediaPlayer.State == MediaState.Playing)
                 MediaPlayer.Stop();
             MediaPlayer.Play(BackgroundMusic[level - 1]);
+            PlayingMusic = true;
         }
 
         /// <summary>
@@ -64,6 +72,15 @@ namespace MakeEveryDayRecount.Managers
         public static void ResumeBGM()
         {
             MediaPlayer.Resume();
+        }
+
+        /// <summary>
+        /// Stop the current bgm
+        /// </summary>
+        public static void StopBGM()
+        {
+            MediaPlayer.Stop();
+            PlayingMusic = false;
         }
 
         /// <summary>
