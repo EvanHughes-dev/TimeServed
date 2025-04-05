@@ -66,28 +66,60 @@ namespace LevelEditor
         public static void SaveRoom(Room room, string folderPath, IEnumerable<Tile> allTiles)
         {
             /*
-             * THE .room FILE FORMAT:
-             *  - int width
-             *  - int height
-             *  - Several tiles, with the following format:
-             *    - bool isWalkable
-             *    - int tileIndex
-             *  - int numOfProps
-             *  - Several props, with the following format:
-             *    - int propIndex
-             *    - int positionX
-             *    - int positionY
-             *    - bool isDoor
-             *    - If it is a door, then the following is also included:
-             *      - int facing
-             *        - 0 = North
-             *        - 1 = East
-             *        - 2 = South
-             *        - 3 = West
-             *      - int entranceIndex
-             *      - int destinationRoom
-             *      - int destinationDoor
-             */
+            * Form of the room data is as follows
+            *
+            * int tileMapWidth
+            * int tileMapHeight
+            *
+            * Tiles:
+            *   bool isWalkable
+            *   int textureIndex
+            *
+            * int gameObjectCount
+            *
+            * GameObject:
+            *   int propIndex
+            *   int positionX
+            *   int positionY
+            *   int objectType 
+            *       0 = Item
+            *       1 = Camera
+            *       2 = Box
+            *       3 = Door 
+            * 
+            *   if objectType == 0 || objectType == 3
+            *   int keyType
+            *       0 = None
+            *       1 = Key card
+            *       2 = Screwdriver
+            *       For doors, this is the key that can unlock them
+            *       For items, this is the key type they are
+            * 
+            *   if objectType == 3
+            *       int facing
+            *           0 = North/Up
+            *           1 = East/Right
+            *           2 = South/Down
+            *           3 = West/Left
+            *       int destRoomId
+            *       int destX
+            *       int destY
+            *       
+            * int triggerCount
+            * 
+            * Trigger:
+            *   int positionX
+            *   int positionY
+            *   Positions are of the top-left corner of the trigger
+            *   int width
+            *   int height
+            *   int triggerType
+            *     0 = Player spawn
+            *     1 = Checkpoint
+            *     
+            *     if triggerType == 1
+            *       int index
+            */
 
             Tile[] tilesArray = [.. allTiles];
 
@@ -227,7 +259,8 @@ namespace LevelEditor
             *     0 = Player spawn
             *     1 = Checkpoint
             *     
-            *     TODO: Checkpoint indexes
+            *     if triggerType == 1
+            *       int index
             */
 
             BinaryReader reader = new(new FileStream(filePath, FileMode.Open));
