@@ -47,6 +47,9 @@ namespace MakeEveryDayRecount.Managers
         {
             //Update Player
             PlayerObject.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+
+            //DELETE this. It's just for testing cams
+            Map.CurrentRoom.roomTestCamera.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
         }
 
         /// <summary>

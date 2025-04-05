@@ -7,6 +7,7 @@ using MakeEveryDayRecount.Map.Tiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Managers;
+using System.Runtime.CompilerServices;
 
 namespace MakeEveryDayRecount.Map
 {
@@ -47,6 +48,10 @@ namespace MakeEveryDayRecount.Map
         /// Get the current room
         /// </summary>
         public int RoomIndex { get; private set; }
+
+        //DELETE THIS. IT'S JUST FOR TESTING
+        //This camera is public so that we can call its update fuction from gameplay manager
+        public Camera roomTestCamera;
 
         /// <summary>
         /// Get the path to this room's file
@@ -90,6 +95,11 @@ namespace MakeEveryDayRecount.Map
             _itemsInRoom = new List<Prop> { };
             Doors = new List<Door> { };
             ParseData(filePath);
+
+            //Add a camera to the room for testing
+            //In the actual game this will be done by parsing it from a file, but i's basically the same
+            roomTestCamera = new Camera(new Point(6, 0), AssetManager.CameraTextures[1], this, new Point(10, 2), 0f);
+            _itemsInRoom.Add(roomTestCamera);
         }
 
         #region  Drawing Logic

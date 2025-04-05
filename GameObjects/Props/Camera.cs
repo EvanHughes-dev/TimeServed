@@ -124,9 +124,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //I intentionally wrote the above to prioritize up/down over left/right
             //I don't think we need a special case for if camera ray X and Y are equal because that can only have an effect if the camera is on an outside corner 
             #endregion
-
-            //NOTE: for testing the camera is in the top wall, so the raybase is one down from the camera's location
-            _rayBase = new Point(Location.X, Location.Y - 1);
+            Debug.WriteLine($"Raybase is {_rayBase.X}, {_rayBase.Y}");
 
             //-----Create the vision kite and figure out all the rays-----
             //---Find the endpoints for the corners of the kite---
@@ -148,17 +146,19 @@ namespace MakeEveryDayRecount.GameObjects.Props
         public void Update(float deltaTime)
         {
             //TimeSpan startTime = DateTime.Now.TimeOfDay;
-            //Add a check to see if there's a box directly in front of the camera, and if so don't check any of the rays
-            CheckRay(new Vector2(3, -4));
+            //TODO: Add a check to see if there's a box directly in front of the camera, and if so don't check any of the rays
+            //TODO: Only check rays if we saw a box in the watchedtiles during the previous frame??
+
+            _watchedTiles.AddRange(Rasterize(_rayBase, _centerPoint));
             //Debug.WriteLine(DateTime.Now.TimeOfDay - startTime);
         }
 
-        public void Draw(SpriteBatch sb)
+        public override void Draw(SpriteBatch sb, Point worldToScreen, Point pixelOffset)
         {
-            sb.Draw(Sprite, new Rectangle(MapUtils.TileToWorld(Location) - MapUtils.WorldToScreen() + MapUtils.PixelOffset(), new Point(128, 128)), Color.White);
+            sb.Draw(Sprite, new Rectangle(MapUtils.TileToWorld(Location) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
             foreach (Point tile in _watchedTiles)
             {
-                sb.Draw(AssetManager.PropTextures[3], new Rectangle(MapUtils.TileToWorld(tile) - MapUtils.WorldToScreen() + MapUtils.PixelOffset(), new Point(128, 128)), Color.White);
+                sb.Draw(AssetManager.CameraSight, new Rectangle(MapUtils.TileToWorld(tile) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
             }
         }
 
@@ -185,6 +185,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
             for (; x <= p2.X; x++) //using x as loop variable
             {
                 returnPoints.Add(new Point(x, y));
+                Debug.WriteLine($"Added point {x}, {y}");
                 if (p < 0)
                 {
                     p = p + (2 * dy);

@@ -84,11 +84,6 @@ namespace MakeEveryDayRecount.Managers
         public static Texture2D[] CameraTextures { get; private set; }
 
         /// <summary>
-        /// An array of all camera textures
-        /// </summary>
-        public static Texture2D[] Cameras { get; private set; }
-
-        /// <summary>
         /// An array of all box textures
         /// </summary>
         public static Texture2D[] Boxes { get; private set; }
