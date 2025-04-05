@@ -63,7 +63,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
             _centerPoint = centerPoint;
             _spread = spread;
             //Check which way the ray for the camera is pointing
-            Vector2 centerRay = new Vector2(centerPoint.X-location.X, centerPoint.Y-location.Y); //base of this ray is at location
+            Vector2 centerRay = new Vector2(_centerPoint.X-location.X, _centerPoint.Y-location.Y); //base of this ray is at location
             #region Raybase Check
             //Please do not put the centerpoint on top of the camera it breaks everything
             if (Math.Abs(centerRay.X) > Math.Abs(centerRay.Y)) //The ray is more horizontal
@@ -126,20 +126,39 @@ namespace MakeEveryDayRecount.GameObjects.Props
             #endregion
             Debug.WriteLine($"Raybase is {_rayBase.X}, {_rayBase.Y}");
 
-            //-----Create the vision kite and figure out all the rays-----
+            #region Vision Kite/Endpoints
             //---Find the endpoints for the corners of the kite---
             //Create a vector for the center from the raybase to the centerpoint
-
+            centerRay = new Vector2(_centerPoint.X - _rayBase.X, _centerPoint.Y - location.Y); //Base of the ray is now at raybase
+            //TODO: I feel like some of the variable names for these rays and points are not best practice tbh
             //Rotate that vector by spread in both directions
+            Vector2 clockwiseRay = Vector2.Transform(centerRay, Matrix.CreateRotationX(spread));
+            Vector2 counterclockwiseRay = Vector2.Transform(centerRay, Matrix.CreateRotationX(-spread));
+            //^These built-in methods are *chef kiss*
+            //TODO: Combine the above and below steps into one long line to save some time and memory
 
-            //Round the components of each vector
-
-            //Add the vectors to the raybase to find the corner endpoints
-
-            //Add those corners to the list of endpoints
+            //Turn these rotated vectors back into points
+            Point clockwisePoint = new Point((int)MathF.Round(_rayBase.X + clockwiseRay.X), (int)MathF.Round(_rayBase.Y + clockwiseRay.Y));
+            Point counterclockwisePoint = new Point((int)MathF.Round(_rayBase.X + counterclockwiseRay.X), (int)MathF.Round(_rayBase.Y + counterclockwiseRay.Y));
+            //Gang why does mathF return a float when you round to the nearest integer. This is highly unserious
 
             //Rasterize between the corners and the centerpoint to get all the points we need to send out a ray to
-
+            List<Point> clockwisePoints = Rasterize(clockwisePoint, _centerPoint);
+            List<Point> counterclockwisePoints = Rasterize(_centerPoint, counterclockwisePoint);
+            //TODO: Maybe sort the lists so that the _endpoints array ends up in a centain order?
+            //The endpoints array starts from the counterclockwise corner, goes to the center, and ends at the clockwise corner
+            //Basically sweeping from left to right, from the camera's point of view
+            //Although maybe if the camera "sweeps" from the center outwards, it would somehow help us avoid duplicates more?
+            //Because rays in the center are more likely to have tiles that overlap with the rays at the edges. The closer to the center you are the more overlap there is.
+            //Arbitrarily remove the centerpoint from the clockwise list so we don't add it to endpoints twice
+            //We can't use Remove for this because the centerpoint could be at either end of the return list
+            counterclockwisePoints.Remove(_centerPoint);
+            //Now combine the two lists into one and turn that into an array
+            List<Point> endPoints = clockwisePoints;
+            endPoints.AddRange(counterclockwisePoints);
+            _endPoints = endPoints.ToArray();
+            #endregion
+            //Note that the length of _endPoints may be even or odd depending on rounding
         }
         //TODO: add an alternative constructor that takes a point as the center of the vision cone and constructs a vector from that
 
@@ -156,6 +175,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         public override void Draw(SpriteBatch sb, Point worldToScreen, Point pixelOffset)
         {
             sb.Draw(Sprite, new Rectangle(MapUtils.TileToWorld(Location) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
+            //TODO: Draw the camera differently depending on its _direction
             foreach (Point tile in _watchedTiles)
             {
                 sb.Draw(AssetManager.CameraSight, new Rectangle(MapUtils.TileToWorld(tile) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
