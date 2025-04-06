@@ -332,34 +332,44 @@ namespace LevelEditor
 
                 if (e.Button == MouseButtons.Left)
                 {
+                    //Propy is ALive!! They gets all of tile's shit like a younger sibling does
                     PropBox proppy = new PropBox()
                     {
                         SizeMode = PictureBoxSizeMode.Zoom,
                         Parent = tile,
                         Location = new Point(0,0),
                         Size = tile.Size,
-                        BackColor = Color.Transparent
+                        BackColor = Color.Transparent //and their parent is trans apparently
                     };
 
                     tile.Controls.Add(proppy);
 
-                    proppy.Prop = SelectedProp;
+                    proppy.Prop = SelectedProp.Instantiate(new(x, y));
                     proppy.BringToFront();
                     proppy.MouseDown += PropBox_MouseDown;
+
                     Room.Props.Add(SelectedProp);
                     _propBoxesInRoom.Add(proppy);
                 }
             }
         }
+
+        /// <summary>
+        /// When clicking on a PropBox
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <exception cref="Exception"></exception>
         private void PropBox_MouseDown(object? sender, MouseEventArgs e)
         {
             if (sender is not PropBox proppy) throw new Exception();
 
-            if (e.Button == MouseButtons.Right)
+            if (e.Button == MouseButtons.Right) //Right click will...
             {
-                proppy.Parent?.Controls.Remove(proppy);
-                _propBoxesInRoom.Remove(proppy);
-                proppy.Dispose();
+                proppy.Parent?.Controls.Remove(proppy); //Remove proppy form controls
+                Room.Props.Remove(proppy.Prop);   //Remove proppy from the actual room list
+                _propBoxesInRoom.Remove(proppy);  //Remove proppy form the form's room list
+                proppy.Dispose();                 //REMOVES PROPPY FROM LIFE!!! MWAHAHAHAHHA
             }
         }
 
@@ -444,7 +454,12 @@ namespace LevelEditor
         }
 
         #endregion
-
+        /// <summary>
+        /// Changes the state based on the current tab selected and decides what to do with that info
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <exception cref="Exception"></exception>
         private void tabControlTilesProps_SelectedIndexChanged(object sender, EventArgs e)
         {
 
@@ -457,13 +472,13 @@ namespace LevelEditor
                 case TabState.Tiles:
                     foreach (PropBox proppy in _propBoxesInRoom)
                     {
-                        proppy.Enabled = false;
+                        proppy.Enabled = false; //So that tiles can be drawn underneath the props
                     }
                     break;
                 case TabState.Props:
                     foreach (PropBox proppy in _propBoxesInRoom)
                     {
-                        proppy.Enabled = true;
+                        proppy.Enabled = true; //Props can now be interacted with
                     }
                     break;
                 default:
