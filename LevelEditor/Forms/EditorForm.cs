@@ -6,6 +6,7 @@ using LevelEditor.Classes;
 using LevelEditor.Classes.Props;
 using LevelEditor.Controls;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace LevelEditor
 {
@@ -317,9 +318,6 @@ namespace LevelEditor
                 // Right click picks color! Because that's convenient and I wanted it to be a feature!
                 if (e.Button == MouseButtons.Right)
                     SelectedTile = tile.Tile;
-
-
-                Debug.WriteLine("BOOOOOOOOO");
             }
             else if (_tabState == TabState.Props)
             {
@@ -342,13 +340,26 @@ namespace LevelEditor
                         Size = tile.Size,
                         BackColor = Color.Transparent
                     };
+
                     tile.Controls.Add(proppy);
+
                     proppy.Prop = SelectedProp;
                     proppy.BringToFront();
+                    proppy.MouseDown += PropBox_MouseDown;
                     Room.Props.Add(SelectedProp);
                     _propBoxesInRoom.Add(proppy);
-                    Debug.WriteLine("I HATH ARISEN");
                 }
+            }
+        }
+        private void PropBox_MouseDown(object? sender, MouseEventArgs e)
+        {
+            if (sender is not PropBox proppy) throw new Exception();
+
+            if (e.Button == MouseButtons.Right)
+            {
+                proppy.Parent?.Controls.Remove(proppy);
+                _propBoxesInRoom.Remove(proppy);
+                proppy.Dispose();
             }
         }
 
