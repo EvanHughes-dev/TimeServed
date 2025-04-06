@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace LevelEditor.Classes.Props
 {
     /// <summary>
-    /// Represents a single pusable Box in a room.
+    /// Represents a single pushable Box in a room.
     /// </summary>
     public class Box : Prop
     {
@@ -26,7 +26,7 @@ namespace LevelEditor.Classes.Props
         /// <returns>A copy of this Box at the given position.</returns>
         public override Box Instantiate(Point position)
         {
-            return new(Sprite, position);
+            return new Box(Sprite, position);
         }
     }
 }
