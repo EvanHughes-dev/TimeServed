@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Players;
+using MakeEveryDayRecount.GameObjects.Props;
 
 namespace MakeEveryDayRecount.Managers
 {
@@ -45,11 +46,15 @@ namespace MakeEveryDayRecount.Managers
 
         public void Update(GameTime gameTime)
         {
+            float floatGameTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             //Update Player
-            PlayerObject.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+            PlayerObject.Update(floatGameTime);
 
-            //DELETE this. It's just for testing cams
-            Map.CurrentRoom.roomTestCamera.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+            //Update all the cameras in the current room
+            foreach (Camera cam in Map.CurrentRoom.Cameras)
+            {
+                cam.Update(floatGameTime);
+            }
         }
 
         /// <summary>

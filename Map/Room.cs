@@ -49,10 +49,6 @@ namespace MakeEveryDayRecount.Map
         /// </summary>
         public int RoomIndex { get; private set; }
 
-        //DELETE THIS. IT'S JUST FOR TESTING
-        //This camera is public so that we can call its update fuction from gameplay manager
-        public Camera roomTestCamera;
-
         /// <summary>
         /// Get the path to this room's file
         /// </summary>
@@ -72,6 +68,12 @@ namespace MakeEveryDayRecount.Map
         }
         private Tile[,] _map;
         private List<Prop> _itemsInRoom;
+        //I originally wanted to make this a generic list of all the props in the room that might need to be updated
+        //But most props don't have an update function, so it's better to have this list only be concerned with cameras because they can actually update
+        /// <summary>
+        /// Get the list of cameras in the room so we can update them every frame
+        /// </summary>
+        public List<Camera> Cameras { get; private set; }
         public List<Door> Doors
         { get; private set; }
 
@@ -97,9 +99,10 @@ namespace MakeEveryDayRecount.Map
             ParseData(filePath);
 
             //Add a camera to the room for testing
-            //In the actual game this will be done by parsing it from a file, but i's basically the same
-            roomTestCamera = new Camera(new Point(6, 0), AssetManager.CameraTextures[1], this, new Point(10, 10), (float)(Math.PI/4));
+            //In the actual game this will be done by parsing it from a file, but it's basically the same
+            Camera roomTestCamera = new Camera(new Point(6, 0), AssetManager.CameraTextures[1], this, new Point(10, 10), (float)(Math.PI/4));
             _itemsInRoom.Add(roomTestCamera);
+            Cameras.Add(roomTestCamera);
         }
 
         #region  Drawing Logic
@@ -156,18 +159,18 @@ namespace MakeEveryDayRecount.Map
             {
                 Point propPosition = propToDraw.Location;
 
-                //Cameras are excluded from this check and are always drawn if they are in the room
-                //This is done to allow the camera's vision to be seen even when the camera is not on the screen
-                if (propToDraw is Camera)
-                {
-                    propToDraw.Draw(sb, worldToScreen, pixelOffset);
-                }
-                else if (
+                if (
                     propPosition.X >= screenMinX
                     && propPosition.X <= screenMaxX
                     && propPosition.Y >= screenMinY
                     && propPosition.Y <= screenMaxY
                 )
+                {
+                    propToDraw.Draw(sb, worldToScreen, pixelOffset);
+                }
+                //Cameras are excluded from this check and are always drawn if they are in the room
+                //This is done to allow the camera's vision to be seen even when the camera is not on the screen
+                else if (propToDraw is Camera)
                 {
                     propToDraw.Draw(sb, worldToScreen, pixelOffset);
                 }
