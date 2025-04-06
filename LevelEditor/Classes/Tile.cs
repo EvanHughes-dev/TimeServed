@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LevelEditor
+namespace LevelEditor.Classes
 {
     /// <summary>
     /// A single Tile, with a sprite and whether or not it can be walked on.

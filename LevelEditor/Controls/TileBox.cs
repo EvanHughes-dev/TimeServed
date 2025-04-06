@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LevelEditor.Classes;
 
-namespace LevelEditor
+namespace LevelEditor.Controls
 {
     /// <summary>
     /// An extension of PictureBox specialized to store a Tile.
@@ -16,7 +17,8 @@ namespace LevelEditor
         /// <summary>
         /// Gets or sets the Tile this TileBox should display.
         /// </summary>
-        public Tile Tile {
+        public Tile Tile
+        {
             get => _tile;
             set
             {
