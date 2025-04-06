@@ -71,7 +71,7 @@ namespace MakeEveryDayRecount.Map
         //I originally wanted to make this a generic list of all the props in the room that might need to be updated
         //But most props don't have an update function, so it's better to have this list only be concerned with cameras because they can actually update
         /// <summary>
-        /// Get the list of cameras in the room so we can update them every frame
+        /// Get the list of cameras in the room
         /// </summary>
         public List<Camera> Cameras { get; private set; }
         public List<Door> Doors
@@ -95,6 +95,7 @@ namespace MakeEveryDayRecount.Map
 
             _map = new Tile[,] { };
             _itemsInRoom = new List<Prop> { };
+            Cameras = new List<Camera>();
             Doors = new List<Door> { };
             ParseData(filePath);
 
@@ -169,7 +170,7 @@ namespace MakeEveryDayRecount.Map
                     propToDraw.Draw(sb, worldToScreen, pixelOffset);
                 }
                 //Cameras are excluded from this check and are always drawn if they are in the room
-                //This is done to allow the camera's vision to be seen even when the camera is not on the screen
+                //This is done to allow the camera's vision cone to be seen even when the camera is not on the screen
                 else if (propToDraw is Camera)
                 {
                     propToDraw.Draw(sb, worldToScreen, pixelOffset);
