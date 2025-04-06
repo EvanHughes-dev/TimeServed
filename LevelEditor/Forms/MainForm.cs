@@ -70,6 +70,7 @@ namespace LevelEditor
             Tiles = null!;
 
             Folder = null!;
+            FileIOHelpers.CopyFolder("../../.././Sprites", ".bin/Debug/net8.0-windows");
         }
 
         /// <summary>
@@ -137,12 +138,17 @@ namespace LevelEditor
             try
             {
                 Prop[] props = [
-                    FileIOHelpers.LoadBox("Box.png"),
-                    FileIOHelpers.LoadItem("hook.png", KeyType.None),
-                    FileIOHelpers.LoadItem("hookAndRope.png", KeyType.None),
-                    FileIOHelpers.LoadItem("idCard.png", KeyType.KeyCard),
-                    FileIOHelpers.LoadItem("screwdriver.png", KeyType.Screwdriver),
-                    FileIOHelpers.LoadItem("wireCutters.png", KeyType.None),
+                        FileIOHelpers.LoadBox("Box.png", 0),
+                        FileIOHelpers.LoadItem("hook.png",0, KeyType.None),
+                        FileIOHelpers.LoadItem("hookAndRope.png",0, KeyType.None),
+                        FileIOHelpers.LoadItem("idCard.png",0, KeyType.KeyCard),
+                        FileIOHelpers.LoadItem("screwdriver.png",0, KeyType.Screwdriver),
+                        FileIOHelpers.LoadItem("wireCutters.png",0, KeyType.None),
+                        FileIOHelpers.LoadDoor("Door-Top.png", 0, KeyType.KeyCard, Orientation.North),
+                        FileIOHelpers.LoadDoor("Door-Right.png", 0, KeyType.KeyCard, Orientation.East),
+                        FileIOHelpers.LoadDoor("Door-Bottom.png", 0, KeyType.KeyCard, Orientation.South),
+                        FileIOHelpers.LoadDoor("Door-Left.png", 0, KeyType.KeyCard, Orientation.West),
+
                     ];
 
                 Props = props.AsReadOnly();

@@ -7,6 +7,7 @@ using System.IO;
 using static System.Windows.Forms.LinkLabel;
 using LevelEditor.Classes;
 using LevelEditor.Classes.Props;
+using System.Threading.Channels;
 
 namespace LevelEditor
 {
@@ -165,7 +166,7 @@ namespace LevelEditor
 
             writer.Close();
         }
-        
+
         /// <summary>
         /// Loads the level at the given file path and returns it.
         /// This method is UNSAFE and MUST be called within a TRY-CATCH!
@@ -330,6 +331,22 @@ namespace LevelEditor
             return new(Image.FromFile(Path.Join(TileFolderPath, spriteName)), isWalkable);
         }
 
+        public static void CopyFolder(string sourceFolder, string destFolder){
+            if(!Directory.Exists(destFolder)){
+                Directory.CreateDirectory(destFolder);
+            }            
+
+            foreach(string file in Directory.GetFiles(sourceFolder)){
+                string destFile = Path.Combine(destFolder, Path.GetFileName(file));
+                File.Copy(file, destFile, true);
+            }
+
+            foreach(string subDir in Directory.GetDirectories(sourceFolder)){
+                string destSubDir=Path.Combine(destFolder, Path.GetFileName(subDir));
+                CopyFolder(subDir, destSubDir);
+            }
+        }
+
         /// <summary>
         /// UNIMPLEMENTED
         /// </summary>
@@ -340,35 +357,38 @@ namespace LevelEditor
         /// <summary>
         /// Loads a door from disk given the name of the sprite file and the necessary data about the door.
         /// </summary>
-        /// <param name="spriteName">The name of the sprite file in the Sprites/Props folder, including file extension.</param>
+        /// <param name="spriteName">The name of the sprite file in the Sprites/Props folder, including file extension.</param
+        /// <param name="imageIndex"> Index of this image inside the coresponding array in the game</prarm>
         /// <param name="keyToOpen">The type of key necessary to open this door, if any.</param>
         /// <param name="facing">The direction that this door is facing (a north-facing door would be placed on a south wall).</param>
         /// <returns>The loaded door.</returns>
-        public static Door LoadDoor(string spriteName, KeyType keyToOpen, Orientation facing)
+        public static Door LoadDoor(string spriteName, int imageIndex, KeyType keyToOpen, Orientation facing)
         {
             // These loaded props are fundamentally positionless -- they aren't in a room!
-            return new Door(LoadPropSprite(spriteName),  0, keyToOpen, facing, null);
+            return new Door(LoadPropSprite(spriteName),  imageIndex, keyToOpen, facing);
         }
 
         /// <summary>
         /// Loads an item from disk given the name of the sprite file and the necessary data about the item.
         /// </summary>
         /// <param name="spriteName">The name of the sprite file in the Sprites/Props folder, including file extension.</param>
+        /// <param name="imageIndex"> Index of this image inside the coresponding array in the game</prarm>
         /// <param name="keyType">The type of key that this item is, if any.</param>
         /// <returns>The loaded item.</returns>
-        public static Item LoadItem(string spriteName, KeyType keyType)
+        public static Item LoadItem(string spriteName, int imageIndex, KeyType keyType)
         {
-            return new Item(LoadPropSprite(spriteName), 0, keyType, null);
+            return new Item(LoadPropSprite(spriteName), imageIndex, keyType);
         }
 
         /// <summary>
         /// Loads a box from disk given the name of the sprite file.
         /// </summary>
         /// <param name="spriteName">The name of the sprite file in the Sprites/Props folder, including file extension.</param>
+        /// <param name="imageIndex"> Index of this image inside the coresponding array in the game</prarm>
         /// <returns>The loaded box.</returns>
-        public static Box LoadBox(string spriteName)
+        public static Box LoadBox(string spriteName, int imageIndex)
         {
-            return new Box(LoadPropSprite(spriteName),0, null);
+            return new Box(LoadPropSprite(spriteName), imageIndex, null);
         }
 
         /// <summary>
