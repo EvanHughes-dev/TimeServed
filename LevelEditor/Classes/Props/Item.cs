@@ -26,11 +26,21 @@ namespace LevelEditor.Classes.Props
         ///     The kind of key that this Item is. Will open Doors with a matching KeyType.
         ///     Set to None to make this Item inable to open any locked doors.
         /// </param>
-        public Item(Image sprite, Point position, int imageIndex, KeyType keyType)
-            : base(sprite, position, imageIndex, ObjectType.Item)
+        public Item(Image sprite, int imageIndex, KeyType keyType, Point? position=null)
+            : base(sprite, imageIndex, ObjectType.Item, position)
         {
             // Save params
             KeyType = keyType;
+        }
+
+        /// <summary>
+        /// Returns a copy of this Item at the given position.
+        /// </summary>
+        /// <param name="position">The position to "instantiate" the Item at.</param>
+        /// <returns>A copy of this Item at the given position.</returns>
+        public override Item Instantiate(Point position)
+        {
+            return new Item(Sprite,ImageIndex, KeyType, position);
         }
     }
 }

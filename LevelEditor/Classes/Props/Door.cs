@@ -41,12 +41,23 @@ namespace LevelEditor.Classes.Props
         ///     Set to None to make this door unlocked.
         /// </param>
         /// <param name="facing">The direction this door faces.</param>
-        public Door(Image sprite, Point position, int propIndex, KeyType keyToOpen, Orientation facing)
-            : base(sprite, position, propIndex, ObjectType.Door)
+        public Door(Image sprite, int propIndex, KeyType keyToOpen, Orientation facing, Point? position=null)
+            : base(sprite,  propIndex, ObjectType.Door, position)
         {
             // Save params
             KeyToOpen = keyToOpen;
             Facing = facing;
+        }
+
+
+        /// <summary>
+        /// Creates a copy of this Door at the given position.
+        /// </summary>
+        /// <param name="position">The position to copy this Door to.</param>
+        /// <returns>A copy of this Door at the given position.</returns>
+        public override Door Instantiate(Point position)
+        {
+            return new Door(Sprite, ImageIndex, KeyToOpen, Facing,  position);
         }
     }
 }
