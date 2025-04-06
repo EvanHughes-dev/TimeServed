@@ -67,46 +67,46 @@ namespace LevelEditor
         /// <param name="allTiles">All possible tiles, so this method can save the room with the proper tile indexes.</param>
         public static void SaveRoom(Room room, string folderPath, IEnumerable<Tile> allTiles)
         {
-           /*
-            * Form of the room data is as follows
-            *
-            * int tileMapWidth
-            * int tileMapHeight
-            *
-            * Tiles:
-            *   bool isWalkable
-            *   int textureIndex
-            *
-            * int gameObjectCount
-            *
-            * GameObject:
-            *   int propIndex
-            *   int positionX
-            *   int positionY
-            *   int objectType 
-            *       0 = Item
-            *       1 = Camera
-            *       2 = Box
-            *       3 = Door 
-            * 
-            *   if objectType == 0 || objectType == 3
-            *   int keyType
-            *       0 = None
-            *       1 = Key card
-            *       2 = Screwdriver
-            *       For doors, this is the key that can unlock them
-            *       For items, this is the key type they are
-            * 
-            *   if objectType == 3
-            *       int facing
-            *           0 = North/Up
-            *           1 = East/Right
-            *           2 = South/Down
-            *           3 = West/Left
-            *       int destRoomId
-            *       int destX
-            *       int destY
-            */
+            /*
+             * Form of the room data is as follows
+             *
+             * int tileMapWidth
+             * int tileMapHeight
+             *
+             * Tiles:
+             *   bool isWalkable
+             *   int textureIndex
+             *
+             * int gameObjectCount
+             *
+             * GameObject:
+             *   int propIndex
+             *   int positionX
+             *   int positionY
+             *   int objectType 
+             *       0 = Item
+             *       1 = Camera
+             *       2 = Box
+             *       3 = Door 
+             * 
+             *   if objectType == 0 || objectType == 3
+             *   int keyType
+             *       0 = None
+             *       1 = Key card
+             *       2 = Screwdriver
+             *       For doors, this is the key that can unlock them
+             *       For items, this is the key type they are
+             * 
+             *   if objectType == 3
+             *       int facing
+             *           0 = North/Up
+             *           1 = East/Right
+             *           2 = South/Down
+             *           3 = West/Left
+             *       int destRoomId
+             *       int destX
+             *       int destY
+             */
 
             Tile[] tilesArray = [.. allTiles];
 
@@ -133,9 +133,11 @@ namespace LevelEditor
 
             writer.Write(room.Props.Count);
 
-            foreach(Prop prop in room.Props){
+            foreach (Prop prop in room.Props)
+            {
                 writer.Write(prop.ImageIndex);
-                if(prop.Position.HasValue){
+                if (prop.Position.HasValue)
+                {
                     writer.Write(prop.Position.Value.X);
                     writer.Write(prop.Position.Value.Y);
                 }
@@ -156,7 +158,7 @@ namespace LevelEditor
                         Door door = (Door)prop;
                         writer.Write((int)door.KeyToOpen);
                         writer.Write((int)door.Facing);
-                        if(door.ConnectedTo!=null)
+                        if (door.ConnectedTo != null)
                             writer.Write(door.ConnectedTo.Id);
                         writer.Write(door.Destination.X);
                         writer.Write(door.Destination.Y);
@@ -173,8 +175,9 @@ namespace LevelEditor
         /// </summary>
         /// <param name="filePath">The path to the .level file.</param>
         /// <param name="allTiles">A reference to the tile array, so the rooms can be loaded properly.</param>
+        /// <param name="allProps">A reference to the prop array so the room can load any props that have been saved</param>
         /// <returns>The loaded level, including all of its contained rooms.</returns>
-        public static Level LoadLevel(string filePath, IEnumerable<Tile> allTiles)
+        public static Level LoadLevel(string filePath, IEnumerable<Tile> allTiles, IEnumerable<Prop> allProps)
         {
             /*
              * THE .level FILE FORMAT:
@@ -201,7 +204,7 @@ namespace LevelEditor
                 if (File.Exists(roomPath))
                 {
                     level.Rooms.Add(
-                        LoadRoom(roomPath, allTiles)
+                        LoadRoom(roomPath, allTiles, allProps)
                         );
                 }
 
@@ -218,9 +221,9 @@ namespace LevelEditor
         /// </summary>
         /// <param name="filePath">The path to the .room file.</param>
         /// <param name="allTiles">A reference to the tile array, so it can be loaded properly.</param>
+        /// <param name="allProps">A reference to the prop array so the room can load any props that have been saved</param>
         /// <returns>The loaded room.</returns>
-        /// <exception cref="NotImplementedException">Thrown for any .room file that includes a Prop.</exception>
-        public static Room LoadRoom(string filePath, IEnumerable<Tile> allTiles)
+        public static Room LoadRoom(string filePath, IEnumerable<Tile> allTiles, IEnumerable<Prop> allProps)
         {
             /*
             * Form of the room data is as follows
@@ -288,24 +291,26 @@ namespace LevelEditor
             }
 
             // TODO: ADD LOADING OF PROPS
-            // For now, if a room has any props, we'll just throw an error
             int numOfProps = reader.ReadInt32();
 
             while (numOfProps > 0)
             {
-                int propIndex = reader.ReadInt32();
+                int imageIndex = reader.ReadInt32();
                 Point propPosition = new Point(reader.ReadInt32(), reader.ReadInt32());
                 ObjectType objectType = (ObjectType)reader.ReadInt32();
 
                 switch (objectType)
                 {
                     case ObjectType.Item:
-                        break;
-                    case ObjectType.Camera:
+                        room.Props.Add(allProps.ElementAt(imageIndex).Instantiate(propPosition));
                         break;
                     case ObjectType.Box:
+                        room.Props.Add(allProps.ElementAt(imageIndex + 5).Instantiate(propPosition));
                         break;
                     case ObjectType.Door:
+                        room.Props.Add(allProps.ElementAt(imageIndex + 6).Instantiate(propPosition));
+                        break;
+                    case ObjectType.Camera:
                         break;
                 }
 
@@ -317,40 +322,7 @@ namespace LevelEditor
             return room;
         }
 
-        /// <summary>
-        /// Loads a tile from disk given the name of the sprite file in the Tiles folder and whether that tile is walkable.
-        /// This method is UNSAFE and MUST be called within a TRY-CATCH!
-        /// </summary>
-        /// <param name="spriteName">The name of the sprite file in the Sprites/Tiles folder, including file extension.</param>
-        /// <param name="isWalkable">Whether this tile should be allowed to be walked on.</param>
-        /// <returns>The loaded tile.</returns>
-        public static Tile LoadTile(string spriteName, bool isWalkable)
-        {
-            const string TileFolderPath = "./Sprites/Tiles";
-
-            return new(Image.FromFile(Path.Join(TileFolderPath, spriteName)), isWalkable);
-        }
-
-        /// <summary>
-        /// Copy all the contents of a folder from one location to another
-        /// </summary>
-        /// <param name="sourceFolder">Folder to copy the contents of</param>
-        /// <param name="destFolder">Folder to copy to</param>
-        public static void CopyFolder(string sourceFolder, string destFolder){
-            if(!Directory.Exists(destFolder)){
-                Directory.CreateDirectory(destFolder);
-            }            
-
-            foreach(string file in Directory.GetFiles(sourceFolder)){
-                string destFile = Path.Combine(destFolder, Path.GetFileName(file));
-                File.Copy(file, destFile, true);
-            }
-
-            foreach(string subDir in Directory.GetDirectories(sourceFolder)){
-                string destSubDir=Path.Combine(destFolder, Path.GetFileName(subDir));
-                CopyFolder(subDir, destSubDir);
-            }
-        }
+        #region Loading Assets
 
         /// <summary>
         /// UNIMPLEMENTED
@@ -370,7 +342,7 @@ namespace LevelEditor
         public static Door LoadDoor(string spriteName, int imageIndex, KeyType keyToOpen, Orientation facing)
         {
             // These loaded props are fundamentally positionless -- they aren't in a room!
-            return new Door(LoadPropSprite(spriteName),  imageIndex, keyToOpen, facing);
+            return new Door(LoadPropSprite(spriteName), imageIndex, keyToOpen, facing);
         }
 
         /// <summary>
@@ -408,6 +380,22 @@ namespace LevelEditor
             return Image.FromFile(Path.Join(PropFolderPath, spriteName));
         }
 
+        /// <summary>
+        /// Loads a tile from disk given the name of the sprite file in the Tiles folder and whether that tile is walkable.
+        /// This method is UNSAFE and MUST be called within a TRY-CATCH!
+        /// </summary>
+        /// <param name="spriteName">The name of the sprite file in the Sprites/Tiles folder, including file extension.</param>
+        /// <param name="isWalkable">Whether this tile should be allowed to be walked on.</param>
+        /// <returns>The loaded tile.</returns>
+        public static Tile LoadTile(string spriteName, bool isWalkable)
+        {
+            const string TileFolderPath = "./Sprites/Tiles";
+
+            return new(Image.FromFile(Path.Join(TileFolderPath, spriteName)), isWalkable);
+        }
+        #endregion
+
+        #region Useful File Macros
         /// <summary>
         /// Automatically update the Content.MGCB file to contain ALL files inside the Levels
         /// folder to be included in the build. This function assumes that the folder locations 
@@ -479,5 +467,33 @@ namespace LevelEditor
                             .Select(Path.GetFileName)
                             .ToList()!;
         }
+
+        /// <summary>
+        /// Copy all the contents of a folder from one location to another
+        /// </summary>
+        /// <param name="sourceFolder">Folder to copy the contents of</param>
+        /// <param name="destFolder">Folder to copy to</param>
+        public static void CopyFolder(string sourceFolder, string destFolder)
+        {
+            if (!Directory.Exists(destFolder))
+            {
+                Directory.CreateDirectory(destFolder);
+            }
+
+            foreach (string file in Directory.GetFiles(sourceFolder))
+            {
+                string destFile = Path.Combine(destFolder, Path.GetFileName(file));
+                File.Copy(file, destFile, true);
+            }
+
+            foreach (string subDir in Directory.GetDirectories(sourceFolder))
+            {
+                string destSubDir = Path.Combine(destFolder, Path.GetFileName(subDir));
+                CopyFolder(subDir, destSubDir);
+            }
+        }
+
+        #endregion
+
     }
 }
