@@ -5,16 +5,17 @@
 using LevelEditor.Classes;
 using LevelEditor.Classes.Props;
 using LevelEditor.Controls;
+using System.Diagnostics;
 
 namespace LevelEditor
 {
     /// <summary>
     /// Keeps track of tab state
     /// </summary>
-    enum TabState 
+    enum TabState
     {
-        Tiles, 
-        Props 
+        Tiles,
+        Props
     };
 
     /// <summary>
@@ -54,7 +55,10 @@ namespace LevelEditor
         /// Gets the palette of props the user may select from
         /// </summary>
         private Prop[,] PropPalette { get; }
-
+        /// <summary>
+        /// Holds the prop boxes that exist in the room
+        /// </summary>
+        private List<PropBox> _propBoxesInRoom;
         /// <summary>
         /// Creates a new EditorForm, editing an existing room.
         /// </summary>
@@ -106,6 +110,8 @@ namespace LevelEditor
             // Sets the selected color to some sort of reasonable default -- Palette[0, 0] is the only place we can guarantee there's a color in the palette
             //   (assuming the developer didn't change Palette to an entirely empty array)
             SelectedProp = PropPalette[0, 0];
+
+            _propBoxesInRoom = [];
         }
 
         /// <summary>
@@ -136,6 +142,7 @@ namespace LevelEditor
             InitializeMap(Room);
         }
 
+        #region Create Palettes
 
         /// <summary>
         /// Creates the color selection buttons corresponding with the palette. Should only be run once!
@@ -196,6 +203,8 @@ namespace LevelEditor
             }
         }
 
+        #endregion
+
         /// <summary>
         /// Immediately after the form finishes loading.
         /// </summary>
@@ -205,6 +214,8 @@ namespace LevelEditor
             //   but deleting it would mean I'd have to fix the designer file and I
             //   don't wanna have to deal with that hassle. Maybe it'll have a use!
         }
+
+        #region Swatch Events
 
         /// <summary>
         /// When a "swatch" button is clicked, select its color.
@@ -226,6 +237,8 @@ namespace LevelEditor
 
             SelectedProp = prop.Prop;
         }
+
+        #endregion
 
         /// <summary>
         /// Initializes the grid of TileBoxes and sets their display to facilitate editing of a given Room.
@@ -276,6 +289,8 @@ namespace LevelEditor
             }
         }
 
+        #region Tile Events
+
         /// <summary>
         /// When a tile is clicked, either change its color or select its color (for left and right click, respectively).
         /// </summary>
@@ -284,22 +299,57 @@ namespace LevelEditor
         {
             if (sender is not TileBox tile) throw new Exception();
 
-            // We have to disable this control capturing the mouse so that future MouseMove events can be fired on *other* tiles
-            //   (to make clicking and dragging work)
-            tile.Capture = false;
-
-            (int y, int x) = TileGrid.IndexesOf(tile);
-
-            if (e.Button == MouseButtons.Left)
+            if (_tabState == TabState.Tiles)
             {
-                tile.Tile = SelectedTile;
+                // We have to disable this control capturing the mouse so that future MouseMove events can be fired on *other* tiles
+                //   (to make clicking and dragging work)
+                tile.Capture = false;
 
-                Room.Tiles[y, x] = SelectedTile;
+                (int y, int x) = TileGrid.IndexesOf(tile);
+
+                if (e.Button == MouseButtons.Left)
+                {
+                    tile.Tile = SelectedTile;
+
+                    Room.Tiles[y, x] = SelectedTile;
+                }
+
+                // Right click picks color! Because that's convenient and I wanted it to be a feature!
+                if (e.Button == MouseButtons.Right)
+                    SelectedTile = tile.Tile;
+
+
+                Debug.WriteLine("BOOOOOOOOO");
             }
+            else if (_tabState == TabState.Props)
+            {
+                // We have to disable this control capturing the mouse so that future MouseMove events can be fired on *other* tiles
+                //   (to make clicking and dragging work)
+                //tile.Capture = false;
 
-            // Right click picks color! Because that's convenient and I wanted it to be a feature!
-            if (e.Button == MouseButtons.Right)
-                SelectedTile = tile.Tile;
+
+                (int y, int x) = TileGrid.IndexesOf(tile);
+
+
+
+                if (e.Button == MouseButtons.Left)
+                {
+                    PropBox proppy = new PropBox()
+                    {
+                        SizeMode = PictureBoxSizeMode.Zoom,
+                        Parent = tile,
+                        Location = new Point(0,0),
+                        Size = tile.Size,
+                        BackColor = Color.Transparent
+                    };
+                    tile.Controls.Add(proppy);
+                    proppy.Prop = SelectedProp;
+                    proppy.BringToFront();
+                    Room.Props.Add(SelectedProp);
+                    _propBoxesInRoom.Add(proppy);
+                    Debug.WriteLine("I HATH ARISEN");
+                }
+            }
         }
 
         /// <summary>
@@ -309,16 +359,21 @@ namespace LevelEditor
         private void Tile_MouseMove(object? sender, MouseEventArgs e)
         {
             if (sender is not TileBox tile) throw new Exception();
-
-            (int y, int x) = TileGrid.IndexesOf(tile);
-
-            if (e.Button == MouseButtons.Left)
+            if (_tabState == TabState.Tiles)
             {
-                tile.Tile = SelectedTile;
+                (int y, int x) = TileGrid.IndexesOf(tile);
 
-                Room.Tiles[y, x] = SelectedTile;
+                if (e.Button == MouseButtons.Left)
+                {
+                    tile.Tile = SelectedTile;
+
+                    Room.Tiles[y, x] = SelectedTile;
+                }
             }
         }
+
+        #endregion
+        #region Helpers
 
         /// <summary>
         /// Creates a uniform grid of controls following a number of parameters.
@@ -377,12 +432,34 @@ namespace LevelEditor
                 rect.Height - padTop - padBottom);
         }
 
-        private void tabControlTilesProps_TabIndexChanged(object sender, EventArgs e)
+        #endregion
+
+        private void tabControlTilesProps_SelectedIndexChanged(object sender, EventArgs e)
         {
 
             if (sender is not TabControl tabby) throw new Exception();
 
-            _tabState = (TabState)tabby.TabIndex;
+            TabState newState = (TabState)tabby.SelectedIndex;
+
+            switch (newState)
+            {
+                case TabState.Tiles:
+                    foreach (PropBox proppy in _propBoxesInRoom)
+                    {
+                        proppy.Enabled = false;
+                    }
+                    break;
+                case TabState.Props:
+                    foreach (PropBox proppy in _propBoxesInRoom)
+                    {
+                        proppy.Enabled = true;
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            _tabState = newState;
         }
     }
 }
