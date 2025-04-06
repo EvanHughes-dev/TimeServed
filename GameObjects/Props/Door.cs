@@ -56,7 +56,8 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// <param name="_destDoor">Door's index that this door goes to</param>
         /// <param name="keyType">Type of key this door leads to</param>
         /// <param name="location">Position in room</param>
-        /// <param name="sprite">Sprite to display</param>
+        /// <param name="spriteArray">Sprite array of the door</param>
+        /// <param name="spriteIndex">index of the sprite in the sprite array</param>
         public Door(
             Point outPosition,
             int sourceDoor,
@@ -64,9 +65,10 @@ namespace MakeEveryDayRecount.GameObjects.Props
             int _destDoor,
             DoorKeyType keyType,
             Point location,
-            Texture2D sprite
+            Texture2D[] spriteArray,
+            int spriteIndex
         )
-            : base(location, sprite)
+            : base(location, spriteArray, spriteIndex)
         {
             DoorIndex = sourceDoor;
             DestRoom = destRoom;

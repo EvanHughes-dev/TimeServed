@@ -7,8 +7,8 @@ namespace MakeEveryDayRecount.GameObjects.Props
 {
     internal class Camera : Prop
     {
-        public Camera(Point location, Texture2D sprite)
-            : base(location, sprite) { }
+        public Camera(Point location, Texture2D[] spriteArray, int spriteIndex)
+            : base(location, spriteArray, spriteIndex) { }
 
         public override void Interact(Player player)
         {

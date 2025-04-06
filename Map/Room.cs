@@ -33,6 +33,12 @@ namespace MakeEveryDayRecount.Map
         Checkpoint = 4
     }
 
+    public enum TriggerTypes
+    {
+        PlayerSpawn = 0,
+        Checkpoint = 1
+    }
+
     /// <summary>
     /// Hold all the information relating to what should be
     /// draw in each given room. Also controls which room should
@@ -94,9 +100,6 @@ namespace MakeEveryDayRecount.Map
             _triggersInRoom = new List<Trigger> { };
             Doors = new List<Door> { };
             ParseData(filePath);
-
-            //SUPER TEST CODE DELETE AT ONCE
-            _triggersInRoom.Add(new Checkpoint(new Point(3, 3), null, 1, 5, 1));
         }
 
         #region  Drawing Logic
@@ -298,7 +301,8 @@ namespace MakeEveryDayRecount.Map
                                     binaryReader.ReadInt32(),
                                     keyType,
                                     new Point(posX, posY),
-                                    AssetManager.DoorTexture[propIndex]
+                                    AssetManager.DoorTexture,
+                                    propIndex
                                 );
                                 // When this door is interacted with, transition the player
                                 doorFromFile.OnDoorInteract += TransitionPlayer;
@@ -310,7 +314,8 @@ namespace MakeEveryDayRecount.Map
 
                                 Item newItemInRoom = new Item(
                                     new Point(posX, posY),
-                                    AssetManager.PropTextures[propIndex],
+                                    AssetManager.PropTextures,
+                                    propIndex,
                                     "TEMP_NAME",
                                     keyType
                                 );
@@ -321,11 +326,11 @@ namespace MakeEveryDayRecount.Map
                         }
                         else if (objectType == ObjectTypes.Camera)
                         {
-                            _itemsInRoom.Add(new Camera(new Point(posX, posY), AssetManager.Cameras[propIndex]));
+                            _itemsInRoom.Add(new Camera(new Point(posX, posY), AssetManager.Cameras, propIndex));
                         }
                         else if (objectType == ObjectTypes.Box)
                         {
-                            _itemsInRoom.Add(new Box(new Point(posX, posY), AssetManager.Boxes[propIndex]));
+                            _itemsInRoom.Add(new Box(new Point(posX, posY), AssetManager.Boxes, propIndex));
                         }
                         else if (objectType == ObjectTypes.Checkpoint)
                         {
@@ -478,6 +483,8 @@ namespace MakeEveryDayRecount.Map
                     *       int entranceIndex
                     *       int destRoom
                     *       int destDoor
+                    *       
+                    *       This comment is not up to date!
                     */
             BinaryWriter binaryWriter = null;
             try
@@ -498,6 +505,61 @@ namespace MakeEveryDayRecount.Map
                         binaryWriter.Write(_map[x, y].SpriteIndex);
                     }
                 }
+
+                //Write prop count
+                binaryWriter.Write(_itemsInRoom.Count + Doors.Count);
+
+                //Write out all non-door props
+                for (int i = 0; i < _itemsInRoom.Count; i++)
+                {
+                    binaryWriter.Write(_itemsInRoom[i].SpriteIndex);
+                    binaryWriter.Write(_itemsInRoom[i].Location.X);
+                    binaryWriter.Write(_itemsInRoom[i].Location.Y);
+
+                    //If statements to determine what kind of prop this is, and if it needs extra data
+                    if (_itemsInRoom[i] is Item)
+                    {
+                        binaryWriter.Write((int)ObjectTypes.Item);
+                        binaryWriter.Write((int)((Item)_itemsInRoom[i]).ItemKeyType);
+                    }
+                    else if (_itemsInRoom[i] is Camera)
+                        binaryWriter.Write((int)ObjectTypes.Camera);
+                    else if (_itemsInRoom[i] is Box)
+                        binaryWriter.Write((int)ObjectTypes.Box);
+                }
+
+                //TODO: Write out all doors
+                //This has been put on hold for now, because the way doors will be read from files is going to change very soon
+
+                //for (int i = 0; i < Doors.Count; i++)
+                //{
+                //    binaryWriter.Write(Doors.PropIndex);
+                //    binaryWriter.Write(Doors.Point.X);
+                //    binaryWriter.Write(Doors.Point.Y);
+                //    binaryWriter.Write(ObjectTypes.Door);
+                //    binaryWriter.Write(Doors.DoorKeyType);
+                //    binaryWriter.Write()
+                //}
+
+                //Write out all triggers
+                binaryWriter.Write(_triggersInRoom.Count);
+                for (int i = 0; i < _triggersInRoom.Count; i++)
+                {
+                    binaryWriter.Write(_triggersInRoom[i].Location.X);
+                    binaryWriter.Write(_triggersInRoom[i].Location.Y);
+                    binaryWriter.Write(_triggersInRoom[i].Width);
+                    binaryWriter.Write(_triggersInRoom[i].Height);
+
+                    //If statements to determine trigger type
+                    if (_triggersInRoom[i] is PlayerSpawn)
+                        binaryWriter.Write((int)TriggerTypes.PlayerSpawn);
+                    if (_triggersInRoom[i] is Checkpoint)
+                    {
+                        binaryWriter.Write((int)ObjectTypes.Checkpoint);
+                        binaryWriter.Write(((Checkpoint)_triggersInRoom[i]).Index);
+                    }
+                }
+
             }
             catch(Exception e)
             {
@@ -507,7 +569,14 @@ namespace MakeEveryDayRecount.Map
             {
                 binaryWriter.Close();
             }
-            
+        }
+
+        //TODO: implement this function
+        //Should save the player's position and inventory to a file
+
+        public void SavePlayer()
+        {
+            throw new NotImplementedException();
         }
     }
 }

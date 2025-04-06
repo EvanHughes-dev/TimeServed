@@ -22,8 +22,8 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// </summary>
         public Door.DoorKeyType ItemKeyType { get; private set; }
 
-        public Item(Point location, Texture2D sprite, string name, Door.DoorKeyType keyType)
-            : base(location, sprite)
+        public Item(Point location, Texture2D[] spriteArray, int spriteIndex, string name, Door.DoorKeyType keyType)
+            : base(location, spriteArray, spriteIndex)
         {
             ItemName = name;
             ItemKeyType = keyType;

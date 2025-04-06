@@ -41,7 +41,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// </summary>
         /// <param name="location">Location to display at</param>
         /// <param name="sprite">Sprite to display as</param>
-        public Box(Point location, Texture2D sprite) : base(location, sprite)
+        public Box(Point location, Texture2D[] spriteArray, int spriteIndex) : base(location, spriteArray, spriteIndex)
         {
             AttachmentPoint = Point.Zero;
         }

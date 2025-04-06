@@ -11,8 +11,8 @@ namespace MakeEveryDayRecount.GameObjects.Props
 {
     internal abstract class Prop : GameObject
     {
-        protected Prop(Point location, Texture2D sprite)
-            : base(location, sprite) { }
+        protected Prop(Point location, Texture2D[] spriteArray, int spriteIndex)
+            : base(location, spriteArray, spriteIndex) { }
 
         public abstract void Interact(Player player);
     }
