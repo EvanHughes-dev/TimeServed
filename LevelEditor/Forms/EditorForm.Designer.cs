@@ -66,21 +66,22 @@
             tabControlTilesProps.SelectedIndex = 0;
             tabControlTilesProps.Size = new Size(178, 490);
             tabControlTilesProps.TabIndex = 0;
+            tabControlTilesProps.TabIndexChanged += tabControlTilesProps_TabIndexChanged;
             // 
             // tabPageTiles
             // 
-            tabPageTiles.Location = new Point(8, 46);
+            tabPageTiles.Location = new Point(4, 24);
             tabPageTiles.Name = "tabPageTiles";
-            tabPageTiles.Size = new Size(162, 436);
+            tabPageTiles.Size = new Size(170, 462);
             tabPageTiles.TabIndex = 0;
             tabPageTiles.Text = "Tiles";
             tabPageTiles.UseVisualStyleBackColor = true;
             // 
             // tabPageProps
             // 
-            tabPageProps.Location = new Point(8, 46);
+            tabPageProps.Location = new Point(4, 24);
             tabPageProps.Name = "tabPageProps";
-            tabPageProps.Size = new Size(162, 436);
+            tabPageProps.Size = new Size(170, 462);
             tabPageProps.TabIndex = 0;
             tabPageProps.Text = "Props";
             tabPageProps.UseVisualStyleBackColor = true;

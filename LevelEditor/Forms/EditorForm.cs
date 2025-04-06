@@ -9,12 +9,23 @@ using LevelEditor.Controls;
 namespace LevelEditor
 {
     /// <summary>
+    /// Keeps track of tab state
+    /// </summary>
+    enum TabState 
+    {
+        Tiles, 
+        Props 
+    };
+
+    /// <summary>
     /// The EditorForm, with a palette, selected color, save and load buttons, and a grid of PictureBoxes the user can draw on.
     /// </summary>
     public partial class EditorForm : Form
     {
         // A reference to the MainForm that created this EditorForm
         private readonly MainForm _mainForm;
+
+        private TabState _tabState;
 
         /// <summary>
         /// Gets or sets the 2D array of grid tiles the user can draw on.
@@ -42,7 +53,7 @@ namespace LevelEditor
         /// <summary>
         /// Gets the palette of props the user may select from
         /// </summary>
-        private Prop[,] PropPalette { get;}
+        private Prop[,] PropPalette { get; }
 
         /// <summary>
         /// Creates a new EditorForm, editing an existing room.
@@ -52,6 +63,8 @@ namespace LevelEditor
             InitializeComponent();
 
             _mainForm = mainForm;
+
+            _tabState = TabState.Tiles;
 
             int numOfTiles = _mainForm.Tiles.Count;
 
@@ -148,6 +161,8 @@ namespace LevelEditor
                     //   file size of the saved maps, but again that's hard and not necessary
                     swatches[y, x].Tile = Palette[y, x];
                     swatches[y, x].Click += Swatch_Click;
+
+                    swatches[y, x].SizeMode = PictureBoxSizeMode.Zoom;
                 }
             }
         }
@@ -175,6 +190,8 @@ namespace LevelEditor
                     //   file size of the saved maps, but again that's hard and not necessary
                     toolBox[y, x].Prop = PropPalette[y, x];
                     toolBox[y, x].Click += PropSwatch_Click;
+
+                    toolBox[y, x].SizeMode = PictureBoxSizeMode.Zoom;
                 }
             }
         }
@@ -360,5 +377,12 @@ namespace LevelEditor
                 rect.Height - padTop - padBottom);
         }
 
+        private void tabControlTilesProps_TabIndexChanged(object sender, EventArgs e)
+        {
+
+            if (sender is not TabControl tabby) throw new Exception();
+
+            _tabState = (TabState)tabby.TabIndex;
+        }
     }
 }
