@@ -6,6 +6,15 @@ using System.Threading.Tasks;
 
 namespace LevelEditor.Classes.Props
 {
+
+    public enum ObjectType
+    {
+        Item = 0,
+        Camera = 1,
+        Box = 2,
+        Door = 3
+    }
+
     /// <summary>
     /// Represents a single Prop (interactable GameObject) in a room.
     /// </summary>

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.IO;
 using static System.Windows.Forms.LinkLabel;
 using LevelEditor.Classes;
+using LevelEditor.Classes.Props;
 
 namespace LevelEditor
 {
@@ -243,8 +244,28 @@ namespace LevelEditor
             // TODO: ADD LOADING OF PROPS
             // For now, if a room has any props, we'll just throw an error
             int numOfProps = reader.ReadInt32();
-            if (numOfProps > 0)
-                throw new NotImplementedException("LoadRoom() does not support loading of props!");
+
+            while (numOfProps > 0)
+            {
+                int propIndex = reader.ReadInt32();
+                Point propPosition = new Point(reader.ReadInt32(), reader.ReadInt32());
+                ObjectType objectType = (ObjectType)reader.ReadInt32();
+
+                switch (objectType)
+                {
+                    case ObjectType.Item:
+                        room.Props.Add(new Item(allTiles.));
+                        break;
+                    case ObjectType.Camera:
+                        break;
+                    case ObjectType.Box:
+                        break;
+                    case ObjectType.Door:
+                        break;
+                }
+
+                numOfProps--;
+            }
 
             reader.Close();
 
