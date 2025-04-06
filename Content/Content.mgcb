@@ -97,6 +97,13 @@
 /processorParam:TextureFormat=Color
 /build:Doors/TempDoor-Top.png
 
+#begin Fonts/Arial10.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Fonts/Arial10.spritefont
+
 #begin Fonts/Arial20.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
@@ -104,17 +111,19 @@
 /processorParam:TextureFormat=Compressed
 /build:Fonts/Arial20.spritefont
 
-#begin UI/DefaultButton.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
+#begin Fonts/Arial30.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:UI/DefaultButton.png
+/processorParam:TextureFormat=Compressed
+/build:Fonts/Arial30.spritefont
+
+#begin Fonts/Arial5.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Fonts/Arial5.spritefont
 
 #begin Items/Box.png
 /importer:TextureImporter
@@ -164,6 +173,30 @@
 /processorParam:TextureFormat=Color
 /build:Items/idCard.png
 
+#begin Items/prop_cameraOff.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Items/prop_cameraOff.png
+
+#begin Items/prop_cameraOn.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Items/prop_cameraOn.png
+
 #begin Items/screwdriver.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -188,14 +221,14 @@
 /processorParam:TextureFormat=Color
 /build:Items/wireCutters.png
 
-#begin level1/Level.level
-/copy:level1/Level.level
+#begin Levels/Level1/level.level
+/copy:Levels/Level1/level.level
 
-#begin level1/TestRoom1.room
-/copy:level1/TestRoom1.room
+#begin Levels/Level1/TestRoom1.room
+/copy:Levels/Level1/TestRoom1.room
 
-#begin level1/TestRoom2.room
-/copy:level1/TestRoom2.room
+#begin Levels/Level1/TestRoom2.room
+/copy:Levels/Level1/TestRoom2.room
 
 #begin Player/Inventory/InventoryBox_hover.png
 /importer:TextureImporter
@@ -281,6 +314,18 @@
 /processorParam:TextureFormat=Color
 /build:Tiles/testWall.png
 
+#begin Tiles/void.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Tiles/void.png
+
 #begin UI/DefaultButton.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -292,3 +337,40 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:UI/DefaultButton.png
+
+#begin UI/UI_cameraSight.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:UI/UI_cameraSight.png
+
+#begin UI/ui_cursor.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:UI/ui_cursor.png
+
+#begin UI/ui_cursorHover.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:UI/ui_cursorHover.png
+

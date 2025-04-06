@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Players;
+using MakeEveryDayRecount.Managers;
 
 namespace MakeEveryDayRecount.GameObjects.Props
 {
@@ -90,7 +91,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         }
 
         /// <summary>
-        /// Assign the door this door leads to
+        /// Assign the door to which this door leads 
         /// </summary>
         /// <param name="doorAssignment">Door this door leads to</param>
         public void AssignDoor(Door doorAssignment)

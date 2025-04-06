@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using MakeEveryDayRecount.GameObjects.Props;
 using MakeEveryDayRecount.GameObjects.Triggers;
@@ -62,10 +60,19 @@ namespace MakeEveryDayRecount.Managers
         /// <param name="destRoom"> Destination room for transition </param>
         public void TransitionRoom(Door transDoor, int destRoom)
         {
-            _currentRoom = _rooms[destRoom];
-            OnRoomUpdate?.Invoke(_currentRoom);
+            ChangeRoom(destRoom);
             _gameplayManager.PlayerObject.ChangeRoom(transDoor.DestinationTile);
 
+        }
+
+        /// <summary>
+        /// Change to the given room
+        /// </summary>
+        /// <param name="destRoom">Room index to change to</param>
+        public void ChangeRoom(int destRoom)
+        {
+            _currentRoom = _rooms[destRoom];
+            OnRoomUpdate?.Invoke(_currentRoom);
         }
 
         /// <summary>
@@ -91,7 +98,7 @@ namespace MakeEveryDayRecount.Managers
         /// Check if the tile in front of the player contains an interactable item
         /// </summary>
         /// <param name="playerFacing">The tile the player wants to interact with</param>
-        /// <returns></returns>
+        /// <returns>Current item to interact with in the provided tile</returns>
         public Prop CheckInteractable(Point playerFacing)
         {
             return _currentRoom.VerifyInteractable(playerFacing);
@@ -112,7 +119,7 @@ namespace MakeEveryDayRecount.Managers
         {
             // only read binary data here
             // each room is in charge of parsing itself
-            string folderPath = $"./Content/Level{currentLevel}";
+            string folderPath = $"./Content/Levels/Level{currentLevel}";
 
             // Level.level should exist in every Level folder
             // Acts as a config file for the .room files
@@ -127,10 +134,10 @@ namespace MakeEveryDayRecount.Managers
             * Loop through and pass path and index to a new room object
             */
             Room[] rooms = new Room[0];
-            if (File.Exists(folderPath + "/Level.level"))
+            if (File.Exists(folderPath + "/level.level"))
             {
                 Dictionary<(int roomIndex, int doorIndex), Door> doorLookup = new Dictionary<(int roomIndex, int doorIndex), Door>();
-                Stream streamReader = File.OpenRead(folderPath + "/Level.level");
+                Stream streamReader = File.OpenRead(folderPath + "/level.level");
                 BinaryReader binaryReader = new BinaryReader(streamReader);
 
                 int roomCount = binaryReader.ReadInt32();
@@ -164,10 +171,23 @@ namespace MakeEveryDayRecount.Managers
             {
                 // Provide more details about what level the error occurred on
                 throw new FileNotFoundException(
-                    $"No Level.level file located for level {currentLevel}. File path: {folderPath}/Level.level"
+                    $"No Level.level file located for level {currentLevel}. File path: {folderPath}/level.level"
                 );
             }
             return rooms;
+        }
+
+        /// <summary>
+        /// Switch to the level in gameplayManager
+        /// </summary>
+        public void ChangeLevel()
+        {
+            _rooms = LoadMapData(_gameplayManager.Level);
+            ChangeRoom(0);
+            foreach (Room room in _rooms)
+            {
+                room.DoorTransition += TransitionRoom;
+            }
         }
 
         public void SaveMap()

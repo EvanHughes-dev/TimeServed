@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
+using static System.Windows.Forms.LinkLabel;
+using LevelEditor.Classes;
+using LevelEditor.Classes.Props;
 
 namespace LevelEditor
 {
@@ -144,9 +148,17 @@ namespace LevelEditor
                 string roomName = reader.ReadString();
                 string folder = Path.GetDirectoryName(filePath)!;
 
-                level.Rooms.Add(
-                    LoadRoom(Path.Join(folder, $"{roomName}.room"), allTiles)
-                    );
+                string roomPath = Path.Join(folder, $"{roomName}.room");
+
+                // If the room doesn't exist... actually just don't try and load it
+                //   This way, you can easily remove rooms by just deleting their .room file
+                if (File.Exists(roomPath))
+                {
+                    level.Rooms.Add(
+                        LoadRoom(roomPath, allTiles)
+                        );
+                }
+
             }
 
             reader.Close();
@@ -165,28 +177,45 @@ namespace LevelEditor
         public static Room LoadRoom(string filePath, IEnumerable<Tile> allTiles)
         {
             /*
-             * THE .room FILE FORMAT:
-             *  - int width
-             *  - int height
-             *  - Several tiles, with the following format:
-             *    - bool isWalkable
-             *    - int tileIndex
-             *  - int numOfProps
-             *  - Several props, with the following format:
-             *    - int propIndex
-             *    - int positionX
-             *    - int positionY
-             *    - bool isDoor
-             *    - If it is a door, then the following is also included:
-             *      - int facing
-             *        - 0 = North
-             *        - 1 = East
-             *        - 2 = South
-             *        - 3 = West
-             *      - int entranceIndex
-             *      - int destinationRoom
-             *      - int destinationDoor
-             */
+            * Form of the room data is as follows
+            *
+            * int tileMapWidth
+            * int tileMapHeight
+            *
+            * Tiles:
+            *   bool isWalkable
+            *   int textureIndex
+            *
+            * int gameObjectCount
+            *
+            * GameObject:
+            *   int propIndex
+            *   int positionX
+            *   int positionY
+            *   int objectType 
+            *       0 = Item
+            *       1 = Camera
+            *       2 = Box
+            *       3 = Door 
+            * 
+            *   if objectType == 0 || objectType == 3
+            *   int keyType
+            *       0 = None
+            *       1 = Key card
+            *       2 = Screwdriver
+            *       For doors, this is the key that can unlock them
+            *       For items, this is the key type they are
+            * 
+            *   if objectType == 3
+            *       int facing
+            *           0 = North/Up
+            *           1 = East/Right
+            *           2 = South/Down
+            *           3 = West/Left
+            *       int destRoomId
+            *       int destX
+            *       int destY
+            */
 
             BinaryReader reader = new(new FileStream(filePath, FileMode.Open));
 
@@ -227,14 +256,139 @@ namespace LevelEditor
         /// Loads a tile from disk given the name of the sprite file in the Tiles folder and whether that tile is walkable.
         /// This method is UNSAFE and MUST be called within a TRY-CATCH!
         /// </summary>
-        /// <param name="spriteName">The name of the sprite file in the Tiles folder, including file extension.</param>
+        /// <param name="spriteName">The name of the sprite file in the Sprites/Tiles folder, including file extension.</param>
         /// <param name="isWalkable">Whether this tile should be allowed to be walked on.</param>
         /// <returns>The loaded tile.</returns>
         public static Tile LoadTile(string spriteName, bool isWalkable)
         {
-            const string TileFolderPath = "./Tiles";
+            const string TileFolderPath = "./Sprites/Tiles";
 
             return new(Image.FromFile(Path.Join(TileFolderPath, spriteName)), isWalkable);
+        }
+
+        /// <summary>
+        /// UNIMPLEMENTED
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public static Camera LoadCamera() => throw new NotImplementedException("CAMERAS ARE NOT IMPLEMENTED YELL AT LEAH");
+
+        /// <summary>
+        /// Loads a door from disk given the name of the sprite file and the necessary data about the door.
+        /// </summary>
+        /// <param name="spriteName">The name of the sprite file in the Sprites/Props folder, including file extension.</param>
+        /// <param name="keyToOpen">The type of key necessary to open this door, if any.</param>
+        /// <param name="facing">The direction that this door is facing (a north-facing door would be placed on a south wall).</param>
+        /// <returns>The loaded door.</returns>
+        public static Door LoadDoor(string spriteName, KeyType keyToOpen, Orientation facing)
+        {
+            // These loaded props are fundamentally positionless -- they aren't in a room!
+            return new Door(keyToOpen, facing, LoadPropSprite(spriteName), null);
+        }
+
+        /// <summary>
+        /// Loads an item from disk given the name of the sprite file and the necessary data about the item.
+        /// </summary>
+        /// <param name="spriteName">The name of the sprite file in the Sprites/Props folder, including file extension.</param>
+        /// <param name="keyType">The type of key that this item is, if any.</param>
+        /// <returns>The loaded item.</returns>
+        public static Item LoadItem(string spriteName, KeyType keyType)
+        {
+            return new Item(keyType, LoadPropSprite(spriteName), null);
+        }
+
+        /// <summary>
+        /// Loads a box from disk given the name of the sprite file.
+        /// </summary>
+        /// <param name="spriteName">The name of the sprite file in the Sprites/Props folder, including file extension.</param>
+        /// <returns>The loaded box.</returns>
+        public static Box LoadBox(string spriteName)
+        {
+            return new Box(LoadPropSprite(spriteName), null);
+        }
+
+        /// <summary>
+        /// Loads a sprite with a given name from the folder containing the prop sprites.
+        /// </summary>
+        /// <param name="spriteName">The file name of the sprite to load, including file extension (e.g. sprite.png)</param>
+        /// <returns>The loaded image.</returns>
+        private static Image LoadPropSprite(string spriteName)
+        {
+            const string PropFolderPath = "./Sprites/Props";
+
+            return Image.FromFile(Path.Join(PropFolderPath, spriteName));
+        }
+
+        /// <summary>
+        /// Automatically update the Content.MGCB file to contain ALL files inside the Levels
+        /// folder to be included in the build. This function assumes that the folder locations 
+        /// for the Level Editor, Content.MGCB, and Levels folder do not change.
+        /// </summary>
+        public static void UpdateContentMGCB()
+        {
+            string pathToContent = "../../../../Content/";
+            string levelsPath = Path.Combine(pathToContent, "Levels");
+            string contentFilePath = Path.Combine(pathToContent, "Content.mgcb");
+
+            List<string> fileLines = new List<string>(File.ReadAllLines(contentFilePath));
+            List<string> existingEntries = new List<string>();
+            List<int> commentLines = new List<int>();
+
+            // Collect existing level references and mark their line positions
+            for (int i = 0; i < fileLines.Count; i++)
+            {
+                string line = fileLines[i].TrimStart();
+                if (line.StartsWith("#begin Levels"))
+                {
+                    commentLines.Add(i);
+                    existingEntries.Add(line);
+                }
+            }
+
+            // Iterate through all level folders and files
+            foreach (string folder in Directory.GetDirectories(levelsPath).Select(Path.GetFileName)!)
+            {
+                foreach (string fileName in FindAllFiles(Path.Combine(levelsPath, folder!)))
+                {
+                    string entry = $"#begin Levels/{folder}/{fileName}";
+
+                    if (!existingEntries.Contains(entry))
+                    {
+                        fileLines.Add("");
+                        fileLines.Add(entry);
+                        fileLines.Add($"/copy:Levels/{folder}/{fileName}");
+                    }
+                    else
+                    {
+                        commentLines.RemoveAll(index => fileLines[index] == entry);
+                    }
+                }
+            }
+
+            // Remove obsolete entries
+            for (int i = commentLines.Count - 1; i >= 0; i--)
+            {
+                int index = commentLines[i];
+                if (index + 1 < fileLines.Count && fileLines[index + 1].StartsWith("/copy:"))
+                {
+                    fileLines.RemoveAt(index + 1);
+                }
+                fileLines.RemoveAt(index);
+            }
+
+            // Save the updated file
+            File.WriteAllLines(contentFilePath, fileLines);
+        }
+        /// <summary>
+        /// Find all the *.level and *.room files in a folder
+        /// </summary>
+        /// <param name="folderPath">Path to the folder</param>
+        /// <returns>List<string> with all the file names</returns>
+        private static List<string> FindAllFiles(string folderPath)
+        {
+            return Directory.GetFiles(folderPath, "*.level").Concat(Directory.GetFiles(folderPath, "*.room"))
+                            .Select(Path.GetFileName)
+                            .ToList()!;
         }
     }
 }
