@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Players;
 using MakeEveryDayRecount.Managers;
+using ShapeUtils;
 
 namespace MakeEveryDayRecount.GameObjects.Props
 {
@@ -62,9 +63,11 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //_player = GameplayManager.PlayerObject;
             _centerPoint = centerPoint;
             _spread = spread;
+
+            #region Raybase Check
             //Check which way the ray for the camera is pointing
             Vector2 centerRay = new Vector2(_centerPoint.X-location.X, _centerPoint.Y-location.Y); //base of this ray is at location
-            #region Raybase Check
+
             //Please do not put the centerpoint on top of the camera it breaks everything
             if (Math.Abs(centerRay.X) > Math.Abs(centerRay.Y)) //The ray is more horizontal
             {
@@ -126,21 +129,69 @@ namespace MakeEveryDayRecount.GameObjects.Props
             #endregion
             Debug.WriteLine($"Raybase is {_rayBase.X}, {_rayBase.Y}");
 
-            #region Vision Kite/Endpoints
+            //for TESTING
+            _watchedTiles.AddRange(Rasterize(_rayBase, _centerPoint));
+
+            #region Vision Kite
             //---Find the endpoints for the corners of the kite---
             //Create a vector for the center from the raybase to the centerpoint
             centerRay = new Vector2(_centerPoint.X - _rayBase.X, _centerPoint.Y - location.Y); //Base of the ray is now at raybase
-            //TODO: I feel like some of the variable names for these rays and points are not best practice tbh
+            //TODO: The edge rays are not being calculated correctly
             //Rotate that vector by spread in both directions
             Vector2 clockwiseRay = Vector2.Transform(centerRay, Matrix.CreateRotationX(spread));
             Vector2 counterclockwiseRay = Vector2.Transform(centerRay, Matrix.CreateRotationX(-spread));
             //^These built-in methods are *chef kiss*
-            //TODO: Combine the above and below steps into one long line to save some time and memory
+            Debug.WriteLine("Center ray is " + centerRay.ToString());
+            Debug.WriteLine("Counter-clockwise ray is: " + counterclockwiseRay.ToString());
+            Debug.WriteLine("Clockwise ray is : " + clockwiseRay.ToString());
 
-            //Turn these rotated vectors back into points
+            //Turn these rotated vectors back into points to get the corners of the kite
             Point clockwisePoint = new Point((int)MathF.Round(_rayBase.X + clockwiseRay.X), (int)MathF.Round(_rayBase.Y + clockwiseRay.Y));
             Point counterclockwisePoint = new Point((int)MathF.Round(_rayBase.X + counterclockwiseRay.X), (int)MathF.Round(_rayBase.Y + counterclockwiseRay.Y));
-            //Gang why does mathF return a float when you round to the nearest integer. This is highly unserious
+            //Gang why does mathF still return a float when you round to the nearest integer. This is highly unserious
+
+            //TESTING - tell me where the corners are
+            Debug.WriteLine("Center point is " + _centerPoint.ToString());
+            Debug.WriteLine("Counter-clockwise point is: " + counterclockwisePoint.ToString());
+            Debug.WriteLine("Clockwise point is: " + clockwisePoint.ToString());
+
+            //Create a rectangle that bounds the entire kite
+            //TODO: Could this be done more efficiently?
+            Point[] corners = {_rayBase, _centerPoint, clockwisePoint, counterclockwisePoint};
+            //Find the minimum/maximum X and Y of the 4 bounding points (the edges of the rectangle basically)
+            int minX = _rayBase.X;
+            int maxX = _rayBase.X;
+            int minY = _rayBase.Y;
+            int maxY = _rayBase.Y;
+            foreach (Point corner in corners)
+            {
+                if (corner.X < minX) minX = corner.X;
+                if (corner.X > maxX) maxX = corner.X;
+                if (corner.Y < minY) minY = corner.Y;
+                if (corner.Y > maxY) maxY = corner.Y;
+            }
+            //Nested for loops to go from left to right and then top to bottom
+            for (int y = minY; y <= maxY; y++)
+            {
+                for (int x = minX; x <= maxX; x++)
+                {
+                    //For each point in that rectangle, create a vector from the raybase to it
+                    Vector2 candidateVector = new Vector2(x - _rayBase.X, y - _rayBase.Y);
+                    //Figure out if that vector is between the two edge vectors. If it is, then it should be inside of the vision kite
+                    //I got the formula for this from StackOverflow (Andy G)
+                    //Where A and C are the edge vectors, and B is the candidate vector, and the three vectors are pointing out from the same point
+                    //if (AxB * AxC >= 0 && CxB * CxA >= 0) then B is between A and C
+                    if ((counterclockwiseRay.Y * candidateVector.X - counterclockwiseRay.X * candidateVector.Y) *
+                        (counterclockwiseRay.Y * clockwiseRay.X - counterclockwiseRay.X * clockwiseRay.Y) >= 0
+                        &&
+                        (clockwiseRay.Y * candidateVector.X - clockwiseRay.X * candidateVector.Y) *
+                        (clockwiseRay.Y * counterclockwiseRay.X - clockwiseRay.X * counterclockwiseRay.Y) >= 0)
+                    {
+                        //_watchedTiles.Add(new Point(x, y));
+                    }
+                }
+            }
+
 
             //Rasterize between the corners and the centerpoint to get all the points we need to send out a ray to
             List<Point> clockwisePoints = Rasterize(clockwisePoint, _centerPoint);
@@ -159,6 +210,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
             _endPoints = endPoints.ToArray();
             #endregion
             //Note that the length of _endPoints may be even or odd depending on rounding
+
         }
         //TODO: add an alternative constructor that takes a point as the center of the vision cone and constructs a vector from that
 
@@ -168,7 +220,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //TODO: Add a check to see if there's a box directly in front of the camera, and if so don't check any of the rays
             //TODO: Only check rays if we saw a box in the watchedtiles during the previous frame??
 
-            _watchedTiles.AddRange(Rasterize(_rayBase, _centerPoint));
+            
             //Debug.WriteLine(DateTime.Now.TimeOfDay - startTime);
         }
 
@@ -184,6 +236,22 @@ namespace MakeEveryDayRecount.GameObjects.Props
 
         private List<Point> Rasterize(Point p1, Point p2)
         {
+            bool rotated = false;
+            //If dy > dx, switch the X and Y of the endpoints
+            if (Math.Abs(p2.Y-p1.Y) > Math.Abs(p2.X - p1.X))
+            {
+                //Indicate that we changed this stuff for later
+                rotated = true;
+                //Swap the X and Y of p1
+                int swapX = p1.X;
+                p1.X = p1.Y;
+                p1.Y = swapX;
+                //Then do the same to p2
+                swapX = p2.X;
+                p2.X = p2.Y;
+                p2.Y = swapX;
+            }
+
             //If the line is going from right to left, we switch the start and end point so it can be drawn left to right
             if (p1.X > p2.X)
             {
@@ -205,7 +273,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
             for (; x <= p2.X; x++) //using x as loop variable
             {
                 returnPoints.Add(new Point(x, y));
-                Debug.WriteLine($"Added point {x}, {y}");
+                //Debug.WriteLine($"Added point {x}, {y}");
                 if (p < 0)
                 {
                     p = p + (2 * dy);
@@ -216,9 +284,22 @@ namespace MakeEveryDayRecount.GameObjects.Props
                     y = y + 1;
                 }
             }
+
+            //If we flipped the X and Y of everything, flip it back here
+            if (rotated)
+            {
+                for (int i = 0; i < returnPoints.Count; i++)
+                {
+                    returnPoints[i] = new Point(returnPoints[i].Y, returnPoints[i].X);
+                }
+            }
+
             //Return the list of points
             return returnPoints;
         }
+
+        //TODO: Create a version of Rasterize that always returns from the raybase first
+        //I think this will allow us to more easily check if a box is blocking a ray
 
         /**
         private void ExperimentalCheckRay(Vector2 ray)

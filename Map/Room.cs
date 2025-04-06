@@ -98,7 +98,7 @@ namespace MakeEveryDayRecount.Map
 
             //Add a camera to the room for testing
             //In the actual game this will be done by parsing it from a file, but i's basically the same
-            roomTestCamera = new Camera(new Point(6, 0), AssetManager.CameraTextures[1], this, new Point(10, 2), 0f);
+            roomTestCamera = new Camera(new Point(6, 0), AssetManager.CameraTextures[1], this, new Point(10, 10), (float)(Math.PI/4));
             _itemsInRoom.Add(roomTestCamera);
         }
 
@@ -156,7 +156,13 @@ namespace MakeEveryDayRecount.Map
             {
                 Point propPosition = propToDraw.Location;
 
-                if (
+                //Cameras are excluded from this check and are always drawn if they are in the room
+                //This is done to allow the camera's vision to be seen even when the camera is not on the screen
+                if (propToDraw is Camera)
+                {
+                    propToDraw.Draw(sb, worldToScreen, pixelOffset);
+                }
+                else if (
                     propPosition.X >= screenMinX
                     && propPosition.X <= screenMaxX
                     && propPosition.Y >= screenMinY
