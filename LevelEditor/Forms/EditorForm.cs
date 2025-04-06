@@ -26,7 +26,7 @@ namespace LevelEditor
         /// </summary>
         private Room Room { get; set; }
 
-/       // <summary>
+        // <summary>
         /// Gets or sets the color the user currently has selected from the palette.
         /// </summary>
         private Tile SelectedTile { get; set; }
@@ -72,6 +72,27 @@ namespace LevelEditor
             // Sets the selected color to some sort of reasonable default -- Palette[0, 0] is the only place we can guarantee there's a color in the palette
             //   (assuming the developer didn't change Palette to an entirely empty array)
             SelectedTile = Palette[0, 0];
+
+
+            int numOfProps = _mainForm.Props.Count;
+
+            numOfRows = (int)Math.Ceiling((float)numOfProps / 2);
+            PropPalette = new Prop[numOfRows, 2];
+
+            for (int i = 0; i < numOfProps; i++)
+            {
+                int y = (int)Math.Floor((float)i / 2);
+                int x = i % 2;
+
+                PropPalette[y, x] = _mainForm.Props.ElementAt(i);
+            }
+
+            // Creates all of the buttons in the palette
+            CreatePalettePropBoxes();
+
+            // Sets the selected color to some sort of reasonable default -- Palette[0, 0] is the only place we can guarantee there's a color in the palette
+            //   (assuming the developer didn't change Palette to an entirely empty array)
+            SelectedProp = PropPalette[0, 0];
         }
 
         /// <summary>
@@ -133,7 +154,7 @@ namespace LevelEditor
         /// <summary>
         /// Creates the prop selection buttons corresponding with the &*%*@^(^#_. Should only be run once!
         /// </summary>
-        private void CreatePropTileBoxes() //this will be difficult to implement until I have tile info
+        private void CreatePalettePropBoxes() //this will be difficult to implement until I have tile info
         {
             // Shortcut variables for the width and height
             int height = PropPalette.GetLength(0);
@@ -143,7 +164,7 @@ namespace LevelEditor
             Rectangle paletteBounds = PadRectInwards(tabPageProps.ClientRectangle, 5, 5, 20, 5);
 
             // Give it 5 units of padding between each button just because it happens to look nice
-            TileBox[,] swatches = GenerateGrid<TileBox>(width, height, paletteBounds, 5, tabPageProps);
+            PropBox[,] toolBox = GenerateGrid<PropBox>(width, height, paletteBounds, 5, tabPageProps);
 
             for (int x = 0; x < width; x++)
             {
@@ -152,8 +173,8 @@ namespace LevelEditor
                     // We're going to store the color associated with each button in its back color, and then read the back color
                     //   when the button is clicked. Ideally we would track a color index so we could dramatically reduce the
                     //   file size of the saved maps, but again that's hard and not necessary
-                    swatches[y, x].Tile = Palette[y, x];
-                    swatches[y, x].Click += PropSwatch_Click;
+                    toolBox[y, x].Prop = PropPalette[y, x];
+                    toolBox[y, x].Click += PropSwatch_Click;
                 }
             }
         }
@@ -184,9 +205,9 @@ namespace LevelEditor
         /// <exception cref="Exception">Thrown when this method is called with a non-Button sender.</exception>
         private void PropSwatch_Click(object? sender, EventArgs e)
         {
-            if (sender is not TileBox prop) throw new Exception();
+            if (sender is not PropBox prop) throw new Exception();
 
-            
+            SelectedProp = prop.Prop;
         }
 
         /// <summary>
