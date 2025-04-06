@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using LevelEditor.Classes;
+using LevelEditor.Classes.Props;
 
 namespace LevelEditor
 {
@@ -18,6 +19,12 @@ namespace LevelEditor
         /// </summary>
         public IReadOnlyCollection<Tile> Tiles { get; private set; }
 
+        /// <summary>
+        /// The gospel determining what Props have what corresponding indexes.
+        /// </summary>
+        public IReadOnlyCollection<Prop> Props { get; private set; }
+
+        // The level currently being edited
         private Level _level;
 
         /// <summary>
@@ -71,6 +78,7 @@ namespace LevelEditor
         private void MainForm_Load(object sender, EventArgs e)
         {
             LoadTiles();
+            LoadProps();
 
             // In case LoadTiles creating a MessageBox, activating this window will ensure it still becomes
             //   the center of attention afterwards
@@ -110,6 +118,52 @@ namespace LevelEditor
 
                     case DialogResult.Retry:
                         LoadTiles();
+                        break;
+
+                    case DialogResult.Cancel:
+                    case DialogResult.Ignore:
+                        // Do nothing! Assume that it's fine that nothing could be loaded!
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Loads all of the prop sprites and initializes the prop array, displaying a MessageBox
+        /// if loading the props fails.
+        /// </summary>
+        private void LoadProps()
+        {
+            try
+            {
+                Prop[] props = [
+                    FileIOHelpers.LoadBox("Box.png"),
+                    FileIOHelpers.LoadItem("hook.png", KeyType.None),
+                    FileIOHelpers.LoadItem("hookAndRope.png", KeyType.None),
+                    FileIOHelpers.LoadItem("idCard.png", KeyType.KeyCard),
+                    FileIOHelpers.LoadItem("screwdriver.png", KeyType.Screwdriver),
+                    FileIOHelpers.LoadItem("wireCutters.png", KeyType.None),
+                    ];
+
+                Props = props.AsReadOnly();
+            }
+            catch (Exception ex)
+            {
+                Tiles = [];
+
+                DialogResult response = MessageBox.Show($"Could not load tiles: {ex.Message}",
+                    "Error",
+                    MessageBoxButtons.AbortRetryIgnore,
+                    MessageBoxIcon.Error);
+
+                switch (response)
+                {
+                    case DialogResult.Abort:
+                        Close();
+                        break;
+
+                    case DialogResult.Retry:
+                        LoadProps();
                         break;
 
                     case DialogResult.Cancel:
@@ -290,6 +344,14 @@ namespace LevelEditor
         {
             FileIOHelpers.SaveLevel(Level, Folder, Tiles);
             FileIOHelpers.UpdateContentMGCB();
+        }
+
+        /// <summary>
+        /// Loads the props when clicked.
+        /// </summary>
+        private void reloadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoadProps();
         }
     }
 }

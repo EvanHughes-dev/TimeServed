@@ -33,19 +33,30 @@ namespace LevelEditor.Classes.Props
         /// <summary>
         /// Creates a new Door with the given sprite, position, KeyType, and facing direction.
         /// </summary>
-        /// <param name="sprite">The sprite this Prop displays with.</param>
-        /// <param name="position">The position of this Prop.</param>
         /// <param name="keyToOpen">
         ///     The type of key that can be used to open this door. 
         ///     Set to None to make this door unlocked.
         /// </param>
         /// <param name="facing">The direction this door faces.</param>
-        public Door(Image sprite, Point position, KeyType keyToOpen, Orientation facing)
+        /// <param name="sprite">The sprite this Prop displays with.</param>
+        /// <param name="position">The position of this Prop.</param>
+        public Door(KeyType keyToOpen, Orientation facing, Image sprite, Point? position = null)
             : base(sprite, position)
         {
             // Save params
             KeyToOpen = keyToOpen;
             Facing = facing;
+        }
+
+
+        /// <summary>
+        /// Creates a copy of this Door at the given position.
+        /// </summary>
+        /// <param name="position">The position to copy this Door to.</param>
+        /// <returns>A copy of this Door at the given position.</returns>
+        public override Door Instantiate(Point position)
+        {
+            return new Door(KeyToOpen, Facing, Sprite, position);
         }
     }
 }
