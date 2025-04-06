@@ -69,18 +69,18 @@
             // 
             // tabPageTiles
             // 
-            tabPageTiles.Location = new Point(4, 24);
+            tabPageTiles.Location = new Point(8, 46);
             tabPageTiles.Name = "tabPageTiles";
-            tabPageTiles.Size = new Size(170, 462);
+            tabPageTiles.Size = new Size(162, 436);
             tabPageTiles.TabIndex = 0;
             tabPageTiles.Text = "Tiles";
             tabPageTiles.UseVisualStyleBackColor = true;
             // 
             // tabPageProps
             // 
-            tabPageProps.Location = new Point(4, 24);
+            tabPageProps.Location = new Point(8, 46);
             tabPageProps.Name = "tabPageProps";
-            tabPageProps.Size = new Size(170, 462);
+            tabPageProps.Size = new Size(162, 436);
             tabPageProps.TabIndex = 0;
             tabPageProps.Text = "Props";
             tabPageProps.UseVisualStyleBackColor = true;
