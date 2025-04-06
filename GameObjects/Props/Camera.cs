@@ -127,10 +127,10 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //I intentionally wrote the above to prioritize up/down over left/right
             //I don't think we need a special case for if camera ray X and Y are equal because that can only have an effect if the camera is on an outside corner 
             #endregion
-            Debug.WriteLine($"Raybase is {_rayBase.X}, {_rayBase.Y}");
+            //Debug.WriteLine($"Raybase is {_rayBase.X}, {_rayBase.Y}");
 
-            //for TESTING
-            _watchedTiles.AddRange(Rasterize(_rayBase, _centerPoint));
+            //TESTING - show me the center ray
+            //_watchedTiles.AddRange(Rasterize(_rayBase, _centerPoint));
 
             #region Vision Kite
             //---Find the endpoints for the corners of the kite---
@@ -138,12 +138,14 @@ namespace MakeEveryDayRecount.GameObjects.Props
             centerRay = new Vector2(_centerPoint.X - _rayBase.X, _centerPoint.Y - location.Y); //Base of the ray is now at raybase
             //TODO: The edge rays are not being calculated correctly
             //Rotate that vector by spread in both directions
-            Vector2 clockwiseRay = Vector2.Transform(centerRay, Matrix.CreateRotationX(spread));
-            Vector2 counterclockwiseRay = Vector2.Transform(centerRay, Matrix.CreateRotationX(-spread));
+            Vector2 clockwiseRay = Vector2.Transform(centerRay, Matrix.CreateRotationZ(spread));
+            Vector2 counterclockwiseRay = Vector2.Transform(centerRay, Matrix.CreateRotationZ(-spread));
             //^These built-in methods are *chef kiss*
-            Debug.WriteLine("Center ray is " + centerRay.ToString());
-            Debug.WriteLine("Counter-clockwise ray is: " + counterclockwiseRay.ToString());
-            Debug.WriteLine("Clockwise ray is : " + clockwiseRay.ToString());
+
+            //TESTING - tell me the rays
+            //Debug.WriteLine("Center ray is " + centerRay.ToString());
+            //Debug.WriteLine("Counter-clockwise ray is: " + counterclockwiseRay.ToString());
+            //Debug.WriteLine("Clockwise ray is : " + clockwiseRay.ToString());
 
             //Turn these rotated vectors back into points to get the corners of the kite
             Point clockwisePoint = new Point((int)MathF.Round(_rayBase.X + clockwiseRay.X), (int)MathF.Round(_rayBase.Y + clockwiseRay.Y));
@@ -151,9 +153,9 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //Gang why does mathF still return a float when you round to the nearest integer. This is highly unserious
 
             //TESTING - tell me where the corners are
-            Debug.WriteLine("Center point is " + _centerPoint.ToString());
-            Debug.WriteLine("Counter-clockwise point is: " + counterclockwisePoint.ToString());
-            Debug.WriteLine("Clockwise point is: " + clockwisePoint.ToString());
+            //Debug.WriteLine("Center point is " + _centerPoint.ToString());
+            //Debug.WriteLine("Counter-clockwise point is: " + counterclockwisePoint.ToString());
+            //Debug.WriteLine("Clockwise point is: " + clockwisePoint.ToString());
 
             //Create a rectangle that bounds the entire kite
             //TODO: Could this be done more efficiently?
@@ -187,7 +189,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                         (clockwiseRay.Y * candidateVector.X - clockwiseRay.X * candidateVector.Y) *
                         (clockwiseRay.Y * counterclockwiseRay.X - clockwiseRay.X * counterclockwiseRay.Y) >= 0)
                     {
-                        //_watchedTiles.Add(new Point(x, y));
+                        _watchedTiles.Add(new Point(x, y));
                     }
                 }
             }
