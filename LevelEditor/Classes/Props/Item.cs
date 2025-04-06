@@ -21,12 +21,13 @@ namespace LevelEditor.Classes.Props
         /// </summary>
         /// <param name="sprite">The sprite this Item displays with.</param>
         /// <param name="position">The position of this Item.</param>
+        /// <param name="imageIndex"> Index of this image</param>
         /// <param name="keyType">
         ///     The kind of key that this Item is. Will open Doors with a matching KeyType.
         ///     Set to None to make this Item inable to open any locked doors.
         /// </param>
-        public Item(Image sprite, Point position, KeyType keyType)
-            : base(sprite, position)
+        public Item(Image sprite, Point position, int imageIndex, KeyType keyType)
+            : base(sprite, position, imageIndex, ObjectType.Item)
         {
             // Save params
             KeyType = keyType;

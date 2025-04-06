@@ -57,7 +57,7 @@ namespace LevelEditor.Classes
                     }
                 }
             }
-
+            Props=new List<Prop>{};
             Id = Program.Random.Next();
         }
 

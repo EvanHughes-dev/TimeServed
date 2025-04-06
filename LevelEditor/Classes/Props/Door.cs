@@ -35,13 +35,14 @@ namespace LevelEditor.Classes.Props
         /// </summary>
         /// <param name="sprite">The sprite this Prop displays with.</param>
         /// <param name="position">The position of this Prop.</param>
+        /// <param name="imageIndex"> Index of this image</param>
         /// <param name="keyToOpen">
         ///     The type of key that can be used to open this door. 
         ///     Set to None to make this door unlocked.
         /// </param>
         /// <param name="facing">The direction this door faces.</param>
-        public Door(Image sprite, Point position, KeyType keyToOpen, Orientation facing)
-            : base(sprite, position)
+        public Door(Image sprite, Point position, int propIndex, KeyType keyToOpen, Orientation facing)
+            : base(sprite, position, propIndex, ObjectType.Door)
         {
             // Save params
             KeyToOpen = keyToOpen;

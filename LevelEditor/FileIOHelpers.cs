@@ -66,29 +66,46 @@ namespace LevelEditor
         /// <param name="allTiles">All possible tiles, so this method can save the room with the proper tile indexes.</param>
         public static void SaveRoom(Room room, string folderPath, IEnumerable<Tile> allTiles)
         {
-            /*
-             * THE .room FILE FORMAT:
-             *  - int width
-             *  - int height
-             *  - Several tiles, with the following format:
-             *    - bool isWalkable
-             *    - int tileIndex
-             *  - int numOfProps
-             *  - Several props, with the following format:
-             *    - int propIndex
-             *    - int positionX
-             *    - int positionY
-             *    - bool isDoor
-             *    - If it is a door, then the following is also included:
-             *      - int facing
-             *        - 0 = North
-             *        - 1 = East
-             *        - 2 = South
-             *        - 3 = West
-             *      - int entranceIndex
-             *      - int destinationRoom
-             *      - int destinationDoor
-             */
+           /*
+            * Form of the room data is as follows
+            *
+            * int tileMapWidth
+            * int tileMapHeight
+            *
+            * Tiles:
+            *   bool isWalkable
+            *   int textureIndex
+            *
+            * int gameObjectCount
+            *
+            * GameObject:
+            *   int propIndex
+            *   int positionX
+            *   int positionY
+            *   int objectType 
+            *       0 = Item
+            *       1 = Camera
+            *       2 = Box
+            *       3 = Door 
+            * 
+            *   if objectType == 0 || objectType == 3
+            *   int keyType
+            *       0 = None
+            *       1 = Key card
+            *       2 = Screwdriver
+            *       For doors, this is the key that can unlock them
+            *       For items, this is the key type they are
+            * 
+            *   if objectType == 3
+            *       int facing
+            *           0 = North/Up
+            *           1 = East/Right
+            *           2 = South/Down
+            *           3 = West/Left
+            *       int destRoomId
+            *       int destX
+            *       int destY
+            */
 
             Tile[] tilesArray = [.. allTiles];
 
@@ -113,10 +130,36 @@ namespace LevelEditor
                 }
             }
 
-            // TEMPORARY
-            // For now, the level editor doesn't support placing props, so we always will write a zero here
-            //   ... but that won't be the case forever!
-            writer.Write(0);
+            writer.Write(room.Props.Count);
+
+            foreach(Prop prop in room.Props){
+                writer.Write(prop.ImageIndex);
+                writer.Write(prop.Position.X);
+                writer.Write(prop.Position.Y);
+                writer.Write((int)prop.PropType);
+                switch (prop.PropType)
+                {
+                    case ObjectType.Item:
+                        Item item = (Item)prop;
+                        writer.Write((int)item.KeyType);
+                        break;
+                    case ObjectType.Camera:
+                        // TODO Add camera saving when the file format has been decided
+                        break;
+                    case ObjectType.Box:
+                        // Don't need to save any extra data for the box
+                        break;
+                    case ObjectType.Door:
+                        Door door = (Door)prop;
+                        writer.Write((int)door.KeyToOpen);
+                        writer.Write((int)door.Facing);
+                        if(door.ConnectedTo!=null)
+                            writer.Write(door.ConnectedTo.Id);
+                        writer.Write(door.Destination.X);
+                        writer.Write(door.Destination.Y);
+                        break;
+                }
+            }
 
             writer.Close();
         }
@@ -254,7 +297,6 @@ namespace LevelEditor
                 switch (objectType)
                 {
                     case ObjectType.Item:
-                        room.Props.Add(new Item(allTiles.));
                         break;
                     case ObjectType.Camera:
                         break;
