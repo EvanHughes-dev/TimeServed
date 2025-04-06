@@ -64,13 +64,14 @@ namespace LevelEditor
         /// </summary>
         public MainForm()
         {
+            FileIOHelpers.CopyFolder("../../.././Sprites", "./Sprites");
+
             InitializeComponent();
 
             _level = null!;
             Tiles = null!;
 
             Folder = null!;
-            FileIOHelpers.CopyFolder("../../.././Sprites", ".bin/Debug/net8.0-windows");
         }
 
         /// <summary>

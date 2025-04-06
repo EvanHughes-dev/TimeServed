@@ -331,6 +331,11 @@ namespace LevelEditor
             return new(Image.FromFile(Path.Join(TileFolderPath, spriteName)), isWalkable);
         }
 
+        /// <summary>
+        /// Copy all the contents of a folder from one location to another
+        /// </summary>
+        /// <param name="sourceFolder">Folder to copy the contents of</param>
+        /// <param name="destFolder">Folder to copy to</param>
         public static void CopyFolder(string sourceFolder, string destFolder){
             if(!Directory.Exists(destFolder)){
                 Directory.CreateDirectory(destFolder);
