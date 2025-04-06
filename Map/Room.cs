@@ -291,7 +291,7 @@ namespace MakeEveryDayRecount.Map
                                     binaryReader.ReadInt32(), // The index of the destination room
                                     binaryReader.ReadInt32(), // The index of the destination door
                                     keyType,
-                                    new Point(posX, posY),
+                                    tileLocation,
                                     AssetManager.DoorTexture,
                                     propIndex
                                 );
@@ -304,7 +304,7 @@ namespace MakeEveryDayRecount.Map
                                 // Parse a prop from the file
 
                                 Item newItemInRoom = new Item(
-                                    new Point(posX, posY),
+                                    tileLocation,
                                     AssetManager.PropTextures,
                                     propIndex,
                                     "TEMP_NAME",
@@ -317,16 +317,16 @@ namespace MakeEveryDayRecount.Map
                         }
                         else if (objectType == ObjectTypes.Camera)
                         {
-                            _itemsInRoom.Add(new Camera(new Point(posX, posY), AssetManager.Cameras, propIndex));
+                            _itemsInRoom.Add(new Camera(tileLocation, AssetManager.Cameras, propIndex));
                         }
                         else if (objectType == ObjectTypes.Box)
                         {
-                            _itemsInRoom.Add(new Box(new Point(posX, posY), AssetManager.Boxes, propIndex));
+                            _itemsInRoom.Add(new Box(tileLocation, AssetManager.Boxes, propIndex));
                         }
                         else if (objectType == ObjectTypes.Checkpoint)
                         {
                             //TODO: Properly assign the checkpoint's index, width, and height
-                            _triggersInRoom.Add(new Checkpoint(new Point(posX, posY), null, 1, 1, 1));
+                            _triggersInRoom.Add(new Checkpoint(tileLocation, null, 1, 1, 1));
                         }
                         numberOfGameObjects--;
                     }
