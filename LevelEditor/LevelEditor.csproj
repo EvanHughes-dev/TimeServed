@@ -10,6 +10,31 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Update="Sprites\Props\Box.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Sprites\Props\hook.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Sprites\Props\hookAndRope.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Sprites\Props\idCard.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Sprites\Props\prop_cameraOff.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Sprites\Props\prop_cameraOn.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Sprites\Props\screwdriver.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Sprites\Props\wireCutters.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Sprites\Tiles\testWalkable.png">
     <Compile Update="Controls\PropBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -19,12 +44,16 @@
     <None Update="Tiles\testWalkable.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Tiles\testWall.png">
+    <None Update="Sprites\Tiles\testWall.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Tiles\void.png">
+    <None Update="Sprites\Tiles\void.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Sprites\Props\" />
   </ItemGroup>
 
 </Project>
