@@ -461,7 +461,7 @@ namespace LevelEditor
         private void TabControlTilesProps_SelectedIndexChanged(object sender, EventArgs e)
         {
 
-            if (sender is not TabControl tabby) throw new Exception();
+            if (sender is not TabControl tabby) throw new Exception("Invalid sender to tabControlTilesProps_SelectedIndexChanged");
 
             TabState newState = (TabState)tabby.SelectedIndex;
 
