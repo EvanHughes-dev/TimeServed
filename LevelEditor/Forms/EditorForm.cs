@@ -362,7 +362,7 @@ namespace LevelEditor
         /// <exception cref="Exception"></exception>
         private void PropBox_MouseDown(object? sender, MouseEventArgs e)
         {
-            if (sender is not PropBox proppy) throw new Exception();
+            if (sender is not PropBox proppy) throw new Exception("Invalid sender to PropBox_MouseDown");
 
             if (e.Button == MouseButtons.Right) //Right click will...
             {
