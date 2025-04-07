@@ -177,7 +177,7 @@ namespace LevelEditor
         /// <summary>
         /// Creates the prop selection buttons corresponding with the &*%*@^(^#_. Should only be run once!
         /// </summary>
-        private void CreatePalettePropBoxes() //this will be difficult to implement until I have tile info
+        private void CreatePalettePropBoxes() 
         {
             // Shortcut variables for the width and height
             int height = PropPalette.GetLength(0);
