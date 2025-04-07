@@ -96,7 +96,6 @@
             MaximizeBox = false;
             Name = "EditorForm";
             Text = "Level Editor";
-            Load += EditorForm_Load;
             tabControlTilesProps.ResumeLayout(false);
             ResumeLayout(false);
         }

@@ -23,8 +23,8 @@ namespace LevelEditor.Controls
             set
             {
                 // When the tile is uploaded, also update the displayed sprite.
-                Image = value.Sprite;
-                _prop = value;
+                Image = value?.Sprite;
+                _prop = value!;
             }
         }
     }
