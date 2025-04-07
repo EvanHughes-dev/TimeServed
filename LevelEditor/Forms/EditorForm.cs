@@ -357,9 +357,7 @@ namespace LevelEditor
         /// <summary>
         /// When clicking on a PropBox
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        /// <exception cref="Exception"></exception>
+        /// <exception cref="Exception">Thrown when this method is called with a non-PropBox sender</exception>
         private void PropBox_MouseDown(object? sender, MouseEventArgs e)
         {
             if (sender is not PropBox proppy) throw new Exception("Invalid sender to PropBox_MouseDown");
@@ -478,8 +476,6 @@ namespace LevelEditor
                     {
                         proppy.Enabled = true; //Props can now be interacted with
                     }
-                    break;
-                default:
                     break;
             }
 
