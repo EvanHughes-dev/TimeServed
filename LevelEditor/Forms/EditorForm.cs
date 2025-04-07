@@ -5,6 +5,7 @@
 using LevelEditor.Classes;
 using LevelEditor.Classes.Props;
 using LevelEditor.Controls;
+using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
@@ -89,7 +90,7 @@ namespace LevelEditor
 
             // Sets the selected color to some sort of reasonable default -- Palette[0, 0] is the only place we can guarantee there's a color in the palette
             //   (assuming the developer didn't change Palette to an entirely empty array)
-            SelectedTile = Palette[0, 0];
+            _selectedTile = Palette[0, 0];
 
 
             int numOfProps = _mainForm.Props.Count;
@@ -226,7 +227,7 @@ namespace LevelEditor
         {
             if (sender is not TileBox swatch) throw new Exception();
 
-            SelectedTile = swatch.Tile;
+            _selectedTile = swatch.Tile;
         }
         /// <summary>
         /// When a prop button is clicked, select its object.
@@ -310,14 +311,14 @@ namespace LevelEditor
 
                 if (e.Button == MouseButtons.Left)
                 {
-                    tile.Tile = SelectedTile;
+                    tile.Tile = _selectedTile;
 
-                    Room.Tiles[y, x] = SelectedTile;
+                    Room.Tiles[yIndex, xIndex] = _selectedTile;
                 }
 
                 // Right click picks color! Because that's convenient and I wanted it to be a feature!
                 if (e.Button == MouseButtons.Right)
-                    SelectedTile = tile.Tile;
+                    _selectedTile = tile.Tile;
             }
             else if (_tabState == TabState.Props)
             {
@@ -384,9 +385,9 @@ namespace LevelEditor
 
                 if (e.Button == MouseButtons.Left)
                 {
-                    tile.Tile = SelectedTile;
+                    tile.Tile = _selectedTile;
 
-                    Room.Tiles[y, x] = SelectedTile;
+                    Room.Tiles[y, x] = _selectedTile;
                 }
             }
         }
