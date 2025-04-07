@@ -42,7 +42,7 @@ namespace LevelEditor
         // <summary>
         /// Gets or sets the color the user currently has selected from the palette.
         /// </summary>
-        private Tile SelectedTile { get; set; }
+        private Tile _selectedTile;
         /// <summary>
         /// Gets the palette of tiles the user may select from.
         /// </summary>
