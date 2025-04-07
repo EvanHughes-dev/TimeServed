@@ -332,7 +332,7 @@ namespace LevelEditor
 
                 if (e.Button == MouseButtons.Left)
                 {
-                    //Propy is ALive!! They gets all of tile's shit like a younger sibling does
+                    //Propy is ALive!! They gets all of tile's crap like a younger sibling does
                     PropBox proppy = new PropBox()
                     {
                         SizeMode = PictureBoxSizeMode.Zoom,
