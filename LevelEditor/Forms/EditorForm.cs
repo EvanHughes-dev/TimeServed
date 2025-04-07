@@ -236,6 +236,7 @@ namespace LevelEditor
         {
             if (sender is not PropBox prop) throw new Exception("Invalid call to PropSwatch_Click");
 
+            prop.BackColor = Color.Honeydew;
             SelectedProp = prop.Prop;
         }
 
