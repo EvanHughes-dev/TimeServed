@@ -50,7 +50,7 @@ namespace LevelEditor
 
             if (result == DialogResult.OK)
             {
-                Room room = FileIOHelpers.LoadRoom(openFileDialog.FileName, _mainForm.Tiles);
+                Room room = FileIOHelpers.LoadRoom(openFileDialog.FileName, _mainForm.Tiles, _mainForm.Props);
 
                 _mainForm.AddNewRoom(room);
 

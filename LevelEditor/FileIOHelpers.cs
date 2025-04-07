@@ -195,6 +195,8 @@ namespace LevelEditor
             for (int i = 0; i < roomCount; i++)
             {
                 string roomName = reader.ReadString();
+                int roomIndex = reader.ReadInt32();
+
                 string folder = Path.GetDirectoryName(filePath)!;
 
                 string roomPath = Path.Join(folder, $"{roomName}.room");
@@ -220,6 +222,7 @@ namespace LevelEditor
         /// This method is UNSAFE and MUST be called within a TRY-CATCH!
         /// </summary>
         /// <param name="filePath">The path to the .room file.</param>
+        /// <param name="id">id assigned to the room</param>
         /// <param name="allTiles">A reference to the tile array, so it can be loaded properly.</param>
         /// <param name="allProps">A reference to the prop array so the room can load any props that have been saved</param>
         /// <returns>The loaded room.</returns>
@@ -273,7 +276,7 @@ namespace LevelEditor
 
             string roomName = Path.GetFileNameWithoutExtension(filePath);
 
-            Room room = new(roomName, width, height);
+            Room room = new Room(roomName, width, height);
 
             for (int y = 0; y < height; y++)
             {
