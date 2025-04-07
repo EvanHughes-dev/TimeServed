@@ -275,10 +275,8 @@ namespace MakeEveryDayRecount.Map
                                 // Parse a door from the file
                                 // Next three values correspond to the needed data
                                 Door doorFromFile = new Door(
-                                    direction[binaryReader.ReadInt32()], // Direction door is facing
-                                    binaryReader.ReadInt32(), // The index of this door
-                                    binaryReader.ReadInt32(), // The index of the destination room
-                                    binaryReader.ReadInt32(), // The index of the destination door
+                                    new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32()),// Read the destination point in the new room
+                                    binaryReader.ReadInt32(),//Read destination room
                                     keyType,
                                     tileLocation,
                                     AssetManager.DoorTexture[propIndex]

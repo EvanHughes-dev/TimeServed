@@ -24,30 +24,21 @@ namespace MakeEveryDayRecount.GameObjects.Props
         }
 
         private DoorKeyType _keyType;
+
         /// <summary>
-        /// Get the direction the player will be outputted in when entering this door 
+        /// Get the direction the player will be outputted in when interacting with this door
         /// </summary>
         public Point DestinationTile { get; private set; }
-        /// <summary>
-        /// Get the index of this door
-        /// </summary>
-        public int DoorIndex { get; private set; }
+
         /// <summary>
         /// Get the room this door leads to
         /// </summary>
         public int DestRoom { get; private set; }
 
         /// <summary>
-        /// Get the door this door leads to
-        /// </summary>
-        public int _destDoorIndex { get; private set; }
-
-        /// <summary>
         /// Called when the player successfully interacts with a door
         /// </summary>
         public event DoorTransition OnDoorInteract;
-
-        private Door _destDoor;
 
         /// <summary>
         ///Create the door object
@@ -60,19 +51,15 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// <param name="sprite">Sprite to display</param>
         public Door(
             Point outPosition,
-            int sourceDoor,
             int destRoom,
-            int _destDoor,
             DoorKeyType keyType,
             Point location,
             Texture2D sprite
         )
             : base(location, sprite)
         {
-            DoorIndex = sourceDoor;
             DestRoom = destRoom;
-            _destDoorIndex = _destDoor;
-            DestinationTile = outPosition + location;
+            DestinationTile = outPosition;
             _keyType = keyType;
         }
 
@@ -84,17 +71,8 @@ namespace MakeEveryDayRecount.GameObjects.Props
         {
             if (_keyType == DoorKeyType.None || player.ContainsKey(_keyType))
             {
-                OnDoorInteract?.Invoke(_destDoor, DestRoom);
+                OnDoorInteract?.Invoke(this, DestRoom);
             }
-        }
-
-        /// <summary>
-        /// Assign the door to which this door leads 
-        /// </summary>
-        /// <param name="doorAssignment">Door this door leads to</param>
-        public void AssignDoor(Door doorAssignment)
-        {
-            _destDoor = doorAssignment;
         }
     }
 }

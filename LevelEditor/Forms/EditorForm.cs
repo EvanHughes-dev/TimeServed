@@ -393,7 +393,7 @@ namespace LevelEditor
                 if (prop.Position.HasValue)
                 {
                     Point propPosition = new Point(prop.Position.Value.X, prop.Position.Value.Y);
-                    TileBox tile = TileGrid[propPosition.X, propPosition.Y];
+                    TileBox tile = TileGrid[propPosition.Y, propPosition.X];
                     //Propy is ALive!! They gets all of tile's crap like a younger sibling does
                     PropBox proppy = new PropBox()
                     {

@@ -305,12 +305,19 @@ namespace LevelEditor
                 switch (objectType)
                 {
                     case ObjectType.Item:
+                        _ = reader.ReadInt32();
                         room.Props.Add(allProps.ElementAt(imageIndex).Instantiate(propPosition));
                         break;
                     case ObjectType.Box:
                         room.Props.Add(allProps.ElementAt(imageIndex + 5).Instantiate(propPosition));
                         break;
                     case ObjectType.Door:
+                        _ = reader.ReadInt32();
+                        _ = reader.ReadInt32();
+                        _ = reader.ReadInt32();
+                        _ = reader.ReadInt32();
+                        _ = reader.ReadInt32();
+                        
                         room.Props.Add(allProps.ElementAt(imageIndex + 6).Instantiate(propPosition));
                         break;
                     case ObjectType.Camera:

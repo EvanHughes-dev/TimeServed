@@ -28,7 +28,7 @@ namespace LevelEditor.Classes.Props
         /// <summary>
         /// The coordinates that the door should lead to in the room it is connected to.
         /// </summary>
-        public Point Destination { get; set; }
+        public Point? Destination { get; set; }
 
         /// <summary>
         /// Creates a new Door with the given sprite, position, KeyType, and facing direction.
@@ -41,12 +41,13 @@ namespace LevelEditor.Classes.Props
         ///     Set to None to make this door unlocked.
         /// </param>
         /// <param name="facing">The direction this door faces.</param>
-        public Door(Image sprite, int propIndex, KeyType keyToOpen, Orientation facing, Point? position=null)
+        public Door(Image sprite, int propIndex, KeyType keyToOpen, Orientation facing, Point? position=null, Point? destination = null)
             : base(sprite,  propIndex, ObjectType.Door, position)
         {
             // Save params
             KeyToOpen = keyToOpen;
             Facing = facing;
+            Destination = destination;
         }
 
 
@@ -58,6 +59,17 @@ namespace LevelEditor.Classes.Props
         public override Door Instantiate(Point position)
         {
             return new Door(Sprite, ImageIndex, KeyToOpen, Facing,  position);
+        }
+
+        /// <summary>
+        /// Creates a copy of this Door at the given position.
+        /// </summary>
+        /// <param name="position">The position to copy this Door to.</param>
+        /// <param name="destination">Destination point of this door</param>
+        /// <returns>A copy of this Door at the given position.</returns>
+        public Door Instantiate(Point position, Point destination)
+        {
+            return new Door(Sprite, ImageIndex, KeyToOpen, Facing, position, destination);
         }
     }
 }
