@@ -306,7 +306,7 @@ namespace LevelEditor
                 //   (to make clicking and dragging work)
                 tile.Capture = false;
 
-                (int y, int x) = TileGrid.IndexesOf(tile);
+                (int yIndex, int xIndex) = TileGrid.IndexesOf(tile);
 
                 if (e.Button == MouseButtons.Left)
                 {
