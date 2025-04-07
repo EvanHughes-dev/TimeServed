@@ -344,7 +344,7 @@ namespace LevelEditor
 
                     tile.Controls.Add(proppy);
 
-                    proppy.Prop = SelectedProp.Instantiate(new(x, y));
+                    proppy.Prop = SelectedProp.Instantiate(new Point(x, y));
                     proppy.BringToFront();
                     proppy.MouseDown += PropBox_MouseDown;
 
