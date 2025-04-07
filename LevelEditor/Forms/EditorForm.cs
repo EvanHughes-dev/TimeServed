@@ -457,8 +457,6 @@ namespace LevelEditor
         /// <summary>
         /// Changes the state based on the current tab selected and decides what to do with that info
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         /// <exception cref="Exception"></exception>
         private void TabControlTilesProps_SelectedIndexChanged(object sender, EventArgs e)
         {
