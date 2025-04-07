@@ -234,7 +234,7 @@ namespace LevelEditor
         /// <exception cref="Exception">Thrown when this method is called with a non-Button sender.</exception>
         private void PropSwatch_Click(object? sender, EventArgs e)
         {
-            if (sender is not PropBox prop) throw new Exception();
+            if (sender is not PropBox prop) throw new Exception("Invalid call to PropSwatch_Click");
 
             SelectedProp = prop.Prop;
         }
