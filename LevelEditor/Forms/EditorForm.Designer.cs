@@ -66,7 +66,7 @@
             tabControlTilesProps.SelectedIndex = 0;
             tabControlTilesProps.Size = new Size(178, 490);
             tabControlTilesProps.TabIndex = 0;
-            tabControlTilesProps.SelectedIndexChanged += tabControlTilesProps_SelectedIndexChanged;
+            tabControlTilesProps.SelectedIndexChanged += TabControlTilesProps_SelectedIndexChanged;
             // 
             // tabPageTiles
             // 
