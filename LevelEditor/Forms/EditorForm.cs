@@ -455,7 +455,7 @@ namespace LevelEditor
         /// <summary>
         /// Changes the state based on the current tab selected and decides what to do with that info
         /// </summary>
-        /// <exception cref="Exception"></exception>
+        /// <exception cref="Exception">Thrown when this method is called with a non-Control sender.</exception>
         private void TabControlTilesProps_SelectedIndexChanged(object sender, EventArgs e)
         {
 
