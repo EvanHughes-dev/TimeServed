@@ -379,7 +379,7 @@ namespace LevelEditor
         /// <exception cref="Exception">Thrown when this method is called with a non-Control sender.</exception>
         private void Tile_MouseMove(object? sender, MouseEventArgs e)
         {
-            if (sender is not TileBox tile) throw new Exception();
+            if (sender is not TileBox tile) throw new Exception("Invalid sender to Tile_MouseMove");
             if (_tabState == TabState.Tiles)
             {
                 (int y, int x) = TileGrid.IndexesOf(tile);
