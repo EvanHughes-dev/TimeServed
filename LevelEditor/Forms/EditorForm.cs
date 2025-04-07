@@ -146,7 +146,7 @@ namespace LevelEditor
         {
             if (sender is not TileBox swatch) throw new Exception();
 
-            _selectedTile = swatch.Tile;
+            SelectedTile = swatch.Tile;
         }
         /// <summary>
         /// When a prop button is clicked, select its object.
@@ -179,14 +179,14 @@ namespace LevelEditor
 
                 if (e.Button == MouseButtons.Left)
                 {
-                    tile.Tile = _selectedTile;
+                    tile.Tile = SelectedTile;
 
                     Room.Tiles[tileY, tileX] = SelectedTile;
                 }
 
                 // Right click picks color! Because that's convenient and I wanted it to be a feature!
                 if (e.Button == MouseButtons.Right)
-                    _selectedTile = tile.Tile;
+                    SelectedTile = tile.Tile;
             }
             else if (TabState == TabState.Props)
             {
@@ -250,9 +250,9 @@ namespace LevelEditor
 
                 if (e.Button == MouseButtons.Left)
                 {
-                    tile.Tile = _selectedTile;
+                    tile.Tile = SelectedTile;
 
-                    Room.Tiles[y, x] = _selectedTile;
+                    Room.Tiles[y, x] = SelectedTile;
                 }
             }
         }
