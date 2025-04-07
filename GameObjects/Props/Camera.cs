@@ -156,8 +156,24 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //Debug.WriteLine("Counter-clockwise point is: " + counterclockwisePoint.ToString());
             //Debug.WriteLine("Clockwise point is: " + clockwisePoint.ToString());
 
+            //Rasterize between the corners and the centerpoint to get all the points we need to send out a ray to
+            List<Point> clockwisePoints = Rasterize(clockwisePoint, _centerPoint);
+            List<Point> counterclockwisePoints = Rasterize(_centerPoint, counterclockwisePoint);
+            //TODO: Maybe sort the lists so that the _endpoints array ends up in a centain order?
+            //The endpoints array starts from the counterclockwise corner, goes to the center, and ends at the clockwise corner
+            //Basically sweeping from left to right, from the camera's point of view
+            //Although maybe if the camera "sweeps" from the center outwards, it would somehow help us avoid duplicates more?
+            //Because rays in the center are more likely to have tiles that overlap with the rays at the edges. The closer to the center you are the more overlap there is.
+            //Arbitrarily remove the centerpoint from the clockwise list so we don't add it to endpoints twice
+            //We can't use RemoveAt for this because the centerpoint could be at either end of this list
+            counterclockwisePoints.Remove(_centerPoint);
+            //Now combine the two lists into one and turn that into an array
+            List<Point> endPoints = clockwisePoints;
+            endPoints.AddRange(counterclockwisePoints);
+            _endPoints = endPoints.ToArray();
+
             //Create a rectangle that bounds the entire kite
-            //TODO: Could this be done more efficiently?
+            //TODO: Could finding the corners be done more efficiently?
             Point[] corners = {_rayBase, _centerPoint, clockwisePoint, counterclockwisePoint};
             //Find the minimum/maximum X and Y of the 4 bounding points (the edges of the rectangle basically)
             int minX = _rayBase.X;
@@ -174,8 +190,13 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //Nested for loops to go from left to right and then top to bottom
             for (int y = minY; y <= maxY; y++)
             {
+                //If there's an endpoint in this column, and y is further from the camera than that endpoint is
+                //Continue
                 for (int x = minX; x <= maxX; x++)
                 {
+                    //If there's an endpoint in this row, and x is further from the camera than that endpoint is
+                    //Then break
+
                     //For each point in that rectangle, create a vector from the raybase to it
                     Vector2 candidateVector = new Vector2(x - _rayBase.X, y - _rayBase.Y);
                     //Figure out if that vector is between the two edge vectors. If it is, then it should be inside of the vision kite
@@ -193,22 +214,6 @@ namespace MakeEveryDayRecount.GameObjects.Props
                 }
             }
 
-
-            //Rasterize between the corners and the centerpoint to get all the points we need to send out a ray to
-            List<Point> clockwisePoints = Rasterize(clockwisePoint, _centerPoint);
-            List<Point> counterclockwisePoints = Rasterize(_centerPoint, counterclockwisePoint);
-            //TODO: Maybe sort the lists so that the _endpoints array ends up in a centain order?
-            //The endpoints array starts from the counterclockwise corner, goes to the center, and ends at the clockwise corner
-            //Basically sweeping from left to right, from the camera's point of view
-            //Although maybe if the camera "sweeps" from the center outwards, it would somehow help us avoid duplicates more?
-            //Because rays in the center are more likely to have tiles that overlap with the rays at the edges. The closer to the center you are the more overlap there is.
-            //Arbitrarily remove the centerpoint from the clockwise list so we don't add it to endpoints twice
-            //We can't use Remove for this because the centerpoint could be at either end of the return list
-            counterclockwisePoints.Remove(_centerPoint);
-            //Now combine the two lists into one and turn that into an array
-            List<Point> endPoints = clockwisePoints;
-            endPoints.AddRange(counterclockwisePoints);
-            _endPoints = endPoints.ToArray();
             #endregion
             //Note that the length of _endPoints may be even or odd depending on rounding
 
