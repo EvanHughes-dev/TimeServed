@@ -229,7 +229,7 @@ namespace LevelEditor
             SelectedTile = swatch.Tile;
         }
         /// <summary>
-        /// When a prop button is clicked, select its color.
+        /// When a prop button is clicked, select its object.
         /// </summary>
         /// <exception cref="Exception">Thrown when this method is called with a non-Button sender.</exception>
         private void PropSwatch_Click(object? sender, EventArgs e)
