@@ -460,7 +460,7 @@ namespace LevelEditor
         /// <param name="sender"></param>
         /// <param name="e"></param>
         /// <exception cref="Exception"></exception>
-        private void tabControlTilesProps_SelectedIndexChanged(object sender, EventArgs e)
+        private void TabControlTilesProps_SelectedIndexChanged(object sender, EventArgs e)
         {
 
             if (sender is not TabControl tabby) throw new Exception();
