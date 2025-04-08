@@ -17,6 +17,9 @@ namespace LevelEditor
     /// </summary>
     internal static class FileIOHelpers
     {
+
+        #region File Saving
+
         /// <summary>
         /// Saves a given level to the given path.
         /// This method is UNSAFE and MUST be called within a TRY-CATCH!
@@ -170,6 +173,10 @@ namespace LevelEditor
             writer.Close();
         }
 
+        #endregion
+
+        #region  File Loading
+
         /// <summary>
         /// Loads the level at the given file path and returns it.
         /// This method is UNSAFE and MUST be called within a TRY-CATCH!
@@ -209,7 +216,7 @@ namespace LevelEditor
                     level.Rooms.Add(
                         LoadRoom(roomPath, allTiles, allProps)
                         );
-                    level.Rooms[level.Rooms.Count].Id= roomIndex;
+                    level.Rooms[level.Rooms.Count-1].Id = roomIndex;
                 }
 
             }
@@ -311,7 +318,7 @@ namespace LevelEditor
                     case ObjectType.Door:
                         _ = reader.ReadInt32(); //Don't need the key type
                         int destRoom = reader.ReadInt32();
-                        Point destPoint =new Point( reader.ReadInt32(), reader.ReadInt32());                        
+                        Point destPoint = new Point(reader.ReadInt32(), reader.ReadInt32());
                         room.Props.Add(((Door)allProps.ElementAt(imageIndex + 6)).Instantiate(propPosition, destPoint, destRoom));
                         break;
                     case ObjectType.Camera:
@@ -325,6 +332,8 @@ namespace LevelEditor
 
             return room;
         }
+
+        #endregion
 
         #region Loading Assets
 
@@ -397,6 +406,7 @@ namespace LevelEditor
 
             return new(Image.FromFile(Path.Join(TileFolderPath, spriteName)), isWalkable);
         }
+
         #endregion
 
         #region Useful File Macros
