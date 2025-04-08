@@ -159,10 +159,10 @@ namespace LevelEditor
                         FileIOHelpers.LoadItem("hook.png",3, KeyType.None),
                         FileIOHelpers.LoadItem("hookAndRope.png",4, KeyType.None),
                         FileIOHelpers.LoadBox("Box.png", 0),
-                        FileIOHelpers.LoadDoor("Door-Top.png", 0, KeyType.KeyCard, Orientation.North),
-                        FileIOHelpers.LoadDoor("Door-Right.png", 1, KeyType.KeyCard, Orientation.East),
-                        FileIOHelpers.LoadDoor("Door-Bottom.png", 2, KeyType.KeyCard, Orientation.South),
-                        FileIOHelpers.LoadDoor("Door-Left.png", 3, KeyType.KeyCard, Orientation.West),
+                        FileIOHelpers.LoadDoor("Door-Top.png", 0, KeyType.KeyCard),
+                        FileIOHelpers.LoadDoor("Door-Right.png", 1, KeyType.KeyCard),
+                        FileIOHelpers.LoadDoor("Door-Bottom.png", 2, KeyType.KeyCard),
+                        FileIOHelpers.LoadDoor("Door-Left.png", 3, KeyType.KeyCard),
                     ];
 
                 Props = props.AsReadOnly();

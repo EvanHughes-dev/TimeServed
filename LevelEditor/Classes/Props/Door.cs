@@ -15,15 +15,11 @@ namespace LevelEditor.Classes.Props
         /// The type of key necessary to open this door, if any.
         /// </summary>
         public KeyType KeyToOpen { get; set; }
-        /// <summary>
-        /// The direction this door is facing. A north-facing door would be placed on a south wall.
-        /// </summary>
-        public Orientation Facing { get; set; }
 
         /// <summary>
         /// The Room that this door should connect to.
         /// </summary>
-        public Room? ConnectedTo { get; set; }
+        public int? ConnectedTo { get; set; }
 
         /// <summary>
         /// The coordinates that the door should lead to in the room it is connected to.
@@ -40,14 +36,14 @@ namespace LevelEditor.Classes.Props
         ///     The type of key that can be used to open this door. 
         ///     Set to None to make this door unlocked.
         /// </param>
-        /// <param name="facing">The direction this door faces.</param>
-        public Door(Image sprite, int propIndex, KeyType keyToOpen, Orientation facing, Point? position=null, Point? destination = null)
-            : base(sprite,  propIndex, ObjectType.Door, position)
+        /// <param name="destination">Destination the player will be at when they interact</param>
+        public Door(Image sprite, int imageIndex, KeyType keyToOpen, Point? position=null, Point? destination = null, int? roomIndex=null)
+            : base(sprite,  imageIndex, ObjectType.Door, position)
         {
             // Save params
             KeyToOpen = keyToOpen;
-            Facing = facing;
             Destination = destination;
+            ConnectedTo = roomIndex;
         }
 
 
@@ -58,7 +54,7 @@ namespace LevelEditor.Classes.Props
         /// <returns>A copy of this Door at the given position.</returns>
         public override Door Instantiate(Point position)
         {
-            return new Door(Sprite, ImageIndex, KeyToOpen, Facing,  position);
+            return new Door(Sprite, ImageIndex, KeyToOpen,  position);
         }
 
         /// <summary>
@@ -66,10 +62,11 @@ namespace LevelEditor.Classes.Props
         /// </summary>
         /// <param name="position">The position to copy this Door to.</param>
         /// <param name="destination">Destination point of this door</param>
+        /// <param name="roomIndex">Index this room coresponds to</param>
         /// <returns>A copy of this Door at the given position.</returns>
-        public Door Instantiate(Point position, Point destination)
+        public Door Instantiate(Point position, Point destination, int roomIndex)
         {
-            return new Door(Sprite, ImageIndex, KeyToOpen, Facing, position, destination);
+            return new Door(Sprite, ImageIndex, KeyToOpen, position, destination, roomIndex);
         }
     }
 }

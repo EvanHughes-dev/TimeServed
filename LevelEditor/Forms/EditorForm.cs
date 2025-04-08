@@ -214,7 +214,7 @@ namespace LevelEditor
                     proppy.BringToFront();
                     proppy.MouseDown += PropBox_MouseDown;
 
-                    Room.Props.Add(SelectedProp);
+                    Room.Props.Add(proppy.Prop);
                     _propBoxesInRoom.Add(proppy);
                 }
             }

@@ -37,12 +37,14 @@ namespace LevelEditor.Classes.Props
         /// <param name="sprite">The sprite this Prop displays with.</param>
         /// <param name="position">The position of this Prop.</param>
         /// <param name="imageIndex"> Index of this image inside the coresponding array in the game</prarm>
-        /// <param name="objectType">Type o fobject this is</param>
+        /// <param name="objectType">Type of object this is</param>
         public Prop(Image sprite, int imageIndex, ObjectType objectType, Point? position=null)
         {
             // Save params without filtering
             Sprite = sprite;
+            ImageIndex = imageIndex;
             Position = position;
+            PropType = objectType;
         }
 
         /// <summary>

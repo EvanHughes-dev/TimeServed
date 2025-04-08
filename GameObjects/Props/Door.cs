@@ -43,15 +43,14 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// <summary>
         ///Create the door object
         /// </summary>
-        /// <param name="sourceDoor">This door's index</param>
+        /// <param name="outPosition">Position to output the player when they interact with the door</param>
         /// <param name="destRoom">Room index that this door leads to</param>
-        /// <param name="_destDoor">Door's index that this door goes to</param>
         /// <param name="keyType">Type of key this door leads to</param>
         /// <param name="location">Position in room</param>
         /// <param name="sprite">Sprite to display</param>
         public Door(
-            Point outPosition,
             int destRoom,
+            Point outPosition,
             DoorKeyType keyType,
             Point location,
             Texture2D sprite

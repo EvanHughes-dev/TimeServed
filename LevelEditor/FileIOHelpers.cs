@@ -98,11 +98,6 @@ namespace LevelEditor
              *       For items, this is the key type they are
              * 
              *   if objectType == 3
-             *       int facing
-             *           0 = North/Up
-             *           1 = East/Right
-             *           2 = South/Down
-             *           3 = West/Left
              *       int destRoomId
              *       int destX
              *       int destY
@@ -157,11 +152,17 @@ namespace LevelEditor
                     case ObjectType.Door:
                         Door door = (Door)prop;
                         writer.Write((int)door.KeyToOpen);
-                        writer.Write((int)door.Facing);
                         if (door.ConnectedTo != null)
-                            writer.Write(door.ConnectedTo.Id);
-                        writer.Write(door.Destination.X);
-                        writer.Write(door.Destination.Y);
+                            writer.Write(door.ConnectedTo.Value);
+                        if (door.Destination.HasValue)
+                        {
+                            writer.Write(door.Destination.Value.X);
+                            writer.Write(door.Destination.Value.Y);
+                        }
+                        else
+                        {
+                            throw new NullReferenceException("Doors must have a destination value to save");
+                        }
                         break;
                 }
             }
@@ -259,11 +260,6 @@ namespace LevelEditor
             *       For items, this is the key type they are
             * 
             *   if objectType == 3
-            *       int facing
-            *           0 = North/Up
-            *           1 = East/Right
-            *           2 = South/Down
-            *           3 = West/Left
             *       int destRoomId
             *       int destX
             *       int destY
@@ -305,20 +301,17 @@ namespace LevelEditor
                 switch (objectType)
                 {
                     case ObjectType.Item:
-                        _ = reader.ReadInt32();
+                        _ = reader.ReadInt32();// Don't need the key type
                         room.Props.Add(allProps.ElementAt(imageIndex).Instantiate(propPosition));
                         break;
                     case ObjectType.Box:
                         room.Props.Add(allProps.ElementAt(imageIndex + 5).Instantiate(propPosition));
                         break;
                     case ObjectType.Door:
-                        _ = reader.ReadInt32();
-                        _ = reader.ReadInt32();
-                        _ = reader.ReadInt32();
-                        _ = reader.ReadInt32();
-                        _ = reader.ReadInt32();
-                        
-                        room.Props.Add(allProps.ElementAt(imageIndex + 6).Instantiate(propPosition));
+                        _ = reader.ReadInt32(); //Don't need the key type
+                        int destRoom = reader.ReadInt32();
+                        Point destPoint =new Point( reader.ReadInt32(), reader.ReadInt32());                        
+                        room.Props.Add(((Door)allProps.ElementAt(imageIndex + 6)).Instantiate(propPosition, destPoint, destRoom));
                         break;
                     case ObjectType.Camera:
                         break;
@@ -349,10 +342,10 @@ namespace LevelEditor
         /// <param name="keyToOpen">The type of key necessary to open this door, if any.</param>
         /// <param name="facing">The direction that this door is facing (a north-facing door would be placed on a south wall).</param>
         /// <returns>The loaded door.</returns>
-        public static Door LoadDoor(string spriteName, int imageIndex, KeyType keyToOpen, Orientation facing)
+        public static Door LoadDoor(string spriteName, int imageIndex, KeyType keyToOpen)
         {
             // These loaded props are fundamentally positionless -- they aren't in a room!
-            return new Door(LoadPropSprite(spriteName), imageIndex, keyToOpen, facing);
+            return new Door(LoadPropSprite(spriteName), imageIndex, keyToOpen);
         }
 
         /// <summary>

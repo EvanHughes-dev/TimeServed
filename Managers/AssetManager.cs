@@ -127,10 +127,10 @@ namespace MakeEveryDayRecount.Managers
             };
             DoorTexture = new Texture2D[]
             {
-                content.Load<Texture2D>("Doors/TempDoor-Top"),
-                content.Load<Texture2D>("Doors/TempDoor-Right"),
-                content.Load<Texture2D>("Doors/TempDoor-Bottom"),
-                content.Load<Texture2D>("Doors/TempDoor-Left")
+                content.Load<Texture2D>("Doors/Door-Top"),
+                content.Load<Texture2D>("Doors/Door-Right"),
+                content.Load<Texture2D>("Doors/Door-Bottom"),
+                content.Load<Texture2D>("Doors/Door-Left")
             };
             TileSize = InterfaceManager.ScalePointUniform(new Point(TileMap[0].Width / 2, TileMap[0].Height / 2));
 
