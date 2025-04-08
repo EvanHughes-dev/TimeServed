@@ -19,7 +19,7 @@ namespace LevelEditor.Classes
         /// <summary>
         /// The room's randomly-generated ID.
         /// </summary>
-        public int Id { get; }
+        public int Id { get; set; }
 
         /// <summary>
         /// The grid of tiles the room is made of.

@@ -209,6 +209,7 @@ namespace LevelEditor
                     level.Rooms.Add(
                         LoadRoom(roomPath, allTiles, allProps)
                         );
+                    level.Rooms[level.Rooms.Count].Id= roomIndex;
                 }
 
             }
