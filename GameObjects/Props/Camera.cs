@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Players;
 using MakeEveryDayRecount.Managers;
+using MakeEveryDayRecount.Map.Tiles;
 
 namespace MakeEveryDayRecount.GameObjects.Props
 {
@@ -152,12 +153,17 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //Gang why does mathF still return a float when you round to the nearest integer. This is highly unserious
 
             //TESTING - tell me where the corners are
-            //Debug.WriteLine("Center point is " + _centerPoint.ToString());
-            //Debug.WriteLine("Counter-clockwise point is: " + counterclockwisePoint.ToString());
-            //Debug.WriteLine("Clockwise point is: " + clockwisePoint.ToString());
+            Debug.WriteLine("Center point is " + _centerPoint.ToString());
+            Debug.WriteLine("Counter-clockwise point is: " + counterclockwisePoint.ToString());
+            Debug.WriteLine("Clockwise point is: " + clockwisePoint.ToString());
 
             //Rasterize between the corners and the centerpoint to get all the points we need to send out a ray to
+            Debug.WriteLine("Clockwise");
             List<Point> clockwisePoints = Rasterize(clockwisePoint, _centerPoint);
+            //Debug.Write("Clockwise points are: ");
+            //foreach (Point debugPoint in clockwisePoints) Debug.Write(debugPoint + " ");
+            //Debug.WriteLine(null);
+            Debug.WriteLine("Counter-clockwise");
             List<Point> counterclockwisePoints = Rasterize(_centerPoint, counterclockwisePoint);
             //TODO: Maybe sort the lists so that the _endpoints array ends up in a centain order?
             //The endpoints array starts from the counterclockwise corner, goes to the center, and ends at the clockwise corner
@@ -191,6 +197,20 @@ namespace MakeEveryDayRecount.GameObjects.Props
             for (int y = minY; y <= maxY; y++)
             {
                 //If there's an endpoint in this column, and y is further from the camera than that endpoint is
+                //TODO: This shit is NOT efficent. HEWLP
+                //It's not that bad because this only runs when the cam is created, but it's O(n^2)
+                Point yPoint = Point.Zero;
+                foreach (Point endpoint in _endPoints)
+                {
+                    if (endpoint.Y == y)
+                    {
+                        yPoint = endpoint;
+                    }
+                }
+                if (yPoint != Point.Zero)
+                {
+                    maxX = yPoint.X;
+                }
                 //Continue
                 for (int x = minX; x <= maxX; x++)
                 {
@@ -238,6 +258,10 @@ namespace MakeEveryDayRecount.GameObjects.Props
             {
                 sb.Draw(AssetManager.CameraSight, new Rectangle(MapUtils.TileToWorld(tile) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
             }
+            foreach (Point endpoint in _endPoints)
+            {
+                sb.Draw(AssetManager.PropTextures[3], new Rectangle(MapUtils.TileToWorld(endpoint) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
+            }
         }
 
         private List<Point> Rasterize(Point p1, Point p2)
@@ -246,8 +270,9 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //If dy > dx, switch the X and Y of the endpoints
             if (Math.Abs(p2.Y-p1.Y) > Math.Abs(p2.X - p1.X))
             {
+                Debug.WriteLine("Swapped X and Y");
                 //Indicate that we changed this stuff for later
-                rotated = true;
+                rotated = !rotated;
                 //Swap the X and Y of p1
                 int swapX = p1.X;
                 p1.X = p1.Y;
@@ -261,10 +286,19 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //If the line is going from right to left, we switch the start and end point so it can be drawn left to right
             if (p1.X > p2.X)
             {
-                //Store this so that we don't forget a point
-                Point swapPoint = p1;
-                p1 = p2;
-                p2 = swapPoint;
+                if (p2.Y - p1.Y < 0)
+                {
+                    //Reflect the line over it's x-center in order to fix this, and then flip it back?
+                    //So basically switch the X of the start and end points
+                }
+                else
+                {
+                    Debug.WriteLine("Switched start and end");
+                    //Store this so that we don't forget a point
+                    Point swapPoint = p1;
+                    p1 = p2;
+                    p2 = swapPoint;
+                }
             }
             
             int dx = p2.X - p1.X;
@@ -279,7 +313,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
             for (; x <= p2.X; x++) //using x as loop variable
             {
                 returnPoints.Add(new Point(x, y));
-                //Debug.WriteLine($"Added point {x}, {y}");
+                Debug.WriteLine($"Added point {x}, {y}");
                 if (p < 0)
                 {
                     p = p + (2 * dy);
