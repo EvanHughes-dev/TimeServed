@@ -78,10 +78,12 @@ namespace MakeEveryDayRecount.Managers
         /// Called to reset the level to the starting state
         /// </summary>
         public void LevelReset(){
+            // TODO eventually change this to a checkpoint system
             Level = 1;
             PlayerObject = new Player(new Point(5, 5), AssetManager.PlayerTexture, this, MapUtils.ScreenSize);
-            Map = new MapManager(this);
+            Map.ChangeLevel();
             OnPlayerUpdate?.Invoke(PlayerObject);
+            ReplayManager.ClearData();
         }
 
     }

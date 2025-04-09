@@ -228,6 +228,9 @@ namespace MakeEveryDayRecount.Map
                     *       int destRoom
                     *       int outputPosX
                     *       int outputPosY
+                    *  if objectType == 1
+                    *       Point centerPoint point of a camera vision cone
+                    *       float radian value of camera spread
                     */
 
                     // Define the size of the current room and loop to populate tiles
