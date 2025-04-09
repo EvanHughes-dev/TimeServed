@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Managers;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 
 namespace MakeEveryDayRecount.Map
 {
@@ -98,12 +99,6 @@ namespace MakeEveryDayRecount.Map
             Cameras = new List<Camera>();
             Doors = new List<Door> { };
             ParseData(filePath);
-
-            //Add a camera to the room for testing
-            //In the actual game this will be done by parsing it from a file, but it's basically the same
-            Camera roomTestCamera = new Camera(new Point(6, 0), AssetManager.CameraTextures[1], this, new Point(12, 8), (float)(Math.PI/6));
-            _itemsInRoom.Add(roomTestCamera);
-            Cameras.Add(roomTestCamera);
         }
 
         #region  Drawing Logic
@@ -284,48 +279,48 @@ namespace MakeEveryDayRecount.Map
                         Point tileLocation = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
 
                         ObjectTypes objectType = (ObjectTypes)binaryReader.ReadInt32();
-                        if (objectType == ObjectTypes.Item || objectType == ObjectTypes.Door)
+                        switch (objectType)
                         {
-                            Door.DoorKeyType keyType = (Door.DoorKeyType)binaryReader.ReadInt32();
+                            case ObjectTypes.Item:
+                                Door.DoorKeyType keyTypeItem = (Door.DoorKeyType)binaryReader.ReadInt32();
 
-                            if (objectType == ObjectTypes.Door)
-                            {
+                                Item newItemInRoom = new Item(
+                                    tileLocation,
+                                    AssetManager.PropTextures[propIndex],
+                                    "TEMP_NAME",
+                                    keyTypeItem
+                                );
+
+                                newItemInRoom.OnItemPickup += RemoveGameObject;
+                                _itemsInRoom.Add(newItemInRoom);
+                                break;
+                            case ObjectTypes.Camera:
+                                Point centerCastPoint = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
+                                Camera cam = new Camera(tileLocation, AssetManager.CameraTextures[propIndex], this, centerCastPoint, (float)binaryReader.ReadDouble());
+                                _itemsInRoom.Add(cam);
+                                Cameras.Add(cam);
+                                break;
+                            case ObjectTypes.Box:
+                                _itemsInRoom.Add(new Box(tileLocation, AssetManager.Boxes[propIndex]));
+                                break;
+                            case ObjectTypes.Door:
+                                Door.DoorKeyType keyTypeDoor = (Door.DoorKeyType)binaryReader.ReadInt32();
+
                                 // Parse a door from the file
                                 // Next three values correspond to the needed data
                                 Door doorFromFile = new Door(
                                     binaryReader.ReadInt32(),//Read destination room
                                     new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32()),// Read the destination point in the new room
-                                    keyType,
+                                    keyTypeDoor,
                                     tileLocation,
                                     AssetManager.DoorTexture[propIndex]
                                 );
                                 // When this door is interacted with, transition the player
                                 doorFromFile.OnDoorInteract += TransitionPlayer;
                                 Doors.Add(doorFromFile);
-                            }
-                            else
-                            {
-                                // Parse a prop from the file
+                                break;
+                        }
 
-                                Item newItemInRoom = new Item(
-                                    tileLocation,
-                                    AssetManager.PropTextures[propIndex],
-                                    "TEMP_NAME",
-                                    keyType
-                                );
-                                // When this item is picked up, remove it from this room
-                                newItemInRoom.OnItemPickup += RemoveGameObject;
-                                _itemsInRoom.Add(newItemInRoom);
-                            }
-                        }
-                        else if (objectType == ObjectTypes.Camera)
-                        {
-                            //_itemsInRoom.Add(new Camera(tileLocation, AssetManager.Cameras[propIndex], this, Player));
-                        }
-                        else if (objectType == ObjectTypes.Box)
-                        {
-                            _itemsInRoom.Add(new Box(tileLocation, AssetManager.Boxes[propIndex]));
-                        }
                         numberOfGameObjects--;
                     }
                 }
