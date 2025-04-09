@@ -42,9 +42,6 @@ namespace MakeEveryDayRecount
 
         private GameState _state;
 
-        private GameplayManager _gameplayManager;
-
-
         /// <summary>
         /// Access the current size of the screen in pixels
         /// </summary>
@@ -107,14 +104,14 @@ namespace MakeEveryDayRecount
 
             InterfaceManager.InitializeMenus(ScreenSize);
 
-            _gameplayManager = new GameplayManager(ScreenSize);
-            MapUtils.Initialize(this, _gameplayManager);
+            GameplayManager.Initialize(ScreenSize);
+            MapUtils.Initialize(this);
 
 
             
 
-            _debugModes[0] = new PlayerDebug(_gameplayManager);
-            _debugModes[1] = new MapDebug(_gameplayManager);
+            _debugModes[0] = new PlayerDebug();
+            _debugModes[1] = new MapDebug();
 
         }
 
@@ -151,7 +148,7 @@ namespace MakeEveryDayRecount
                         break;
                     }
 
-                    _gameplayManager.Update(gameTime);
+                     GameplayManager.Update(gameTime);
                     // Save the current state of the keyboard
                     ReplayManager.SaveState();
                     if (InputManager.GetKeyPress(Keys.Tab))
@@ -178,7 +175,7 @@ namespace MakeEveryDayRecount
                     if (!ReplayManager.PlayingReplay)
                     {
                         ReplayManager.BeginReplay();
-                        _gameplayManager.ReplayMode();
+                         GameplayManager.ReplayMode();
                     }
                     else if (!ReplayManager.NextFrame())
                     {
@@ -189,7 +186,7 @@ namespace MakeEveryDayRecount
                     }
 
                     InputManager.ReplayUpdate();
-                    _gameplayManager.Update(gameTime);
+                    GameplayManager.Update(gameTime);
 
                     break;
             }
@@ -217,17 +214,17 @@ namespace MakeEveryDayRecount
                 case GameState.Pause:
                     //TODO: Blur the gameplay in the background.
 
-                    _gameplayManager.Draw(_spriteBatch);
+                     GameplayManager.Draw(_spriteBatch);
                     DisplayDebug();
                     break;
                 case GameState.Level:
-                    _gameplayManager.Draw(_spriteBatch);
+                     GameplayManager.Draw(_spriteBatch);
                     DisplayDebug();
                     break;
                 case GameState.Cutscene:
                     break;
                 case GameState.Playback:
-                    _gameplayManager.Draw(_spriteBatch);
+                     GameplayManager.Draw(_spriteBatch);
                     DisplayDebug();
                     break;
             }
@@ -298,7 +295,7 @@ namespace MakeEveryDayRecount
                 if (SoundManager.PlayingMusic)
                     SoundManager.ResumeBGM();
                 else
-                    SoundManager.PlayBGM(_gameplayManager.Level);
+                    SoundManager.PlayBGM( GameplayManager.Level);
             }
             _state = state;
         }
