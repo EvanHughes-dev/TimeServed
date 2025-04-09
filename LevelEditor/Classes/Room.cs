@@ -19,7 +19,7 @@ namespace LevelEditor.Classes
         /// <summary>
         /// The room's randomly-generated ID.
         /// </summary>
-        public int Id { get; }
+        public int Id { get; set; }
 
         /// <summary>
         /// The grid of tiles the room is made of.
@@ -41,7 +41,7 @@ namespace LevelEditor.Classes
         /// If provided, every tile in the Room will be set to this tile.
         /// Should only be excluded if you're planning to immediately set every tile manually!
         /// </param>
-        public Room(string name, int width, int height, Tile? bg = null)
+        public Room(string name, int width, int height, Tile? bg = null, int? id = null)
         {
             Name = name;
 
@@ -57,10 +57,8 @@ namespace LevelEditor.Classes
                     }
                 }
             }
-
-            Props = [];
-
-            Id = Program.Random.Next();
+            Props = new List<Prop> { };
+            Id = id == null ? Program.Random.Next() : (int)id;
         }
 
         // TODO: Add Resize(north, south, east, west) method

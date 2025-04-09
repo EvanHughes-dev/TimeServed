@@ -64,6 +64,8 @@ namespace LevelEditor
         /// </summary>
         public MainForm()
         {
+            FileIOHelpers.CopyFolder("../../.././Sprites", "./Sprites");
+
             InitializeComponent();
 
             _level = null!;
@@ -136,20 +138,38 @@ namespace LevelEditor
         {
             try
             {
+                /*
+                * Rules for adding new props to this list
+                *
+                * Order:
+                *   All items
+                *   All Boxes
+                *   All doors
+                *   All Cameras
+                * 
+                * This is an arbitrary order, but it shouldn't be changed
+                * 
+                * Inertial order needs to be the same as the order the sprites are in the corresponding array in AssetManager
+                * Whenever you add new props, make sure you update any index that is affected in FilIOHelpers.LoadRoom
+                */
                 Prop[] props = [
-                    FileIOHelpers.LoadBox("Box.png"),
-                    FileIOHelpers.LoadItem("hook.png", KeyType.None),
-                    FileIOHelpers.LoadItem("hookAndRope.png", KeyType.None),
-                    FileIOHelpers.LoadItem("idCard.png", KeyType.KeyCard),
-                    FileIOHelpers.LoadItem("screwdriver.png", KeyType.Screwdriver),
-                    FileIOHelpers.LoadItem("wireCutters.png", KeyType.None),
+                        FileIOHelpers.LoadItem("idCard.png",0, KeyType.KeyCard),
+                        FileIOHelpers.LoadItem("screwdriver.png",1, KeyType.Screwdriver),
+                        FileIOHelpers.LoadItem("wireCutters.png",2, KeyType.None),
+                        FileIOHelpers.LoadItem("hook.png",3, KeyType.None),
+                        FileIOHelpers.LoadItem("hookAndRope.png",4, KeyType.None),
+                        FileIOHelpers.LoadBox("Box.png", 0),
+                        FileIOHelpers.LoadDoor("Door-Top.png", 0, KeyType.KeyCard),
+                        FileIOHelpers.LoadDoor("Door-Right.png", 1, KeyType.KeyCard),
+                        FileIOHelpers.LoadDoor("Door-Bottom.png", 2, KeyType.KeyCard),
+                        FileIOHelpers.LoadDoor("Door-Left.png", 3, KeyType.KeyCard),
                     ];
 
                 Props = props.AsReadOnly();
             }
             catch (Exception ex)
             {
-                Tiles = [];
+                Props = [];
 
                 DialogResult response = MessageBox.Show($"Could not load tiles: {ex.Message}",
                     "Error",
@@ -237,7 +257,7 @@ namespace LevelEditor
                     {
                         try
                         {
-                            Level = FileIOHelpers.LoadLevel(fullPath, Tiles);
+                            Level = FileIOHelpers.LoadLevel(fullPath, Tiles, Props);
 
                             Folder = Path.GetDirectoryName(fullPath)!;
 
