@@ -122,10 +122,27 @@ namespace MakeEveryDayRecount.Managers
             TileMap = new Texture2D[]
             {
                 content.Load<Texture2D>("Tiles/void"),
-                content.Load<Texture2D>("Tiles/tile_wall0"),
-                content.Load<Texture2D>("Tiles/tile_wall1"),
-                content.Load<Texture2D>("Tiles/tile_wall2"),
-                content.Load<Texture2D>("Tiles/tile_wall3"),
+
+                content.Load<Texture2D>("Tiles/tile_wall0_top"),
+                content.Load<Texture2D>("Tiles/tile_wall1_top"),
+                content.Load<Texture2D>("Tiles/tile_wall2_top"),
+                content.Load<Texture2D>("Tiles/tile_wall3_top"),
+
+                content.Load<Texture2D>("Tiles/tile_wall0_right"),
+                content.Load<Texture2D>("Tiles/tile_wall1_right"),
+                content.Load<Texture2D>("Tiles/tile_wall2_right"),
+                content.Load<Texture2D>("Tiles/tile_wall3_right"),
+
+                content.Load<Texture2D>("Tiles/tile_wall0_bottom"),
+                content.Load<Texture2D>("Tiles/tile_wall1_bottom"),
+                content.Load<Texture2D>("Tiles/tile_wall2_bottom"),
+                content.Load<Texture2D>("Tiles/tile_wall3_bottom"),
+
+                content.Load<Texture2D>("Tiles/tile_wall0_left"),
+                content.Load<Texture2D>("Tiles/tile_wall1_left"),
+                content.Load<Texture2D>("Tiles/tile_wall2_left"),
+                content.Load<Texture2D>("Tiles/tile_wall3_left"),
+
                 content.Load<Texture2D>("Tiles/tile_walkable0"),
                 content.Load<Texture2D>("Tiles/tile_walkable1"),
                 content.Load<Texture2D>("Tiles/tile_walkable2"),
