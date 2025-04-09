@@ -11,7 +11,6 @@ namespace MakeEveryDayRecount.DebugModes
     /// </summary>
     internal class MapDebug : BaseDebug
     {
-        private readonly MapManager _map;
         private Room _currentRoom;
 
         /// <summary>
@@ -19,12 +18,11 @@ namespace MakeEveryDayRecount.DebugModes
         /// </summary>
         /// <param name="sf">Sprite font to draw debug text</param>
         /// <param name="gameplayManager">Gameplay manager to pull data from</param>
-        public MapDebug(GameplayManager gameplayManager)
-            : base(gameplayManager)
+        public MapDebug()
+            : base()
         {
-            _map = gameplayManager.Map;
-            _currentRoom = _map.CurrentRoom;
-            _map.OnRoomUpdate += UpdateCurrentRoom;
+            _currentRoom = MapManager.CurrentRoom;
+            MapManager.OnRoomUpdate += UpdateCurrentRoom;
             AddMapDebugInfo();
         }
 

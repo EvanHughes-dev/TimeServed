@@ -24,10 +24,10 @@ namespace MakeEveryDayRecount.DebugModes
         /// </summary>
         /// <param name="spriteFont">The font used for debug text.</param>
         /// <param name="gameplayManager">Reference to the game's manager for accessing player data.</param>
-        public PlayerDebug(GameplayManager gameplayManager)
-            : base(gameplayManager)
+        public PlayerDebug()
+            : base()
         {
-            _player = gameplayManager.PlayerObject;
+            _player = GameplayManager.PlayerObject;
             AddPlayerDebugInfo();
             _walkableTileDebug = AssetManager.DebugWalkableTile;
             _notWalkableTileDebug = AssetManager.DebugNotWalkableTile;
@@ -68,13 +68,12 @@ namespace MakeEveryDayRecount.DebugModes
         /// <param name="sb">Sprite batch used for rendering.</param>
         private void DrawTileDebug(SpriteBatch sb)
         {
-            var map = _gameplayManager.Map;
             var playerTilePos = _player.Location;
 
             foreach (var direction in _playerMovementDirections)
             {
                 var playerDest = playerTilePos + direction;
-                var displayTile = map.CheckPlayerCollision(playerDest)
+                var displayTile = MapManager.CheckPlayerCollision(playerDest)
                     ? _walkableTileDebug
                     : _notWalkableTileDebug;
 

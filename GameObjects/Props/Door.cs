@@ -69,7 +69,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
             Texture2D[] spriteArray,
             int spriteIndex
         )
-            : base(location, spriteArray, spriteIndex)
+            : base(location, spriteArray, /*DELETE THIS SPRITES TEST*/4)
         {
             DoorIndex = sourceDoor;
             DestRoom = destRoom;

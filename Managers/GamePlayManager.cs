@@ -13,37 +13,27 @@ namespace MakeEveryDayRecount.Managers
     /// <summary>
     /// Manager of Player and the Map Manager.
     /// </summary>
-    internal class GameplayManager
+    internal static class GameplayManager
     {
         /// <summary>
         /// The current level being played
         /// </summary>
-        public int Level { get; private set; }
+        public static int Level { get; private set; }
 
         /// <summary>
         /// Access the reference to the Player
         /// </summary>
-        public Player PlayerObject { get; private set; }
+        public static Player PlayerObject { get; private set; }
 
-        /// <summary>
-        /// Access the current MapManager
-        /// </summary>
-        public MapManager Map { get; private set; }
+        public static OnPlayerUpdate OnPlayerUpdate;
 
-        public OnPlayerUpdate OnPlayerUpdate;
-
-        /// <summary>
-        /// Initialize GameplayManager to create the player and map
-        /// </summary>
-        public GameplayManager(Point screenSize)
+        public static void Initialize(Point screenSize)
         {
             Level = 1;
-            PlayerObject = new Player(new Point(5, 5), AssetManager.PlayerTexture, this, screenSize);
-            Map = new MapManager(this);
+            PlayerObject = new Player(new Point(5, 5), AssetManager.PlayerTexture, screenSize);
             OnPlayerUpdate?.Invoke(PlayerObject);
         }
-
-        public void Update(GameTime gameTime)
+        public static void Update(GameTime gameTime)
         {
             //Update Player
             PlayerObject.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
@@ -53,10 +43,10 @@ namespace MakeEveryDayRecount.Managers
         /// Draws the map and the player.
         /// </summary>
         /// <param name="sb">sprite batch used to draw</param>
-        public void Draw(SpriteBatch sb)
+        public static void Draw(SpriteBatch sb)
         {
             //Draw the map
-            Map.Draw(sb);
+            MapManager.Draw(sb);
 
             //Draw the player
             PlayerObject.Draw(sb);
@@ -65,10 +55,10 @@ namespace MakeEveryDayRecount.Managers
         /// <summary>
         /// Enter replay mode
         /// </summary>
-        public void ReplayMode()
+        public static void ReplayMode()
         {
             Level = 1;
-            Map.ChangeLevel();
+            MapManager.ChangeLevel();
             PlayerObject.ChangeRoom(new Point(5, 5));
             PlayerObject.ClearStates();
         }

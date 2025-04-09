@@ -2,6 +2,8 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Players;
+using MakeEveryDayRecount.Managers;
+using System.IO;
 
 namespace MakeEveryDayRecount.GameObjects.Triggers
 {
@@ -29,13 +31,14 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
 
         //Methods
 
-        //TODO: Add a method that saves the player's progress when they hit the checkpoint (nearly done!)
+        //TODO: update the SaveRoom method in SaveMap when doors are fixed
         //TODO: Maybe add a method to display that progress is being saved in some way? Low priority
         //TODO: when a checkpoint gets activated, call one of replay manager's functions (ask evan for more details when merging main)
 
         public override void Activate(Player player)
         {
-            throw new NotImplementedException();
+            MapManager.SaveMap();
+            player.Save();
         }
     }
 }

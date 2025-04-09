@@ -121,16 +121,33 @@ namespace MakeEveryDayRecount.Managers
 
             TileMap = new Texture2D[]
             {
-                content.Load<Texture2D>("Tiles/void"),
-                content.Load<Texture2D>("Tiles/testWalkable"),
-                content.Load<Texture2D>("Tiles/testWall"),
+                //TEMP ASSETS
+                //Only the first 3 assets matter for right now (because of how the test rooms are formatted)
+                content.Load<Texture2D>("Tiles/void"), //Void
+                content.Load<Texture2D>("Tiles/tile_walkable0"), //Walkable
+                content.Load<Texture2D>("Tiles/tile_wall0"), //Wall
+
+
+                content.Load<Texture2D>("Tiles/tile_walkable1"),
+                content.Load<Texture2D>("Tiles/tile_walkable2"),
+                content.Load<Texture2D>("Tiles/tile_walkable3"),
+                content.Load<Texture2D>("Tiles/tile_walkable4"),
+
+                
+                content.Load<Texture2D>("Tiles/tile_wall1"),
+                content.Load<Texture2D>("Tiles/tile_wall2"),
+                content.Load<Texture2D>("Tiles/tile_wall3")
             };
             DoorTexture = new Texture2D[]
             {
+                //TEMP ASSETS
                 content.Load<Texture2D>("Doors/TempDoor-Top"),
                 content.Load<Texture2D>("Doors/TempDoor-Right"),
                 content.Load<Texture2D>("Doors/TempDoor-Bottom"),
-                content.Load<Texture2D>("Doors/TempDoor-Left")
+                content.Load<Texture2D>("Doors/TempDoor-Left"),
+
+                content.Load<Texture2D>("Doors/Prop_door")
+
             };
             TileSize = InterfaceManager.ScalePointUniform(new Point(TileMap[0].Width / 2, TileMap[0].Height / 2));
 

@@ -21,31 +21,28 @@ namespace MakeEveryDayRecount.Managers
     /// Keep track of the room the player is currently
     /// in and load the needed map
     /// </summary>
-    internal class MapManager
+    internal static class MapManager
     {
-        public event OnRoomUpdate OnRoomUpdate;
+        public static event OnRoomUpdate OnRoomUpdate;
 
-        private Room _currentRoom;
+        private static Room _currentRoom;
 
         /// <summary>
         /// Get the current room on the map
         /// </summary>
-        public Room CurrentRoom
+        public static Room CurrentRoom
         {
             get => _currentRoom;
         }
-        private Room[] _rooms;
-
-        private readonly GameplayManager _gameplayManager;
+        private static Room[] _rooms;
 
         /// <summary>
         /// Initialize the map manger and make rooms
         /// </summary>
         /// <param name="gameplayManager">Reference to the gamePlayManager</param>
-        public MapManager(GameplayManager gameplayManager)
+        public static void Initialize()
         {
-            _gameplayManager = gameplayManager;
-            _rooms = LoadMapData(_gameplayManager.Level);
+            _rooms = LoadMapData(GameplayManager.Level);
             _currentRoom = _rooms[0];
             OnRoomUpdate?.Invoke(_currentRoom);
             foreach (Room room in _rooms)
@@ -58,10 +55,10 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         /// <param name="transDoor">Door to transition from</param>
         /// <param name="destRoom"> Destination room for transition </param>
-        public void TransitionRoom(Door transDoor, int destRoom)
+        public static void TransitionRoom(Door transDoor, int destRoom)
         {
             ChangeRoom(destRoom);
-            _gameplayManager.PlayerObject.ChangeRoom(transDoor.DestinationTile);
+            GameplayManager.PlayerObject.ChangeRoom(transDoor.DestinationTile);
 
         }
 
@@ -69,7 +66,7 @@ namespace MakeEveryDayRecount.Managers
         /// Change to the given room
         /// </summary>
         /// <param name="destRoom">Room index to change to</param>
-        public void ChangeRoom(int destRoom)
+        public static void ChangeRoom(int destRoom)
         {
             _currentRoom = _rooms[destRoom];
             OnRoomUpdate?.Invoke(_currentRoom);
@@ -79,7 +76,7 @@ namespace MakeEveryDayRecount.Managers
         /// Draw the current room to the screen
         /// </summary>
         /// <param name="batch">Batch of sprites to add to</param>
-        public void Draw(SpriteBatch batch)
+        public static void Draw(SpriteBatch batch)
         {
             _currentRoom.Draw(batch);
         }
@@ -89,7 +86,7 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         /// <param name="playerDest">Tile player wants to move to</param>
         /// <returns>If the player is allowed to move there</returns>
-        public bool CheckPlayerCollision(Point playerDest)
+        public static bool CheckPlayerCollision(Point playerDest)
         {
             return _currentRoom.VerifyWalkable(playerDest);
         }
@@ -99,12 +96,12 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         /// <param name="playerFacing">The tile the player wants to interact with</param>
         /// <returns>Current item to interact with in the provided tile</returns>
-        public Prop CheckInteractable(Point playerFacing)
+        public static Prop CheckInteractable(Point playerFacing)
         {
             return _currentRoom.VerifyInteractable(playerFacing);
         }
 
-        public Trigger CheckTrigger(Point playerPosition)
+        public static Trigger CheckTrigger(Point playerPosition)
         {
             return _currentRoom.VerifyTrigger(playerPosition);
         }
@@ -115,7 +112,7 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         /// <param name="currentLevel">Current level of the game</param>
         /// <returns>Formatted data loaded from files</returns>
-        private Room[] LoadMapData(int currentLevel)
+        private static Room[] LoadMapData(int currentLevel)
         {
             // only read binary data here
             // each room is in charge of parsing itself
@@ -180,9 +177,9 @@ namespace MakeEveryDayRecount.Managers
         /// <summary>
         /// Switch to the level in gameplayManager
         /// </summary>
-        public void ChangeLevel()
+        public static void ChangeLevel()
         {
-            _rooms = LoadMapData(_gameplayManager.Level);
+            _rooms = LoadMapData(GameplayManager.Level);
             ChangeRoom(0);
             foreach (Room room in _rooms)
             {
@@ -190,12 +187,13 @@ namespace MakeEveryDayRecount.Managers
             }
         }
 
-        public void SaveMap()
+        public static void SaveMap()
         {
-            string BaseFolder = "./CheckpointData";
-            //TODO: Saves data about the map thus far
-            if (!Directory.Exists(BaseFolder))
-                Directory.CreateDirectory(BaseFolder);
+            string mapBaseFolder = "./CheckpointData";
+
+            //Make the folders if they don't already exist
+            if (!Directory.Exists(mapBaseFolder))
+                Directory.CreateDirectory(mapBaseFolder);
 
             //MAKE LEVEL FILE HERE!
             //TODO: check if the level file exists
@@ -207,7 +205,7 @@ namespace MakeEveryDayRecount.Managers
                 //IMPORTANT: only work on saving tiles for right now. Props are being revamped, so worry about that afterwards
                 //Except for boxes, those will stay the same
 
-                _rooms[i].SaveRoom(BaseFolder);
+                _rooms[i].SaveRoom(mapBaseFolder);
             }
         }
     }

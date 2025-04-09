@@ -144,7 +144,7 @@ namespace MakeEveryDayRecount.Map
                     Point screenPos =
                         MapUtils.TileToWorld(xTile, yTile) - worldToScreen + pixelOffset;
                     sb.Draw(
-                        AssetManager.TileMap[currentTile.SpriteIndex],
+                        AssetManager.TileMap[currentTile.SpriteIndex], //DELETE THIS SPRITES TEST AssetManager.TileMap[currentTile.SpriteIndex]
                         new Rectangle(screenPos, TileSize),
                         Color.White
                     );
@@ -406,7 +406,6 @@ namespace MakeEveryDayRecount.Map
         {
             foreach (Trigger trigger in _triggersInRoom)
             {
-                //TODO: scale trigger width to tile size properly
                 if (playerPosition.X >= trigger.Location.X && playerPosition.X < trigger.Location.X + trigger.Width &&
                     playerPosition.Y >= trigger.Location.Y && playerPosition.Y < trigger.Location.Y + trigger.Height)
                     return trigger;
@@ -423,6 +422,10 @@ namespace MakeEveryDayRecount.Map
             _itemsInRoom.Remove(itemToRemove);
         }
 
+        /// <summary>
+        /// Saves the current room to a file
+        /// </summary>
+        /// <param name="filepath">filepath for the file</param>
         public void SaveRoom(string filepath)
         {
             //DELETE THIS ONCE YOU'RE DONE IMPLEMENTING!!!!!!!!!
@@ -552,14 +555,6 @@ namespace MakeEveryDayRecount.Map
             {
                 binaryWriter.Close();
             }
-        }
-
-        //TODO: implement this function
-        //Should save the player's position and inventory to a file
-
-        public void SavePlayer()
-        {
-            throw new NotImplementedException();
         }
     }
 }
