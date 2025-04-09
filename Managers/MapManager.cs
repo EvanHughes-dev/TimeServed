@@ -32,16 +32,12 @@ namespace MakeEveryDayRecount.Managers
         }
         private Room[] _rooms;
 
-        private readonly GameplayManager _gameplayManager;
-
         /// <summary>
         /// Initialize the map manger and make rooms
         /// </summary>
-        /// <param name="gameplayManager">Reference to the gamePlayManager</param>
-        public MapManager(GameplayManager gameplayManager)
+        public MapManager()
         {
-            _gameplayManager = gameplayManager;
-            _rooms = LoadMapData(_gameplayManager.Level);
+            _rooms = LoadMapData( GameplayManager.Level);
             _currentRoom = _rooms[0];
             OnRoomUpdate?.Invoke(_currentRoom);
             foreach (Room room in _rooms)
@@ -57,7 +53,7 @@ namespace MakeEveryDayRecount.Managers
         public void TransitionRoom(Door transDoor, int destRoom)
         {
             ChangeRoom(destRoom);
-            _gameplayManager.PlayerObject.ChangeRoom(transDoor.DestinationTile);
+             GameplayManager.PlayerObject.ChangeRoom(transDoor.DestinationTile);
 
         }
 
@@ -159,7 +155,7 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public void ChangeLevel()
         {
-            _rooms = LoadMapData(_gameplayManager.Level);
+            _rooms = LoadMapData(GameplayManager.Level);
             ChangeRoom(0);
             foreach (Room room in _rooms)
             {
