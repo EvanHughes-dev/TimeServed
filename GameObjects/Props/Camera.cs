@@ -72,6 +72,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //Check which way the ray for the camera is pointing
             Vector2 centerRay = new Vector2(_centerPoint.X-location.X, _centerPoint.Y-location.Y); //base of this ray is at location
 
+            //TODO: Let the raybase be caty-corners from the camera location
             //Please do not put the centerpoint on top of the camera it breaks everything
             if (Math.Abs(centerRay.X) > Math.Abs(centerRay.Y)) //The ray is more horizontal
             {
@@ -253,6 +254,8 @@ namespace MakeEveryDayRecount.GameObjects.Props
 
             //Check for boxes before we look for the player
             List<Point> boxes = new List<Point>();
+            //Used to check if there's a box on the raybase
+            bool raybaseBlocked = false;
             //Check the entire vision kite for boxes in order to figure out what tiles are currently watched
             foreach (Point box in _visionKite)
             {
@@ -260,37 +263,43 @@ namespace MakeEveryDayRecount.GameObjects.Props
                 if (!_room.VerifyWalkable(box))
                 {
                     boxes.Add(box);
+                    if (box == _rayBase) raybaseBlocked = true;
                 }
             }
 
-            //Now check to see if any boxes have moved since the last frame
-            if (_previousBoxes.Count != boxes.Count || !boxes.All(_previousBoxes.Contains))
+            //If the raybase is blocked, we can't see anything and can't detect the player
+            if (raybaseBlocked) _watchedTiles.Clear();
+            else
             {
-                //We've found a new box in the way. Check all the rays fellas!
-                _watchedTiles = _visionKite.ToList();
-                foreach (Point box in boxes)
+                //Now check to see if any boxes have moved since the last frame
+                if (_previousBoxes.Count != boxes.Count || !boxes.All(_previousBoxes.Contains))
                 {
-                    foreach (Point endpoint in _endPoints)
+                    //We've found a new box in the way. Check all the rays fellas!
+                    _watchedTiles = _visionKite.ToList();
+                    foreach (Point box in boxes)
                     {
-                        if (Rasterize(_centerPoint, endpoint).Contains(box)) //A ray is blocked by the box
+                        foreach (Point endpoint in _endPoints)
                         {
-                            //Remove all the tiles between the box and the end of the ray
-                            foreach (Point blockedPoint in Rasterize(box, endpoint))
+                            if (Rasterize(_centerPoint, endpoint).Contains(box)) //A ray is blocked by the box
                             {
-                                _watchedTiles.Remove(blockedPoint);
+                                //Remove all the tiles between the box and the end of the ray
+                                foreach (Point blockedPoint in Rasterize(box, endpoint))
+                                {
+                                    _watchedTiles.Remove(blockedPoint);
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            //Now check for the player :)
-            foreach(Point watchedTile in _watchedTiles)
-            {
-                if (_player.Location == watchedTile)
+                //Now check for the player :)
+                foreach (Point watchedTile in _watchedTiles)
                 {
-                    //WE FOUND THE PLAYER! GET HIM BOYS!
-                    _player.Detected();
+                    if (_player.Location == watchedTile)
+                    {
+                        //WE FOUND THE PLAYER! GET HIM BOYS!
+                        _player.Detected();
+                    }
                 }
             }
 
