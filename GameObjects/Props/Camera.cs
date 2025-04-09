@@ -153,23 +153,24 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //Gang why does mathF still return a float when you round to the nearest integer. This is highly unserious
 
             //TESTING - tell me where the corners are
-            Debug.WriteLine("Center point is " + _centerPoint.ToString());
-            Debug.WriteLine("Counter-clockwise point is: " + counterclockwisePoint.ToString());
-            Debug.WriteLine("Clockwise point is: " + clockwisePoint.ToString());
+            //Debug.WriteLine("Center point is " + _centerPoint.ToString());
+            //Debug.WriteLine("Counter-clockwise point is: " + counterclockwisePoint.ToString());
+            //Debug.WriteLine("Clockwise point is: " + clockwisePoint.ToString());
 
             //Rasterize between the corners and the centerpoint to get all the points we need to send out a ray to
-            Debug.WriteLine("Clockwise");
             List<Point> clockwisePoints = Rasterize(clockwisePoint, _centerPoint);
-            //Debug.Write("Clockwise points are: ");
-            //foreach (Point debugPoint in clockwisePoints) Debug.Write(debugPoint + " ");
-            //Debug.WriteLine(null);
-            Debug.WriteLine("Counter-clockwise");
             List<Point> counterclockwisePoints = Rasterize(_centerPoint, counterclockwisePoint);
             //TODO: Maybe sort the lists so that the _endpoints array ends up in a centain order?
             //The endpoints array starts from the counterclockwise corner, goes to the center, and ends at the clockwise corner
             //Basically sweeping from left to right, from the camera's point of view
             //Although maybe if the camera "sweeps" from the center outwards, it would somehow help us avoid duplicates more?
             //Because rays in the center are more likely to have tiles that overlap with the rays at the edges. The closer to the center you are the more overlap there is.
+            
+            //TESTING - Tell me all the endpoints for each half
+            Debug.Write("Clockwise points are: ");
+            foreach (Point debugPoint in clockwisePoints) Debug.Write(debugPoint + " ");
+            Debug.WriteLine(null);
+
             //Arbitrarily remove the centerpoint from the clockwise list so we don't add it to endpoints twice
             //We can't use RemoveAt for this because the centerpoint could be at either end of this list
             counterclockwisePoints.Remove(_centerPoint);
@@ -270,9 +271,9 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //If dy > dx, switch the X and Y of the endpoints
             if (Math.Abs(p2.Y-p1.Y) > Math.Abs(p2.X - p1.X))
             {
-                Debug.WriteLine("Swapped X and Y");
+                //Debug.WriteLine("Swapped X and Y");
                 //Indicate that we changed this stuff for later
-                rotated = !rotated;
+                rotated = true;
                 //Swap the X and Y of p1
                 int swapX = p1.X;
                 p1.X = p1.Y;
@@ -283,22 +284,28 @@ namespace MakeEveryDayRecount.GameObjects.Props
                 p2.Y = swapX;
             }
 
+            //If the line is going down, we reflect it over the x-axis so that it goes up instead
+            bool reflected = false;
+            if (p2.Y - p1.Y < 0)
+            {
+                //Debug.WriteLine("Reflected over x-axis");
+                //Indicated that we reflected this stuff for later
+                reflected = true;
+                //Reflect the line over it's x-center in order to fix this, and then flip it back?
+                //So basically switch the X of the start and end points
+                int swapY = p1.Y;
+                p1.Y = p2.Y;
+                p2.Y = swapY;
+            }
+
             //If the line is going from right to left, we switch the start and end point so it can be drawn left to right
             if (p1.X > p2.X)
             {
-                if (p2.Y - p1.Y < 0)
-                {
-                    //Reflect the line over it's x-center in order to fix this, and then flip it back?
-                    //So basically switch the X of the start and end points
-                }
-                else
-                {
-                    Debug.WriteLine("Switched start and end");
-                    //Store this so that we don't forget a point
-                    Point swapPoint = p1;
-                    p1 = p2;
-                    p2 = swapPoint;
-                }
+                //Debug.WriteLine("Switched start and end");
+                //Store this so that we don't forget a point
+                Point swapPoint = p1;
+                p1 = p2;
+                p2 = swapPoint;
             }
             
             int dx = p2.X - p1.X;
@@ -313,7 +320,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
             for (; x <= p2.X; x++) //using x as loop variable
             {
                 returnPoints.Add(new Point(x, y));
-                Debug.WriteLine($"Added point {x}, {y}");
+                //Debug.WriteLine($"Added point {x}, {y}");
                 if (p < 0)
                 {
                     p = p + (2 * dy);
@@ -322,6 +329,19 @@ namespace MakeEveryDayRecount.GameObjects.Props
                 {
                     p = p + (2 * dy) - (2 * dx);
                     y = y + 1;
+                }
+            }
+
+            //If we reflected everything, fix it before we rotate it back
+            if (reflected)
+            {
+                Debug.WriteLine("Un-reflecting");
+                for (int i = 0; i < returnPoints.Count/2; i++)
+                {
+                    //Debug.WriteLine($"Swapped {returnPoints[i]} and {returnPoints[^(i + 1)]}");
+                    int swapY = returnPoints[i].Y;
+                    returnPoints[i] = new Point(returnPoints[i].X, returnPoints[^(i + 1)].Y);
+                    returnPoints[^(i + 1)] = new Point(returnPoints[^(i + 1)].X, swapY);
                 }
             }
 

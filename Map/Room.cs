@@ -101,7 +101,7 @@ namespace MakeEveryDayRecount.Map
 
             //Add a camera to the room for testing
             //In the actual game this will be done by parsing it from a file, but it's basically the same
-            Camera roomTestCamera = new Camera(new Point(6, 0), AssetManager.CameraTextures[1], this, new Point(10, 10), (float)(Math.PI/4));
+            Camera roomTestCamera = new Camera(new Point(6, 0), AssetManager.CameraTextures[1], this, new Point(12, 8), (float)(Math.PI/6));
             _itemsInRoom.Add(roomTestCamera);
             Cameras.Add(roomTestCamera);
         }
