@@ -151,6 +151,9 @@ namespace MakeEveryDayRecount.Players
 
             if (InputManager.GetKeyPress(Keys.E))
                 Interact();
+            if (InputManager.GetKeyPress(Keys.I))
+                Detected();
+            
         }
 
         /// <summary>
@@ -385,6 +388,14 @@ namespace MakeEveryDayRecount.Players
             if(HoldingBox)
              _currentHeldBox.DropBox();
             _currentHeldBox = null;
+        }
+
+        /// <summary>
+        /// Called when the player is detected by a camera
+        /// </summary>
+        public void Detected(){
+            // TODO rather than restarting the level, just reset the player to the last checkpoint
+            _gameplayManager.LevelReset();
         }
 
         #endregion

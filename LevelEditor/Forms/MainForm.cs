@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using LevelEditor.Classes;
+using LevelEditor.Classes.Props;
 
 namespace LevelEditor
 {
@@ -18,6 +19,12 @@ namespace LevelEditor
         /// </summary>
         public IReadOnlyCollection<Tile> Tiles { get; private set; }
 
+        /// <summary>
+        /// The gospel determining what Props have what corresponding indexes.
+        /// </summary>
+        public IReadOnlyCollection<Prop> Props { get; private set; }
+
+        // The level currently being edited
         private Level _level;
 
         /// <summary>
@@ -57,6 +64,8 @@ namespace LevelEditor
         /// </summary>
         public MainForm()
         {
+            FileIOHelpers.CopyFolder("../../.././Sprites", "./Sprites");
+
             InitializeComponent();
 
             _level = null!;
@@ -71,6 +80,7 @@ namespace LevelEditor
         private void MainForm_Load(object sender, EventArgs e)
         {
             LoadTiles();
+            LoadProps();
 
             // In case LoadTiles creating a MessageBox, activating this window will ensure it still becomes
             //   the center of attention afterwards
@@ -110,6 +120,70 @@ namespace LevelEditor
 
                     case DialogResult.Retry:
                         LoadTiles();
+                        break;
+
+                    case DialogResult.Cancel:
+                    case DialogResult.Ignore:
+                        // Do nothing! Assume that it's fine that nothing could be loaded!
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Loads all of the prop sprites and initializes the prop array, displaying a MessageBox
+        /// if loading the props fails.
+        /// </summary>
+        private void LoadProps()
+        {
+            try
+            {
+                /*
+                * Rules for adding new props to this list
+                *
+                * Order:
+                *   All items
+                *   All Boxes
+                *   All doors
+                *   All Cameras
+                * 
+                * This is an arbitrary order, but it shouldn't be changed
+                * 
+                * Inertial order needs to be the same as the order the sprites are in the corresponding array in AssetManager
+                * Whenever you add new props, make sure you update any index that is affected in FilIOHelpers.LoadRoom
+                */
+                Prop[] props = [
+                        FileIOHelpers.LoadItem("idCard.png",0, KeyType.KeyCard),
+                        FileIOHelpers.LoadItem("screwdriver.png",1, KeyType.Screwdriver),
+                        FileIOHelpers.LoadItem("wireCutters.png",2, KeyType.None),
+                        FileIOHelpers.LoadItem("hook.png",3, KeyType.None),
+                        FileIOHelpers.LoadItem("hookAndRope.png",4, KeyType.None),
+                        FileIOHelpers.LoadBox("Box.png", 0),
+                        FileIOHelpers.LoadDoor("Door-Top.png", 0, KeyType.KeyCard),
+                        FileIOHelpers.LoadDoor("Door-Right.png", 1, KeyType.KeyCard),
+                        FileIOHelpers.LoadDoor("Door-Bottom.png", 2, KeyType.KeyCard),
+                        FileIOHelpers.LoadDoor("Door-Left.png", 3, KeyType.KeyCard),
+                    ];
+
+                Props = props.AsReadOnly();
+            }
+            catch (Exception ex)
+            {
+                Props = [];
+
+                DialogResult response = MessageBox.Show($"Could not load tiles: {ex.Message}",
+                    "Error",
+                    MessageBoxButtons.AbortRetryIgnore,
+                    MessageBoxIcon.Error);
+
+                switch (response)
+                {
+                    case DialogResult.Abort:
+                        Close();
+                        break;
+
+                    case DialogResult.Retry:
+                        LoadProps();
                         break;
 
                     case DialogResult.Cancel:
@@ -183,7 +257,7 @@ namespace LevelEditor
                     {
                         try
                         {
-                            Level = FileIOHelpers.LoadLevel(fullPath, Tiles);
+                            Level = FileIOHelpers.LoadLevel(fullPath, Tiles, Props);
 
                             Folder = Path.GetDirectoryName(fullPath)!;
 
@@ -290,6 +364,14 @@ namespace LevelEditor
         {
             FileIOHelpers.SaveLevel(Level, Folder, Tiles);
             FileIOHelpers.UpdateContentMGCB();
+        }
+
+        /// <summary>
+        /// Loads the props when clicked.
+        /// </summary>
+        private void reloadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoadProps();
         }
     }
 }

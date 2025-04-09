@@ -103,7 +103,7 @@ namespace MakeEveryDayRecount
             SoundManager.LoadContent(Content);
 
             // Initialize all items that need assets to be loaded 
-
+            GlobalDebug.Initialize();
 
             InterfaceManager.InitializeMenus(ScreenSize);
 
@@ -111,7 +111,7 @@ namespace MakeEveryDayRecount
             MapUtils.Initialize(this, _gameplayManager);
 
 
-            GlobalDebug.Initialize();
+            
 
             _debugModes[0] = new PlayerDebug(_gameplayManager);
             _debugModes[1] = new MapDebug(_gameplayManager);

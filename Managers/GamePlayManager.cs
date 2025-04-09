@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Players;
+using MakeEveryDayRecount.Map;
 using MakeEveryDayRecount.GameObjects.Props;
 
 namespace MakeEveryDayRecount.Managers
@@ -80,5 +81,18 @@ namespace MakeEveryDayRecount.Managers
             PlayerObject.ChangeRoom(new Point(5, 5));
             PlayerObject.ClearStates();
         }
+
+        /// <summary>
+        /// Called to reset the level to the starting state
+        /// </summary>
+        public void LevelReset(){
+            // TODO eventually change this to a checkpoint system
+            Level = 1;
+            PlayerObject = new Player(new Point(5, 5), AssetManager.PlayerTexture, this, MapUtils.ScreenSize);
+            Map.ChangeLevel();
+            OnPlayerUpdate?.Invoke(PlayerObject);
+            ReplayManager.ClearData();
+        }
+
     }
 }

@@ -11,9 +11,9 @@ namespace LevelEditor
     /// </summary>
     public enum KeyType
     {
-        None,
-        KeyCard,
-        Screwdriver
+        None=0,
+        KeyCard=1,
+        Screwdriver=2
     }
 
     /// <summary>
@@ -22,9 +22,20 @@ namespace LevelEditor
     /// </summary>
     public enum Orientation
     {
-        North,
-        East,
-        South,
-        West
+        North=0,
+        East=1,
+        South=2,
+        West=3
+    }
+
+        /// <summary>
+    /// Define what type of object this is
+    /// </summary>
+    public enum ObjectType
+    {
+        Item = 0,
+        Camera = 1,
+        Box = 2,
+        Door = 3
     }
 }
