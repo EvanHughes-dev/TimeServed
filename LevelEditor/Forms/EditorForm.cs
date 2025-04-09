@@ -214,7 +214,7 @@ namespace LevelEditor
                     proppy.BringToFront();
                     proppy.MouseDown += PropBox_MouseDown;
 
-                    Room.Props.Add(SelectedProp);
+                    Room.Props.Add(proppy.Prop);
                     _propBoxesInRoom.Add(proppy);
                 }
             }
@@ -387,6 +387,34 @@ namespace LevelEditor
                     tileBox.MouseMove += Tile_MouseMove;
                 }
             }
+
+            foreach (Prop prop in Room.Props)
+            {
+                if (prop.Position.HasValue)
+                {
+                    Point propPosition = new Point(prop.Position.Value.X, prop.Position.Value.Y);
+                    TileBox tile = TileGrid[propPosition.Y, propPosition.X];
+                    //Propy is ALive!! They gets all of tile's crap like a younger sibling does
+                    PropBox proppy = new PropBox()
+                    {
+                        SizeMode = PictureBoxSizeMode.Zoom,
+                        Parent = tile,
+                        Location = new Point(0, 0),
+                        Size = tile.Size,
+                        BackColor = Color.Transparent //and their parent is trans apparently
+                    };
+
+
+                    tile.Controls.Add(proppy);
+
+                    proppy.Prop = prop;
+                    proppy.BringToFront();
+                    proppy.MouseDown += PropBox_MouseDown;
+
+                    _propBoxesInRoom.Add(proppy);
+                }
+            }
+
         }
 
         /// <summary>

@@ -19,14 +19,15 @@ namespace LevelEditor.Classes.Props
         /// <summary>
         /// Creates a new Item with the given sprite, position, and KeyType.
         /// </summary>
+        /// <param name="sprite">The sprite this Item displays with.</param>
+        /// <param name="position">The position of this Item.</param>
+        /// <param name="imageIndex"> Index of this image</param>
         /// <param name="keyType">
         ///     The kind of key that this Item is. Will open Doors with a matching KeyType.
         ///     Set to None to make this Item inable to open any locked doors.
         /// </param>
-        /// <param name="sprite">The sprite this Item displays with.</param>
-        /// <param name="position">The position of this Item.</param>
-        public Item(KeyType keyType, Image sprite, Point? position = null)
-            : base(sprite, position)
+        public Item(Image sprite, int imageIndex, KeyType keyType, Point? position=null)
+            : base(sprite, imageIndex, ObjectType.Item, position)
         {
             // Save params
             KeyType = keyType;
@@ -39,7 +40,7 @@ namespace LevelEditor.Classes.Props
         /// <returns>A copy of this Item at the given position.</returns>
         public override Item Instantiate(Point position)
         {
-            return new Item(KeyType, Sprite, position);
+            return new Item(Sprite,ImageIndex, KeyType, position);
         }
     }
 }
