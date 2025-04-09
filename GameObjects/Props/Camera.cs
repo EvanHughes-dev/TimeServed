@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Players;
 using MakeEveryDayRecount.Managers;
 using MakeEveryDayRecount.Map.Tiles;
+using System.Linq;
 
 namespace MakeEveryDayRecount.GameObjects.Props
 {
@@ -41,10 +42,11 @@ namespace MakeEveryDayRecount.GameObjects.Props
 
         private Point[] _visionKite;
         private List<Point> _watchedTiles;
+        private List<Point> _previousBoxes;
         //This is going to need a reference to the room that created it in order to check collision
         private Room _room;
         //It also needs a reference to the player to know if they step into the vision kite
-        private Player _player;
+        private Player _player = GameplayManager.PlayerObject;
 
         /// <summary>
         /// Makes a security camera that watches a certain vision kite to see if the player is inside it
@@ -57,7 +59,8 @@ namespace MakeEveryDayRecount.GameObjects.Props
         public Camera(Point location, Texture2D sprite, Room containingRoom, Point centerPoint, float spread)
             : base(location, sprite)
         {
-            _watchedTiles = new List<Point>();
+            _watchedTiles = new List<Point>(); //This ends up being the same as visionkite at the end of this function
+            _previousBoxes = new List<Point>();
             //All cams start active
             _active = true;
             _room = containingRoom;
@@ -245,12 +248,55 @@ namespace MakeEveryDayRecount.GameObjects.Props
 
         public void Update(float deltaTime)
         {
-
-            //TimeSpan startTime = DateTime.Now.TimeOfDay;
             //TODO: Add a check to see if there's a box directly in front of the camera, and if so don't check any of the rays
             //TODO: Only check rays if we saw a box in the watchedtiles during the previous frame??
 
-            
+            //Check for boxes before we look for the player
+            List<Point> boxes = new List<Point>();
+            //Check the entire vision kite for boxes in order to figure out what tiles are currently watched
+            foreach (Point box in _visionKite)
+            {
+                //Check if there's a box. Any un-walkable tile is treated like a box
+                if (!_room.VerifyWalkable(box))
+                {
+                    boxes.Add(box);
+                }
+            }
+
+            //Now check to see if any boxes have moved since the last frame
+            if (_previousBoxes.Count != boxes.Count || !boxes.All(_previousBoxes.Contains))
+            {
+                //We've found a new box in the way. Check all the rays fellas!
+                _watchedTiles = _visionKite.ToList();
+                foreach (Point box in boxes)
+                {
+                    foreach (Point endpoint in _endPoints)
+                    {
+                        if (Rasterize(_centerPoint, endpoint).Contains(box)) //A ray is blocked by the box
+                        {
+                            //Remove all the tiles between the box and the end of the ray
+                            foreach (Point blockedPoint in Rasterize(box, endpoint))
+                            {
+                                _watchedTiles.Remove(blockedPoint);
+                            }
+                        }
+                    }
+                }
+            }
+
+            //Now check for the player :)
+            foreach(Point watchedTile in _watchedTiles)
+            {
+                if (_player.Location == watchedTile)
+                {
+                    //WE FOUND THE PLAYER! GET HIM BOYS!
+                    _player.Detected();
+                }
+            }
+
+            _previousBoxes = boxes;
+
+            //TimeSpan startTime = DateTime.Now.TimeOfDay;
             //Debug.WriteLine(DateTime.Now.TimeOfDay - startTime);
         }
 
