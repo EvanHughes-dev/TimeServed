@@ -38,7 +38,8 @@ namespace MakeEveryDayRecount.GameObjects.Props
         //The rays don't project from inside of the wall, where the camera is technically drawn
         //All the rays come out from the point on the floor right "in front of" the camera
         private Point _rayBase;
-        
+
+        private Point[] _visionKite;
         private List<Point> _watchedTiles;
         //This is going to need a reference to the room that created it in order to check collision
         private Room _room;
@@ -136,7 +137,6 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //---Find the endpoints for the corners of the kite---
             //Create a vector for the center from the raybase to the centerpoint
             centerRay = new Vector2(_centerPoint.X - _rayBase.X, _centerPoint.Y - location.Y); //Base of the ray is now at raybase
-            //TODO: The edge rays are not being calculated correctly
             //Rotate that vector by spread in both directions
             Vector2 clockwiseRay = Vector2.Transform(centerRay, Matrix.CreateRotationZ(spread));
             Vector2 counterclockwiseRay = Vector2.Transform(centerRay, Matrix.CreateRotationZ(-spread));
@@ -167,9 +167,9 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //Because rays in the center are more likely to have tiles that overlap with the rays at the edges. The closer to the center you are the more overlap there is.
             
             //TESTING - Tell me all the endpoints for each half
-            Debug.Write("Clockwise points are: ");
-            foreach (Point debugPoint in clockwisePoints) Debug.Write(debugPoint + " ");
-            Debug.WriteLine(null);
+            //Debug.Write("Clockwise points are: ");
+            //foreach (Point debugPoint in clockwisePoints) Debug.Write(debugPoint + " ");
+            //Debug.WriteLine(null);
 
             //Arbitrarily remove the centerpoint from the clockwise list so we don't add it to endpoints twice
             //We can't use RemoveAt for this because the centerpoint could be at either end of this list
@@ -234,6 +234,8 @@ namespace MakeEveryDayRecount.GameObjects.Props
                     }
                 }
             }
+            //Permanantely save this into an array that won't be changed and indicates the full kite with no obstructions
+            _visionKite = _watchedTiles.ToArray();
 
             #endregion
             //Note that the length of _endPoints may be even or odd depending on rounding
@@ -243,6 +245,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
 
         public void Update(float deltaTime)
         {
+
             //TimeSpan startTime = DateTime.Now.TimeOfDay;
             //TODO: Add a check to see if there's a box directly in front of the camera, and if so don't check any of the rays
             //TODO: Only check rays if we saw a box in the watchedtiles during the previous frame??
@@ -258,10 +261,6 @@ namespace MakeEveryDayRecount.GameObjects.Props
             foreach (Point tile in _watchedTiles)
             {
                 sb.Draw(AssetManager.CameraSight, new Rectangle(MapUtils.TileToWorld(tile) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
-            }
-            foreach (Point endpoint in _endPoints)
-            {
-                sb.Draw(AssetManager.PropTextures[3], new Rectangle(MapUtils.TileToWorld(endpoint) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
             }
         }
 
