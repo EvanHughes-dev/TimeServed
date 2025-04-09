@@ -249,9 +249,6 @@ namespace MakeEveryDayRecount.GameObjects.Props
 
         public void Update(float deltaTime)
         {
-            //TODO: Add a check to see if there's a box directly in front of the camera, and if so don't check any of the rays
-            //TODO: Only check rays if we saw a box in the watchedtiles during the previous frame??
-
             //Check for boxes before we look for the player
             List<Point> boxes = new List<Point>();
             //Used to check if there's a box on the raybase
@@ -262,6 +259,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                 //Check if there's a box. Any un-walkable tile is treated like a box
                 if (!_room.VerifyWalkable(box))
                 {
+                    Debug.WriteLine($"Found a box at {box.X}, {box.Y}");
                     boxes.Add(box);
                     if (box == _rayBase) raybaseBlocked = true;
                 }
@@ -317,6 +315,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
             {
                 sb.Draw(AssetManager.CameraSight, new Rectangle(MapUtils.TileToWorld(tile) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
             }
+            foreach (Point box in _previousBoxes) sb.Draw(AssetManager.PropTextures[3], new Rectangle(MapUtils.TileToWorld(box) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
         }
 
         private List<Point> Rasterize(Point p1, Point p2)
@@ -389,7 +388,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //If we reflected everything, fix it before we rotate it back
             if (reflected)
             {
-                Debug.WriteLine("Un-reflecting");
+                //Debug.WriteLine("Un-reflecting");
                 for (int i = 0; i < returnPoints.Count/2; i++)
                 {
                     //Debug.WriteLine($"Swapped {returnPoints[i]} and {returnPoints[^(i + 1)]}");

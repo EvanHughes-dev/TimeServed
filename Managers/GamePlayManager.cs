@@ -40,7 +40,7 @@ namespace MakeEveryDayRecount.Managers
         public static void Initialize(Point screenSize)
         {
             Level = 1;
-            PlayerObject = new Player(new Point(5, 5), AssetManager.PlayerTexture, screenSize);
+            PlayerObject = new Player(new Point(4, 5), AssetManager.PlayerTexture, screenSize);
             Map = new MapManager();
             OnPlayerUpdate?.Invoke(PlayerObject);
         }
