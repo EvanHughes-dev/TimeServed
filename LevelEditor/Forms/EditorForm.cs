@@ -5,6 +5,7 @@
 using LevelEditor.Classes;
 using LevelEditor.Classes.Props;
 using LevelEditor.Controls;
+using LevelEditor.Forms.Prompts;
 
 namespace LevelEditor
 {
@@ -198,6 +199,31 @@ namespace LevelEditor
 
                 if (e.Button == MouseButtons.Left)
                 {
+                    Prop createdProp = null!;
+
+                    switch (SelectedProp.PropType)
+                    {
+                        case ObjectType.Item: // Items and boxes are created the same
+                        case ObjectType.Box:
+                            createdProp = SelectedProp.Instantiate(new Point(x, y));
+                            break;
+
+                        case ObjectType.Door:
+                            Door door = (Door)SelectedProp;
+
+                            Room room = new RoomSelectForm(_mainForm.GetAllRooms()).Prompt();
+                            if (room == null) return;
+
+                            Point? destination = new PositionSelectForm(room).Prompt();
+                            if (destination == null) return;
+
+                            createdProp = door.Instantiate(new Point(x, y), (Point)destination, room.Id);
+                            break;
+
+                        case ObjectType.Camera:
+                            throw new NotImplementedException();
+                    }
+
                     //Propy is ALive!! They gets all of tile's crap like a younger sibling does
                     PropBox proppy = new PropBox()
                     {
@@ -205,12 +231,12 @@ namespace LevelEditor
                         Parent = tile,
                         Location = new Point(0, 0),
                         Size = tile.Size,
-                        BackColor = Color.Transparent //and their parent is trans apparently
+                        BackColor = Color.Transparent, //and their parent is trans apparently
+                        Prop = createdProp
                     };
 
                     tile.Controls.Add(proppy);
 
-                    proppy.Prop = SelectedProp.Instantiate(new Point(x, y));
                     proppy.BringToFront();
                     proppy.MouseDown += PropBox_MouseDown;
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -323,6 +324,11 @@ namespace LevelEditor
             Level.Rooms.Add(room);
 
             CreateRoomButton(room);
+        }
+
+        public ReadOnlyCollection<Room> GetAllRooms()
+        {
+            return Level.Rooms.AsReadOnly();
         }
 
         /// <summary>
