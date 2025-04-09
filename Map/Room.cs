@@ -7,6 +7,7 @@ using MakeEveryDayRecount.Map.Tiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Managers;
+using System.Runtime.CompilerServices;
 
 namespace MakeEveryDayRecount.Map
 {
@@ -67,6 +68,12 @@ namespace MakeEveryDayRecount.Map
         }
         private Tile[,] _map;
         private List<Prop> _itemsInRoom;
+        //I originally wanted to make this a generic list of all the props in the room that might need to be updated
+        //But most props don't have an update function, so it's better to have this list only be concerned with cameras because they can actually update
+        /// <summary>
+        /// Get the list of cameras in the room
+        /// </summary>
+        public List<Camera> Cameras { get; private set; }
         public List<Door> Doors
         { get; private set; }
 
@@ -88,8 +95,15 @@ namespace MakeEveryDayRecount.Map
 
             _map = new Tile[,] { };
             _itemsInRoom = new List<Prop> { };
+            Cameras = new List<Camera>();
             Doors = new List<Door> { };
             ParseData(filePath);
+
+            //Add a camera to the room for testing
+            //In the actual game this will be done by parsing it from a file, but it's basically the same
+            Camera roomTestCamera = new Camera(new Point(6, 0), AssetManager.CameraTextures[1], this, new Point(10, 10), (float)(Math.PI/4));
+            _itemsInRoom.Add(roomTestCamera);
+            Cameras.Add(roomTestCamera);
         }
 
         #region  Drawing Logic
@@ -152,6 +166,12 @@ namespace MakeEveryDayRecount.Map
                     && propPosition.Y >= screenMinY
                     && propPosition.Y <= screenMaxY
                 )
+                {
+                    propToDraw.Draw(sb, worldToScreen, pixelOffset);
+                }
+                //Cameras are excluded from this check and are always drawn if they are in the room
+                //This is done to allow the camera's vision cone to be seen even when the camera is not on the screen
+                else if (propToDraw is Camera)
                 {
                     propToDraw.Draw(sb, worldToScreen, pixelOffset);
                 }
@@ -300,7 +320,7 @@ namespace MakeEveryDayRecount.Map
                         }
                         else if (objectType == ObjectTypes.Camera)
                         {
-                            _itemsInRoom.Add(new Camera(tileLocation, AssetManager.Cameras[propIndex]));
+                            //_itemsInRoom.Add(new Camera(tileLocation, AssetManager.Cameras[propIndex], this, Player));
                         }
                         else if (objectType == ObjectTypes.Box)
                         {
