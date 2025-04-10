@@ -32,8 +32,8 @@ namespace MakeEveryDayRecount.GameObjects.Props
         private float _spread;
         //The camera will get a certain set of endpoints to look towards when it's created, and those points will never change, even if they get blocked
         private Point[] _endPoints;
-        //To tell the camera which way to face
-        private CameraDirections _direction;
+        //This float tells the camera which way it's facing. By default, the camera faces down
+        private float _direction;
 
         //The rays don't project from inside of the wall, where the camera is technically drawn
         //All the rays come out from the point on the floor right "in front of" the camera
@@ -78,12 +78,12 @@ namespace MakeEveryDayRecount.GameObjects.Props
                 if (centerRay.X < 0 && containingRoom.VerifyWalkable(new Point(location.X - 1, location.Y))) //cam is pointing left
                 {
                     _rayBase = new Point(location.X - 1, location.Y);
-                    _direction = CameraDirections.Left;
+                    _direction = 0.5f;
                 }
                 else if (containingRoom.VerifyWalkable(new Point(location.X + 1, location.Y)))//Cam is pointing right
                 {
                     _rayBase = new Point(location.X + 1, location.Y);
-                    _direction = CameraDirections.Right;
+                    _direction = 1.5f;
                 }
                 //If both the left and right tiles aren't walkable, try to set the raybase either up or down
                 else
@@ -91,12 +91,12 @@ namespace MakeEveryDayRecount.GameObjects.Props
                     if (centerRay.Y < 0 && containingRoom.VerifyWalkable(new Point(Location.X, Location.Y - 1)))
                     {
                         _rayBase = new Point(location.X, Location.Y - 1);
-                        _direction = CameraDirections.Up;
+                        _direction = 1f;
                     }
                     else //This will be fine unless the camera is deep in the wall or cameraRay is zero vector
                     {
                         _rayBase = new Point(location.X, Location.Y + 1);
-                        _direction = CameraDirections.Down;
+                        _direction = 0f;
                     }
                 }
             }
@@ -106,12 +106,12 @@ namespace MakeEveryDayRecount.GameObjects.Props
                 if (centerRay.Y < 0 && containingRoom.VerifyWalkable(new Point(location.X, location.Y - 1))) //camera is pointing up
                 {
                     _rayBase = new Point(Location.X, location.Y - 1);
-                    _direction = CameraDirections.Up;
+                    _direction = 1f;
                 }
                 else if (containingRoom.VerifyWalkable(new Point(location.X, location.Y + 1))) //camera is pointing down
                 {
                     _rayBase = new Point(Location.X, location.Y + 1);
-                    _direction = CameraDirections.Down;
+                    _direction = 0f;
                 }
                 //If both the up and down tiles aren't walkable, try to set the raybase either left or right
                 else
@@ -119,18 +119,18 @@ namespace MakeEveryDayRecount.GameObjects.Props
                     if (centerRay.X < 0 && containingRoom.VerifyWalkable(new Point(location.X - 1, location.Y)))
                     {
                         _rayBase = new Point(Location.X - 1, location.Y);
-                        _direction = CameraDirections.Left;
+                        _direction = 0.5f;
                     }
                     else //This will be fine unless the camera is deep in the wall or cameraRay is zero vector
                     {
                         _rayBase = new Point(Location.X + 1, Location.Y);
-                        _direction = CameraDirections.Right;
+                        _direction = 1.5f;
                     }
                 }
             }
             //I intentionally wrote the above to prioritize up/down over left/right
-            //I don't think we need a special case for if camera ray X and Y are equal because that can only have an effect if the camera is on an outside corner 
             #endregion
+            //TODO: Allow the raybase to be catycorners from the camera's location
             //Debug.WriteLine($"Raybase is {_rayBase.X}, {_rayBase.Y}");
 
             //TESTING - show me the center ray
@@ -243,7 +243,8 @@ namespace MakeEveryDayRecount.GameObjects.Props
             #endregion
             //Note that the length of _endPoints may be even or odd depending on rounding
         }
-        //TODO: add an alternative constructor that takes a point as the center of the vision cone and constructs a vector from that
+
+        //TODO: add an alternative constructor that creates an electrical box connected to this camera
 
         public void Update(float deltaTime)
         {
@@ -315,8 +316,8 @@ namespace MakeEveryDayRecount.GameObjects.Props
 
         public override void Draw(SpriteBatch sb, Point worldToScreen, Point pixelOffset)
         {
-            sb.Draw(Sprite, new Rectangle(MapUtils.TileToWorld(Location) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
-            //TODO: Draw the camera differently depending on its _direction
+            sb.Draw(Sprite, new Rectangle(MapUtils.TileToWorld(Location) - worldToScreen + pixelOffset, AssetManager.TileSize), null, //no source rectangle
+                Color.White, _direction, Vector2.Zero, SpriteEffects.None, 0f); //Layer depth is not used
             foreach (Point tile in _watchedTiles)
             {
                 sb.Draw(AssetManager.CameraSight, new Rectangle(MapUtils.TileToWorld(tile) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
