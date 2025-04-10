@@ -326,9 +326,13 @@ namespace LevelEditor
             CreateRoomButton(room);
         }
 
+        /// <summary>
+        /// Gets all rooms contained within the level currently being edited, or null if no level is open.
+        /// </summary>
+        /// <returns>A read only collection of the rooms in the level currently being edited, or null if no level is open.</returns>
         public ReadOnlyCollection<Room> GetAllRooms()
         {
-            return Level.Rooms.AsReadOnly();
+            return Level?.Rooms.AsReadOnly()!;
         }
 
         /// <summary>

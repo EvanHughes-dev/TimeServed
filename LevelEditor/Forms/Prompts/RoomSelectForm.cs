@@ -13,43 +13,73 @@ using System.Windows.Forms;
 
 namespace LevelEditor.Forms.Prompts
 {
+    /// <summary>
+    /// A prompt that can be used to have the user select a room.
+    /// </summary>
     public partial class RoomSelectForm : Form
     {
-        private Room _selected;
+        private static Room _selected = null!;
 
-        public RoomSelectForm(ReadOnlyCollection<Room> rooms)
+        /// <summary>
+        /// Creates a new RoomSelectForm based on the given collection of rooms.
+        /// </summary>
+        /// <param name="rooms">The rooms the user should be allowed to select.</param>
+        private RoomSelectForm(ReadOnlyCollection<Room> rooms)
         {
             InitializeComponent();
 
-            _selected = null!;
-
+            // Make all the buttons so the user can actually select the given rooms
             foreach (Room room in rooms)
             {
-                Button roomButton = new()
-                {
-                    Size = new(140, 80),
-                    TextAlign = ContentAlignment.MiddleCenter,
-                    Text = room.Name,
-                    Parent = flowLayoutPanelRooms
-                };
-
-                roomButton.Click += MakeClickCallback(room);
-
-                Controls.Add(roomButton);
+                CreateRoomButton(room);
             }
         }
 
+        /// <summary>
+        /// Creates a new button in the UI that selects the given room when clicked.
+        /// </summary>
+        /// <param name="room">The Room to create the button for.</param>
+        private void CreateRoomButton(Room room)
+        {
+            // Copy+pasted and modified from MainForm!
+            Button roomButton = new()
+            {
+                Size = new(140, 80),
+                TextAlign = ContentAlignment.MiddleCenter,
+                Text = room.Name,
+                Parent = flowLayoutPanelRooms
+            };
+
+            roomButton.Click += MakeClickCallback(room);
+        }
+
+        /// <summary>
+        /// Creates a callback function to be used when the user clicks a button associated with a given room.
+        /// </summary>
+        /// <param name="room">The room the button should select.</param>
+        /// <returns>The created callback function.</returns>
         private EventHandler MakeClickCallback(Room room)
         {
             return (object? sender, EventArgs e) =>
             {
                 _selected = room;
+
+                // Once the user makes a selection, the form should close itself so control flow is returned to the static Prompt() method
+                Close();
             };
         }
 
-        public Room Prompt()
+        /// <summary>
+        /// Opens a RoomSelectForm with the given rooms.
+        /// </summary>
+        /// <param name="rooms">The rooms the user should be able to select.</param>
+        /// <returns>The room the user selected, or null if they closed the form manually.</returns>
+        public static Room Prompt(ReadOnlyCollection<Room> rooms)
         {
-            ShowDialog();
+            _selected = null!;
+            RoomSelectForm form = new RoomSelectForm(rooms);
+
+            form.ShowDialog();
 
             return _selected;
         }

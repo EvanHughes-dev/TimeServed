@@ -37,7 +37,6 @@
             flowLayoutPanelRooms.Name = "flowLayoutPanelRooms";
             flowLayoutPanelRooms.Size = new Size(776, 408);
             flowLayoutPanelRooms.TabIndex = 1;
-            flowLayoutPanelRooms.Visible = false;
             // 
             // RoomSelectForm
             // 

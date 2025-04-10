@@ -201,6 +201,7 @@ namespace LevelEditor
                 {
                     Prop createdProp = null!;
 
+                    // Different props have to be created in different ways
                     switch (SelectedProp.PropType)
                     {
                         case ObjectType.Item: // Items and boxes are created the same
@@ -211,10 +212,10 @@ namespace LevelEditor
                         case ObjectType.Door:
                             Door door = (Door)SelectedProp;
 
-                            Room room = new RoomSelectForm(_mainForm.GetAllRooms()).Prompt();
+                            Room room = RoomSelectForm.Prompt(_mainForm.GetAllRooms());
                             if (room == null) return;
 
-                            Point? destination = new PositionSelectForm(room).Prompt();
+                            Point? destination = PositionSelectForm.Prompt(room);
                             if (destination == null) return;
 
                             createdProp = door.Instantiate(new Point(x, y), (Point)destination, room.Id);

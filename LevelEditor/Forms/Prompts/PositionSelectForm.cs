@@ -13,31 +13,39 @@ using System.Windows.Forms;
 
 namespace LevelEditor.Forms.Prompts
 {
+    /// <summary>
+    /// A prompt that can be used to have a user select a position within a room.
+    /// </summary>
     public partial class PositionSelectForm : Form
     {
-        private Point? _selected;
+        private static Point? _selected;
 
-        public PositionSelectForm(Room room)
+        /// <summary>
+        /// Creates a new PositionSelectForm with the given room.
+        /// </summary>
+        /// <param name="room">The room to have the user select a position of.</param>
+        private PositionSelectForm(Room room)
         {
             InitializeComponent();
-
-            _selected = null;
 
             InitializeMap(room);
         }
 
-        public Point? Prompt()
-        {
-            ShowDialog();
 
-            return _selected;
-        }
-
+        /// <summary>
+        /// Creates a callback function to be used when the user clicks a tile associated with a given position.
+        /// </summary>
+        /// <param name="point">The position to associate.</param>
+        /// <returns>The created callback function.</returns>
         private EventHandler MakeClickCallback(Point point)
         {
             return (object? _, EventArgs _) =>
             {
                 _selected = point;
+
+                // Closing the form returns control flow to the Prompt function so we can return their selected value without the
+                //   user having to manually close the form themself
+                Close();
             };
         }
 
@@ -161,5 +169,20 @@ namespace LevelEditor.Forms.Prompts
         }
 
         #endregion
+
+        /// <summary>
+        /// Opens a PositionSelectForm with the given room.
+        /// </summary>
+        /// <param name="room">The room to have the user select a position within.</param>
+        /// <returns>The user's selected position, or null if they closed the form manually.</returns>
+        public static Point? Prompt(Room room)
+        {
+            _selected = null!;
+
+            PositionSelectForm form = new PositionSelectForm(room);
+            form.ShowDialog();
+
+            return _selected;
+        }
     }
 }
