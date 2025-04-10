@@ -221,14 +221,17 @@
 /processorParam:TextureFormat=Color
 /build:Items/wireCutters.png
 
+#begin Levels/Level1/Camera Puzzle.room
+/copy:Levels/Level1/Camera Puzzle.room
+
 #begin Levels/Level1/level.level
 /copy:Levels/Level1/level.level
 
-#begin Levels/Level1/TestRoom1.room
-/copy:Levels/Level1/TestRoom1.room
+#begin Levels/Level2/level.level
+/copy:Levels/Level2/level.level
 
-#begin Levels/Level1/TestRoom2.room
-/copy:Levels/Level1/TestRoom2.room
+#begin Levels/Level2/TestRoom1.room
+/copy:Levels/Level2/TestRoom1.room
 
 #begin Player/Inventory/InventoryBox_hover.png
 /importer:TextureImporter
@@ -302,30 +305,6 @@
 /processorParam:TextureFormat=Color
 /build:Tiles/tile_walkable0.png
 
-#begin Tiles/tile_walkable0.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Tiles/tile_walkable0.png
-
-#begin Tiles/tile_walkable1.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Tiles/tile_walkable1.png
-
 #begin Tiles/tile_walkable1.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -350,18 +329,6 @@
 /processorParam:TextureFormat=Color
 /build:Tiles/tile_walkable2.png
 
-#begin Tiles/tile_walkable2.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Tiles/tile_walkable2.png
-
 #begin Tiles/tile_walkable3.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -373,30 +340,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Tiles/tile_walkable3.png
-
-#begin Tiles/tile_walkable3.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Tiles/tile_walkable3.png
-
-#begin Tiles/tile_walkable4.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Tiles/tile_walkable4.png
 
 #begin Tiles/tile_walkable4.png
 /importer:TextureImporter
@@ -614,18 +557,6 @@
 /processorParam:TextureFormat=Color
 /build:Tiles/void.png
 
-#begin Tiles/void.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Tiles/void.png
-
 #begin UI/DefaultButton.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -674,9 +605,3 @@
 /processorParam:TextureFormat=Color
 /build:UI/ui_cursorHover.png
 
-
-#begin Levels/Level Camera/level.level
-/copy:Levels/Level Camera/level.level
-
-#begin Levels/Level Camera/Camera Puzzle.room
-/copy:Levels/Level Camera/Camera Puzzle.room

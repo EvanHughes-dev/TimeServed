@@ -66,17 +66,17 @@ namespace MakeEveryDayRecount.DebugModes
         /// <param name="sb">Sprite batch used for rendering.</param>
         private void DrawTileDebug(SpriteBatch sb)
         {
-            var map = GameplayManager.Map;
-            var playerTilePos = _player.Location;
+            MapManager map = GameplayManager.Map;
+            Point playerTilePos = _player.Location;
 
             foreach (var direction in _playerMovementDirections)
             {
-                var playerDest = playerTilePos + direction;
-                var displayTile = map.CheckPlayerCollision(playerDest)
+                Point playerDest = playerTilePos + direction;
+                Texture2D displayTile = map.CheckPlayerCollision(playerDest)
                     ? _walkableTileDebug
                     : _notWalkableTileDebug;
 
-                var screenPos = MapUtils.TileToWorld(playerDest) - MapUtils.WorldToScreen();
+                Point screenPos = MapUtils.TileToWorld(playerDest) - MapUtils.WorldToScreen() + MapUtils.PixelOffset();
                 sb.Draw(displayTile, new Rectangle(screenPos, AssetManager.TileSize), Color.White);
             }
         }
