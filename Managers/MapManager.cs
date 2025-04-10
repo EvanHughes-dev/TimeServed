@@ -133,7 +133,6 @@ namespace MakeEveryDayRecount.Managers
             Room[] rooms = new Room[0];
             if (File.Exists(folderPath + "/level.level"))
             {
-                Dictionary<(int roomIndex, int doorIndex), Door> doorLookup = new Dictionary<(int roomIndex, int doorIndex), Door>();
                 Stream streamReader = File.OpenRead(folderPath + "/level.level");
                 BinaryReader binaryReader = new BinaryReader(streamReader);
 
@@ -147,22 +146,9 @@ namespace MakeEveryDayRecount.Managers
                     int roomIndex = binaryReader.ReadInt32();
                     Room room = new Room(roomFilePath, roomName, roomIndex);
                     rooms[currentRoom] = room;
-                    // Store doors in lookup for fast access
-                    foreach (Door door in room.Doors)
-                    {
-                        doorLookup[(roomIndex, door.DoorIndex)] = door;
-                    }
                 }
 
                 binaryReader.Close();
-                // Assign corresponding doors efficiently
-                foreach (Door door in doorLookup.Values)
-                {
-                    if (doorLookup.TryGetValue((door.DestRoom, door.DoorIndex), out Door matchingDoor))
-                    {
-                        door.AssignDoor(matchingDoor);
-                    }
-                }
             }
             else
             {

@@ -236,14 +236,9 @@ namespace MakeEveryDayRecount.Map
                     *       For items, this is the key type they are
                     * 
                     *   if objectType == 3
-                    *       int facing
-                    *           0 = South/Down
-                    *           1 = West/Left
-                    *           2 = North/Up
-                    *           3 = East/Right
-                    *       int entranceIndex
                     *       int destRoom
-                    *       int destDoor
+                    *       int outputPosX
+                    *       int outputPosY
                     */
 
                     // Define the size of the current room and loop to populate tiles
@@ -286,10 +281,8 @@ namespace MakeEveryDayRecount.Map
                                 // Parse a door from the file
                                 // Next three values correspond to the needed data
                                 Door doorFromFile = new Door(
-                                    direction[binaryReader.ReadInt32()], // Direction door is facing
-                                    binaryReader.ReadInt32(), // The index of this door
-                                    binaryReader.ReadInt32(), // The index of the destination room
-                                    binaryReader.ReadInt32(), // The index of the destination door
+                                    binaryReader.ReadInt32(),//Read destination room
+                                    new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32()),// Read the destination point in the new room
                                     keyType,
                                     tileLocation,
                                     AssetManager.DoorTexture,

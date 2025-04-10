@@ -25,6 +25,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// </summary>
         /// <param name="player">Player interacting</param>
         public abstract void Interact(Player player);
+
         /// <summary>
         /// Allow props to draw themselves
         /// </summary>

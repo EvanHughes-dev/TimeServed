@@ -29,6 +29,6 @@ namespace LevelEditor.Classes
         /// Creates a new Level with no rooms in it.
         /// </summary>
         public Level()
-          : this([]) { }
+          : this(new List<Room> { }) { }
     }
 }
