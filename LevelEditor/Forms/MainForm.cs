@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -95,8 +96,32 @@ namespace LevelEditor
             {
                 Tile[] tiles = [
                     FileIOHelpers.LoadTile("void.png", false),
-                    FileIOHelpers.LoadTile("testWalkable.png", true),
-                    FileIOHelpers.LoadTile("testWall.png", false)
+
+                    FileIOHelpers.LoadTile("tile_wall0_top.png", false),
+                    FileIOHelpers.LoadTile("tile_wall1_top.png", false),
+                    FileIOHelpers.LoadTile("tile_wall2_top.png", false),
+                    FileIOHelpers.LoadTile("tile_wall3_top.png", false),
+                                                                
+                    FileIOHelpers.LoadTile("tile_wall0_right.png", false),
+                    FileIOHelpers.LoadTile("tile_wall1_right.png", false),
+                    FileIOHelpers.LoadTile("tile_wall2_right.png", false),
+                    FileIOHelpers.LoadTile("tile_wall3_right.png", false),
+
+                    FileIOHelpers.LoadTile("tile_wall0_bottom.png", false),
+                    FileIOHelpers.LoadTile("tile_wall1_bottom.png", false),
+                    FileIOHelpers.LoadTile("tile_wall2_bottom.png", false),
+                    FileIOHelpers.LoadTile("tile_wall3_bottom.png", false),
+
+                    FileIOHelpers.LoadTile("tile_wall0_left.png", false),
+                    FileIOHelpers.LoadTile("tile_wall1_left.png", false),
+                    FileIOHelpers.LoadTile("tile_wall2_left.png", false),
+                    FileIOHelpers.LoadTile("tile_wall3_left.png", false),
+
+                    FileIOHelpers.LoadTile("tile_walkable0.png", true),
+                    FileIOHelpers.LoadTile("tile_walkable1.png", true),
+                    FileIOHelpers.LoadTile("tile_walkable2.png", true),
+                    FileIOHelpers.LoadTile("tile_walkable3.png", true),
+                    FileIOHelpers.LoadTile("tile_walkable4.png", true),
                     ];
 
                 Tiles = tiles.AsReadOnly();
@@ -105,7 +130,7 @@ namespace LevelEditor
             {
                 Tiles = [];
 
-                DialogResult response = MessageBox.Show($"Could not load tiles: {ex.Message}",
+                DialogResult response = MessageBox.Show($"Could not load tiles: {ex}",
                     "Error",
                     MessageBoxButtons.AbortRetryIgnore,
                     MessageBoxIcon.Error);
