@@ -25,15 +25,14 @@ namespace MakeEveryDayRecount.GameObjects.Props
             Right
         }
 
-        //Specify a line for the center of it's vision and the length of its vision, an angle in radians for the width of it's field of vision
-        //All the lines share the same parametric point (the camera's location), so only the vectors for each line are different
+        //Specify a point for the center of it's vision and an angle in radians for the width of it's field of vision
+
         //The point at the center of the vision cone
         private Point _centerPoint;
         private float _spread;
-        //The camera will get a certain set of rays when it's created, and those rays will never change, even if they get blocked
-        //TODO: Maybe these should be changed into points?
+        //The camera will get a certain set of endpoints to look towards when it's created, and those points will never change, even if they get blocked
         private Point[] _endPoints;
-        //To tell the cam which way to face
+        //To tell the camera which way to face
         private CameraDirections _direction;
 
         //The rays don't project from inside of the wall, where the camera is technically drawn
@@ -43,7 +42,6 @@ namespace MakeEveryDayRecount.GameObjects.Props
         private Point[] _visionKite;
         private List<Point> _watchedTiles;
         private List<Point> _previousBoxes;
-        private List<Point> _testTiles;
         //This is going to need a reference to the room that created it in order to check collision
         private Room _room;
         //It also needs a reference to the player to know if they step into the vision kite
@@ -60,9 +58,8 @@ namespace MakeEveryDayRecount.GameObjects.Props
         public Camera(Point location, Texture2D sprite, Room containingRoom, Point centerPoint, float spread)
             : base(location, sprite)
         {
-            _watchedTiles = new List<Point>(); //This ends up being the same as visionkite at the end of this function
+            _watchedTiles = new List<Point>(); //This ends up being the same as visionkite by the end of this function
             _previousBoxes = new List<Point>();
-            _testTiles = new List<Point>();
             //All cams start active
             _active = true;
             _room = containingRoom;
@@ -245,73 +242,75 @@ namespace MakeEveryDayRecount.GameObjects.Props
 
             #endregion
             //Note that the length of _endPoints may be even or odd depending on rounding
-
         }
         //TODO: add an alternative constructor that takes a point as the center of the vision cone and constructs a vector from that
 
         public void Update(float deltaTime)
         {
-            //Check for boxes before we look for the player
-            List<Point> boxes = new List<Point>();
-            //Used to check if there's a box on the raybase
-            bool raybaseBlocked = false;
-            //Check the entire vision kite for boxes in order to figure out what tiles are currently watched
-            foreach (Point box in _visionKite)
+            if (_active)
             {
-                //Check if there's a box. Any un-walkable tile is treated like a box
-                if (!_room.VerifyWalkable(box))
+                #region Update the watched tiles and check for the player
+                //Check for boxes before we look for the player
+                List<Point> boxes = new List<Point>();
+                //Used to check if there's a box on the raybase
+                bool raybaseBlocked = false;
+                //Check the entire vision kite for boxes in order to figure out what tiles are currently watched
+                foreach (Point box in _visionKite)
                 {
-                    //Debug.WriteLine($"Found a box at {box.X}, {box.Y}");
-                    boxes.Add(box);
-                    if (box == _rayBase) raybaseBlocked = true;
-                }
-            }
-
-            //If the raybase is blocked, we can't see anything and can't detect the player
-            if (raybaseBlocked) _watchedTiles.Clear();
-            else
-            {
-                //Now check to see if any boxes have moved since the last frame
-                if (_previousBoxes.Count != boxes.Count || !boxes.All(_previousBoxes.Contains))
-                {
-                    //We've found a new box in the way. Check all the rays fellas!
-                    _watchedTiles = _visionKite.ToList();
-                    foreach (Point box in boxes)
+                    //Check if there's a box. Any un-walkable tile is treated like a box
+                    if (!_room.VerifyWalkable(box))
                     {
-                        foreach (Point endpoint in _endPoints)
+                        //Debug.WriteLine($"Found a box at {box.X}, {box.Y}");
+                        boxes.Add(box);
+                        if (box == _rayBase) raybaseBlocked = true;
+                    }
+                }
+
+                //If the raybase is blocked, we can't see anything and can't detect the player
+                if (raybaseBlocked) _watchedTiles.Clear();
+                else
+                {
+                    //Now check to see if any boxes have moved since the last frame
+                    if (_previousBoxes.Count != boxes.Count || !boxes.All(_previousBoxes.Contains))
+                    {
+                        //We've found a new box in the way. Check all the rays fellas!
+                        _watchedTiles = _visionKite.ToList();
+                        foreach (Point box in boxes)
                         {
-                            //Debug.WriteLine($"Checking {_rayBase} with {endpoint}");
-                            //foreach (Point point in Rasterize(_rayBase, endpoint)) Debug.Write(point + " ");
-                            //Debug.WriteLine(null);
-                            if (Rasterize(_rayBase, endpoint).Contains(box)) //A ray is blocked by the box
+                            foreach (Point endpoint in _endPoints)
                             {
-                                //Debug.WriteLine($"Endpoint {endpoint.X}, {endpoint.Y} is blocked");
-                                //Remove all the tiles between the box and the end of the ray
-                                foreach (Point blockedPoint in Rasterize(box, endpoint))
+                                //Debug.WriteLine($"Checking {_rayBase} with {endpoint}");
+                                //foreach (Point point in Rasterize(_rayBase, endpoint)) Debug.Write(point + " ");
+                                //Debug.WriteLine(null);
+                                if (Rasterize(_rayBase, endpoint).Contains(box)) //A ray is blocked by the box
                                 {
-                                    _watchedTiles.Remove(blockedPoint);
-                                    Debug.WriteLine($"Removed: {blockedPoint}");
+                                    //Debug.WriteLine($"Endpoint {endpoint.X}, {endpoint.Y} is blocked");
+                                    //Remove all the tiles between the box and the end of the ray
+                                    foreach (Point blockedPoint in Rasterize(box, endpoint))
+                                    {
+                                        _watchedTiles.Remove(blockedPoint);
+                                        Debug.WriteLine($"Removed: {blockedPoint}");
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                //Now check for the player :)
-                foreach (Point watchedTile in _watchedTiles)
-                {
-                    if (_player.Location == watchedTile)
+                    //Now check for the player :)
+                    foreach (Point watchedTile in _watchedTiles)
                     {
-                        //WE FOUND THE PLAYER! GET HIM BOYS!
-                        _player.Detected();
+                        if (_player.Location == watchedTile)
+                        {
+                            //WE FOUND THE PLAYER! GET HIM BOYS!
+                            _player.Detected();
+                        }
                     }
                 }
+                #endregion
+
+                _previousBoxes = boxes;
             }
 
-            _previousBoxes = boxes;
-
-            //TimeSpan startTime = DateTime.Now.TimeOfDay;
-            //Debug.WriteLine(DateTime.Now.TimeOfDay - startTime);
         }
 
         public override void Draw(SpriteBatch sb, Point worldToScreen, Point pixelOffset)
@@ -322,11 +321,11 @@ namespace MakeEveryDayRecount.GameObjects.Props
             {
                 sb.Draw(AssetManager.CameraSight, new Rectangle(MapUtils.TileToWorld(tile) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
             }
-            //foreach (Point box in _testTiles) sb.Draw(AssetManager.PropTextures[3], new Rectangle(MapUtils.TileToWorld(box) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
         }
 
         private List<Point> Rasterize(Point p1, Point p2)
         {
+            #region Bresenham's Line Algorithm
             bool rotated = false;
             //If dy > dx, switch the X and Y of the endpoints
             if (Math.Abs(p2.Y-p1.Y) > Math.Abs(p2.X - p1.X))
@@ -413,134 +412,9 @@ namespace MakeEveryDayRecount.GameObjects.Props
                     returnPoints[i] = new Point(returnPoints[i].Y, returnPoints[i].X);
                 }
             }
-
-            //Return the list of points
+            #endregion
+            //Return the points intersected by the line
             return returnPoints;
-        }
-
-        //TODO: Create a version of Rasterize that always returns from the raybase first
-        //I think this will allow us to more easily check if a box is blocking a ray
-
-        /**
-        private void ExperimentalCheckRay(Vector2 ray)
-        {
-
-            //create a parametric line using the point and the vector
-            //Step along that line in small intervals, checking what tile you're over at every step
-            float dx = ray.X;
-            float dy = ray.Y;
-            //error is the slope error. We assume it starts exactly right
-            float error = 0;
-            int y = 0;
-
-            //All this is old.Take this out before I make the pull request
-            for (int x = 0; x <= ray.X; x++)
-            {
-                //Add the current point to the line
-                //This first time this runs, this will always be the raybase
-                _watchedTiles.Add(new Point(x + _rayBase.X, y + _rayBase.Y));
-                //Debug.WriteLine("Added " + (x + _rayBase.X) + ", " + (y + _rayBase.Y));
-
-                //Then check error for the next point along
-                //Debug.WriteLine("Evaluated: " + ((_rayBase.Y * ray.X) + ((x) * ray.Y) - ((y + 0.5) * ray.X)));
-                error = error + (ray.Y / ray.X) * (x - _rayBase.X) + _rayBase.Y  - y;
-
-                //And figure out if it should go up or not
-                //Debug.WriteLine("Error is: " + error);
-                if (error >= 0.5)
-                {
-                    error = error - 1;
-                    y = y + 1;
-                }
-
-                //if (error > 1)
-                //{
-                //    y = y + 1;
-                //    error = error - 1;
-                //}
-                //if (error == error + 2 * dy)
-                //{
-                //    break;
-                //}
-            }
-        }
-        **/
-
-        private List<Point> CheckRay(Vector2 ray)
-        {
-            //None of the rays check the base, because all of the rays come from the base
-            //If the rays are a float, we're in the soup
-            int dx = (int)ray.X;
-            int dy = (int)ray.Y;
-            //Create a local raybase for this particular vector so we can move it for this ray if necessarry
-            //Without messing up the other rays
-            Point rayBase = _rayBase;
-            //This is the array of points this will return
-            List<Point> intersectededPoints = new List<Point>();
-
-            if (Math.Abs(dy) > Math.Abs(dx))
-            {
-                //X is the dependant variable
-                int x = 0;
-
-                //If the line is going from down to up, switch the start and end points so we can draw it from top to bottom
-                if (dy < 0)
-                {
-                    rayBase.Y = rayBase.Y + dy;
-                    rayBase.X = rayBase.X + dx;
-
-                    dy = dy * -1;
-                    dx = dx * -1;
-                }
-
-                //The length of the return array will be the change in the independent variable
-
-                for (int y = rayBase.Y; y <= rayBase.Y + dy; y++)
-                {
-                    //get this, x = my + b
-                    double xValue = (ray.X / ray.Y) * (y - rayBase.Y) + rayBase.X;
-                    int xCoord;
-                    xCoord = (int)Math.Round(xValue);
-                    intersectededPoints.Add(new Point(xCoord, y));
-                    Debug.WriteLine($"Added {xCoord}, {y}");
-                }
-            }
-            else
-            {
-                //Y is the dependant variable
-                int y = 0;
-
-                //If the line is going from right to left, we switch the start and end point so it can be drawn left to right
-                if (dx < 0)
-                {
-                    rayBase.X = rayBase.X + (int)dx;
-                    rayBase.Y = rayBase.Y + (int)dy;
-
-                    dx = dx * -1;
-                    dy = dy * -1;
-                    //_watchedTiles.Add(_rayBase);
-                    //Debug.WriteLine($"Okay, raybase is at {rayBase.X}, {rayBase.Y} --- DX is {dx} and DY is {dy}");
-                }
-
-                for (int x = rayBase.X; x <= rayBase.X + dx; x++)
-                {
-                    //y = mx + b
-                    double yValue = (ray.Y / ray.X) * (x - rayBase.X) + rayBase.Y;
-                    int yCoord;
-                    yCoord = (int)Math.Round(yValue);
-                    intersectededPoints.Add(new Point(x, yCoord));
-                    Debug.WriteLine($"Added {x}, {yCoord}");
-                }
-            }
-            return intersectededPoints;
-        }
-
-        private void LookForPlayer()
-        {
-            
-            throw new NotImplementedException();
-            //This can be optimized by making it only check the tiles on the outside edges of the "vision cone"
-            //Meaning the two unblocked rays on either side with the furthest angle from the center ray, and the most extreme point of each ray
         }
 
         public override void Interact(Player player)
