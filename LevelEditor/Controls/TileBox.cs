@@ -8,9 +8,9 @@ using LevelEditor.Classes;
 namespace LevelEditor.Controls
 {
     /// <summary>
-    /// An extension of PictureBox specialized to store a Tile.
+    /// An extension of PixelBox specialized to store a Tile.
     /// </summary>
-    internal class TileBox : PictureBox
+    internal class TileBox : PixelBox
     {
         private Tile _tile;
 
