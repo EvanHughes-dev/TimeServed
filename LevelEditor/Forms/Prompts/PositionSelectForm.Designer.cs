@@ -47,7 +47,7 @@
             ClientSize = new Size(304, 514);
             Controls.Add(groupBoxMap);
             Name = "PositionSelectForm";
-            Text = "DoorPositionSelectForm";
+            Text = "Select a Position";
             ResumeLayout(false);
         }
 

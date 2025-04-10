@@ -45,7 +45,7 @@
             ClientSize = new Size(800, 450);
             Controls.Add(flowLayoutPanelRooms);
             Name = "RoomSelectForm";
-            Text = "DoorForm";
+            Text = "Select a Room";
             ResumeLayout(false);
         }
 
