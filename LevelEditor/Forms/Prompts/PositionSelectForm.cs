@@ -81,6 +81,8 @@ namespace LevelEditor.Forms.Prompts
                     TileBox tileBox = tileGrid[y, x];
                     tileBox.Tile = room.Tiles[y, x];
                     tileBox.Click += MakeClickCallback(new Point(x, y));
+
+                    tileBox.SizeMode = PictureBoxSizeMode.Zoom;
                 }
             }
 

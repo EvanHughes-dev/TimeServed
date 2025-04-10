@@ -419,6 +419,8 @@ namespace LevelEditor
                     tileBox.Tile = Room.Tiles[y, x];
                     tileBox.MouseDown += Tile_MouseDown;
                     tileBox.MouseMove += Tile_MouseMove;
+
+                    tileBox.SizeMode = PictureBoxSizeMode.Zoom;
                 }
             }
 
