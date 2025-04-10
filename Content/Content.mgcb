@@ -674,3 +674,6 @@
 /processorParam:TextureFormat=Color
 /build:UI/ui_cursorHover.png
 
+
+#begin Levels/Level Camera/level.level
+/copy:Levels/Level Camera/level.level
