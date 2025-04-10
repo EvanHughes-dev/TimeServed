@@ -23,7 +23,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
             Card = 2
         }
 
-        private DoorKeyType _keyType;
+        public readonly DoorKeyType KeyType;
 
         /// <summary>
         /// Get the direction the player will be outputted in when interacting with this door
@@ -61,7 +61,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         {
             DestRoom = destRoom;
             DestinationTile = outPosition;
-            _keyType = keyType;
+            KeyType = keyType;
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// <returns>If the door can be interacted</returns>
         public override void Interact(Player player)
         {
-            if (_keyType == DoorKeyType.None || player.ContainsKey(_keyType))
+            if (KeyType == DoorKeyType.None || player.ContainsKey(KeyType))
             {
                 OnDoorInteract?.Invoke(this, DestRoom);
             }

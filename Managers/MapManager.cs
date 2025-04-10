@@ -108,11 +108,22 @@ namespace MakeEveryDayRecount.Managers
 
         /// <summary>
         /// Load all the needed data relating to each room
-        /// from the corresponding files and format them
+        /// from the corresponding files and format them.
         /// </summary>
         /// <param name="currentLevel">Current level of the game</param>
         /// <returns>Formatted data loaded from files</returns>
         private static Room[] LoadMapData(int currentLevel)
+        {
+            return LoadMapData(currentLevel.ToString());
+        }
+
+        /// <summary>
+        /// Load all the needed data relating to each room
+        /// from the corresponding files and format them
+        /// </summary>
+        /// <param name="currentLevel">Current level of the game</param>
+        /// <returns>Formatted data loaded from files</returns>
+        private static Room[] LoadMapData(string currentLevel)
         {
             // only read binary data here
             // each room is in charge of parsing itself
@@ -173,25 +184,27 @@ namespace MakeEveryDayRecount.Managers
             }
         }
 
-        public static void SaveMap()
+        public static void SaveMap(string baseFolder)
         {
-            string mapBaseFolder = "./CheckpointData";
+            //Make the .level file
+            BinaryWriter writer = new BinaryWriter(File.OpenWrite(baseFolder + "/level.level"));
 
-            //Make the folders if they don't already exist
-            if (!Directory.Exists(mapBaseFolder))
-                Directory.CreateDirectory(mapBaseFolder);
+            //Save number of rooms
+            writer.Write(_rooms.Length);
 
-            //MAKE LEVEL FILE HERE!
-            //TODO: check if the level file exists
+            //Write data for each room
+            for (int i = 0; i < _rooms.Length; i++)
+            {
+                //Write name
+                writer.Write(_rooms[i].RoomName);
+
+                //Write index
+                writer.Write(_rooms[i].RoomIndex);
+            }
 
             for (int i = 0; i < _rooms.Length; i++)
             {
-                //TODO: call function in each room that saves it data (save room)
-                //Name of each room file should be the room's name property
-                //IMPORTANT: only work on saving tiles for right now. Props are being revamped, so worry about that afterwards
-                //Except for boxes, those will stay the same
-
-                _rooms[i].SaveRoom(mapBaseFolder);
+                _rooms[i].SaveRoom(baseFolder);
             }
         }
     }
