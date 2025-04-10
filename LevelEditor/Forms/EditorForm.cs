@@ -60,6 +60,10 @@ namespace LevelEditor
         private Prop[,] PropPalette { get; }
 
         /// <summary>
+        /// Holds the prop box 
+        /// </summary>
+        private PropBox _currentlySelectedPropBox;
+        /// <summary>
         /// Holds the prop boxes that exist in the room
         /// </summary>
         private readonly List<PropBox> _propBoxesInRoom;
@@ -156,6 +160,9 @@ namespace LevelEditor
         {
             if (sender is not PropBox prop) throw new Exception("Invalid call to PropSwatch_Click");
 
+            if (_currentlySelectedPropBox != null) _currentlySelectedPropBox.BackColor = Color.Transparent;
+            prop.BackColor = Color.Honeydew;
+            _currentlySelectedPropBox = prop;
             SelectedProp = prop.Prop;
         }
 
