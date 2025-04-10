@@ -677,3 +677,6 @@
 
 #begin Levels/Level Camera/level.level
 /copy:Levels/Level Camera/level.level
+
+#begin Levels/Level Camera/Camera Puzzle.room
+/copy:Levels/Level Camera/Camera Puzzle.room
