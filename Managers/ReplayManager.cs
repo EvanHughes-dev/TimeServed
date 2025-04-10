@@ -36,8 +36,9 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static void Initialize()
         {
-            if (!Directory.Exists(BaseFolder))
-                Directory.CreateDirectory(BaseFolder);
+            if (Directory.Exists(BaseFolder))
+                Directory.Delete(BaseFolder);
+            Directory.CreateDirectory(BaseFolder);
 
             _currentReplyStates = new List<ReplayState> { };
             _selectedReplayState = 0;

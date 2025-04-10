@@ -93,7 +93,7 @@ namespace MakeEveryDayRecount.Players
             : base(location, sprite)
         {
             _walkingSeconds = 0;
-          
+
             _animationFrame = 0;
             _playerSize = new Point(sprite.Width / 4, sprite.Height / 4);
             //Create an inventory
@@ -146,9 +146,6 @@ namespace MakeEveryDayRecount.Players
 
             if (InputManager.GetKeyPress(Keys.E))
                 Interact();
-            if (InputManager.GetKeyPress(Keys.I))
-                Detected();
-            
         }
 
         /// <summary>
@@ -187,8 +184,8 @@ namespace MakeEveryDayRecount.Players
             if (!_readyToMove)
                 UpdateWalkingTime(deltaTime);
 
-            if (_readyToMove &&  GameplayManager.Map.CheckPlayerCollision(Location + movement) &&
-                (!HoldingBox ||  GameplayManager.Map.CheckPlayerCollision(_currentHeldBox.Location + movement)))
+            if (_readyToMove && GameplayManager.Map.CheckPlayerCollision(Location + movement) &&
+                (!HoldingBox || GameplayManager.Map.CheckPlayerCollision(_currentHeldBox.Location + movement)))
             {
 
                 Location += movement;
@@ -337,16 +334,16 @@ namespace MakeEveryDayRecount.Players
             switch (_playerCurrentDirection)
             {
                 case Direction.Left:
-                    objectToInteract =  GameplayManager.Map.CheckInteractable(Location + new Point(-1, 0));
+                    objectToInteract = GameplayManager.Map.CheckInteractable(Location + new Point(-1, 0));
                     break;
                 case Direction.Up:
-                    objectToInteract =  GameplayManager.Map.CheckInteractable(Location + new Point(0, -1));
+                    objectToInteract = GameplayManager.Map.CheckInteractable(Location + new Point(0, -1));
                     break;
                 case Direction.Right:
-                    objectToInteract =  GameplayManager.Map.CheckInteractable(Location + new Point(1, 0));
+                    objectToInteract = GameplayManager.Map.CheckInteractable(Location + new Point(1, 0));
                     break;
                 case Direction.Down:
-                    objectToInteract =  GameplayManager.Map.CheckInteractable(Location + new Point(0, 1));
+                    objectToInteract = GameplayManager.Map.CheckInteractable(Location + new Point(0, 1));
                     break;
                     //add code that makes the interaction happen
             }
@@ -380,17 +377,18 @@ namespace MakeEveryDayRecount.Players
         /// </summary>
         private void DropBox()
         {
-            if(HoldingBox)
-             _currentHeldBox.DropBox();
+            if (HoldingBox)
+                _currentHeldBox.DropBox();
             _currentHeldBox = null;
         }
 
         /// <summary>
         /// Called when the player is detected by a camera
         /// </summary>
-        public void Detected(){
+        public void Detected()
+        {
             // TODO rather than restarting the level, just reset the player to the last checkpoint
-             GameplayManager.LevelReset();
+            GameplayManager.LevelReset();
         }
 
         #endregion
