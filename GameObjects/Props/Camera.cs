@@ -43,6 +43,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         private Point[] _visionKite;
         private List<Point> _watchedTiles;
         private List<Point> _previousBoxes;
+        private List<Point> _testTiles;
         //This is going to need a reference to the room that created it in order to check collision
         private Room _room;
         //It also needs a reference to the player to know if they step into the vision kite
@@ -61,6 +62,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         {
             _watchedTiles = new List<Point>(); //This ends up being the same as visionkite at the end of this function
             _previousBoxes = new List<Point>();
+            _testTiles = new List<Point>();
             //All cams start active
             _active = true;
             _room = containingRoom;
@@ -259,7 +261,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                 //Check if there's a box. Any un-walkable tile is treated like a box
                 if (!_room.VerifyWalkable(box))
                 {
-                    Debug.WriteLine($"Found a box at {box.X}, {box.Y}");
+                    //Debug.WriteLine($"Found a box at {box.X}, {box.Y}");
                     boxes.Add(box);
                     if (box == _rayBase) raybaseBlocked = true;
                 }
@@ -278,12 +280,17 @@ namespace MakeEveryDayRecount.GameObjects.Props
                     {
                         foreach (Point endpoint in _endPoints)
                         {
-                            if (Rasterize(_centerPoint, endpoint).Contains(box)) //A ray is blocked by the box
+                            //Debug.WriteLine($"Checking {_rayBase} with {endpoint}");
+                            //foreach (Point point in Rasterize(_rayBase, endpoint)) Debug.Write(point + " ");
+                            //Debug.WriteLine(null);
+                            if (Rasterize(_rayBase, endpoint).Contains(box)) //A ray is blocked by the box
                             {
+                                //Debug.WriteLine($"Endpoint {endpoint.X}, {endpoint.Y} is blocked");
                                 //Remove all the tiles between the box and the end of the ray
                                 foreach (Point blockedPoint in Rasterize(box, endpoint))
                                 {
                                     _watchedTiles.Remove(blockedPoint);
+                                    Debug.WriteLine($"Removed: {blockedPoint}");
                                 }
                             }
                         }
@@ -315,7 +322,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
             {
                 sb.Draw(AssetManager.CameraSight, new Rectangle(MapUtils.TileToWorld(tile) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
             }
-            foreach (Point box in _previousBoxes) sb.Draw(AssetManager.PropTextures[3], new Rectangle(MapUtils.TileToWorld(box) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
+            //foreach (Point box in _testTiles) sb.Draw(AssetManager.PropTextures[3], new Rectangle(MapUtils.TileToWorld(box) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
         }
 
         private List<Point> Rasterize(Point p1, Point p2)
@@ -345,7 +352,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                 //Indicated that we reflected this stuff for later
                 reflected = true;
                 //Reflect the line over it's x-center in order to fix this, and then flip it back?
-                //So basically switch the X of the start and end points
+                //So basically switch the Y of the start and end points
                 int swapY = p1.Y;
                 p1.Y = p2.Y;
                 p2.Y = swapY;
