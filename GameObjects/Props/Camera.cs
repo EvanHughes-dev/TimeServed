@@ -70,18 +70,18 @@ namespace MakeEveryDayRecount.GameObjects.Props
 
             #region Raybase Check
             //Check which way the ray for the camera is pointing
-            Vector2 centerRay = new Vector2(_centerPoint.X-location.X, _centerPoint.Y-location.Y); //base of this ray is at location
+            Vector2 centerRay = new Vector2(_centerPoint.X - location.X, _centerPoint.Y - location.Y); //base of this ray is at location
 
             //TODO: Let the raybase be caty-corners from the camera location
             //Please do not put the centerpoint on top of the camera it breaks everything
             if (Math.Abs(centerRay.X) > Math.Abs(centerRay.Y)) //The ray is more horizontal
             {
-                if (centerRay.X < 0 && containingRoom.VerifyWalkable(new Point(location.X - 1, location.Y))) //cam is pointing left
+                if (centerRay.X < 0 && containingRoom.VerifyWalkable(new Point(location.X - 1, location.Y), true)) //cam is pointing left
                 {
                     _rayBase = new Point(location.X - 1, location.Y);
                     _direction = CameraDirections.Left;
                 }
-                else if (containingRoom.VerifyWalkable(new Point(location.X + 1, location.Y)))//Cam is pointing right
+                else if (containingRoom.VerifyWalkable(new Point(location.X + 1, location.Y), true))//Cam is pointing right
                 {
                     _rayBase = new Point(location.X + 1, location.Y);
                     _direction = CameraDirections.Right;
@@ -89,7 +89,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                 //If both the left and right tiles aren't walkable, try to set the raybase either up or down
                 else
                 {
-                    if (centerRay.Y < 0 && containingRoom.VerifyWalkable(new Point(Location.X, Location.Y - 1)))
+                    if (centerRay.Y < 0 && containingRoom.VerifyWalkable(new Point(Location.X, Location.Y - 1), true))
                     {
                         _rayBase = new Point(location.X, Location.Y - 1);
                         _direction = CameraDirections.Up;
@@ -104,7 +104,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
 
             else //the ray is more vertical
             {
-                if (centerRay.Y < 0 && containingRoom.VerifyWalkable(new Point(location.X, location.Y - 1))) //camera is pointing up
+                if (centerRay.Y < 0 && containingRoom.VerifyWalkable(new Point(location.X, location.Y - 1), true)) //camera is pointing up
                 {
                     _rayBase = new Point(Location.X, location.Y - 1);
                     _direction = CameraDirections.Up;
@@ -117,7 +117,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                 //If both the up and down tiles aren't walkable, try to set the raybase either left or right
                 else
                 {
-                    if (centerRay.X < 0 && containingRoom.VerifyWalkable(new Point(location.X - 1, location.Y)))
+                    if (centerRay.X < 0 && containingRoom.VerifyWalkable(new Point(location.X - 1, location.Y), true))
                     {
                         _rayBase = new Point(Location.X - 1, location.Y);
                         _direction = CameraDirections.Left;
@@ -169,7 +169,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //Basically sweeping from left to right, from the camera's point of view
             //Although maybe if the camera "sweeps" from the center outwards, it would somehow help us avoid duplicates more?
             //Because rays in the center are more likely to have tiles that overlap with the rays at the edges. The closer to the center you are the more overlap there is.
-            
+
             //TESTING - Tell me all the endpoints for each half
             //Debug.Write("Clockwise points are: ");
             //foreach (Point debugPoint in clockwisePoints) Debug.Write(debugPoint + " ");
@@ -185,7 +185,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
 
             //Create a rectangle that bounds the entire kite
             //TODO: Could finding the corners be done more efficiently?
-            Point[] corners = {_rayBase, _centerPoint, clockwisePoint, counterclockwisePoint};
+            Point[] corners = { _rayBase, _centerPoint, clockwisePoint, counterclockwisePoint };
             //Find the minimum/maximum X and Y of the 4 bounding points (the edges of the rectangle basically)
             int minX = _rayBase.X;
             int maxX = _rayBase.X;
@@ -257,7 +257,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
             foreach (Point box in _visionKite)
             {
                 //Check if there's a box. Any un-walkable tile is treated like a box
-                if (!_room.VerifyWalkable(box))
+                if (!_room.VerifyWalkable(box, true))
                 {
                     Debug.WriteLine($"Found a box at {box.X}, {box.Y}");
                     boxes.Add(box);
@@ -315,14 +315,13 @@ namespace MakeEveryDayRecount.GameObjects.Props
             {
                 sb.Draw(AssetManager.CameraSight, new Rectangle(MapUtils.TileToWorld(tile) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
             }
-            foreach (Point box in _previousBoxes) sb.Draw(AssetManager.PropTextures[3], new Rectangle(MapUtils.TileToWorld(box) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
         }
 
         private List<Point> Rasterize(Point p1, Point p2)
         {
             bool rotated = false;
             //If dy > dx, switch the X and Y of the endpoints
-            if (Math.Abs(p2.Y-p1.Y) > Math.Abs(p2.X - p1.X))
+            if (Math.Abs(p2.Y - p1.Y) > Math.Abs(p2.X - p1.X))
             {
                 //Debug.WriteLine("Swapped X and Y");
                 //Indicate that we changed this stuff for later
@@ -360,7 +359,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                 p1 = p2;
                 p2 = swapPoint;
             }
-            
+
             int dx = p2.X - p1.X;
             int dy = p2.Y - p1.Y;
             int p = (2 * dy) - dx;
@@ -389,7 +388,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
             if (reflected)
             {
                 //Debug.WriteLine("Un-reflecting");
-                for (int i = 0; i < returnPoints.Count/2; i++)
+                for (int i = 0; i < returnPoints.Count / 2; i++)
                 {
                     //Debug.WriteLine($"Swapped {returnPoints[i]} and {returnPoints[^(i + 1)]}");
                     int swapY = returnPoints[i].Y;
@@ -530,7 +529,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
 
         private void LookForPlayer()
         {
-            
+
             throw new NotImplementedException();
             //This can be optimized by making it only check the tiles on the outside edges of the "vision cone"
             //Meaning the two unblocked rays on either side with the furthest angle from the center ray, and the most extreme point of each ray
