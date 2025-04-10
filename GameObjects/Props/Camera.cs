@@ -107,7 +107,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                     _rayBase = new Point(Location.X, location.Y - 1);
                     _direction = 1f;
                 }
-                else if (containingRoom.VerifyWalkable(new Point(location.X, location.Y + 1))) //camera is pointing down
+                else if (containingRoom.VerifyWalkable(new Point(location.X, location.Y + 1), true)) //camera is pointing down
                 {
                     _rayBase = new Point(Location.X, location.Y + 1);
                     _direction = 0f;
@@ -258,7 +258,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                 foreach (Point box in _visionKite)
                 {
                     //Check if there's a box. Any un-walkable tile is treated like a box
-                    if (!_room.VerifyWalkable(box))
+                    if (!_room.VerifyWalkable(box, true))
                     {
                         //Debug.WriteLine($"Found a box at {box.X}, {box.Y}");
                         boxes.Add(box);
