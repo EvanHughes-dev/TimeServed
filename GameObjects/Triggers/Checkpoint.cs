@@ -18,6 +18,10 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
         {
             get { return _index; }
         }
+        public bool Active
+        {
+            get { return _active; }
+        }
 
         //TODO:
         //Make it so checkpoints can only trigger in sequence (checkpoint 3 can't happen unless checkpoint 2 has tripped)
@@ -35,6 +39,12 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
 
         public override void Activate(Player player)
         {
+            //Makes sure the prior checkpoint has been activatated
+            //unless this is the first checkpoint, in which case it's always good to activate
+            if (Index != 1)
+                if (!TriggerManager.Checkpoints[Index - 1].Active)
+                    return;
+
             if (_active)
             {
                 string baseFolder = "./CheckpointData";
