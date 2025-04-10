@@ -200,8 +200,6 @@ namespace MakeEveryDayRecount.Map
             // save the file path for debug uses
             FilePath = filePath;
 
-            try
-            {
                 using (BinaryReader binaryReader = new BinaryReader(File.OpenRead(filePath)))
                 {
                     /*
@@ -322,12 +320,8 @@ namespace MakeEveryDayRecount.Map
                             _triggersInRoom.Add(new Checkpoint(tileLocation, null, 1, 1, 1));
                         }
                         numberOfGameObjects--;
-                    }
+                    
                 }
-            }
-            catch (Exception e)
-            {
-                System.Diagnostics.Debug.Write(e.Message);
             }
         }
 

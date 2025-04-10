@@ -57,7 +57,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
             Texture2D[] spriteArray,
             int spriteIndex
         )
-            : base(location, spriteArray, /*DELETE THIS SPRITES TEST*/4)
+            : base(location, spriteArray, spriteIndex)
         {
             DestRoom = destRoom;
             DestinationTile = outPosition;

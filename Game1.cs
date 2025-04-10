@@ -75,7 +75,7 @@ namespace MakeEveryDayRecount
             //_graphics.PreferredBackBufferHeight = 360;
 
             _graphics.HardwareModeSwitch = false;
-            //_graphics.IsFullScreen = true;
+            _graphics.IsFullScreen = true;
             _graphics.ApplyChanges();
 
             _debugState = DebugState.None;
@@ -103,7 +103,6 @@ namespace MakeEveryDayRecount
 
             // Initialize all items that need assets to be loaded 
             GameplayManager.Initialize(ScreenSize);
-            MapManager.Initialize();
 
             InterfaceManager.InitializeMenus(ScreenSize);
 
