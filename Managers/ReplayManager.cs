@@ -37,12 +37,35 @@ namespace MakeEveryDayRecount.Managers
         public static void Initialize()
         {
             if (Directory.Exists(BaseFolder))
-                Directory.Delete(BaseFolder);
-            Directory.CreateDirectory(BaseFolder);
+                ClearSavedData();
+            else
+                Directory.CreateDirectory(BaseFolder);
 
             _currentReplyStates = new List<ReplayState> { };
             _selectedReplayState = 0;
             PlayingReplay = false;
+        }
+
+        /// <summary>
+        /// Clear any binary saved data 
+        /// </summary>
+        private static void ClearSavedData()
+        {
+            ClearDirectory(BaseFolder);
+        }
+
+        /// <summary>
+        /// Clear all files and sub directories from the provided directory
+        /// </summary>
+        /// <param name="directory">Directory to clear</param>
+        private static void ClearDirectory(string directory)
+        {
+            string[] files = Directory.GetFiles(directory);
+            foreach (string file in files)
+                File.Delete(file);
+            string[] directories = Directory.GetDirectories(directory);
+            foreach (string clearDirectory in directories)
+                ClearDirectory(clearDirectory);
         }
 
         /// <summary>
