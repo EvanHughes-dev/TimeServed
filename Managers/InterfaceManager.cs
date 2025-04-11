@@ -76,7 +76,7 @@ namespace MakeEveryDayRecount.Managers
 
             Point buttonSize = ScalePoint(new Point(100, 25));
             int fontIndex = ((int)ScaleFactorX) > AssetManager.ArialFonts.Length ? AssetManager.ArialFonts.Length - 1 : (int)ScaleFactorX;
-            SpriteFont font = AssetManager.ArialFonts[fontIndex];
+            SpriteFont font = AssetManager.ArialFonts[fontIndex-1];
 
             int buttonSpacing = buttonSize.Y / 4;
 

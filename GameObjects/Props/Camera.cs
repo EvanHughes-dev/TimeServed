@@ -196,29 +196,160 @@ namespace MakeEveryDayRecount.GameObjects.Props
                 if (corner.Y < minY) minY = corner.Y;
                 if (corner.Y > maxY) maxY = corner.Y;
             }
-            //Nested for loops to go from left to right and then top to bottom
+            //TODO: Fix this entire switch statement so it's not so hard-coded. There should be a better way to do this
+            #region Broken Switch Statement
+            //switch (_direction)
+            //{
+            //    case 0f: //Down
+            //        //For loop goes top to bottom and left to right
+            //        for (int x = minX; x < maxX; x++)
+            //        {
+            //            int y;
+            //            Point xPoint = Point.Zero;
+            //            foreach (Point endpoint in _endPoints)
+            //            {
+            //                if (endpoint.X == x)
+            //                {
+            //                    xPoint = endpoint;
+            //                }
+            //            }
+            //            if (xPoint != Point.Zero)
+            //            {
+            //                y = xPoint.X;
+            //            }
+            //            else y = minY;
+            //            for (; y < maxY; y++)
+            //            {
+            //                Vector2 candidateVector = new Vector2(x - _rayBase.X, y - _rayBase.Y);
+            //                if ((counterclockwiseRay.Y * candidateVector.X - counterclockwiseRay.X * candidateVector.Y) *
+            //                (counterclockwiseRay.Y * clockwiseRay.X - counterclockwiseRay.X * clockwiseRay.Y) >= 0
+            //                &&
+            //                (clockwiseRay.Y * candidateVector.X - clockwiseRay.X * candidateVector.Y) *
+            //                (clockwiseRay.Y * counterclockwiseRay.X - clockwiseRay.X * counterclockwiseRay.Y) >= 0)
+            //                {
+            //                    _watchedTiles.Add(new Point(x, y));
+            //                }
+            //            }
+            //        }
+            //        break;
+
+            //    case 0.5f: //Left
+            //        //loop goes left to right an top to bottom
+            //        for (int y = minY; y <= maxY; y++)
+            //        {
+            //            int x;
+            //            //If there's an endpoint in this column, and y is further from the camera than that endpoint is
+            //            //TODO: This shit is NOT efficent. HEWLP
+            //            //It's not that bad because this only runs when the cam is created, but it's O(n^2)
+            //            Point yPoint = Point.Zero;
+            //            foreach (Point endpoint in _endPoints)
+            //            {
+            //                if (endpoint.Y == y)
+            //                {
+            //                    yPoint = endpoint;
+            //                }
+            //            }
+            //            if (yPoint != Point.Zero)
+            //            {
+            //                x = yPoint.X;
+            //            }
+            //            else x = minX;
+            //            //Continue
+            //            for (; x <= maxX; x++)
+            //            {
+            //                Vector2 candidateVector = new Vector2(x - _rayBase.X, y - _rayBase.Y);
+            //                if ((counterclockwiseRay.Y * candidateVector.X - counterclockwiseRay.X * candidateVector.Y) *
+            //                (counterclockwiseRay.Y * clockwiseRay.X - counterclockwiseRay.X * clockwiseRay.Y) >= 0
+            //                &&
+            //                (clockwiseRay.Y * candidateVector.X - clockwiseRay.X * candidateVector.Y) *
+            //                (clockwiseRay.Y * counterclockwiseRay.X - clockwiseRay.X * counterclockwiseRay.Y) >= 0)
+            //                {
+            //                    _watchedTiles.Add(new Point(x, y));
+            //                }
+            //            }
+            //        }
+            //        break;
+
+            //    case 1f: //Up
+            //        //For loop goes bottom to top and left to right
+            //        for (int x = minX; x < maxX; x++)
+            //        {
+            //            Point xPoint = Point.Zero;
+            //            foreach (Point endpoint in _endPoints)
+            //            {
+            //                if (endpoint.X == x)
+            //                {
+            //                    xPoint = endpoint;
+            //                }
+            //            }
+            //            if (xPoint != Point.Zero)
+            //            {
+            //                minY = xPoint.X;
+            //            }
+            //            for (int y = maxY; y > minY; y--)
+            //            {
+            //                Vector2 candidateVector = new Vector2(x - _rayBase.X, y - _rayBase.Y);
+            //                if ((counterclockwiseRay.Y * candidateVector.X - counterclockwiseRay.X * candidateVector.Y) *
+            //                (counterclockwiseRay.Y * clockwiseRay.X - counterclockwiseRay.X * clockwiseRay.Y) >= 0
+            //                &&
+            //                (clockwiseRay.Y * candidateVector.X - clockwiseRay.X * candidateVector.Y) *
+            //                (clockwiseRay.Y * counterclockwiseRay.X - clockwiseRay.X * counterclockwiseRay.Y) >= 0)
+            //                {
+            //                    _watchedTiles.Add(new Point(x, y));
+            //                }
+            //            }
+            //        }
+            //        break;
+
+            //    case 1.5f: //Right
+            //               //Nested for loops to go from left to right and then top to bottom
+            //        for (int y = minY; y <= maxY; y++)
+            //        {
+            //            //If there's an endpoint in this column, and y is further from the camera than that endpoint is
+            //            //TODO: This shit is NOT efficent. HEWLP
+            //            //It's not that bad because this only runs when the cam is created, but it's O(n^2)
+            //            Point yPoint = Point.Zero;
+            //            foreach (Point endpoint in _endPoints)
+            //            {
+            //                if (endpoint.Y == y)
+            //                {
+            //                    yPoint = endpoint;
+            //                }
+            //            }
+            //            if (yPoint != Point.Zero)
+            //            {
+            //                maxX = yPoint.X;
+            //            }
+            //            //Continue
+            //            for (int x = minX; x <= maxX; x++)
+            //            {
+            //                //If there's an endpoint in this row, and x is further from the camera than that endpoint is
+            //                //Then break
+
+            //                //For each point in that rectangle, create a vector from the raybase to it
+            //                Vector2 candidateVector = new Vector2(x - _rayBase.X, y - _rayBase.Y);
+            //                //Figure out if that vector is between the two edge vectors. If it is, then it should be inside of the vision kite
+            //                //I got the formula for this from StackOverflow (Andy G)
+            //                //Where A and C are the edge vectors, and B is the candidate vector, and the three vectors are pointing out from the same point
+            //                //if (AxB * AxC >= 0 && CxB * CxA >= 0) then B is between A and C
+            //                if ((counterclockwiseRay.Y * candidateVector.X - counterclockwiseRay.X * candidateVector.Y) *
+            //                    (counterclockwiseRay.Y * clockwiseRay.X - counterclockwiseRay.X * clockwiseRay.Y) >= 0
+            //                    &&
+            //                    (clockwiseRay.Y * candidateVector.X - clockwiseRay.X * candidateVector.Y) *
+            //                    (clockwiseRay.Y * counterclockwiseRay.X - clockwiseRay.X * counterclockwiseRay.Y) >= 0)
+            //                {
+            //                    _watchedTiles.Add(new Point(x, y));
+            //                }
+            //            }
+            //        }
+            //        break;
+            //}
+            #endregion
+
             for (int y = minY; y <= maxY; y++)
             {
-                //If there's an endpoint in this column, and y is further from the camera than that endpoint is
-                //TODO: This shit is NOT efficent. HEWLP
-                //It's not that bad because this only runs when the cam is created, but it's O(n^2)
-                Point yPoint = Point.Zero;
-                foreach (Point endpoint in _endPoints)
-                {
-                    if (endpoint.Y == y)
-                    {
-                        yPoint = endpoint;
-                    }
-                }
-                if (yPoint != Point.Zero)
-                {
-                    maxX = yPoint.X;
-                }
-                //Continue
                 for (int x = minX; x <= maxX; x++)
                 {
-                    //If there's an endpoint in this row, and x is further from the camera than that endpoint is
-                    //Then break
 
                     //For each point in that rectangle, create a vector from the raybase to it
                     Vector2 candidateVector = new Vector2(x - _rayBase.X, y - _rayBase.Y);
@@ -230,12 +361,14 @@ namespace MakeEveryDayRecount.GameObjects.Props
                         (counterclockwiseRay.Y * clockwiseRay.X - counterclockwiseRay.X * clockwiseRay.Y) >= 0
                         &&
                         (clockwiseRay.Y * candidateVector.X - clockwiseRay.X * candidateVector.Y) *
-                        (clockwiseRay.Y * counterclockwiseRay.X - clockwiseRay.X * counterclockwiseRay.Y) >= 0)
+                        (clockwiseRay.Y * counterclockwiseRay.X - clockwiseRay.X * counterclockwiseRay.Y) >= 0
+                        && candidateVector.Length() <= centerRay.Length() - 1)
                     {
                         _watchedTiles.Add(new Point(x, y));
                     }
                 }
             }
+
             //Permanantely save this into an array that won't be changed and indicates the full kite with no obstructions
             _visionKite = _watchedTiles.ToArray();
 
@@ -289,7 +422,6 @@ namespace MakeEveryDayRecount.GameObjects.Props
                                     foreach (Point blockedPoint in Rasterize(box, endpoint))
                                     {
                                         _watchedTiles.Remove(blockedPoint);
-                                        Debug.WriteLine($"Removed: {blockedPoint}");
                                     }
                                 }
                             }
@@ -320,7 +452,8 @@ namespace MakeEveryDayRecount.GameObjects.Props
             foreach (Point tile in _watchedTiles)
             {
                 sb.Draw(AssetManager.CameraSight, new Rectangle(MapUtils.TileToWorld(tile) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
-            }
+            }//TESTING - show all the endpoints with hooks
+            //foreach (Point endpoint in _endPoints) sb.Draw(AssetManager.PropTextures[3], new Rectangle(MapUtils.TileToWorld(endpoint) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
         }
 
         private List<Point> Rasterize(Point p1, Point p2)

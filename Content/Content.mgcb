@@ -227,12 +227,6 @@
 #begin Levels/Level1/level.level
 /copy:Levels/Level1/level.level
 
-#begin Levels/Level2/level.level
-/copy:Levels/Level2/level.level
-
-#begin Levels/Level2/TestRoom1.room
-/copy:Levels/Level2/TestRoom1.room
-
 #begin Player/Inventory/InventoryBox_hover.png
 /importer:TextureImporter
 /processor:TextureProcessor
