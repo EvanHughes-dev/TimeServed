@@ -371,7 +371,6 @@ namespace MakeEveryDayRecount.GameObjects.Props
 
             //Permanantely save this into an array that won't be changed and indicates the full kite with no obstructions
             _visionKite = _watchedTiles.ToArray();
-
             #endregion
             //Note that the length of _endPoints may be even or odd depending on rounding
         }
@@ -407,24 +406,25 @@ namespace MakeEveryDayRecount.GameObjects.Props
                     if (_previousBoxes.Count != boxes.Count || !boxes.All(_previousBoxes.Contains))
                     {
                         //We've found a new box in the way. Check all the rays fellas!
-                        _watchedTiles = _visionKite.ToList();
-                        foreach (Point box in boxes)
+                        _watchedTiles = new List<Point> { };
+                        foreach (Point endpoint in _endPoints)
                         {
-                            foreach (Point endpoint in _endPoints)
+                            List<Point> tilesInRay = Rasterize(_rayBase, endpoint);
+                            foreach (Point box in boxes)
                             {
+
                                 //Debug.WriteLine($"Checking {_rayBase} with {endpoint}");
                                 //foreach (Point point in Rasterize(_rayBase, endpoint)) Debug.Write(point + " ");
                                 //Debug.WriteLine(null);
-                                if (Rasterize(_rayBase, endpoint).Contains(box)) //A ray is blocked by the box
+                                if (tilesInRay.Contains(box)) //A ray is blocked by the box
                                 {
                                     //Debug.WriteLine($"Endpoint {endpoint.X}, {endpoint.Y} is blocked");
                                     //Remove all the tiles between the box and the end of the ray
-                                    foreach (Point blockedPoint in Rasterize(box, endpoint))
-                                    {
-                                        _watchedTiles.Remove(blockedPoint);
-                                    }
+                                    tilesInRay = Rasterize(_rayBase, box);
+                                    tilesInRay.Remove(box);
                                 }
                             }
+                            _watchedTiles.AddRange(tilesInRay.Where(p => !_watchedTiles.Contains(p) && _visionKite.Contains(p)));
                         }
                     }
 
@@ -453,102 +453,52 @@ namespace MakeEveryDayRecount.GameObjects.Props
             {
                 sb.Draw(AssetManager.CameraSight, new Rectangle(MapUtils.TileToWorld(tile) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
             }//TESTING - show all the endpoints with hooks
-            //foreach (Point endpoint in _endPoints) sb.Draw(AssetManager.PropTextures[3], new Rectangle(MapUtils.TileToWorld(endpoint) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
+            if (Location.X == 8)
+                foreach (Point EndPoint in _endPoints)
+                    foreach (Point endpoint in Rasterize(_rayBase, EndPoint)) sb.Draw(AssetManager.PropTextures[3], new Rectangle(MapUtils.TileToWorld(endpoint) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
         }
 
         private List<Point> Rasterize(Point p1, Point p2)
         {
-            #region Bresenham's Line Algorithm
             bool rotated = false;
-            //If dy > dx, switch the X and Y of the endpoints
+
+            // Swap X and Y if the line is steep
             if (Math.Abs(p2.Y - p1.Y) > Math.Abs(p2.X - p1.X))
             {
-                //Debug.WriteLine("Swapped X and Y");
-                //Indicate that we changed this stuff for later
                 rotated = true;
-                //Swap the X and Y of p1
-                int swapX = p1.X;
-                p1.X = p1.Y;
-                p1.Y = swapX;
-                //Then do the same to p2
-                swapX = p2.X;
-                p2.X = p2.Y;
-                p2.Y = swapX;
+                (p1.X, p1.Y) = (p1.Y, p1.X);
+                (p2.X, p2.Y) = (p2.Y, p2.X);
             }
 
-            //If the line is going down, we reflect it over the x-axis so that it goes up instead
-            bool reflected = false;
-            if (p2.Y - p1.Y < 0)
-            {
-                //Debug.WriteLine("Reflected over x-axis");
-                //Indicated that we reflected this stuff for later
-                reflected = true;
-                //Reflect the line over it's x-center in order to fix this, and then flip it back?
-                //So basically switch the Y of the start and end points
-                int swapY = p1.Y;
-                p1.Y = p2.Y;
-                p2.Y = swapY;
-            }
-
-            //If the line is going from right to left, we switch the start and end point so it can be drawn left to right
+            // Ensure left-to-right drawing
             if (p1.X > p2.X)
             {
-                //Debug.WriteLine("Switched start and end");
-                //Store this so that we don't forget a point
-                Point swapPoint = p1;
-                p1 = p2;
-                p2 = swapPoint;
+                (p1, p2) = (p2, p1);
             }
 
             int dx = p2.X - p1.X;
-            int dy = p2.Y - p1.Y;
-            int p = (2 * dy) - dx;
-            int x = p1.X;
+            int dy = Math.Abs(p2.Y - p1.Y);
+            int yStep = p2.Y > p1.Y ? 1 : -1;
+
+            int decisionParam = 2 * dy - dx;
             int y = p1.Y;
 
-            //The array of points that will be returned. Length = change in the independent variable + 1
-            List<Point> returnPoints = new List<Point>();
+            List<Point> returnPoints = new();
 
-            for (; x <= p2.X; x++) //using x as loop variable
+            for (int x = p1.X; x <= p2.X; x++)
             {
-                returnPoints.Add(new Point(x, y));
-                //Debug.WriteLine($"Added point {x}, {y}");
-                if (p < 0)
+                returnPoints.Add(rotated ? new Point(y, x) : new Point(x, y));
+                if (decisionParam > 0)
                 {
-                    p = p + (2 * dy);
+                    y += yStep;
+                    decisionParam -= 2 * dx;
                 }
-                else //If p >= 0
-                {
-                    p = p + (2 * dy) - (2 * dx);
-                    y = y + 1;
-                }
+                decisionParam += 2 * dy;
             }
 
-            //If we reflected everything, fix it before we rotate it back
-            if (reflected)
-            {
-                //Debug.WriteLine("Un-reflecting");
-                for (int i = 0; i < returnPoints.Count / 2; i++)
-                {
-                    //Debug.WriteLine($"Swapped {returnPoints[i]} and {returnPoints[^(i + 1)]}");
-                    int swapY = returnPoints[i].Y;
-                    returnPoints[i] = new Point(returnPoints[i].X, returnPoints[^(i + 1)].Y);
-                    returnPoints[^(i + 1)] = new Point(returnPoints[^(i + 1)].X, swapY);
-                }
-            }
-
-            //If we flipped the X and Y of everything, flip it back here
-            if (rotated)
-            {
-                for (int i = 0; i < returnPoints.Count; i++)
-                {
-                    returnPoints[i] = new Point(returnPoints[i].Y, returnPoints[i].X);
-                }
-            }
-            #endregion
-            //Return the points intersected by the line
             return returnPoints;
         }
+
 
         public override void Interact(Player player)
         {
