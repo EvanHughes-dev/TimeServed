@@ -14,7 +14,7 @@ namespace MakeEveryDayRecount.DebugModes
     internal abstract class BaseDebug
     {
         protected Dictionary<string, Func<object>> _objectsToDisplay;
-        protected SpriteFont _spriteFont;        
+        protected SpriteFont _spriteFont;
 
         private readonly int _yAxisIncrement;
 
@@ -41,13 +41,13 @@ namespace MakeEveryDayRecount.DebugModes
 
             Vector2 drawPoint = new Vector2(10, 10);
 
-            sb.DrawString(_spriteFont, $"Debug Mode: {debugMode}", drawPoint, Color.Black);
+            sb.DrawString(_spriteFont, $"Debug Mode: {debugMode}", drawPoint, Color.White);
             drawPoint.Y += _yAxisIncrement;
             foreach (KeyValuePair<string, Func<object>> entry in _objectsToDisplay)
             {
                 string displayValue = $"{entry.Key}: {entry.Value()}";
 
-                sb.DrawString(_spriteFont, displayValue, drawPoint, Color.Black);
+                sb.DrawString(_spriteFont, displayValue, drawPoint, Color.White);
                 drawPoint.Y += _yAxisIncrement;
             }
         }

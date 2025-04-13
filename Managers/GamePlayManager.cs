@@ -40,7 +40,7 @@ namespace MakeEveryDayRecount.Managers
         public static void Initialize(Point screenSize)
         {
             Level = 1;
-            PlayerObject = new Player(new Point(4, 5), AssetManager.PlayerTexture, screenSize);
+            PlayerObject = new Player(new Point(23, 23), AssetManager.PlayerTexture, screenSize);
             Map = new MapManager();
             OnPlayerUpdate?.Invoke(PlayerObject);
         }
@@ -78,17 +78,18 @@ namespace MakeEveryDayRecount.Managers
         {
             Level = 1;
             Map.ChangeLevel();
-            PlayerObject.ChangeRoom(new Point(5, 5));
+            PlayerObject.ChangeRoom(new Point(23, 23));
             PlayerObject.ClearStates();
         }
 
         /// <summary>
         /// Called to reset the level to the starting state
         /// </summary>
-        public static void LevelReset(){
+        public static void LevelReset()
+        {
             // TODO eventually change this to a checkpoint system
             Level = 1;
-            PlayerObject = new Player(new Point(5, 5), AssetManager.PlayerTexture, MapUtils.ScreenSize);
+            PlayerObject = new Player(new Point(23, 23), AssetManager.PlayerTexture, MapUtils.ScreenSize);
             Map.ChangeLevel();
             OnPlayerUpdate?.Invoke(PlayerObject);
             ReplayManager.ClearData();

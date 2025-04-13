@@ -7,8 +7,6 @@ using MakeEveryDayRecount.Map.Tiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Managers;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
 
 namespace MakeEveryDayRecount.Map
 {
@@ -323,6 +321,26 @@ namespace MakeEveryDayRecount.Map
 
                         numberOfGameObjects--;
                     }
+
+                    //Camera camera = new Camera(new Point(17, 16), AssetManager.CameraTextures[1], this, new Point(17, 23), (float)MathF.PI / 4);
+                    //_itemsInRoom.Add(camera);
+                    //Cameras.Add(camera);
+                    //camera = new Camera(new Point(9, 0), AssetManager.CameraTextures[1], this, new Point(9, 10), (float)MathF.PI / 4);
+                    //_itemsInRoom.Add(camera);
+                    //Cameras.Add(camera);
+                    Camera camera = new Camera(new Point(16, 24), AssetManager.CameraTextures[1], this, new Point(16, 17), (float)MathF.PI / 4);
+                    _itemsInRoom.Add(camera);
+                    Cameras.Add(camera);
+                    camera = new Camera(new Point(17, 9), AssetManager.CameraTextures[1], this, new Point(4, 10), (float)MathF.PI / 4);
+                    _itemsInRoom.Add(camera);
+                    Cameras.Add(camera);
+                    camera = new Camera(new Point(8, 0), AssetManager.CameraTextures[1], this, new Point(9, 12), (float)MathF.PI / 4);
+                    _itemsInRoom.Add(camera);
+                    Cameras.Add(camera);
+                    //camera = new Camera(new Point(0, 20), AssetManager.CameraTextures[1], this, new Point(9, 12), (float)MathF.PI / 4);
+                    //_itemsInRoom.Add(camera);
+                    //Cameras.Add(camera);
+
                 }
             }
             catch (Exception e)
@@ -330,8 +348,6 @@ namespace MakeEveryDayRecount.Map
                 System.Diagnostics.Debug.Write(e.Message);
             }
         }
-
-
 
         /// <summary>
         /// Transition the player from one room to another
@@ -347,16 +363,20 @@ namespace MakeEveryDayRecount.Map
         /// Return if a tile can be walk on
         /// </summary>
         /// <param name="pointToCheck">Tile to check</param>
+        /// <param name="isCamera">Is from camera</param>
         /// <returns>If the tile is walkable. True means the tile is walkable</returns>
-        public bool VerifyWalkable(Point pointToCheck)
+        public bool VerifyWalkable(Point pointToCheck, bool isCamera = false)
         {
             foreach (GameObject gameObject in _itemsInRoom)
             {
                 // If the object is a box that is held and in the square, do not let the player enter it
-                if (gameObject is Box && ((Box)gameObject).AttachmentDirection == Players.Direction.None
-                 && gameObject.Location == pointToCheck)
+                if (gameObject is Box && gameObject.Location == pointToCheck)
                 {
-                    return false;
+
+                    if (((Box)gameObject).AttachmentDirection == Players.Direction.None || isCamera)
+                        return false;
+
+                    return true;
                 }
             }
 

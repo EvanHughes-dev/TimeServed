@@ -117,8 +117,32 @@ namespace MakeEveryDayRecount.Managers
             TileMap = new Texture2D[]
             {
                 content.Load<Texture2D>("Tiles/void"),
-                content.Load<Texture2D>("Tiles/testWalkable"),
-                content.Load<Texture2D>("Tiles/testWall"),
+
+                content.Load<Texture2D>("Tiles/tile_wall0_top"),
+                content.Load<Texture2D>("Tiles/tile_wall1_top"),
+                content.Load<Texture2D>("Tiles/tile_wall2_top"),
+                content.Load<Texture2D>("Tiles/tile_wall3_top"),
+
+                content.Load<Texture2D>("Tiles/tile_wall0_right"),
+                content.Load<Texture2D>("Tiles/tile_wall1_right"),
+                content.Load<Texture2D>("Tiles/tile_wall2_right"),
+                content.Load<Texture2D>("Tiles/tile_wall3_right"),
+
+                content.Load<Texture2D>("Tiles/tile_wall0_bottom"),
+                content.Load<Texture2D>("Tiles/tile_wall1_bottom"),
+                content.Load<Texture2D>("Tiles/tile_wall2_bottom"),
+                content.Load<Texture2D>("Tiles/tile_wall3_bottom"),
+
+                content.Load<Texture2D>("Tiles/tile_wall0_left"),
+                content.Load<Texture2D>("Tiles/tile_wall1_left"),
+                content.Load<Texture2D>("Tiles/tile_wall2_left"),
+                content.Load<Texture2D>("Tiles/tile_wall3_left"),
+
+                content.Load<Texture2D>("Tiles/tile_walkable0"),
+                content.Load<Texture2D>("Tiles/tile_walkable1"),
+                content.Load<Texture2D>("Tiles/tile_walkable2"),
+                content.Load<Texture2D>("Tiles/tile_walkable3"),
+                content.Load<Texture2D>("Tiles/tile_walkable4"),
             };
             DoorTexture = new Texture2D[]
             {
@@ -127,7 +151,7 @@ namespace MakeEveryDayRecount.Managers
                 content.Load<Texture2D>("Doors/Door-Bottom"),
                 content.Load<Texture2D>("Doors/Door-Left")
             };
-            TileSize = InterfaceManager.ScalePointUniform(new Point(TileMap[0].Width / 2, TileMap[0].Height / 2));
+            TileSize = InterfaceManager.ScalePointUniform(new Point(TileMap[0].Width / 4, TileMap[0].Height / 4));
 
             //LOAD DEBUG ASSETS
             DebugWalkableTile = content.Load<Texture2D>("DebugAssets/WALKABLE");

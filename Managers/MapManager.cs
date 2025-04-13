@@ -37,7 +37,7 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public MapManager()
         {
-            _rooms = LoadMapData( GameplayManager.Level);
+            _rooms = LoadMapData(GameplayManager.Level);
             _currentRoom = _rooms[0];
             OnRoomUpdate?.Invoke(_currentRoom);
             foreach (Room room in _rooms)
@@ -53,7 +53,7 @@ namespace MakeEveryDayRecount.Managers
         public void TransitionRoom(Door transDoor, int destRoom)
         {
             ChangeRoom(destRoom);
-             GameplayManager.PlayerObject.ChangeRoom(transDoor.DestinationTile);
+            GameplayManager.PlayerObject.ChangeRoom(transDoor.DestinationTile);
 
         }
 
@@ -80,10 +80,11 @@ namespace MakeEveryDayRecount.Managers
         /// Check if a player is allowed to move to a certain tile
         /// </summary>
         /// <param name="playerDest">Tile player wants to move to</param>
+        /// <param name="isCamera"> If this passer is a camera</param>
         /// <returns>If the player is allowed to move there</returns>
-        public bool CheckPlayerCollision(Point playerDest)
+        public bool CheckPlayerCollision(Point playerDest, bool isCamera = false)
         {
-            return _currentRoom.VerifyWalkable(playerDest);
+            return _currentRoom.VerifyWalkable(playerDest, isCamera);
         }
 
         /// <summary>
