@@ -22,12 +22,10 @@ namespace MakeEveryDayRecount.DebugModes
         /// Initializes the player debug system.
         /// This must be called before drawing debug information.
         /// </summary>
-        /// <param name="spriteFont">The font used for debug text.</param>
-        /// <param name="gameplayManager">Reference to the game's manager for accessing player data.</param>
-        public PlayerDebug(GameplayManager gameplayManager)
-            : base(gameplayManager)
+        public PlayerDebug()
+            : base()
         {
-            _player = gameplayManager.PlayerObject;
+            _player = GameplayManager.PlayerObject;
             AddPlayerDebugInfo();
             _walkableTileDebug = AssetManager.DebugWalkableTile;
             _notWalkableTileDebug = AssetManager.DebugNotWalkableTile;
@@ -68,17 +66,17 @@ namespace MakeEveryDayRecount.DebugModes
         /// <param name="sb">Sprite batch used for rendering.</param>
         private void DrawTileDebug(SpriteBatch sb)
         {
-            var map = _gameplayManager.Map;
-            var playerTilePos = _player.Location;
+            MapManager map = GameplayManager.Map;
+            Point playerTilePos = _player.Location;
 
             foreach (var direction in _playerMovementDirections)
             {
-                var playerDest = playerTilePos + direction;
-                var displayTile = map.CheckPlayerCollision(playerDest)
+                Point playerDest = playerTilePos + direction;
+                Texture2D displayTile = map.CheckPlayerCollision(playerDest)
                     ? _walkableTileDebug
                     : _notWalkableTileDebug;
 
-                var screenPos = MapUtils.TileToWorld(playerDest) - MapUtils.WorldToScreen();
+                Point screenPos = MapUtils.TileToWorld(playerDest) - MapUtils.WorldToScreen() + MapUtils.PixelOffset();
                 sb.Draw(displayTile, new Rectangle(screenPos, AssetManager.TileSize), Color.White);
             }
         }

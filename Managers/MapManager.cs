@@ -32,16 +32,12 @@ namespace MakeEveryDayRecount.Managers
         }
         private Room[] _rooms;
 
-        private readonly GameplayManager _gameplayManager;
-
         /// <summary>
         /// Initialize the map manger and make rooms
         /// </summary>
-        /// <param name="gameplayManager">Reference to the gamePlayManager</param>
-        public MapManager(GameplayManager gameplayManager)
+        public MapManager()
         {
-            _gameplayManager = gameplayManager;
-            _rooms = LoadMapData(_gameplayManager.Level);
+            _rooms = LoadMapData(GameplayManager.Level);
             _currentRoom = _rooms[0];
             OnRoomUpdate?.Invoke(_currentRoom);
             foreach (Room room in _rooms)
@@ -57,7 +53,7 @@ namespace MakeEveryDayRecount.Managers
         public void TransitionRoom(Door transDoor, int destRoom)
         {
             ChangeRoom(destRoom);
-            _gameplayManager.PlayerObject.ChangeRoom(transDoor.DestinationTile);
+            GameplayManager.PlayerObject.ChangeRoom(transDoor.DestinationTile);
 
         }
 
@@ -84,10 +80,11 @@ namespace MakeEveryDayRecount.Managers
         /// Check if a player is allowed to move to a certain tile
         /// </summary>
         /// <param name="playerDest">Tile player wants to move to</param>
+        /// <param name="isCamera"> If this passer is a camera</param>
         /// <returns>If the player is allowed to move there</returns>
-        public bool CheckPlayerCollision(Point playerDest)
+        public bool CheckPlayerCollision(Point playerDest, bool isCamera = false)
         {
-            return _currentRoom.VerifyWalkable(playerDest);
+            return _currentRoom.VerifyWalkable(playerDest, isCamera);
         }
 
         /// <summary>
@@ -159,7 +156,7 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public void ChangeLevel()
         {
-            _rooms = LoadMapData(_gameplayManager.Level);
+            _rooms = LoadMapData(GameplayManager.Level);
             ChangeRoom(0);
             foreach (Room room in _rooms)
             {

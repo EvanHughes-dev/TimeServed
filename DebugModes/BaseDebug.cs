@@ -15,7 +15,6 @@ namespace MakeEveryDayRecount.DebugModes
     {
         protected Dictionary<string, Func<object>> _objectsToDisplay;
         protected SpriteFont _spriteFont;
-        protected GameplayManager _gameplayManager;
 
         private readonly int _yAxisIncrement;
 
@@ -23,11 +22,9 @@ namespace MakeEveryDayRecount.DebugModes
         /// Initializes the basic debug system
         /// </summary>
         /// <param name="spriteFont">The font used for debug text</param>
-        /// <param name="gameplayManager">Reference to the game's manager for accessing player data</param>
-        public BaseDebug(GameplayManager gameplayManager)
+        public BaseDebug()
         {
             _spriteFont = AssetManager.Arial20;
-            _gameplayManager = gameplayManager;
             _yAxisIncrement = _spriteFont.LineSpacing;
             _objectsToDisplay = new Dictionary<string, Func<object>> { };
         }
@@ -44,13 +41,13 @@ namespace MakeEveryDayRecount.DebugModes
 
             Vector2 drawPoint = new Vector2(10, 10);
 
-            sb.DrawString(_spriteFont, $"Debug Mode: {debugMode}", drawPoint, Color.Black);
+            sb.DrawString(_spriteFont, $"Debug Mode: {debugMode}", drawPoint, Color.White);
             drawPoint.Y += _yAxisIncrement;
             foreach (KeyValuePair<string, Func<object>> entry in _objectsToDisplay)
             {
                 string displayValue = $"{entry.Key}: {entry.Value()}";
 
-                sb.DrawString(_spriteFont, displayValue, drawPoint, Color.Black);
+                sb.DrawString(_spriteFont, displayValue, drawPoint, Color.White);
                 drawPoint.Y += _yAxisIncrement;
             }
         }

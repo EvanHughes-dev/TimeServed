@@ -36,7 +36,9 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static void Initialize()
         {
-            if (!Directory.Exists(BaseFolder))
+            if (Directory.Exists(BaseFolder))
+                ClearSavedData();
+            else
                 Directory.CreateDirectory(BaseFolder);
 
             _currentReplyStates = new List<ReplayState> { };
@@ -45,11 +47,41 @@ namespace MakeEveryDayRecount.Managers
         }
 
         /// <summary>
+        /// Clear any binary saved data 
+        /// </summary>
+        private static void ClearSavedData()
+        {
+            ClearDirectory(BaseFolder);
+        }
+
+        /// <summary>
+        /// Clear all files and sub directories from the provided directory
+        /// </summary>
+        /// <param name="directory">Directory to clear</param>
+        private static void ClearDirectory(string directory)
+        {
+            string[] files = Directory.GetFiles(directory);
+            foreach (string file in files)
+                File.Delete(file);
+            string[] directories = Directory.GetDirectories(directory);
+            foreach (string clearDirectory in directories)
+                ClearDirectory(clearDirectory);
+        }
+
+        /// <summary>
         /// Save the current state of the keyboard
         /// </summary>
         public static void SaveState()
         {
             _currentReplyStates.Add(new ReplayState(Keyboard.GetState(), Mouse.GetState()));
+        }
+
+        /// <summary>
+        /// Clear the data saved so far
+        /// </summary>
+        public static void ClearData()
+        {
+            _currentReplyStates.Clear();
         }
 
         /// <summary>
