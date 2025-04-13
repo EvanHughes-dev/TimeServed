@@ -189,6 +189,7 @@ namespace LevelEditor
                         FileIOHelpers.LoadDoor("Door-Right.png", 1, KeyType.KeyCard),
                         FileIOHelpers.LoadDoor("Door-Bottom.png", 2, KeyType.KeyCard),
                         FileIOHelpers.LoadDoor("Door-Left.png", 3, KeyType.KeyCard),
+                        FileIOHelpers.LoadCamera("prop_cameraOn.png", 0)
                     ];
 
                 Props = props.AsReadOnly();

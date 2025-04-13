@@ -34,13 +34,22 @@
     <None Update="Sprites\Props\wireCutters.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Sprites\Tiles\testWalkable.png">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</None>
     <Compile Update="Controls\PropBox.cs">
       <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="Forms\Prompts\CameraForm.cs">
+      <SubType>Form</SubType>
     </Compile>
   </ItemGroup>
 
   <ItemGroup>
     <None Update="Tiles\testWalkable.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Sprites\Tiles\testWall.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Sprites\Tiles\void.png">
