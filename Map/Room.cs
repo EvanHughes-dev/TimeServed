@@ -277,7 +277,6 @@ namespace MakeEveryDayRecount.Map
                             binaryReader.ReadBoolean(),
                             binaryReader.ReadInt32()
                         );
-
                     }
                 }
 
@@ -467,7 +466,47 @@ namespace MakeEveryDayRecount.Map
         /// <param name="filepath">filepath for the file</param>
         public void SaveRoom(string filepath)
         {
-            //Uses the same form of room data as the ParseData function
+            //Uses the same form of room data as the ParseData function, which is...
+            /*
+                    * Form of the room data is as follows
+                    *
+                    * int tileMapWidth
+                    * int tileMapHeight
+                    *
+                    * Tiles:
+                    *   bool isWalkable
+                    *   int textureIndex
+                    *
+                    * int gameObjectCount
+                    *
+                    * GameObject:
+                    *   int propIndex
+                    *   int positionX
+                    *   int positionY
+                    *   int objectType 
+                    *       0 = Item
+                    *       1 = Camera
+                    *       2 = Box
+                    *       3 = Door 
+                    * 
+                    *   if objectType == 0 || objectType == 3
+                    *   int keyType
+                    *       0 = None
+                    *       1 = Key card
+                    *       2 = Screwdriver
+                    *       For doors, this is the key that can unlock them
+                    *       For items, this is the key type they are
+                    * 
+                    *   if objectType == 3
+                    *       int destRoom
+                    *       int outputPosX
+                    *       int outputPosY
+                    *  if objectType == 1
+                    *       Point centerPoint point of a camera vision cone
+                    *       float radian value of camera spread
+                    *       
+                    *       and then a bunch of trigger stuff that isn't implemented yet
+                    */
             BinaryWriter binaryWriter = null;
             try
             {
@@ -491,8 +530,10 @@ namespace MakeEveryDayRecount.Map
                 //Write prop count
                 binaryWriter.Write(_itemsInRoom.Count + Doors.Count);
 
+                //TODO: make sure the amount of times this loops is correct
+                //Honestly it might be better to just have writing out each type of prop be its own thing
                 //Write out all non-door props
-                for (int i = 0; i < _itemsInRoom.Count; i++)
+                for (int i = 0; i < _itemsInRoom.Count - (Doors.Count + Cameras.Count); i++)
                 {
                     binaryWriter.Write(_itemsInRoom[i].SpriteIndex);
                     binaryWriter.Write(_itemsInRoom[i].Location.X);
@@ -525,6 +566,9 @@ namespace MakeEveryDayRecount.Map
                     binaryWriter.Write(Doors[i].DestinationTile.X);
                     binaryWriter.Write(Doors[i].DestinationTile.Y);
                 }
+
+                //TODO: Write out all cameras
+
 
                 //Write out all triggers
                 binaryWriter.Write(_triggersInRoom.Count);
