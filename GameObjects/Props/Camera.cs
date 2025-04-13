@@ -225,6 +225,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                     Vector2 candidateVector = new Vector2(x - _rayBase.X, y - _rayBase.Y);
                     //Figure out if that vector is between the two edge vectors. If it is, then it should be inside of the vision kite
                     //NOTE: Chris suggested using the dot product for this but I think cross product is better because it doesn't require trigonometry
+                    //Maybe this is dumb tho idk
                     //I got the formula for this from StackOverflow (Andy G)
                     //Where A and C are the edge vectors, and B is the candidate vector, and the three vectors are pointing out from the same point
                     //if (AxB * AxC >= 0 && CxB * CxA >= 0) then B is between A and C
@@ -233,7 +234,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                         &&
                         (clockwiseRay.Y * candidateVector.X - clockwiseRay.X * candidateVector.Y) *
                         (clockwiseRay.Y * counterclockwiseRay.X - clockwiseRay.X * counterclockwiseRay.Y) >= 0
-                        && candidateVector.Length() <= centerRay.Length())
+                        && candidateVector.Length() <= centerRay.Length()) //TODO: Is there a better way to keep it from going over the end?
                     {
                         _watchedTiles.Add(new Point(x, y));
                     }
