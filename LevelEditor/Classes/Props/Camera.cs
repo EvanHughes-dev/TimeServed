@@ -16,7 +16,8 @@ namespace LevelEditor.Classes.Props
         /// </summary>
         /// <exception cref="NotImplementedException">ALWAYS THROWN.</exception>
         public Camera()
-            : base(null!, null)
+            : base(default, 0, ObjectType.Camera, null!)
+
         {
             throw new NotImplementedException();
         }

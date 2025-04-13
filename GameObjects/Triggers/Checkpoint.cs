@@ -11,12 +11,16 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
     {
         //Fields
         private int _index;
-        private bool active;
+        private bool _active;
 
         //Properties
         public int Index
         {
             get { return _index; }
+        }
+        public bool Active
+        {
+            get { return _active; }
         }
 
         //TODO:
@@ -25,20 +29,43 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
         public Checkpoint(Point location, Texture2D sprite, int index, int width, int height)
             : base(location, sprite, width, height)
         {
-            active = true;
+            _active = true;
         }
 
 
         //Methods
 
-        //TODO: update the SaveRoom method in SaveMap when triggers are implemented in the files
         //TODO: Maybe add a method to display that progress is being saved in some way? Low priority
-        //TODO: when a checkpoint gets activated, call one of replay manager's functions (ask evan for more details when merging main)
 
         public override void Activate(Player player)
         {
-            MapManager.SaveMap();
-            player.Save();
+            //Makes sure the prior checkpoint has been activatated
+            //unless this is the first checkpoint, in which case it's always good to activate
+            if (Index != 1)
+                if (!TriggerManager.Checkpoints[Index - 1].Active)
+                    return;
+
+            if (_active)
+            {
+                string baseFolder = "./CheckpointData";
+
+                //Always want to overwrite the folder if it exists
+                if (Directory.Exists(baseFolder))
+                    Directory.Delete(baseFolder);
+
+                //(Re)make the folder
+                Directory.CreateDirectory(baseFolder);
+
+                //Save map and player data
+                MapManager.SaveMap(baseFolder);
+                player.Save(baseFolder);
+
+                //Call the replay manager function
+                ReplayManager.SaveData(GameplayManager.Level, _index);
+
+                //Deactivate the checkpoint
+                _active = false;
+            }
         }
     }
 }

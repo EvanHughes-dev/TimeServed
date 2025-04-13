@@ -32,6 +32,7 @@ namespace MakeEveryDayRecount.Managers
             Level = 1;
             PlayerObject = new Player(new Point(5, 5), AssetManager.PlayerTexture, screenSize);
             OnPlayerUpdate?.Invoke(PlayerObject);
+            MapManager.Initialize();
         }
         public static void Update(GameTime gameTime)
         {

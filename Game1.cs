@@ -102,7 +102,7 @@ namespace MakeEveryDayRecount
             SoundManager.LoadContent(Content);
 
             // Initialize all items that need assets to be loaded 
-
+            GameplayManager.Initialize(ScreenSize);
 
             InterfaceManager.InitializeMenus(ScreenSize);
 

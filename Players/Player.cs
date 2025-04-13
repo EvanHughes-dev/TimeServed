@@ -418,7 +418,7 @@ namespace MakeEveryDayRecount.Players
         /// inventory:
         ///     string itemName
         /// </summary>
-        public void Save()
+        public void Save(string baseFolder)
         {
             //Make the folder if it doesn't already exist
             if (!Directory.Exists("./PlayerData"))
@@ -427,7 +427,7 @@ namespace MakeEveryDayRecount.Players
             BinaryWriter writer = null;
             try
             {
-                Stream stream = File.OpenWrite("./PlayerData/PlayerData");
+                Stream stream = File.OpenWrite($"{baseFolder}/PlayerData");
                 writer = new BinaryWriter(stream);
 
                 //Player position

@@ -108,11 +108,22 @@ namespace MakeEveryDayRecount.Managers
 
         /// <summary>
         /// Load all the needed data relating to each room
-        /// from the corresponding files and format them
+        /// from the corresponding files and format them.
         /// </summary>
         /// <param name="currentLevel">Current level of the game</param>
         /// <returns>Formatted data loaded from files</returns>
         private static Room[] LoadMapData(int currentLevel)
+        {
+            return LoadMapData(currentLevel.ToString());
+        }
+
+        /// <summary>
+        /// Load all the needed data relating to each room
+        /// from the corresponding files and format them
+        /// </summary>
+        /// <param name="currentLevel">Current level of the game</param>
+        /// <returns>Formatted data loaded from files</returns>
+        private static Room[] LoadMapData(string currentLevel)
         {
             // only read binary data here
             // each room is in charge of parsing itself
@@ -133,7 +144,6 @@ namespace MakeEveryDayRecount.Managers
             Room[] rooms = new Room[0];
             if (File.Exists(folderPath + "/level.level"))
             {
-                Dictionary<(int roomIndex, int doorIndex), Door> doorLookup = new Dictionary<(int roomIndex, int doorIndex), Door>();
                 Stream streamReader = File.OpenRead(folderPath + "/level.level");
                 BinaryReader binaryReader = new BinaryReader(streamReader);
 
@@ -147,22 +157,9 @@ namespace MakeEveryDayRecount.Managers
                     int roomIndex = binaryReader.ReadInt32();
                     Room room = new Room(roomFilePath, roomName, roomIndex);
                     rooms[currentRoom] = room;
-                    // Store doors in lookup for fast access
-                    foreach (Door door in room.Doors)
-                    {
-                        doorLookup[(roomIndex, door.DoorIndex)] = door;
-                    }
                 }
 
                 binaryReader.Close();
-                // Assign corresponding doors efficiently
-                foreach (Door door in doorLookup.Values)
-                {
-                    if (doorLookup.TryGetValue((door.DestRoom, door.DoorIndex), out Door matchingDoor))
-                    {
-                        door.AssignDoor(matchingDoor);
-                    }
-                }
             }
             else
             {
@@ -187,25 +184,27 @@ namespace MakeEveryDayRecount.Managers
             }
         }
 
-        public static void SaveMap()
+        public static void SaveMap(string baseFolder)
         {
-            string mapBaseFolder = "./CheckpointData";
+            //Make the .level file
+            BinaryWriter writer = new BinaryWriter(File.OpenWrite(baseFolder + "/level.level"));
 
-            //Make the folders if they don't already exist
-            if (!Directory.Exists(mapBaseFolder))
-                Directory.CreateDirectory(mapBaseFolder);
+            //Save number of rooms
+            writer.Write(_rooms.Length);
 
-            //MAKE LEVEL FILE HERE!
-            //TODO: check if the level file exists
+            //Write data for each room
+            for (int i = 0; i < _rooms.Length; i++)
+            {
+                //Write name
+                writer.Write(_rooms[i].RoomName);
+
+                //Write index
+                writer.Write(_rooms[i].RoomIndex);
+            }
 
             for (int i = 0; i < _rooms.Length; i++)
             {
-                //TODO: call function in each room that saves it data (save room)
-                //Name of each room file should be the room's name property
-                //IMPORTANT: only work on saving tiles for right now. Props are being revamped, so worry about that afterwards
-                //Except for boxes, those will stay the same
-
-                _rooms[i].SaveRoom(mapBaseFolder);
+                _rooms[i].SaveRoom(baseFolder);
             }
         }
     }
