@@ -33,6 +33,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         private Point[] _endPoints;
         //This float tells the camera which way it's facing. By default, the camera faces down
         private float _direction;
+        readonly Point _drawOrigin;
 
         //The rays don't project from inside of the wall, where the camera is technically drawn
         //All the rays come out from the point on the floor right "in front of" the camera
@@ -62,7 +63,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //All cams start active
             _active = true;
             _room = containingRoom;
-            //_player = GameplayManager.PlayerObject;
+            _drawOrigin = new Point(AssetManager.TileSize.X / 2, AssetManager.TileSize.Y / 2);
             _centerPoint = centerPoint;
             _spread = spread;
 
@@ -127,6 +128,8 @@ namespace MakeEveryDayRecount.GameObjects.Props
                     }
                 }
             }
+            //The rotation has to be in radians, so we multiply the direction by pi after we determine it
+            _direction = _direction * MathF.PI;
             //I intentionally wrote the above to prioritize up/down over left/right
             #endregion
             //TODO: Allow the raybase to be catycorners from the camera's location
@@ -442,6 +445,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                         {
                             //WE FOUND THE PLAYER! GET HIM BOYS!
                             _player.Detected();
+                            break;
                         }
                     }
                 }
@@ -454,15 +458,18 @@ namespace MakeEveryDayRecount.GameObjects.Props
 
         public override void Draw(SpriteBatch sb, Point worldToScreen, Point pixelOffset)
         {
-            sb.Draw(Sprite, new Rectangle(MapUtils.TileToWorld(Location) - worldToScreen + pixelOffset, AssetManager.TileSize), null, //no source rectangle
-                Color.White, _direction, Vector2.Zero, SpriteEffects.None, 0f); //Layer depth is not used
+            sb.Draw(Sprite, new Rectangle(MapUtils.TileToWorld(Location) - worldToScreen + pixelOffset + _drawOrigin, AssetManager.TileSize), null, //no source rectangle
+                Color.White, _direction, _drawOrigin.ToVector2(), SpriteEffects.None, 0f); //Layer depth is not used
             foreach (Point tile in _watchedTiles)
             {
                 sb.Draw(AssetManager.CameraSight, new Rectangle(MapUtils.TileToWorld(tile) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
-            }//TESTING - show all the endpoints with hooks
-            if (Location.X == 8)
-                foreach (Point EndPoint in _endPoints)
-                    foreach (Point endpoint in Rasterize(_rayBase, EndPoint)) sb.Draw(AssetManager.PropTextures[3], new Rectangle(MapUtils.TileToWorld(endpoint) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
+            }
+            //TESTING - show all the endpoints with hooks
+            foreach (Point endpoint in _endPoints) sb.Draw(AssetManager.PropTextures[3], new Rectangle(MapUtils.TileToWorld(endpoint) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
+
+            //if (Location.X == 8)
+                //foreach (Point EndPoint in _endPoints)
+                    //foreach (Point endpoint in Rasterize(_rayBase, EndPoint)) sb.Draw(AssetManager.PropTextures[3], new Rectangle(MapUtils.TileToWorld(endpoint) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
         }
 
         private List<Point> Rasterize(Point p1, Point p2)
@@ -485,7 +492,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
 
             int dx = p2.X - p1.X;
             int dy = Math.Abs(p2.Y - p1.Y);
-            int yStep = p2.Y > p1.Y ? 1 : -1;
+            int yStep = p2.Y > p1.Y ? 1 : -1; //If the line is going down, this will examine one tile down instead of one tile above
 
             int decisionParam = 2 * dy - dx;
             int y = p1.Y;
@@ -494,10 +501,14 @@ namespace MakeEveryDayRecount.GameObjects.Props
 
             for (int x = p1.X; x <= p2.X; x++)
             {
-                returnPoints.Add(rotated ? new Point(y, x) : new Point(x, y));
+                //Add the current point
+                if (rotated) returnPoints.Add(new Point(y, x));
+                else returnPoints.Add(new Point(x, y));
+
+                //Calculate the next point - should Y change?
                 if (decisionParam > 0)
                 {
-                    y += yStep;
+                    y += yStep; //either 1 or -1
                     decisionParam -= 2 * dx;
                 }
                 decisionParam += 2 * dy;

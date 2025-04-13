@@ -322,12 +322,6 @@ namespace MakeEveryDayRecount.Map
                         numberOfGameObjects--;
                     }
 
-                    //Camera camera = new Camera(new Point(17, 16), AssetManager.CameraTextures[1], this, new Point(17, 23), (float)MathF.PI / 4);
-                    //_itemsInRoom.Add(camera);
-                    //Cameras.Add(camera);
-                    //camera = new Camera(new Point(9, 0), AssetManager.CameraTextures[1], this, new Point(9, 10), (float)MathF.PI / 4);
-                    //_itemsInRoom.Add(camera);
-                    //Cameras.Add(camera);
                     Camera camera = new Camera(new Point(16, 24), AssetManager.CameraTextures[1], this, new Point(16, 17), (float)MathF.PI / 4);
                     _itemsInRoom.Add(camera);
                     Cameras.Add(camera);
@@ -337,9 +331,9 @@ namespace MakeEveryDayRecount.Map
                     camera = new Camera(new Point(8, 0), AssetManager.CameraTextures[1], this, new Point(9, 12), (float)MathF.PI / 4);
                     _itemsInRoom.Add(camera);
                     Cameras.Add(camera);
-                    //camera = new Camera(new Point(0, 20), AssetManager.CameraTextures[1], this, new Point(9, 12), (float)MathF.PI / 4);
-                    //_itemsInRoom.Add(camera);
-                    //Cameras.Add(camera);
+                    camera = new Camera(new Point(0, 20), AssetManager.CameraTextures[1], this, new Point(9, 12), (float)MathF.PI / 4);
+                    _itemsInRoom.Add(camera);
+                    Cameras.Add(camera);
 
                 }
             }
