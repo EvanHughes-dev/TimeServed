@@ -42,6 +42,8 @@
             labelNoLevelOpen = new Label();
             openFileDialog = new OpenFileDialog();
             saveFileDialog = new SaveFileDialog();
+            propsToolStripMenuItem = new ToolStripMenuItem();
+            reloadToolStripMenuItem = new ToolStripMenuItem();
             flowLayoutPanelRooms.SuspendLayout();
             menuStrip.SuspendLayout();
             SuspendLayout();
@@ -67,7 +69,7 @@
             // 
             // menuStrip
             // 
-            menuStrip.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, tilesToolStripMenuItem });
+            menuStrip.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, tilesToolStripMenuItem, propsToolStripMenuItem });
             menuStrip.Location = new Point(0, 0);
             menuStrip.Name = "menuStrip";
             menuStrip.Size = new Size(800, 24);
@@ -84,41 +86,41 @@
             // newLevelToolStripMenuItem
             // 
             newLevelToolStripMenuItem.Name = "newLevelToolStripMenuItem";
-            newLevelToolStripMenuItem.Size = new Size(180, 22);
+            newLevelToolStripMenuItem.Size = new Size(123, 22);
             newLevelToolStripMenuItem.Text = "New";
             newLevelToolStripMenuItem.Click += newLevelToolStripMenuItem_Click;
             // 
             // loadLevelToolStripMenuItem
             // 
             loadLevelToolStripMenuItem.Name = "loadLevelToolStripMenuItem";
-            loadLevelToolStripMenuItem.Size = new Size(180, 22);
+            loadLevelToolStripMenuItem.Size = new Size(123, 22);
             loadLevelToolStripMenuItem.Text = "Open";
             loadLevelToolStripMenuItem.Click += loadLevelToolStripMenuItem_Click;
             // 
             // saveLevelToolStripMenuItem
             // 
             saveLevelToolStripMenuItem.Name = "saveLevelToolStripMenuItem";
-            saveLevelToolStripMenuItem.Size = new Size(180, 22);
+            saveLevelToolStripMenuItem.Size = new Size(123, 22);
             saveLevelToolStripMenuItem.Text = "Save";
             saveLevelToolStripMenuItem.Click += saveLevelToolStripMenuItem_Click;
             // 
             // saveLevelAsToolStripMenuItem
             // 
             saveLevelAsToolStripMenuItem.Name = "saveLevelAsToolStripMenuItem";
-            saveLevelAsToolStripMenuItem.Size = new Size(180, 22);
+            saveLevelAsToolStripMenuItem.Size = new Size(123, 22);
             saveLevelAsToolStripMenuItem.Text = "Save As...";
             // 
             // tilesToolStripMenuItem
             // 
             tilesToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { reloadTilesToolStripMenuItem });
             tilesToolStripMenuItem.Name = "tilesToolStripMenuItem";
-            tilesToolStripMenuItem.Size = new Size(43, 20);
+            tilesToolStripMenuItem.Size = new Size(42, 20);
             tilesToolStripMenuItem.Text = "Tiles";
             // 
             // reloadTilesToolStripMenuItem
             // 
             reloadTilesToolStripMenuItem.Name = "reloadTilesToolStripMenuItem";
-            reloadTilesToolStripMenuItem.Size = new Size(110, 22);
+            reloadTilesToolStripMenuItem.Size = new Size(180, 22);
             reloadTilesToolStripMenuItem.Text = "Reload";
             reloadTilesToolStripMenuItem.Click += reloadTilesToolStripMenuItem_Click;
             // 
@@ -132,7 +134,7 @@
             labelNoLevelOpen.AutoSize = true;
             labelNoLevelOpen.Location = new Point(180, 195);
             labelNoLevelOpen.Name = "labelNoLevelOpen";
-            labelNoLevelOpen.Size = new Size(414, 15);
+            labelNoLevelOpen.Size = new Size(415, 15);
             labelNoLevelOpen.TabIndex = 1;
             labelNoLevelOpen.Text = "No level open. Use the Level tab to create a new level or open an existing one!";
             // 
@@ -148,6 +150,20 @@
             saveFileDialog.FileName = "level.level";
             saveFileDialog.Filter = "Level files|level.level";
             saveFileDialog.Title = "Save Level";
+            // 
+            // propsToolStripMenuItem
+            // 
+            propsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { reloadToolStripMenuItem });
+            propsToolStripMenuItem.Name = "propsToolStripMenuItem";
+            propsToolStripMenuItem.Size = new Size(49, 20);
+            propsToolStripMenuItem.Text = "Props";
+            // 
+            // reloadToolStripMenuItem
+            // 
+            reloadToolStripMenuItem.Name = "reloadToolStripMenuItem";
+            reloadToolStripMenuItem.Size = new Size(180, 22);
+            reloadToolStripMenuItem.Text = "Reload";
+            reloadToolStripMenuItem.Click += reloadToolStripMenuItem_Click;
             // 
             // MainForm
             // 
@@ -185,5 +201,7 @@
         private Label labelNoLevelOpen;
         private OpenFileDialog openFileDialog;
         private SaveFileDialog saveFileDialog;
+        private ToolStripMenuItem propsToolStripMenuItem;
+        private ToolStripMenuItem reloadToolStripMenuItem;
     }
 }

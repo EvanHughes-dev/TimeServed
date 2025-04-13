@@ -16,14 +16,14 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// </summary>
         /// <param name="location">Location of prop</param>
         /// <param name="sprite">Image of the prop</param>
-        protected Prop(Point location, Texture2D sprite)
-    : base(location, sprite) { }
+        protected Prop(Point location, Texture2D sprite) : base(location, sprite) { }
 
         /// <summary>
         /// Allow the player to interact with objects
         /// </summary>
         /// <param name="player">Player interacting</param>
         public abstract void Interact(Player player);
+
         /// <summary>
         /// Allow props to draw themselves
         /// </summary>
