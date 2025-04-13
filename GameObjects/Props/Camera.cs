@@ -224,6 +224,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                     //For each point in that rectangle, create a vector from the raybase to it
                     Vector2 candidateVector = new Vector2(x - _rayBase.X, y - _rayBase.Y);
                     //Figure out if that vector is between the two edge vectors. If it is, then it should be inside of the vision kite
+                    //NOTE: Chris suggested using the dot product for this but I think cross product is better because it doesn't require trigonometry
                     //I got the formula for this from StackOverflow (Andy G)
                     //Where A and C are the edge vectors, and B is the candidate vector, and the three vectors are pointing out from the same point
                     //if (AxB * AxC >= 0 && CxB * CxA >= 0) then B is between A and C
@@ -231,7 +232,8 @@ namespace MakeEveryDayRecount.GameObjects.Props
                         (counterclockwiseRay.Y * clockwiseRay.X - counterclockwiseRay.X * clockwiseRay.Y) >= 0
                         &&
                         (clockwiseRay.Y * candidateVector.X - clockwiseRay.X * candidateVector.Y) *
-                        (clockwiseRay.Y * counterclockwiseRay.X - clockwiseRay.X * counterclockwiseRay.Y) >= 0)
+                        (clockwiseRay.Y * counterclockwiseRay.X - clockwiseRay.X * counterclockwiseRay.Y) >= 0
+                        && candidateVector.Length() <= centerRay.Length())
                     {
                         _watchedTiles.Add(new Point(x, y));
                     }
@@ -245,6 +247,11 @@ namespace MakeEveryDayRecount.GameObjects.Props
         }
 
         //TODO: add an alternative constructor that creates an electrical box connected to this camera
+        public Camera(Point location, Texture2D sprite, Room containingRoom, Point centerPoint, float spread, Point boxLocation)
+            : this(location, sprite, containingRoom, centerPoint, spread)
+        {
+
+        }
 
         public void Update(float deltaTime)
         {
