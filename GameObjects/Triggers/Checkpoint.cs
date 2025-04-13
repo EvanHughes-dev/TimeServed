@@ -31,7 +31,7 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
 
         //Methods
 
-        //TODO: update the SaveRoom method in SaveMap when doors are fixed
+        //TODO: update the SaveRoom method in SaveMap when triggers are implemented in the files
         //TODO: Maybe add a method to display that progress is being saved in some way? Low priority
         //TODO: when a checkpoint gets activated, call one of replay manager's functions (ask evan for more details when merging main)
 

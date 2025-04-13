@@ -144,7 +144,7 @@ namespace MakeEveryDayRecount.Map
                     Point screenPos =
                         MapUtils.TileToWorld(xTile, yTile) - worldToScreen + pixelOffset;
                     sb.Draw(
-                        AssetManager.TileMap[currentTile.SpriteIndex], //DELETE THIS SPRITES TEST AssetManager.TileMap[currentTile.SpriteIndex]
+                        AssetManager.TileMap[currentTile.SpriteIndex],
                         new Rectangle(screenPos, TileSize),
                         Color.White
                     );
