@@ -27,6 +27,12 @@ namespace LevelEditor.Classes
         public Tile[,] Tiles { get; }
 
         /// <summary>
+        /// Get the current save state of this form
+        /// </summary>
+        public SavedState SavedState { get; set; }
+
+
+        /// <summary>
         /// The props that have been placed in this room.
         /// </summary>
         public List<Prop> Props { get; set; }
@@ -59,6 +65,7 @@ namespace LevelEditor.Classes
             }
             Props = new List<Prop> { };
             Id = id == null ? Program.Random.Next() : (int)id;
+            SavedState = SavedState.Saved;
         }
 
         // TODO: Add Resize(north, south, east, west) method

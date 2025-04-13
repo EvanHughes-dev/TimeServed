@@ -1,13 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using static System.Windows.Forms.LinkLabel;
-using LevelEditor.Classes;
+﻿using LevelEditor.Classes;
 using LevelEditor.Classes.Props;
-using System.Threading.Channels;
 
 namespace LevelEditor
 {

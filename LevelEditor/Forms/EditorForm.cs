@@ -6,6 +6,7 @@ using LevelEditor.Classes;
 using LevelEditor.Classes.Props;
 using LevelEditor.Controls;
 using LevelEditor.Forms.Prompts;
+using System.Linq;
 
 namespace LevelEditor
 {
@@ -27,6 +28,7 @@ namespace LevelEditor
         // A reference to the MainForm that created this EditorForm
         private readonly MainForm _mainForm;
 
+
         /// <summary>
         /// The Room this editor is editing.
         /// </summary>
@@ -46,6 +48,7 @@ namespace LevelEditor
         /// Gets or sets the color the user currently has selected from the palette.
         /// </summary>
         private Tile SelectedTile { get; set; }
+
         /// <summary>
         /// The palette of tiles the user may select from.
         /// </summary>
@@ -55,6 +58,7 @@ namespace LevelEditor
         /// Gets or sets the prop the user currently has selected from the palette.
         /// </summary>
         private Prop SelectedProp { get; set; }
+
         /// <summary>
         /// Gets the palette of props the user may select from
         /// </summary>
@@ -64,10 +68,16 @@ namespace LevelEditor
         /// Holds the prop box 
         /// </summary>
         private PropBox _currentlySelectedPropBox;
+
         /// <summary>
         /// Holds the prop boxes that exist in the room
         /// </summary>
         private readonly List<PropBox> _propBoxesInRoom;
+
+        private string _formName;
+        private readonly string _formNameBase;
+
+        private bool _keyDownInputRead;
 
         #endregion
         #region Constructors
@@ -77,8 +87,16 @@ namespace LevelEditor
         private EditorForm(MainForm mainForm)
         {
             InitializeComponent();
+            _formName = "Room Editor";
+            _formNameBase = "Room Editor";
+
+            _keyDownInputRead = false;
 
             _mainForm = mainForm;
+
+            Room = null!;
+            TileGrid = null!;
+            _currentlySelectedPropBox = null!;
 
             TabState = TabState.Tiles;
 
@@ -111,6 +129,13 @@ namespace LevelEditor
             SelectedProp = PropPalette[0, 0];
 
             _propBoxesInRoom = [];
+
+            //setup keyboard capturing
+            this.KeyPreview = true;
+            this.KeyDown += RoomEditor_KeyDown;
+            this.KeyUp += RoomEditor_KeyUp;
+
+            this.FormClosing += RoomEditor_FormClosing;
         }
 
         /// <summary>
@@ -127,6 +152,10 @@ namespace LevelEditor
             InitializeMap(Room);
 
             _mainForm.AddNewRoom(Room);
+            _formName = $"Room Editor - {Room.Name} {(Room.SavedState == SavedState.Unsaved ? "*" : "")}";
+            _formNameBase = $"Room Editor - {Room.Name}";
+
+            this.Text = _formName;
         }
 
         /// <summary>
@@ -139,9 +168,14 @@ namespace LevelEditor
         {
             Room = room;
             InitializeMap(Room);
+            _formName = $"Room Editor - {Room.Name} {(Room.SavedState == SavedState.Unsaved ? "*" : "")}";
+            _formNameBase = $"Room Editor - {Room.Name}";
+
+            this.Text = _formName;
         }
 
         #endregion
+
         #region Swatch Events
         /// <summary>
         /// When a "swatch" button is clicked, select its color.
@@ -168,6 +202,7 @@ namespace LevelEditor
         }
 
         #endregion
+
         #region Tile Events
         /// <summary>
         /// When a tile is clicked, either change its color or select its color (for left and right click, respectively).
@@ -187,9 +222,18 @@ namespace LevelEditor
 
                 if (e.Button == MouseButtons.Left)
                 {
+                    // Handle setting tiles to the save value
+                    if (tile.Tile.Sprite == SelectedTile.Sprite)
+                        return;
+
                     tile.Tile = SelectedTile;
 
                     Room.Tiles[tileY, tileX] = SelectedTile;
+                    if (Room.SavedState == SavedState.Saved)
+                    {
+                        Room.SavedState = SavedState.Unsaved;
+                        UpdateFormName($"{_formNameBase} *");
+                    }
                 }
 
                 // Right click picks color! Because that's convenient and I wanted it to be a feature!
@@ -207,6 +251,8 @@ namespace LevelEditor
                 if (e.Button == MouseButtons.Left)
                 {
                     Prop createdProp = null!;
+
+
 
                     // Different props have to be created in different ways
                     switch (SelectedProp.PropType)
@@ -250,6 +296,12 @@ namespace LevelEditor
 
                     Room.Props.Add(proppy.Prop);
                     _propBoxesInRoom.Add(proppy);
+
+                    if (Room.SavedState == SavedState.Saved)
+                    {
+                        Room.SavedState = SavedState.Unsaved;
+                        UpdateFormName($"{_formNameBase} *");
+                    }
                 }
             }
         }
@@ -268,6 +320,12 @@ namespace LevelEditor
                 Room.Props.Remove(proppy.Prop);   //Remove proppy from the actual room list
                 _propBoxesInRoom.Remove(proppy);  //Remove proppy form the form's room list
                 proppy.Dispose();                 //REMOVES PROPPY FROM LIFE!!! MWAHAHAHAHHA
+
+                if (Room.SavedState == SavedState.Saved)
+                {
+                    Room.SavedState = SavedState.Unsaved;
+                    UpdateFormName($"{_formNameBase} *");
+                }
             }
         }
 
@@ -287,11 +345,18 @@ namespace LevelEditor
                     tile.Tile = SelectedTile;
 
                     Room.Tiles[y, x] = SelectedTile;
+
+                    if (Room.SavedState == SavedState.Saved)
+                    {
+                        Room.SavedState = SavedState.Unsaved;
+                        UpdateFormName($"{_formNameBase} *");
+                    }
                 }
             }
         }
 
         #endregion
+
         #region Tab Events
         /// <summary>
         /// Changes the state based on the current tab selected and decides what to do with that info
@@ -323,6 +388,7 @@ namespace LevelEditor
             TabState = newState;
         }
         #endregion
+
         #region Helpers
         /// <summary>
         /// Creates a palette the user can utilize to select different elements.
@@ -509,6 +575,77 @@ namespace LevelEditor
                 rect.Height - padTop - padBottom);
         }
 
+
+        /// <summary>
+        /// Update the name of the form
+        /// </summary>
+        /// <param name="newName">New name for the form</param>
+        private void UpdateFormName(string newName)
+        {
+            _formName = newName;
+            this.Text = _formName;
+        }
+
+        /// <summary>
+        /// Prevent the user from leaving the form with unsaved changes without confirming they 
+        /// wish to do so
+        /// </summary>
+        private void RoomEditor_FormClosing(object? sender, FormClosingEventArgs e)
+        {
+            if (Room.SavedState == SavedState.Unsaved)
+            {
+                switch (MessageBox.Show("Unsaved changes to room. Do you want to save before exiting?", "Warning",
+                                 MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning))
+                {
+                    case DialogResult.Cancel:
+                        e.Cancel = true;
+                        break;
+                    case DialogResult.Yes:
+                        Room.SavedState = SavedState.Saved;
+                        _mainForm.SaveLevel();
+                        break;
+                    case DialogResult.No:
+                        e.Cancel = false;
+                        break;
+                }
+            }
+        }
         #endregion
+
+        #region Keyboard Input
+
+        /// <summary>
+        /// Read keyboard input and take the needed actions based off which
+        /// keys are pressed at the same time
+        /// </summary>
+        private void RoomEditor_KeyDown(object? sender, KeyEventArgs e)
+        {
+            // prevent multiple inputs from being read at the same time
+            if (_keyDownInputRead)
+                return;
+
+            if (e.Control && e.KeyCode == Keys.S)
+            {
+
+                e.SuppressKeyPress = true;
+                _mainForm.SaveLevel();
+                _keyDownInputRead = true;
+
+                Room.SavedState = SavedState.Saved;
+                UpdateFormName($"{_formNameBase}");
+            }
+
+        }
+
+        /// <summary>
+        /// On the key up event, allow key input to be read again
+        /// </summary>
+        private void RoomEditor_KeyUp(object? sender, KeyEventArgs e)
+        {
+            _keyDownInputRead = false;
+        }
+
+        #endregion
+
     }
 }
