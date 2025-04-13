@@ -91,12 +91,12 @@ namespace MakeEveryDayRecount.Players
         /// </summary>
         /// <param name="location">Location of the player</param>
         /// <param name="sprite">Image of the player</param>
-        /// <param name="gameplayManager">manager of the game</param>
         /// <param name="screenSize">Size of the screen in pixels</param>
         public Player(Point location, Texture2D sprite, Point screenSize)
             : base(location, sprite)
         {
             _walkingSeconds = 0;
+          
             _animationFrame = 0;
             _playerSize = new Point(sprite.Width / 4, sprite.Height / 4);
             //Create an inventory
@@ -149,6 +149,9 @@ namespace MakeEveryDayRecount.Players
 
             if (InputManager.GetKeyPress(Keys.E))
                 Interact();
+            if (InputManager.GetKeyPress(Keys.I))
+                Detected();
+            
         }
 
         /// <summary>
@@ -390,6 +393,14 @@ namespace MakeEveryDayRecount.Players
             if(HoldingBox)
              _currentHeldBox.DropBox();
             _currentHeldBox = null;
+        }
+
+        /// <summary>
+        /// Called when the player is detected by a camera
+        /// </summary>
+        public void Detected(){
+            // TODO rather than restarting the level, just reset the player to the last checkpoint
+             GameplayManager.LevelReset();
         }
 
         #endregion

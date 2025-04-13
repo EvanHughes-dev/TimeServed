@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Players;
+using MakeEveryDayRecount.Map;
+using MakeEveryDayRecount.GameObjects.Props;
 
 namespace MakeEveryDayRecount.Managers
 {
@@ -27,17 +29,31 @@ namespace MakeEveryDayRecount.Managers
 
         public static OnPlayerUpdate OnPlayerUpdate;
 
+        public static OnPlayerUpdate OnPlayerUpdate;
+
+        /// <summary>
+        /// Initialize GameplayManager to create the player and map
+        /// </summary>
         public static void Initialize(Point screenSize)
         {
             Level = 1;
-            PlayerObject = new Player(new Point(5, 5), AssetManager.PlayerTexture, screenSize);
+            PlayerObject = new Player(new Point(4, 5), AssetManager.PlayerTexture, screenSize);
+            Map = new MapManager();
             OnPlayerUpdate?.Invoke(PlayerObject);
             MapManager.Initialize();
         }
+
         public static void Update(GameTime gameTime)
         {
+            float floatGameTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             //Update Player
-            PlayerObject.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+            PlayerObject.Update(floatGameTime);
+
+            //Update all the cameras in the current room
+            foreach (Camera cam in Map.CurrentRoom.Cameras)
+            {
+                cam.Update(floatGameTime);
+            }
         }
 
         /// <summary>
@@ -63,5 +79,18 @@ namespace MakeEveryDayRecount.Managers
             PlayerObject.ChangeRoom(new Point(5, 5));
             PlayerObject.ClearStates();
         }
+
+        /// <summary>
+        /// Called to reset the level to the starting state
+        /// </summary>
+        public static void LevelReset(){
+            // TODO eventually change this to a checkpoint system
+            Level = 1;
+            PlayerObject = new Player(new Point(5, 5), AssetManager.PlayerTexture, MapUtils.ScreenSize);
+            Map.ChangeLevel();
+            OnPlayerUpdate?.Invoke(PlayerObject);
+            ReplayManager.ClearData();
+        }
+
     }
 }

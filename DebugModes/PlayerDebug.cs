@@ -22,8 +22,6 @@ namespace MakeEveryDayRecount.DebugModes
         /// Initializes the player debug system.
         /// This must be called before drawing debug information.
         /// </summary>
-        /// <param name="spriteFont">The font used for debug text.</param>
-        /// <param name="gameplayManager">Reference to the game's manager for accessing player data.</param>
         public PlayerDebug()
             : base()
         {
@@ -68,6 +66,7 @@ namespace MakeEveryDayRecount.DebugModes
         /// <param name="sb">Sprite batch used for rendering.</param>
         private void DrawTileDebug(SpriteBatch sb)
         {
+            var map = GameplayManager.Map;
             var playerTilePos = _player.Location;
 
             foreach (var direction in _playerMovementDirections)

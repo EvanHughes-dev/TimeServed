@@ -56,9 +56,8 @@ namespace MakeEveryDayRecount.Managers
         /// <param name="transDoor">Door to transition from</param>
         /// <param name="destRoom"> Destination room for transition </param>
         public static void TransitionRoom(Door transDoor, int destRoom)
-        {
+             GameplayManager.PlayerObject.ChangeRoom(transDoor.DestinationTile);
             ChangeRoom(destRoom);
-            GameplayManager.PlayerObject.ChangeRoom(transDoor.DestinationTile);
 
         }
 

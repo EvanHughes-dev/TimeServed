@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using MakeEveryDayRecount.Managers;
 using MakeEveryDayRecount.Players;
+using MakeEveryDayRecount.DebugModes;
 
 namespace MakeEveryDayRecount.Map
 {
@@ -163,7 +164,6 @@ namespace MakeEveryDayRecount.Map
         /// of this file that will change during run time
         /// </summary>
         /// <param name="game1">Reference to this instance of the game</param>
-        /// <param name="gameplayManager">Reference to the overall GameplayManager</param>
         public static void Initialize(Game1 game1)
         {
             game1Instance = game1;

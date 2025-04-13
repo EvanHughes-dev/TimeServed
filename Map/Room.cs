@@ -9,6 +9,8 @@ using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Managers;
 using MakeEveryDayRecount.GameObjects.Triggers;
 using Microsoft.Xna.Framework.Content;
+using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 
 namespace MakeEveryDayRecount.Map
 {
@@ -75,6 +77,12 @@ namespace MakeEveryDayRecount.Map
         }
         private Tile[,] _map;
         private List<Prop> _itemsInRoom;
+        //I originally wanted to make this a generic list of all the props in the room that might need to be updated
+        //But most props don't have an update function, so it's better to have this list only be concerned with cameras because they can actually update
+        /// <summary>
+        /// Get the list of cameras in the room
+        /// </summary>
+        public List<Camera> Cameras { get; private set; }
         private List<Trigger> _triggersInRoom;
         public List<Door> Doors
         { get; private set; }
@@ -98,6 +106,7 @@ namespace MakeEveryDayRecount.Map
             _map = new Tile[,] { };
             _itemsInRoom = new List<Prop> { };
             _triggersInRoom = new List<Trigger> { };
+            Cameras = new List<Camera>();
             Doors = new List<Door> { };
             ParseData(filePath);
         }
@@ -165,6 +174,12 @@ namespace MakeEveryDayRecount.Map
                 {
                     propToDraw.Draw(sb, worldToScreen, pixelOffset);
                 }
+                //Cameras are excluded from this check and are always drawn if they are in the room
+                //This is done to allow the camera's vision cone to be seen even when the camera is not on the screen
+                else if (propToDraw is Camera)
+                {
+                    propToDraw.Draw(sb, worldToScreen, pixelOffset);
+                }
             }
 
             // Display all doors
@@ -200,44 +215,48 @@ namespace MakeEveryDayRecount.Map
             // save the file path for debug uses
             FilePath = filePath;
 
-            using (BinaryReader binaryReader = new BinaryReader(File.OpenRead(filePath)))
+            try
             {
-                /*
-                * Form of the room data is as follows
-                *
-                * int tileMapWidth
-                * int tileMapHeight
-                *
-                * Tiles:
-                *   bool isWalkable
-                *   int textureIndex
-                *
-                * int gameObjectCount
-                *
-                * GameObject:
-                *   int propIndex
-                *   int positionX
-                *   int positionY
-                *   int objectType 
-                *       0 = Item
-                *       1 = Camera
-                *       2 = Box
-                *       3 = Door 
-                *       4 = Checkpoint
-                * 
-                *   if objectType == 0 || objectType == 3
-                *   int keyType
-                *       0 = None
-                *       1 = Key card
-                *       2 = Screwdriver
-                *       For doors, this is the key that can unlock them
-                *       For items, this is the key type they are
-                * 
-                *   if objectType == 3
-                *       int destRoom
-                *       int outputPosX
-                *       int outputPosY
-                */
+                using (BinaryReader binaryReader = new BinaryReader(File.OpenRead(filePath)))
+                {
+                    /*
+                    * Form of the room data is as follows
+                    *
+                    * int tileMapWidth
+                    * int tileMapHeight
+                    *
+                    * Tiles:
+                    *   bool isWalkable
+                    *   int textureIndex
+                    *
+                    * int gameObjectCount
+                    *
+                    * GameObject:
+                    *   int propIndex
+                    *   int positionX
+                    *   int positionY
+                    *   int objectType 
+                    *       0 = Item
+                    *       1 = Camera
+                    *       2 = Box
+                    *       3 = Door 
+                    * 
+                    *   if objectType == 0 || objectType == 3
+                    *   int keyType
+                    *       0 = None
+                    *       1 = Key card
+                    *       2 = Screwdriver
+                    *       For doors, this is the key that can unlock them
+                    *       For items, this is the key type they are
+                    * 
+                    *   if objectType == 3
+                    *       int destRoom
+                    *       int outputPosX
+                    *       int outputPosY
+                    *  if objectType == 1
+                    *       Point centerPoint point of a camera vision cone
+                    *       float radian value of camera spread
+                    */
 
                 // Define the size of the current room and loop to populate tiles
                 int tileMapWidth = binaryReader.ReadInt32();
@@ -269,84 +288,87 @@ namespace MakeEveryDayRecount.Map
 
                     Point tileLocation = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
 
-                    ObjectTypes objectType = (ObjectTypes)binaryReader.ReadInt32();
-                    if (objectType == ObjectTypes.Item || objectType == ObjectTypes.Door)
-                    {
-                        Door.DoorKeyType keyType = (Door.DoorKeyType)binaryReader.ReadInt32();
-
-                        if (objectType == ObjectTypes.Door)
+                        ObjectTypes objectType = (ObjectTypes)binaryReader.ReadInt32();
+                        switch (objectType)
                         {
-                            // Parse a door from the file
-                            // Next three values correspond to the needed data
-                            Door doorFromFile = new Door(
-                                binaryReader.ReadInt32(),//Read destination room
-                                new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32()),// Read the destination point in the new room
-                                keyType,
-                                tileLocation,
-                                AssetManager.DoorTexture,
-                                propIndex
-                            );
-                            // When this door is interacted with, transition the player
-                            doorFromFile.OnDoorInteract += TransitionPlayer;
-                            Doors.Add(doorFromFile);
+                            case ObjectTypes.Item:
+                                Door.DoorKeyType keyTypeItem = (Door.DoorKeyType)binaryReader.ReadInt32();
+
+                                Item newItemInRoom = new Item(
+                                    tileLocation,
+                                    AssetManager.PropTextures[propIndex],
+                                    "TEMP_NAME",
+                                    keyTypeItem
+                                );
+
+                                newItemInRoom.OnItemPickup += RemoveGameObject;
+                                _itemsInRoom.Add(newItemInRoom);
+                                break;
+                            case ObjectTypes.Camera:
+                                Point centerCastPoint = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
+                                Camera cam = new Camera(tileLocation, AssetManager.CameraTextures[propIndex], this, centerCastPoint, (float)binaryReader.ReadDouble());
+                                _itemsInRoom.Add(cam);
+                                Cameras.Add(cam);
+                                break;
+                            case ObjectTypes.Box:
+                                _itemsInRoom.Add(new Box(tileLocation, AssetManager.Boxes[propIndex]));
+                                break;
+                            case ObjectTypes.Door:
+                                Door.DoorKeyType keyTypeDoor = (Door.DoorKeyType)binaryReader.ReadInt32();
+
+                                // Parse a door from the file
+                                // Next three values correspond to the needed data
+                                Door doorFromFile = new Door(
+                                    binaryReader.ReadInt32(),//Read destination room
+                                    new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32()),// Read the destination point in the new room
+                                    keyTypeDoor,
+                                    tileLocation,
+                                    AssetManager.DoorTexture[propIndex]
+                                );
+                                // When this door is interacted with, transition the player
+                                doorFromFile.OnDoorInteract += TransitionPlayer;
+                                Doors.Add(doorFromFile);
+                                break;
                         }
-                        else
+                        //Define number of triggers in the room
+                        //TODO: update files so that triggers are implemented
+                        //For rooms with no triggers we can slap a 0 at the end and everything will be fine
+                        //As of right now they are not updated, so the following line has been commented out
+                        //int numberOfTriggers = binaryReader.ReadInt32();
+                        int numberOfTriggers = 0; //DELETE THIS
+
+                        //Parse all needed triggers from file
+                        while (numberOfTriggers > 0)
                         {
-                            // Parse a prop from the file
+                            Point triggerPos = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
+                            int triggerWidth = binaryReader.ReadInt32();
+                            int triggerHeight = binaryReader.ReadInt32();
 
-                            Item newItemInRoom = new Item(
-                                tileLocation,
-                                AssetManager.PropTextures,
-                                propIndex,
-                                "TEMP_NAME",
-                                keyType
-                            );
-                            // When this item is picked up, remove it from this room
-                            newItemInRoom.OnItemPickup += RemoveGameObject;
-                            _itemsInRoom.Add(newItemInRoom);
+                            TriggerTypes triggerType = (TriggerTypes)binaryReader.ReadInt32();
+
+                            if (triggerType == TriggerTypes.PlayerSpawn)
+                            {
+                                _triggersInRoom.Add(new PlayerSpawn(triggerPos, null));
+                            }
+                            else if (triggerType == TriggerTypes.Checkpoint)
+                            {
+                                Checkpoint checkpoint = new Checkpoint(triggerPos, null, binaryReader.ReadInt32(), triggerWidth, triggerHeight);
+                                _triggersInRoom.Add(checkpoint);
+
+                                //And add it to the trigger manager!
+                                TriggerManager.AddCheckpoint(checkpoint);
+                            }
                         }
+                     
+                        numberOfGameObjects--;
                     }
-                    else if (objectType == ObjectTypes.Camera)
-                    {
-                        _itemsInRoom.Add(new Camera(tileLocation, AssetManager.Cameras, propIndex));
-                    }
-                    else if (objectType == ObjectTypes.Box)
-                    {
-                        _itemsInRoom.Add(new Box(tileLocation, AssetManager.Boxes, propIndex));
-                    }
-                    numberOfGameObjects--;
-
                 }
-
-                //Define number of triggers in the room
-                //TODO: update files so that triggers are implemented
-                //For rooms with no triggers we can slap a 0 at the end and everything will be fine
-                //As of right now they are not updated, so the following line has been commented out
-                //int numberOfTriggers = binaryReader.ReadInt32();
-                int numberOfTriggers = 0; //DELETE THIS
-
-                //Parse all needed triggers from file
-                while(numberOfTriggers > 0)
-                {
-                    Point triggerPos = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
-                    int triggerWidth = binaryReader.ReadInt32();
-                    int triggerHeight = binaryReader.ReadInt32();
-
-                    TriggerTypes triggerType = (TriggerTypes)binaryReader.ReadInt32();
-
-                    if (triggerType == TriggerTypes.PlayerSpawn)
-                    {
-                        _triggersInRoom.Add(new PlayerSpawn(triggerPos, null));
-                    }
-                    else if (triggerType == TriggerTypes.Checkpoint)
-                    {
-                        Checkpoint checkpoint = new Checkpoint(triggerPos, null, binaryReader.ReadInt32(), triggerWidth, triggerHeight);
-                        _triggersInRoom.Add(checkpoint);
-
-                        //And add it to the trigger manager!
-                        TriggerManager.AddCheckpoint(checkpoint);
-                    }    
-                }
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.Write(e.Message);
+            }
+        }
 
             }
         }
