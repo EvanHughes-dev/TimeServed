@@ -108,8 +108,6 @@ namespace MakeEveryDayRecount
 
             GameplayManager.Initialize(ScreenSize);
             MapUtils.Initialize(this);
-            MapUtils.Initialize(this);
-            MapUtils.Initialize(this, _gameplayManager);
 
             
 
@@ -219,18 +217,15 @@ namespace MakeEveryDayRecount
                 case GameState.Menu:
                     // DrawMenu(_spriteBatch);
                     break;
+                case GameState.Level:
+                    GameplayManager.Draw(_spriteBatch);
+                    break;
                 case GameState.Pause:
                     //TODO: Blur the gameplay in the background.
                     GameplayManager.Draw(_spriteBatch);
                     DisplayDebug();
                     break;
-                     GameplayManager.Draw(_spriteBatch);
-                    DisplayDebug();
-                    break;
                 case GameState.Cutscene:
-                    break;
-                     GameplayManager.Draw(_spriteBatch);
-                    DisplayDebug();
                     break;
             }
 
@@ -300,7 +295,7 @@ namespace MakeEveryDayRecount
                 if (SoundManager.PlayingMusic)
                     SoundManager.ResumeBGM();
                 else
-                    SoundManager.PlayBGM(_gameplayManager.Level);
+                    SoundManager.PlayBGM(GameplayManager.Level);
             }
             _state = state;
         }

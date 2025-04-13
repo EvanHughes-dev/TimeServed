@@ -51,12 +51,13 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// Makes a security camera that watches a certain vision kite to see if the player is inside it
         /// </summary>
         /// <param name="location">The location of the camera, from which the vision kite is projected</param>
-        /// <param name="sprite">The camera's sprite</param>
+        /// <param name="spriteArray">The array of the camera's sprites</param>
+        /// <param name="spriteIndex">The index of this camera's sprite</param>
         /// <param name="containingRoom">The room containing the camera. Used to check if tiles are walkable</param>
         /// <param name="centerPoint">The point that forms the center of the camera's vision kite</param>
         /// <param name="spread">The arc from the center of the vision kite to the edge, in radians</param>
-        public Camera(Point location, Texture2D sprite, Room containingRoom, Point centerPoint, float spread)
-            : base(location, sprite)
+        public Camera(Point location, Texture2D[] spriteArray, int spriteIndex, Room containingRoom, Point centerPoint, float spread)
+            : base(location, spriteArray, spriteIndex)
         {
             _watchedTiles = new List<Point>(); //This ends up being the same as visionkite by the end of this function
             _previousBoxes = new List<Point>();

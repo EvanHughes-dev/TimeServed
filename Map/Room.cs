@@ -296,7 +296,8 @@ namespace MakeEveryDayRecount.Map
 
                                 Item newItemInRoom = new Item(
                                     tileLocation,
-                                    AssetManager.PropTextures[propIndex],
+                                    AssetManager.PropTextures,
+                                    propIndex,
                                     "TEMP_NAME",
                                     keyTypeItem
                                 );
@@ -306,12 +307,12 @@ namespace MakeEveryDayRecount.Map
                                 break;
                             case ObjectTypes.Camera:
                                 Point centerCastPoint = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
-                                Camera cam = new Camera(tileLocation, AssetManager.CameraTextures[propIndex], this, centerCastPoint, (float)binaryReader.ReadDouble());
+                                Camera cam = new Camera(tileLocation, AssetManager.CameraTextures, propIndex, this, centerCastPoint, (float)binaryReader.ReadDouble());
                                 _itemsInRoom.Add(cam);
                                 Cameras.Add(cam);
                                 break;
                             case ObjectTypes.Box:
-                                _itemsInRoom.Add(new Box(tileLocation, AssetManager.Boxes[propIndex]));
+                                _itemsInRoom.Add(new Box(tileLocation, AssetManager.Boxes, propIndex));
                                 break;
                             case ObjectTypes.Door:
                                 Door.DoorKeyType keyTypeDoor = (Door.DoorKeyType)binaryReader.ReadInt32();
@@ -323,7 +324,8 @@ namespace MakeEveryDayRecount.Map
                                     new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32()),// Read the destination point in the new room
                                     keyTypeDoor,
                                     tileLocation,
-                                    AssetManager.DoorTexture[propIndex]
+                                    AssetManager.DoorTexture,
+                                    propIndex
                                 );
                                 // When this door is interacted with, transition the player
                                 doorFromFile.OnDoorInteract += TransitionPlayer;
@@ -369,11 +371,6 @@ namespace MakeEveryDayRecount.Map
                 System.Diagnostics.Debug.Write(e.Message);
             }
         }
-
-            }
-        }
-
-
 
         /// <summary>
         /// Transition the player from one room to another

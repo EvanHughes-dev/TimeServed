@@ -66,7 +66,6 @@ namespace MakeEveryDayRecount.DebugModes
         /// <param name="sb">Sprite batch used for rendering.</param>
         private void DrawTileDebug(SpriteBatch sb)
         {
-            var map = GameplayManager.Map;
             var playerTilePos = _player.Location;
 
             foreach (var direction in _playerMovementDirections)

@@ -29,8 +29,6 @@ namespace MakeEveryDayRecount.Managers
 
         public static OnPlayerUpdate OnPlayerUpdate;
 
-        public static OnPlayerUpdate OnPlayerUpdate;
-
         /// <summary>
         /// Initialize GameplayManager to create the player and map
         /// </summary>
@@ -38,7 +36,6 @@ namespace MakeEveryDayRecount.Managers
         {
             Level = 1;
             PlayerObject = new Player(new Point(4, 5), AssetManager.PlayerTexture, screenSize);
-            Map = new MapManager();
             OnPlayerUpdate?.Invoke(PlayerObject);
             MapManager.Initialize();
         }
@@ -50,7 +47,7 @@ namespace MakeEveryDayRecount.Managers
             PlayerObject.Update(floatGameTime);
 
             //Update all the cameras in the current room
-            foreach (Camera cam in Map.CurrentRoom.Cameras)
+            foreach (Camera cam in MapManager.CurrentRoom.Cameras)
             {
                 cam.Update(floatGameTime);
             }
@@ -87,7 +84,7 @@ namespace MakeEveryDayRecount.Managers
             // TODO eventually change this to a checkpoint system
             Level = 1;
             PlayerObject = new Player(new Point(5, 5), AssetManager.PlayerTexture, MapUtils.ScreenSize);
-            Map.ChangeLevel();
+            MapManager.ChangeLevel();
             OnPlayerUpdate?.Invoke(PlayerObject);
             ReplayManager.ClearData();
         }
