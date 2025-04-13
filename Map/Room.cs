@@ -346,7 +346,6 @@ namespace MakeEveryDayRecount.Map
                         //And add it to the trigger manager!
                         TriggerManager.AddCheckpoint(checkpoint);
                     }    
-
                 }
 
             }
@@ -442,45 +441,7 @@ namespace MakeEveryDayRecount.Map
         /// <param name="filepath">filepath for the file</param>
         public void SaveRoom(string filepath)
         {
-            //DELETE THIS ONCE YOU'RE DONE IMPLEMENTING!!!!!!!!!
-            /*
-                    * Form of the room data is as follows
-                    *
-                    * int tileMapWidth
-                    * int tileMapHeight
-                    *
-                    * Tiles:
-                    *   bool isWalkable
-                    *   int textureIndex
-                    *
-                    * int gameObjectCount
-                    *
-                    * GameObject:
-                    *   int propIndex
-                    *   int positionX
-                    *   int positionY
-                    *   int objectType 
-                    *       0 = Item
-                    *       1 = Camera
-                    *       2 = Box
-                    *       3 = Door 
-                    *       4 = Checkpoint
-                    * 
-                    *   if objectType == 0 || objectType == 3
-                    *   int keyType
-                    *       0 = None
-                    *       1 = Key card
-                    *       2 = Screwdriver
-                    *       For doors, this is the key that can unlock them
-                    *       For items, this is the key type they are
-                    * 
-                    *   if objectType == 3
-                    *       int destRoom
-                    *       int outputPosX
-                    *       int outputPosY
-                    *       
-                    *       This comment is not up to date!
-                    */
+            //Uses the same form of room data as the ParseData function
             BinaryWriter binaryWriter = null;
             try
             {

@@ -23,9 +23,6 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
             get { return _active; }
         }
 
-        //TODO:
-        //Make it so checkpoints can only trigger in sequence (checkpoint 3 can't happen unless checkpoint 2 has tripped)
-
         public Checkpoint(Point location, Texture2D sprite, int index, int width, int height)
             : base(location, sprite, width, height)
         {
@@ -37,6 +34,10 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
 
         //TODO: Maybe add a method to display that progress is being saved in some way? Low priority
 
+        /// <summary>
+        /// Saves the map and player data
+        /// </summary>
+        /// <param name="player">The player object</param>
         public override void Activate(Player player)
         {
             //Makes sure the prior checkpoint has been activatated
@@ -63,7 +64,7 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
                 //Call the replay manager function
                 ReplayManager.SaveData(GameplayManager.Level, _index);
 
-                //Deactivate the checkpoint
+                //Deactivate the checkpoint after it has saved the data
                 _active = false;
             }
         }

@@ -158,6 +158,13 @@ namespace MakeEveryDayRecount
                         _state = GameState.Playback;
                     }
 
+                    //DELETE THIS
+                    //"kill" the player
+                    if (InputManager.GetKeyPress(Keys.P))
+                    {
+
+                    }
+
                     break;
 
                 case GameState.Cutscene:

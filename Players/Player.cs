@@ -405,9 +405,6 @@ namespace MakeEveryDayRecount.Players
             _inventory.ClearInventory();
         }
 
-
-        //Save player position and inventory in a file
-
         /// <summary>
         /// Saves the player's position and inventory to a file. Format is as follows:
         /// int xPos
