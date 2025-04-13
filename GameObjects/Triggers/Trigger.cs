@@ -25,7 +25,7 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
         //Sprite should always be null, only included so it extends from gameobject
         //Sprite index should be -1, since there is no sprite
         protected Trigger(Point location, Texture2D sprite, int width, int height)
-            : base(location, null, -1) 
+            : base(location, null) 
         {
             _width = width;
             _height = height;

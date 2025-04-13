@@ -24,7 +24,7 @@ namespace MakeEveryDayRecount.GameObjects
             SpriteIndex = spriteIndex;
         }
 
-        //Additional constructor for the player
+        //Additional constructor for things without a sprite array
         public GameObject(Point location, Texture2D sprite)
         {
             Location = location;

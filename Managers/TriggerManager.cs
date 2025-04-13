@@ -9,7 +9,15 @@ namespace MakeEveryDayRecount.Managers
 {
     internal static class TriggerManager
     {
-        public static List<Checkpoint> Checkpoints { get; }
+        public static List<Checkpoint> Checkpoints { get; private set; }
+
+        //TODO: This probably shouldn't be fully public, ask for feedback
+        public static Checkpoint CurrentCheckpoint { get; set; }
+
+        public static void Initialize()
+        {
+            Checkpoints = new List<Checkpoint>();
+        }
 
         /// <summary>
         /// Resets all lists of all triggers

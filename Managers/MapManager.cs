@@ -108,26 +108,23 @@ namespace MakeEveryDayRecount.Managers
 
         /// <summary>
         /// Load all the needed data relating to each room
-        /// from the corresponding files and format them.
-        /// </summary>
-        /// <param name="currentLevel">Current level of the game</param>
-        /// <returns>Formatted data loaded from files</returns>
-        private static Room[] LoadMapData(int currentLevel)
-        {
-            return LoadMapData(currentLevel.ToString());
-        }
-
-        /// <summary>
-        /// Load all the needed data relating to each room
         /// from the corresponding files and format them
         /// </summary>
         /// <param name="currentLevel">Current level of the game</param>
         /// <returns>Formatted data loaded from files</returns>
-        private static Room[] LoadMapData(string currentLevel)
+        private static Room[] LoadMapData(int currentLevel, string alternative = "")
         {
             // only read binary data here
             // each room is in charge of parsing itself
-            string folderPath = $"./Content/Levels/Level{currentLevel}";
+            string folderPath;
+            if (alternative != "")
+            {
+                folderPath = alternative;
+            }
+            else
+            {
+                folderPath = $"./Content/Levels/Level{currentLevel}";
+            }
 
             // Level.level should exist in every Level folder
             // Acts as a config file for the .room files
@@ -184,6 +181,16 @@ namespace MakeEveryDayRecount.Managers
             }
         }
 
+        public static void LoadCheckpoint(Checkpoint c)
+        {
+            _rooms = LoadMapData(1, "./CheckpointData");
+            ChangeRoom(c.RoomIndex);
+            foreach (Room room in _rooms)
+            {
+                room.DoorTransition += TransitionRoom;
+            }
+        }
+
         public static void SaveMap(string baseFolder)
         {
             //Make the .level file
@@ -206,6 +213,9 @@ namespace MakeEveryDayRecount.Managers
             {
                 _rooms[i].SaveRoom(baseFolder);
             }
+
+            //Close the writer
+            writer.Close();
         }
     }
 }

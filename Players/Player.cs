@@ -398,9 +398,10 @@ namespace MakeEveryDayRecount.Players
         /// <summary>
         /// Called when the player is detected by a camera
         /// </summary>
-        public void Detected(){
-            // TODO rather than restarting the level, just reset the player to the last checkpoint
-             GameplayManager.LevelReset();
+        public void Detected()
+        {
+            //Set the player to the last checkpoint
+            MapManager.LoadCheckpoint(TriggerManager.CurrentCheckpoint);
         }
 
         #endregion

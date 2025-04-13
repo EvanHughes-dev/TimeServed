@@ -88,6 +88,7 @@ namespace MakeEveryDayRecount
             InterfaceManager.exitGame += ExitGame;
 
             ReplayManager.Initialize();
+            TriggerManager.Initialize();
             //Set initial GameState
             _state = GameState.Menu;
             base.Initialize();
@@ -219,6 +220,7 @@ namespace MakeEveryDayRecount
                     break;
                 case GameState.Level:
                     GameplayManager.Draw(_spriteBatch);
+                    DisplayDebug();
                     break;
                 case GameState.Pause:
                     //TODO: Blur the gameplay in the background.
@@ -226,6 +228,10 @@ namespace MakeEveryDayRecount
                     DisplayDebug();
                     break;
                 case GameState.Cutscene:
+                    break;
+                case GameState.Playback:
+                    GameplayManager.Draw(_spriteBatch);
+                    DisplayDebug();
                     break;
             }
 

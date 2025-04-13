@@ -109,6 +109,11 @@ namespace MakeEveryDayRecount.Map
             Cameras = new List<Camera>();
             Doors = new List<Door> { };
             ParseData(filePath);
+
+            //DELETE THIS
+            Checkpoint c = new Checkpoint(new Point(1, 1), null, 1, 1, 1);
+            _triggersInRoom.Add(c);
+            TriggerManager.AddCheckpoint(c);
         }
 
         #region  Drawing Logic
@@ -363,6 +368,7 @@ namespace MakeEveryDayRecount.Map
                         }
                      
                         numberOfGameObjects--;
+                        //TODO: ask evan why adding "binaryReader.Close()" here makes cameras not show up
                     }
                 }
             }
@@ -370,6 +376,7 @@ namespace MakeEveryDayRecount.Map
             {
                 System.Diagnostics.Debug.Write(e.Message);
             }
+            
         }
 
         /// <summary>
@@ -464,7 +471,7 @@ namespace MakeEveryDayRecount.Map
             BinaryWriter binaryWriter = null;
             try
             {
-                Stream stream = File.OpenWrite(filepath + "/" + RoomName);
+                Stream stream = File.OpenWrite(Path.Join(filepath, $"{RoomName}.room"));
                 binaryWriter = new BinaryWriter(stream);
 
                 //Write dimensions of room

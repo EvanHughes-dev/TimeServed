@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Players;
 using MakeEveryDayRecount.Managers;
 using System.IO;
+using System.Runtime.CompilerServices;
 
 namespace MakeEveryDayRecount.GameObjects.Triggers
 {
@@ -12,6 +13,7 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
         //Fields
         private int _index;
         private bool _active;
+        private int _roomIndex;
 
         //Properties
         public int Index
@@ -22,11 +24,16 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
         {
             get { return _active; }
         }
+        public int RoomIndex
+        {
+            get { return _roomIndex; }
+        }
 
         public Checkpoint(Point location, Texture2D sprite, int index, int width, int height)
             : base(location, sprite, width, height)
         {
             _active = true;
+            _index = index;
         }
 
 
@@ -52,7 +59,7 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
 
                 //Always want to overwrite the folder if it exists
                 if (Directory.Exists(baseFolder))
-                    Directory.Delete(baseFolder);
+                    RecursiveDelete(baseFolder);
 
                 //(Re)make the folder
                 Directory.CreateDirectory(baseFolder);
@@ -61,12 +68,38 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
                 MapManager.SaveMap(baseFolder);
                 player.Save(baseFolder);
 
+                //Save the room this checkpoint is located in
+                _roomIndex = MapManager.CurrentRoom.RoomIndex;
+
+                //Update the current checkpoint
+                TriggerManager.CurrentCheckpoint = this;
+
                 //Call the replay manager function
                 ReplayManager.SaveData(GameplayManager.Level, _index);
 
                 //Deactivate the checkpoint after it has saved the data
                 _active = false;
             }
+
+            
+        }
+
+        /// <summary>
+        /// Recursibly delete all contents of a folder
+        /// </summary>
+        /// <param name="folderPath">Folder to delete</param>
+        private void RecursiveDelete(string folderPath)
+        {
+
+            foreach (string file in Directory.GetFiles(folderPath))
+                File.Delete(file);
+
+            foreach(string folder in Directory.GetDirectories(folderPath))
+            {
+                RecursiveDelete(folder);
+            }
+
+            Directory.Delete(folderPath);
         }
     }
 }
