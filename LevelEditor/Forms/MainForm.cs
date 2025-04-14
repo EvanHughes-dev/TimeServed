@@ -100,6 +100,16 @@ namespace LevelEditor
                 Tile[] tiles = [
                     FileIOHelpers.LoadTile("void.png", false),
 
+                    FileIOHelpers.LoadTile("tile_wall_corner_inner_tr.png", false),
+                    FileIOHelpers.LoadTile("tile_wall_corner_inner_tl.png", false),
+                    FileIOHelpers.LoadTile("tile_wall_corner_inner_br.png", false),
+                    FileIOHelpers.LoadTile("tile_wall_corner_inner_bl.png", false),
+
+                    FileIOHelpers.LoadTile("tile_wall_corner_outer_tr.png", false),
+                    FileIOHelpers.LoadTile("tile_wall_corner_outer_tl.png", false),
+                    FileIOHelpers.LoadTile("tile_wall_corner_outer_br.png", false),
+                    FileIOHelpers.LoadTile("tile_wall_corner_outer_bl.png", false),
+
                     FileIOHelpers.LoadTile("tile_wall0_top.png", false),
                     FileIOHelpers.LoadTile("tile_wall1_top.png", false),
                     FileIOHelpers.LoadTile("tile_wall2_top.png", false),
