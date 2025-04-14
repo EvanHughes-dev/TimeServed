@@ -123,6 +123,16 @@ namespace MakeEveryDayRecount.Managers
             {
                 content.Load<Texture2D>("Tiles/void"),
 
+                content.Load<Texture2D>("Tiles/tile_wall_corner_inner_tr"),
+                content.Load<Texture2D>("Tiles/tile_wall_corner_inner_tl"),
+                content.Load<Texture2D>("Tiles/tile_wall_corner_inner_br"),
+                content.Load<Texture2D>("Tiles/tile_wall_corner_inner_bl"),
+
+                content.Load<Texture2D>("Tiles/tile_wall_corner_outer_tr"),
+                content.Load<Texture2D>("Tiles/tile_wall_corner_outer_tl"),
+                content.Load<Texture2D>("Tiles/tile_wall_corner_outer_br"),
+                content.Load<Texture2D>("Tiles/tile_wall_corner_outer_bl"),
+
                 content.Load<Texture2D>("Tiles/tile_wall0_top"),
                 content.Load<Texture2D>("Tiles/tile_wall1_top"),
                 content.Load<Texture2D>("Tiles/tile_wall2_top"),
