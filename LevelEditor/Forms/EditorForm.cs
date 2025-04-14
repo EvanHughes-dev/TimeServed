@@ -138,7 +138,11 @@ namespace LevelEditor
             : this(mainForm)
         {
             Room = room;
-            InitializeMap(Room);
+
+            RoomRenderer renderer = new RoomRenderer();
+            renderer.Room = room;
+            groupBoxMap.Controls.Add(renderer);
+            renderer.Bounds = PadRectInwards(groupBoxMap.ClientRectangle, 5, 5, 20, 5);
         }
 
         #endregion
@@ -229,7 +233,11 @@ namespace LevelEditor
                             break;
 
                         case ObjectType.Camera:
-                            throw new NotImplementedException();
+                            Camera camera = (Camera)SelectedProp;
+
+                            CameraForm.Prompt(Room, camera, new Point(x, y));
+
+                            break;
                     }
 
                     //Propy is ALive!! They gets all of tile's crap like a younger sibling does
@@ -510,5 +518,10 @@ namespace LevelEditor
         }
 
         #endregion
+
+        private void EditorForm_Resize(object sender, EventArgs e)
+        {
+            
+        }
     }
 }

@@ -8,6 +8,7 @@ using static System.Windows.Forms.LinkLabel;
 using LevelEditor.Classes;
 using LevelEditor.Classes.Props;
 using System.Threading.Channels;
+using System.CodeDom;
 
 namespace LevelEditor
 {
@@ -322,7 +323,7 @@ namespace LevelEditor
                         room.Props.Add(((Door)allProps.ElementAt(imageIndex + 6)).Instantiate(propPosition, destPoint, destRoom));
                         break;
                     case ObjectType.Camera:
-                        break;
+                        throw new NotImplementedException();
                 }
 
                 numOfProps--;
@@ -338,11 +339,15 @@ namespace LevelEditor
         #region Loading Assets
 
         /// <summary>
-        /// UNIMPLEMENTED
+        /// Loads a camera from disk given the name of the sprite file.
         /// </summary>
+        /// <param name="spriteName"></param>
+        /// <param name="imageIndex"></param>
         /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public static Camera LoadCamera() => throw new NotImplementedException("CAMERAS ARE NOT IMPLEMENTED YELL AT LEAH");
+        public static Camera LoadCamera(string spriteName, int imageIndex)
+        {
+            return new Camera(LoadPropSprite(spriteName), imageIndex);
+        }
 
         /// <summary>
         /// Loads a door from disk given the name of the sprite file and the necessary data about the door.

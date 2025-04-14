@@ -7,28 +7,54 @@ using System.Threading.Tasks;
 namespace LevelEditor.Classes.Props
 {
     /// <summary>
-    /// UNIMPLEMENTED CLASS. DO NOT USE.
+    /// Represents a single security camera that can spot the player.
     /// </summary>
     public class Camera : Prop
     {
         /// <summary>
-        /// UNIMPLEMENTED CLASS. DO NOT USE.
+        /// The point, in tilespace, this camera is pointed at.
         /// </summary>
-        /// <exception cref="NotImplementedException">ALWAYS THROWN.</exception>
-        public Camera()
-            : base(default, 0, ObjectType.Camera, null!)
+        public Point? Target { get; set; }
+        /// <summary>
+        /// The spread of this camera, in radians. Equal to the radian distance between the center ray and either side ray.
+        /// </summary>
+        public float RadianSpread { get; set; }
 
+        /// <summary>
+        /// Creates a new Camera with the given sprite, position, target, and spread.
+        /// </summary>
+        /// <param name="sprite">The sprite this Box displays with.</param>
+        /// <param name="imageIndex">Index of this image within the list of camera sprites.</param>
+        /// <param name="position">The position of this Camera.</param>
+        /// <param name="target">The tile this Camera should point to.</param>
+        /// <param name="radianSpread">The angle of spread the camera should have to each side of its center ray, in radians.</param>
+        public Camera(Image sprite, int imageIndex, Point? position = null, Point? target = null, float radianSpread = float.NaN)
+            : base(sprite, imageIndex, ObjectType.Camera, position)
         {
-            throw new NotImplementedException();
+            Target = target;
+            RadianSpread = radianSpread;
         }
 
         /// <summary>
-        /// UNIMPLEMENTED CLASS. DO NOT USE.
+        /// Creates a copy of this Camera at the given position.
         /// </summary>
-        /// <exception cref="NotImplementedException">ALWAYS THROWN.</exception>
+        /// <param name="position">The position to copy this Camera to.</param>
+        /// <returns>A copy of this Camera at the given position.</returns>
         public override Camera Instantiate(Point position)
         {
-            throw new NotImplementedException();
+            return new Camera(Sprite, ImageIndex, position, Target, RadianSpread);
+        }
+
+        /// <summary>
+        /// Creates a copy of this Camera at the given position with the given target and spread.
+        /// </summary>
+        /// <param name="position">The position to copy this Camera to.</param>
+        /// <param name="target">The tile this Camera should point to.</param>
+        /// <param name="radianSpread">The angle of spread the camera should have to each side of its center ray, in radians.</param>
+        /// <returns>The created copy.</returns>
+        public Camera Instantiate(Point position, Point target, float radianSpread)
+        {
+            return new Camera(Sprite, ImageIndex, position, target, radianSpread);
         }
     }
 }
