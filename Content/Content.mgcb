@@ -221,6 +221,12 @@
 /processorParam:TextureFormat=Color
 /build:Items/wireCutters.png
 
+#begin Levels/Level Camera/Camera Puzzle.room
+/copy:Levels/Level Camera/Camera Puzzle.room
+
+#begin Levels/Level Camera/level.level
+/copy:Levels/Level Camera/level.level
+
 #begin Levels/Level1/level.level
 /copy:Levels/Level1/level.level
 
@@ -302,18 +308,6 @@
 /processorParam:TextureFormat=Color
 /build:Tiles/tile_walkable0.png
 
-#begin Tiles/tile_walkable0.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Tiles/tile_walkable0.png
-
 #begin Tiles/tile_walkable1.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -325,30 +319,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Tiles/tile_walkable1.png
-
-#begin Tiles/tile_walkable1.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Tiles/tile_walkable1.png
-
-#begin Tiles/tile_walkable2.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Tiles/tile_walkable2.png
 
 #begin Tiles/tile_walkable2.png
 /importer:TextureImporter
@@ -374,18 +344,6 @@
 /processorParam:TextureFormat=Color
 /build:Tiles/tile_walkable3.png
 
-#begin Tiles/tile_walkable3.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Tiles/tile_walkable3.png
-
 #begin Tiles/tile_walkable4.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -398,7 +356,7 @@
 /processorParam:TextureFormat=Color
 /build:Tiles/tile_walkable4.png
 
-#begin Tiles/tile_walkable4.png
+#begin Tiles/tile_wall_corner_inne_tr.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -408,7 +366,91 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Tiles/tile_walkable4.png
+/build:Tiles/tile_wall_corner_inne_tr.png
+
+#begin Tiles/tile_wall_corner_inner_bl.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Tiles/tile_wall_corner_inner_bl.png
+
+#begin Tiles/tile_wall_corner_inner_br.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Tiles/tile_wall_corner_inner_br.png
+
+#begin Tiles/tile_wall_corner_inner_tl.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Tiles/tile_wall_corner_inner_tl.png
+
+#begin Tiles/tile_wall_corner_outer_bl.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Tiles/tile_wall_corner_outer_bl.png
+
+#begin Tiles/tile_wall_corner_outer_br.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Tiles/tile_wall_corner_outer_br.png
+
+#begin Tiles/tile_wall_corner_outer_tl.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Tiles/tile_wall_corner_outer_tl.png
+
+#begin Tiles/tile_wall_corner_outer_tr.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Tiles/tile_wall_corner_outer_tr.png
 
 #begin Tiles/tile_wall0_bottom.png
 /importer:TextureImporter
@@ -614,18 +656,6 @@
 /processorParam:TextureFormat=Color
 /build:Tiles/void.png
 
-#begin Tiles/void.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Tiles/void.png
-
 #begin UI/DefaultButton.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -674,9 +704,3 @@
 /processorParam:TextureFormat=Color
 /build:UI/ui_cursorHover.png
 
-
-#begin Levels/Level Camera/level.level
-/copy:Levels/Level Camera/level.level
-
-#begin Levels/Level Camera/Camera Puzzle.room
-/copy:Levels/Level Camera/Camera Puzzle.room
