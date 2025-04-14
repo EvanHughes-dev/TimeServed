@@ -1,4 +1,5 @@
 ﻿using LevelEditor.Classes;
+using LevelEditor.Extensions;
 using System.Drawing.Drawing2D;
 
 namespace LevelEditor.Controls
@@ -31,7 +32,8 @@ namespace LevelEditor.Controls
         private RectangleF _roomBounds;
         private float _tileSize;
 
-        public RoomRenderer()
+        public RoomRenderer(Control? parent = null, string? text = null, int left = 0, int top = 0, int width = 0, int height = 0)
+            : base(parent, text, left, top, width, height)
         {
             _room = null!;
         }

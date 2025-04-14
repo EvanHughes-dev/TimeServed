@@ -92,7 +92,6 @@
             ClientSize = new Size(492, 514);
             Controls.Add(tabControlTilesProps);
             Controls.Add(groupBoxMap);
-            FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
             Name = "EditorForm";
             Text = "Level Editor";

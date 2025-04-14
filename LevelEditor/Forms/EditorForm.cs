@@ -5,6 +5,7 @@
 using LevelEditor.Classes;
 using LevelEditor.Classes.Props;
 using LevelEditor.Controls;
+using LevelEditor.Extensions;
 using LevelEditor.Forms.Prompts;
 
 namespace LevelEditor
@@ -68,6 +69,8 @@ namespace LevelEditor
         /// Holds the prop boxes that exist in the room
         /// </summary>
         private readonly List<PropBox> _propBoxesInRoom;
+
+        private RoomRenderer _roomRenderer;
 
         #endregion
         #region Constructors
@@ -139,10 +142,12 @@ namespace LevelEditor
         {
             Room = room;
 
-            RoomRenderer renderer = new RoomRenderer();
-            renderer.Room = room;
-            groupBoxMap.Controls.Add(renderer);
-            renderer.Bounds = PadRectInwards(groupBoxMap.ClientRectangle, 5, 5, 20, 5);
+            _roomRenderer = new RoomRenderer
+            {
+                Room = room,
+                Bounds = groupBoxMap.ClientRectangle.NudgeSides(-20, -5, -5, -5)
+            };
+            groupBoxMap.Controls.Add(_roomRenderer);
         }
 
         #endregion
@@ -367,7 +372,7 @@ namespace LevelEditor
 
             // Padding is currently hardcoded because I didn't feel like adding 5 more arguments to this function...
             //   it's not the cleanest but it's fine for now
-            Rectangle bounds = PadRectInwards(parent.ClientRectangle, 5, 5, 20, 5);
+            Rectangle bounds = parent.ClientRectangle.NudgeSides(-20, -5, -5, -5);
             TControl[,] swatches = GenerateGrid<TControl>(width, height, bounds, 5, parent);
 
             // Setup each swatch using the user-provided callback
@@ -414,7 +419,7 @@ namespace LevelEditor
             Width += widthChange;
 
             // Padding of 5 units on each side and 20 units on the top just happens to look good
-            Rectangle mapBounds = PadRectInwards(groupBoxMap.ClientRectangle, 5, 5, 20, 5);
+            Rectangle mapBounds = groupBoxMap.ClientRectangle.NudgeSides(-20, -5, -5, -5);
             TileGrid = GenerateGrid<TileBox>(width, height, mapBounds, parent: groupBoxMap);
 
             // Now, lastly, we set up every individual TileBox to show the proper tile
@@ -500,27 +505,13 @@ namespace LevelEditor
             return controls;
         }
 
-        /// <summary>
-        /// Takes a rectangle and pads each individual side inwards by the given amounts.
-        /// </summary>
-        /// <param name="rect">The rectangle to pad.</param>
-        /// <param name="padLeft">How far to move the left side inwards.</param>
-        /// <param name="padRight">How far to move the right side inwards.</param>
-        /// <param name="padTop">How far to move the top side inwards.</param>
-        /// <param name="padBottom">How far to move the bottom side inwards.</param>
-        /// <returns>The padded rectangle.</returns>
-        private static Rectangle PadRectInwards(Rectangle rect, int padLeft, int padRight, int padTop, int padBottom)
-        {
-            return new Rectangle(rect.Left + padLeft,
-                rect.Top + padTop,
-                rect.Width - padLeft - padRight,
-                rect.Height - padTop - padBottom);
-        }
-
         #endregion
 
         private void EditorForm_Resize(object sender, EventArgs e)
         {
+            Point mapPos = groupBoxMap.Location;
+            Rectangle mapRect = Bounds.NudgeSides(-mapPos.Y, -5, -mapPos.X, -5);
+            groupBoxMap.Bounds = mapRect;
             
         }
     }
