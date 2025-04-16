@@ -6,6 +6,7 @@ using MakeEveryDayRecount.Players;
 
 namespace MakeEveryDayRecount.GameObjects.Props
 {
+    
     /// <summary>
     /// An item the player can pick up and add to their inventory
     /// </summary>

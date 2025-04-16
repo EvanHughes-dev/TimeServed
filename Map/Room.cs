@@ -575,7 +575,7 @@ namespace MakeEveryDayRecount.Map
                     //Unique to cameras
                     binaryWriter.Write(Cameras[i].CenterPoint.X);
                     binaryWriter.Write(Cameras[i].CenterPoint.Y);
-                    binaryWriter.Write(Cameras[i].Spread);
+                    binaryWriter.Write((double)Cameras[i].Spread);
                 }
 
                 //Write out all triggers

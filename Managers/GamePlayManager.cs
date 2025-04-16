@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Players;
 using MakeEveryDayRecount.Map;
 using MakeEveryDayRecount.GameObjects.Props;
+using System;
 
 namespace MakeEveryDayRecount.Managers
 {
@@ -89,5 +90,12 @@ namespace MakeEveryDayRecount.Managers
             ReplayManager.ClearData();
         }
 
+        /// <summary>
+        /// Clears checkpoint data and player data
+        /// </summary>
+        public static void ClearSavedData()
+        {
+            //TODO: Implement this!
+        }
     }
 }

@@ -41,8 +41,6 @@ namespace MakeEveryDayRecount.Players
             Interacting = 2
         }
 
-
-
         /// <summary>
         /// Player's current position on the screen
         /// </summary>
@@ -400,11 +398,14 @@ namespace MakeEveryDayRecount.Players
         /// </summary>
         public void Detected()
         {
+            //TODO: This loads checkpoint data from last session. Need to wipe that data if the player wants to start fresh
+            //"Play" instead of "Continue"
+            
             //Reset the map to the last checkpoint
             MapManager.LoadCheckpoint(TriggerManager.CurrentCheckpoint);
 
             //Reset the player data to the last checkpoint
-
+            Load();
         }
 
         #endregion
@@ -428,7 +429,8 @@ namespace MakeEveryDayRecount.Players
         /// int item count
         /// 
         /// inventory:
-        ///     string itemName
+        ///     int propIndex
+        ///     int keyType
         /// </summary>
         public void Save(string baseFolder)
         {
@@ -439,7 +441,7 @@ namespace MakeEveryDayRecount.Players
             BinaryWriter writer = null;
             try
             {
-                Stream stream = File.OpenWrite($"{baseFolder}/PlayerData");
+                Stream stream = File.OpenWrite($"./PlayerData/PlayerData.data");
                 writer = new BinaryWriter(stream);
 
                 //Player position
@@ -451,11 +453,10 @@ namespace MakeEveryDayRecount.Players
 
                 //Items
                 for (int i = 0; i < _inventory.Contents.Count; i++)
-                    writer.Write(_inventory.Contents[i].ItemName);
-            }
-            catch (Exception e)
-            {
-                System.Diagnostics.Debug.Write(e.Message);
+                {
+                    writer.Write(_inventory.Contents[i].SpriteIndex);
+                    writer.Write((int)_inventory.Contents[i].ItemKeyType);
+                }
             }
             finally
             {
@@ -471,14 +472,26 @@ namespace MakeEveryDayRecount.Players
             BinaryReader reader = null!;
             try
             {
-                Stream stream = File.OpenRead("./PlayerData");
+                Stream stream = File.OpenRead("./PlayerData/PlayerData.data");
                 reader = new BinaryReader(stream);
 
-                //TODO: ask what the least disruptive way to change the player's location is
-            }
-            catch(Exception e)
-            {
+                //Clear Player's states
+                ClearStates();
 
+                //Update player position
+                Location = new Point(reader.ReadInt32(), reader.ReadInt32());
+
+                //Check item count
+                int itemCount = reader.ReadInt32();
+
+                //Give the player their items back
+                for (int i = 0; i < itemCount; i++)
+                {
+                    int spriteIndex = reader.ReadInt32();
+                    int keyType = reader.ReadInt32();
+
+                    _inventory.AddItemToInventory(new Item(Point.Zero, AssetManager.PropTextures, spriteIndex, "TEMP_NAME", (Door.DoorKeyType)keyType));
+                }
             }
             finally
             {
