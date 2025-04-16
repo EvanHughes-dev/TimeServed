@@ -400,8 +400,11 @@ namespace MakeEveryDayRecount.Players
         /// </summary>
         public void Detected()
         {
-            //Set the player to the last checkpoint
+            //Reset the map to the last checkpoint
             MapManager.LoadCheckpoint(TriggerManager.CurrentCheckpoint);
+
+            //Reset the player data to the last checkpoint
+
         }
 
         #endregion
@@ -457,6 +460,29 @@ namespace MakeEveryDayRecount.Players
             finally
             {
                 writer.Close();
+            }
+        }
+
+        /// <summary>
+        /// Resets all relevant player values to how they were during the last checkpoint
+        /// </summary>
+        public void Load()
+        {
+            BinaryReader reader = null!;
+            try
+            {
+                Stream stream = File.OpenRead("./PlayerData");
+                reader = new BinaryReader(stream);
+
+                //TODO: ask what the least disruptive way to change the player's location is
+            }
+            catch(Exception e)
+            {
+
+            }
+            finally
+            {
+                reader.Close();
             }
         }
     }

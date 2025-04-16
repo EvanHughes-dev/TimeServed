@@ -530,10 +530,8 @@ namespace MakeEveryDayRecount.Map
                 //Write prop count
                 binaryWriter.Write(_itemsInRoom.Count + Doors.Count);
 
-                //TODO: make sure the amount of times this loops is correct
-                //Honestly it might be better to just have writing out each type of prop be its own thing
-                //Write out all non-door props
-                for (int i = 0; i < _itemsInRoom.Count - (Doors.Count + Cameras.Count); i++)
+                //Write out all non-door non-camera props
+                for (int i = 0; i < _itemsInRoom.Count - Cameras.Count; i++)
                 {
                     binaryWriter.Write(_itemsInRoom[i].SpriteIndex);
                     binaryWriter.Write(_itemsInRoom[i].Location.X);
@@ -545,8 +543,6 @@ namespace MakeEveryDayRecount.Map
                         binaryWriter.Write((int)ObjectTypes.Item);
                         binaryWriter.Write((int)((Item)_itemsInRoom[i]).ItemKeyType);
                     }
-                    else if (_itemsInRoom[i] is Camera)
-                        binaryWriter.Write((int)ObjectTypes.Camera);
                     else if (_itemsInRoom[i] is Box)
                         binaryWriter.Write((int)ObjectTypes.Box);
                 }
@@ -567,8 +563,20 @@ namespace MakeEveryDayRecount.Map
                     binaryWriter.Write(Doors[i].DestinationTile.Y);
                 }
 
-                //TODO: Write out all cameras
+                //Write out all the cameras
+                for (int i = 0; i < Cameras.Count; i++)
+                {
+                    //Standard game object parameters
+                    binaryWriter.Write(Cameras[i].SpriteIndex);
+                    binaryWriter.Write(Cameras[i].Location.X);
+                    binaryWriter.Write(Cameras[i].Location.Y);
+                    binaryWriter.Write((int)ObjectTypes.Camera);
 
+                    //Unique to cameras
+                    binaryWriter.Write(Cameras[i].CenterPoint.X);
+                    binaryWriter.Write(Cameras[i].CenterPoint.Y);
+                    binaryWriter.Write(Cameras[i].Spread);
+                }
 
                 //Write out all triggers
                 binaryWriter.Write(_triggersInRoom.Count);

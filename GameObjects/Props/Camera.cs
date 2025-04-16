@@ -47,6 +47,17 @@ namespace MakeEveryDayRecount.GameObjects.Props
         //It also needs a reference to the player to know if they step into the vision kite
         private Player _player = GameplayManager.PlayerObject;
 
+        //TODO: Check in with Daniel to make sure these properties are ok to have
+        public Point CenterPoint
+        {
+            get { return _centerPoint; }
+        }
+
+        public float Spread
+        {
+            get { return _spread; }
+        }
+
         /// <summary>
         /// Makes a security camera that watches a certain vision kite to see if the player is inside it
         /// </summary>

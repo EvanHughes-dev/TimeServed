@@ -74,7 +74,7 @@ namespace MakeEveryDayRecount
             //_graphics.PreferredBackBufferHeight = 360;
 
             _graphics.HardwareModeSwitch = false;
-            _graphics.IsFullScreen = true;
+            _graphics.IsFullScreen = false; //DELETE THIS
             _graphics.ApplyChanges();
 
             _debugState = DebugState.None;
