@@ -165,28 +165,43 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //Rasterize between the corners and the centerpoint to get all the points we need to send out a ray to
             List<Point> clockwisePoints = Rasterize(clockwisePoint, _centerPoint);
             List<Point> counterclockwisePoints = Rasterize(_centerPoint, counterclockwisePoint);
-            //TODO: Maybe sort the lists so that the _endpoints array ends up in a centain order?
-            //The endpoints array starts from the counterclockwise corner, goes to the center, and ends at the clockwise corner
-            //Basically sweeping from left to right, from the camera's point of view
-            //Although maybe if the camera "sweeps" from the center outwards, it would somehow help us avoid duplicates more?
-            //Because rays in the center are more likely to have tiles that overlap with the rays at the edges. The closer to the center you are the more overlap there is.
 
-            //TESTING - Tell me all the endpoints for each half
-            //Debug.Write("Clockwise points are: ");
-            //foreach (Point debugPoint in clockwisePoints) Debug.Write(debugPoint + " ");
-            //Debug.WriteLine(null);
-
-            //Arbitrarily remove the centerpoint from the clockwise list so we don't add it to endpoints twice
-            //We can't use RemoveAt for this because the centerpoint could be at either end of this list
-            counterclockwisePoints.Remove(_centerPoint);
-            //Now combine the two lists into one and turn that into an array
-            List<Point> endPoints = clockwisePoints;
-            endPoints.AddRange(counterclockwisePoints);
+            List<Point> endPoints = new List<Point>();
+            //Sort the two lists of endpoints so that it goes from the counter-clockwise corner to the center to the clockwise corner
+            if (counterclockwisePoints[0] == counterclockwisePoint)
+            {
+                //Then just add all the points in order
+                for (int i = 0; i < counterclockwisePoints.Count; i++)
+                {
+                    endPoints.Add(counterclockwisePoints[i]);
+                }
+            }
+            else
+            {
+                //Otherwise they must be in backwards order so we need to add them backwards
+                for (int i = counterclockwisePoints.Count-1; i >= 0; i--)
+                {
+                    endPoints.Add(counterclockwisePoints[i]);
+                }
+            }
+            //Remove centerpoint because both the lists contain the centerpoint and we don't want it in there twice
+            //Centerpoint should currently be the last item in the list
+            endPoints.RemoveAt(endPoints.Count-1);
+            //Now do all the stuff we did above for the clockwise points
+            if (clockwisePoints[0] == clockwisePoint)
+            {
+                for (int i = 0; i < clockwisePoints.Count; i++) endPoints.Add(clockwisePoints[i]);
+            }
+            else
+            {
+                for (int i = clockwisePoints.Count - 1; i >= 0; i--) endPoints.Add(clockwisePoints[i]);
+            }
+            //Now save this into the field of the class
             _endPoints = endPoints.ToArray();
 
             //Create a rectangle that bounds the entire kite
             //TODO: Could finding the corners be done more efficiently?
-            Point[] corners = { _rayBase, _centerPoint, clockwisePoint, counterclockwisePoint };
+            Point[] corners = { _rayBase, _centerPoint, clockwisePoint, counterclockwisePoint};
             //Find the minimum/maximum X and Y of the 4 bounding points (the edges of the rectangle basically)
             int minX = _rayBase.X;
             int maxX = _rayBase.X;
@@ -358,7 +373,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                     Vector2 candidateVector = new Vector2(x - _rayBase.X, y - _rayBase.Y);
                     //Figure out if that vector is between the two edge vectors. If it is, then it should be inside of the vision kite
                     //NOTE: Chris suggested using the dot product for this but I think cross product is better because it doesn't require trigonometry
-                    //Maybe this is dumb tho idk
+                    //But maybe if we normalized the vectors and then did dot product? I won't worry about it for now
                     //I got the formula for this from StackOverflow (Andy G)
                     //Where A and C are the edge vectors, and B is the candidate vector, and the three vectors are pointing out from the same point
                     //if (AxB * AxC >= 0 && CxB * CxA >= 0) then B is between A and C
@@ -416,10 +431,10 @@ namespace MakeEveryDayRecount.GameObjects.Props
                     if (_previousBoxes.Count != boxes.Count || !boxes.All(_previousBoxes.Contains))
                     {
                         //We've found a new box in the way. Check all the rays fellas!
-                        _watchedTiles = new List<Point> { };
-                        foreach (Point endpoint in _endPoints)
+                        _watchedTiles = _visionKite.ToList();
+                        for (int i = 0; i < _endPoints.Length; i++)
                         {
-                            List<Point> tilesInRay = Rasterize(_rayBase, endpoint);
+                            List<Point> tilesInRay = Rasterize(_rayBase, _endPoints[i]);
                             foreach (Point box in boxes)
                             {
 
@@ -430,12 +445,34 @@ namespace MakeEveryDayRecount.GameObjects.Props
                                 {
                                     //Debug.WriteLine($"Endpoint {endpoint.X}, {endpoint.Y} is blocked");
                                     //Remove all the tiles between the box and the end of the ray
-                                    tilesInRay = Rasterize(_rayBase, box);
-                                    tilesInRay.Remove(box);
+                                    foreach (Point blockedTile in Rasterize(box, _endPoints[i])) _watchedTiles.Remove(blockedTile);
+                                    //Now check the rays on either side of the ray you just found and treat them as blocked also
+                                    //TODO: There is probably a more efficent way to do this, I'm just trying it out
+                                    foreach (Point blockedTile in ``1233444Rasterize(box, _endPoints[i-1])) _watchedTiles.Remove(blockedTile);
+                                    foreach (Point blockedTile in Rasterize(box, _endPoints[i+1])) _watchedTiles.Remove(blockedTile);
                                 }
                             }
-                            _watchedTiles.AddRange(tilesInRay.Where(p => !_watchedTiles.Contains(p) && _visionKite.Contains(p)));
                         }
+                    }
+
+                    //Now do one more check of the watched tiles. If any of them is isolated, remove it
+                    //NOTE: If there's lag or bugs in this area, this might be the cause
+                    foreach (Point watchedTile in _watchedTiles)
+                    {
+                        //Check the tiles above, below, and to either side of this tile.
+                        //TODO: This may also be inefficanet. Using a dictionary instead of a list of points might help with this, but I'm not sure yet
+                        int watchedNeighbors = 0;
+                        //Left
+                        if (_watchedTiles.Contains(new Point(watchedTile.X - 1, watchedTile.Y))) watchedNeighbors++;
+                        //Right
+                        if (_watchedTiles.Contains(new Point(watchedTile.X + 1, watchedTile.Y))) watchedNeighbors++;
+                        //Above
+                        if (_watchedTiles.Contains(new Point(watchedTile.X, watchedTile.Y - 1))) watchedNeighbors++;
+                        //Below
+                        if (_watchedTiles.Contains(new Point(watchedTile.X, watchedTile.Y + 1))) watchedNeighbors++;
+
+                        //If the tile has one watched neighbor or less, then remove it
+                        if (watchedNeighbors <= 1) _watchedTiles.Remove(watchedTile);
                     }
 
                     //Now check for the player :)
@@ -444,7 +481,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                         if (_player.Location == watchedTile)
                         {
                             //WE FOUND THE PLAYER! GET HIM BOYS!
-                            _player.Detected();
+                            //_player.Detected();
                             break;
                         }
                     }
@@ -467,9 +504,8 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //TESTING - show all the endpoints with hooks
             foreach (Point endpoint in _endPoints) sb.Draw(AssetManager.PropTextures[3], new Rectangle(MapUtils.TileToWorld(endpoint) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
 
-            //if (Location.X == 8)
-                //foreach (Point EndPoint in _endPoints)
-                    //foreach (Point endpoint in Rasterize(_rayBase, EndPoint)) sb.Draw(AssetManager.PropTextures[3], new Rectangle(MapUtils.TileToWorld(endpoint) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
+            foreach (Point EndPoint in _endPoints)
+                foreach (Point endpoint in Rasterize(_rayBase, EndPoint)) sb.Draw(AssetManager.PropTextures[3], new Rectangle(MapUtils.TileToWorld(endpoint) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
         }
 
         private List<Point> Rasterize(Point p1, Point p2)
