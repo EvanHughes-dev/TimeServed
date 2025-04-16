@@ -32,7 +32,7 @@ namespace LevelEditor
             // Path.Join is technically safer than $"{folderPath}/level.level" since different OSs use different path join characters
             // Does that *really* matter for this program's use case? Not really! But it's good practice
             string levelPath = Path.Join(folderPath, "level.level");
-            BinaryWriter writer = new(new FileStream(levelPath, FileMode.Create));
+            BinaryWriter writer = new BinaryWriter(new FileStream(levelPath, FileMode.Create));
 
             int roomCount = level.Rooms.Count;
 
@@ -102,7 +102,7 @@ namespace LevelEditor
 
 
             string roomPath = Path.Join(folderPath, $"{room.Name}.room");
-            BinaryWriter writer = new(new FileStream(roomPath, FileMode.Create));
+            BinaryWriter writer = new BinaryWriter(new FileStream(roomPath, FileMode.Create));
 
             int height = room.Tiles.GetLength(0);
             int width = room.Tiles.GetLength(1);
@@ -186,9 +186,9 @@ namespace LevelEditor
              *    - string roomName
              *    - int roomID
              */
-            Level level = new();
+            Level level = new Level();
 
-            BinaryReader reader = new(new FileStream(filePath, FileMode.Open));
+            BinaryReader reader = new BinaryReader(new FileStream(filePath, FileMode.Open));
 
             int roomCount = reader.ReadInt32();
 
@@ -208,9 +208,8 @@ namespace LevelEditor
                     level.Rooms.Add(
                         LoadRoom(roomPath, allTiles, allProps)
                         );
-                    level.Rooms[level.Rooms.Count-1].Id = roomIndex;
+                    level.Rooms[level.Rooms.Count - 1].Id = roomIndex;
                 }
-
             }
 
             reader.Close();
@@ -265,7 +264,7 @@ namespace LevelEditor
             *       int destY
             */
 
-            BinaryReader reader = new(new FileStream(filePath, FileMode.Open));
+            BinaryReader reader = new BinaryReader(new FileStream(filePath, FileMode.Open));
 
             int width = reader.ReadInt32();
             int height = reader.ReadInt32();

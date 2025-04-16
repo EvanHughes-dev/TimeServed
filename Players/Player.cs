@@ -189,6 +189,10 @@ namespace MakeEveryDayRecount.Players
             if (!_readyToMove)
                 UpdateWalkingTime(deltaTime);
 
+            // Update the player's walking state if needed
+            if (_playerCurrentDirection != directionMove)
+                _playerCurrentDirection = directionMove;
+
             if (_readyToMove && _gameplayManager.Map.CheckPlayerCollision(Location + movement) &&
                 (!HoldingBox || _gameplayManager.Map.CheckPlayerCollision(_currentHeldBox.Location + movement)))
             {
@@ -202,9 +206,7 @@ namespace MakeEveryDayRecount.Players
                 SoundManager.PlaySFX(SoundManager.PlayerStepSound, -20, 20);
             }
 
-            // Update the player's walking state if needed
-            if (_playerCurrentDirection != directionMove)
-                _playerCurrentDirection = directionMove;
+
         }
 
         /// <summary>
@@ -214,10 +216,13 @@ namespace MakeEveryDayRecount.Players
         private void UpdateWalkingTime(float deltaTime)
         {
             _walkingSeconds += deltaTime;
-            if (_walkingSeconds >= SecondsPerTile)
+            int adjustment = 1;
+            if (_playerState == PlayerState.Standing)
+                adjustment = 2;
+            if (_walkingSeconds >= SecondsPerTile / adjustment)
             {
                 _readyToMove = true;
-                _walkingSeconds -= SecondsPerTile;
+                _walkingSeconds -= SecondsPerTile / adjustment;
             }
         }
         #endregion
@@ -382,8 +387,8 @@ namespace MakeEveryDayRecount.Players
         /// </summary>
         private void DropBox()
         {
-            if(HoldingBox)
-             _currentHeldBox.DropBox();
+            if (HoldingBox)
+                _currentHeldBox.DropBox();
             _currentHeldBox = null;
         }
 
