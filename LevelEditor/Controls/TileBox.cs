@@ -10,7 +10,7 @@ namespace LevelEditor.Controls
     /// <summary>
     /// An extension of PixelBox specialized to store a Tile.
     /// </summary>
-    internal class TileBox : PixelBox
+    internal class TileBox : BorderBox
     {
         private Tile _tile;
 

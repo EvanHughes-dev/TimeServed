@@ -29,7 +29,7 @@ namespace LevelEditor.Extensions
          *   
          * For this extension class though, I have a special rule, which is that, unless for some reason it makes absolutely no sense, 
          *   *every method must have a version for both the integer and float version of the type.*
-         *   That means that if you define an extension method for Point, you must also define an identical method for PointF and vice veras
+         *   That means that if you define an extension method for Point, you must also define an identical method for PointF and vice versa
          *   (same for Rectangle/RectangleF and Size/SizeF)
          *   Put the two methods directly next to each other so it's easy to just change both whenever changes are needed!
          *   
@@ -94,6 +94,125 @@ namespace LevelEditor.Extensions
         /// <returns><c>new PointF(-point.X, -point.Y);</c></returns>
         public static PointF Negate(this PointF point) => new PointF(-point.X, -point.Y);
 
+        /// <summary>
+        /// Multiplies both components of this point by a given integer.
+        /// </summary>
+        /// <param name="point">This point.</param>
+        /// <param name="multiplier">The integer to multiply this point by.</param>
+        /// <returns><c>new Point(point.X * multiplier, point.Y * multiplier);</c></returns>
+        public static Point Multiply(this Point point, int multiplier)
+        {
+            return new Point(point.X * multiplier, point.Y * multiplier);
+        }
+        /// <summary>
+        /// Multiplies both components of this point by a given float.
+        /// </summary>
+        /// <param name="point">This point.</param>
+        /// <param name="multiplier">The float to multiply this point by.</param>
+        /// <returns><c>new PointF(point.X * multiplier, point.Y * multiplier);</c></returns>
+        public static PointF Multiply(this PointF point, float multiplier)
+        {
+            return new PointF(point.X * multiplier, point.Y * multiplier);
+        }
+
+        /// <summary>
+        /// Returns a new point that is the component-wise integer division of this point by another point.
+        ///   For float division, cast this point to a PointF!
+        /// </summary>
+        /// <param name="point">This point.</param>
+        /// <param name="other">The point to divide this point by.</param>
+        /// <returns>The result of the division.</returns>
+        public static Point Divide(this Point point, Point other)
+        {
+            return new Point(point.X / other.X, point.Y / other.Y);
+        }
+        /// <summary>
+        /// Returns a new point that is the component-wise float division of this point by another point.
+        ///   For integer division, cast both PointFs to a Point!
+        /// </summary>
+        /// <param name="point">This point.</param>
+        /// <param name="other">The point to divide this point by.</param>
+        /// <returns>The result of the division.</returns>
+        public static PointF Divide(this PointF point, PointF other)
+        {
+            return new PointF(point.X / other.X, point.Y / other.Y);
+        }
+
+        /// <summary>
+        /// Returns a new point which is the quotient of each of this point's components divided by the given integer.
+        ///   For float division, cast this point to a PointF!
+        /// </summary>
+        /// <param name="point">This point.</param>
+        /// <param name="divisor">The integer to divide both components by.</param>
+        /// <returns>The calculated quotient.</returns>
+        public static Point Divide(this Point point, int divisor)
+        {
+            return new Point(point.X / divisor, point.Y / divisor);
+        }
+        /// <summary>
+        /// Returns a new point which is the quotient of each of this point's components divided by the given float.
+        ///   For integer division, cast this PointF to a Point!
+        /// </summary>
+        /// <param name="point">This point.</param>
+        /// <param name="divisor">The float to divide both components by.</param>
+        /// <returns>The calculated quotient.</returns>
+        public static PointF Divide(this PointF point, float divisor)
+        {
+            return new PointF(point.X / divisor, point.Y / divisor);
+        }
+
+        /// <summary>
+        /// Calculates the squared distance between this point and another point.
+        ///   Why squared distance? Because square roots are slow, and squared distance can still be used for relative calculations
+        ///   (i.e. <, >, and/or ==)
+        /// </summary>
+        /// <param name="point">This point.</param>
+        /// <param name="other">The point to calculate distance with.</param>
+        /// <returns>The calculated distance, squared.</returns>
+        public static int SqrDistance(this Point point, Point other)
+        {
+            Point difference = point.Subtract(other);
+
+            return difference.X * difference.X + difference.Y * difference.Y;
+        }
+        /// <summary>
+        /// Calculates the squared distance between this point and another point.
+        ///   Why squared distance? Because square roots are slow, and squared distance can still be used for relative calculations
+        ///   (i.e. <, >, and/or ==)
+        /// </summary>
+        /// <param name="point">This point.</param>
+        /// <param name="other">The point to calculate distance with.</param>
+        /// <returns>The calculated distance, squared.</returns>
+        public static float SqrDistance(this PointF point, PointF other)
+        {
+            PointF difference = point.Subtract(other);
+
+            return difference.X * difference.X + difference.Y * difference.Y;
+        }
+
+        /// <summary>
+        /// Calculates the distance between this point and another point.
+        ///   If you don't actually need the exact number, use SqrDistance()!
+        /// </summary>
+        /// <param name="point">This point.</param>
+        /// <param name="other">The point to calculate distance with.</param>
+        /// <returns>The calculated distance.</returns>
+        public static float Distance(this Point point, Point other)
+        {
+            return MathF.Sqrt(point.SqrDistance(other));
+        }
+        /// <summary>
+        /// Calculates the distance between this point and another point.
+        ///   If you don't actually need the exact number, use SqrDistance()!
+        /// </summary>
+        /// <param name="point">This point.</param>
+        /// <param name="other">The point to calculate distance with.</param>
+        /// <returns>The calculated distance.</returns>
+        public static float Distance(this PointF point, PointF other)
+        {
+            return MathF.Sqrt(point.SqrDistance(other));
+        }
+
         #endregion
         #region Rectangle / RectangleF
         /// <summary>
@@ -129,6 +248,25 @@ namespace LevelEditor.Extensions
                 rect.Top - top,
                 rect.Width + left + right,
                 rect.Height + top + bottom);
+        }
+
+        /// <summary>
+        /// Gets the center point of this rectangle.
+        /// </summary>
+        /// <param name="rect">This rectangle.</param>
+        /// <returns><c>return Point.Add(rect.Location, rect.Size / 2);</c></returns>
+        public static Point GetCenter(this Rectangle rect)
+        {
+            return Point.Add(rect.Location, rect.Size / 2);
+        }
+        /// <summary>
+        /// Gets the center point of this rectangle.
+        /// </summary>
+        /// <param name="rect">This rectangle.</param>
+        /// <returns><c>return PointF.Add(rect.Location, rect.Size / 2);</c></returns>
+        public static PointF GetCenter(this RectangleF rect)
+        {
+            return PointF.Add(rect.Location, rect.Size / 2);
         }
 
         #endregion

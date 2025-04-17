@@ -21,171 +21,133 @@ namespace LevelEditor.Forms.Prompts
     public partial class CameraForm : Form
     {
         private readonly Camera _camera;
-        private readonly RayRenderer _ray;
+
+        // The last valid input to the textBoxSpread
+        private string _lastValidInput;
 
         /// <summary>
         /// Creates a new CameraForm with the given room.
         /// </summary>
         /// <param name="room">The room to have the user select a position of.</param>
-        private CameraForm(Room room, Camera camera, Point position)
+        private CameraForm(Room room, Camera camera)
         {
             InitializeComponent();
 
+            // Save params
             _camera = camera;
+            roomRenderer.Room = room;
 
-            _ray = new RayRenderer()
-            {
-                Bounds = this.Bounds,
-                RayColor = Color.Black,
-                RayStart = new(0,0), // TEMP CODE
-                RayEnd = new(100,100)
-            };
+            // For some reason you can't subscribe to this event in the designer, so just do it here
+            textBoxSpread.LostFocus += TextBoxSpread_LostFocus;
 
-            Controls.Add(_ray);
+            // Set the text box and track bar to show the camera's existing RadianSpread
+            float degreeSpread = float.RadiansToDegrees(camera.RadianSpread);
+            textBoxSpread.Text = degreeSpread.ToString();
+            trackBarSpread.Value = (int)degreeSpread;
 
-            InitializeMap(room);
+            _lastValidInput = textBoxSpread.Text;
 
-            _ray.BringToFront();
+            // Automatically size all of this form's components
+            Reformat();
         }
 
-
         /// <summary>
-        /// Creates a callback function to be used when the user clicks a tile associated with a given position.
+        /// Updates the auto-resizing components of this form.
         /// </summary>
-        /// <param name="point">The position to associate.</param>
-        /// <returns>The created callback function.</returns>
-        private EventHandler MakeClickCallback(Point point)
+        private void Reformat()
         {
-            return (object? sender, EventArgs _) =>
-            {
-                if (sender is not TileBox tile) throw new Exception();
+            // The splitContainer should just cover the entire form
+            splitContainer.Bounds = ClientRectangle;
 
-                Debug.WriteLine("Callback!");
-
-                _camera.Target = point;
-                _ray.RayEnd = tile.GetAbsoluteLocation();
-            };
+            // The map should take up the entirety of the top panel of the split container
+            groupBoxMap.Bounds = splitContainer.Panel1.ClientRectangle;
+            roomRenderer.Bounds = groupBoxMap.ClientRectangle.NudgeSides(-20, -5, -5, -5); // This padding looks nice
         }
 
-        #region Helpers
         /// <summary>
-        /// Initializes the grid of TileBoxes and sets their display to facilitate editing of a given Room.
+        /// Updates the camera's RadianSpread property based on the input to the text box.
         /// </summary>
-        /// <param name="room">The room to be edited.</param>
-        private void InitializeMap(Room room)
+        private void UpdateSpreadFromText()
         {
-            int height = room.Tiles.GetLength(0);
-            int width = room.Tiles.GetLength(1);
+            bool validInput = float.TryParse(textBoxSpread.Text, out float degSpread);
 
-            // We need the overall form window to adapt to the size of the map, so if we measure how much the groupBoxMap changes
-            //   width then we can apply that same width change to the form window
-            int priorWidth = groupBoxMap.Width;
-
-            groupBoxMap.Width = groupBoxMap.Height / height * width;
-
-            int widthChange = groupBoxMap.Width - priorWidth;
-            Width += widthChange;
-
-            // Padding of 5 units on each side and 20 units on the top just happens to look good
-            Rectangle mapBounds = PadRectInwards(groupBoxMap.ClientRectangle, 5, 5, 20, 5);
-            TileBox[,] tileGrid = GenerateGrid<TileBox>(width, height, mapBounds, parent: groupBoxMap);
-
-            // Now, lastly, we set up every individual TileBox to show the proper tile
-            //   and respond properly when clicked on or dragged over
-            for (int y = 0; y < height; y++)
+            if (validInput)
             {
-                for (int x = 0; x < width; x++)
-                {
-                    TileBox tileBox = tileGrid[y, x];
-                    tileBox.Tile = room.Tiles[y, x];
-                    tileBox.Click += MakeClickCallback(new Point(x, y));
+                _camera.RadianSpread = float.DegreesToRadians(degSpread);
 
-                    tileBox.SizeMode = PictureBoxSizeMode.Zoom;
-                }
+                trackBarSpread.Value = (int)float.Round(degSpread);
+
+                _lastValidInput = textBoxSpread.Text;
             }
-
-            foreach (Prop prop in room.Props)
+            else
             {
-                if (prop.Position.HasValue)
-                {
-                    Point propPosition = new Point(prop.Position.Value.X, prop.Position.Value.Y);
-                    TileBox tile = tileGrid[propPosition.Y, propPosition.X];
-                    //Propy is ALive!! They gets all of tile's crap like a younger sibling does
-                    PropBox proppy = new PropBox()
-                    {
-                        SizeMode = PictureBoxSizeMode.Zoom,
-                        Parent = tile,
-                        Location = new Point(0, 0),
-                        Size = tile.Size,
-                        BackColor = Color.Transparent //and their parent is trans apparently
-                    };
-
-
-                    tile.Controls.Add(proppy);
-
-                    proppy.Prop = prop;
-                    proppy.BringToFront();
-
-                    proppy.Enabled = false;
-                }
+                // If the user typed something that can't be parsed to a float, we want to undo that work
+                textBoxSpread.Text = _lastValidInput;
             }
+        }
 
+        #region Event Handlers
+        /// <summary>
+        /// Reformats the form.
+        /// </summary>
+        private void CameraForm_Resize(object sender, EventArgs e)
+        {
+            Reformat();
         }
 
         /// <summary>
-        /// Creates a uniform grid of controls following a number of parameters.
+        /// Reformats the form.
         /// </summary>
-        /// <typeparam name="T">The type of control to create a grid of.</typeparam>
-        /// <param name="width">The width of the grid to create, in "number of controls".</param>
-        /// <param name="height">The height of the grid to create, in "number of controls".</param>
-        /// <param name="rect">The rectangle to fit the grid in. The individual controls will be resized to fit the grid entirely within this rectangle.</param>
-        /// <param name="padding">The padding to apply between each individual control.</param>
-        /// <param name="parent">A Control to make all of the grid elements a child of.</param>
-        /// <returns>A 2D array with all of the controls in the grid.</returns>
-        private T[,] GenerateGrid<T>(int width, int height, Rectangle rect, int padding = 0, Control? parent = null) where T : Control, new()
+        private void splitContainer_SplitterMoved(object sender, SplitterEventArgs e)
         {
-            T[,] controls = new T[height, width];
-
-            int controlSize = Math.Min(rect.Width / width, rect.Height / height);
-
-            // The grid is generated in columns, from left to right and top to bottom
-            for (int x = 0; x < width; x++)
-            {
-                for (int y = 0; y < height; y++)
-                {
-                    T control = new T();
-                    Controls.Add(control);
-
-                    // Doesn't matter that the parent argument might be null here -- control.Parent is nullable already!
-                    control.Parent = parent;
-
-                    control.SetBounds((x * controlSize) + rect.Left + padding,
-                        (y * controlSize) + rect.Top + padding,
-                        controlSize - padding,
-                        controlSize - padding);
-
-                    controls[y, x] = control;
-                }
-            }
-
-            return controls;
+            Reformat();
         }
 
         /// <summary>
-        /// Takes a rectangle and pads each individual side inwards by the given amounts.
+        /// Closes the form.
         /// </summary>
-        /// <param name="rect">The rectangle to pad.</param>
-        /// <param name="padLeft">How far to move the left side inwards.</param>
-        /// <param name="padRight">How far to move the right side inwards.</param>
-        /// <param name="padTop">How far to move the top side inwards.</param>
-        /// <param name="padBottom">How far to move the bottom side inwards.</param>
-        /// <returns>The padded rectangle.</returns>
-        private static Rectangle PadRectInwards(Rectangle rect, int padLeft, int padRight, int padTop, int padBottom)
+        private void buttonDone_Click(object sender, EventArgs e)
         {
-            return new Rectangle(rect.Left + padLeft,
-                rect.Top + padTop,
-                rect.Width - padLeft - padRight,
-                rect.Height - padTop - padBottom);
+            Close();
+        }
+
+        /// <summary>
+        /// Updates the text box and the camera's radian spread.
+        /// </summary>
+        private void trackBarSpread_Scroll(object sender, EventArgs e)
+        {
+            if (sender is not TrackBar bar) throw new Exception();
+
+            textBoxSpread.Text = bar.Value.ToString();
+
+            _camera.RadianSpread = float.DegreesToRadians(bar.Value);
+        }
+
+        /// <summary>
+        /// Updates the camera's spread when enter is pressed.
+        /// </summary>
+        private void textBoxSpread_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter)
+            {
+                UpdateSpreadFromText();
+            }
+        }
+
+        /// <summary>
+        /// Updates the camera's spread.
+        /// </summary>
+        private void TextBoxSpread_LostFocus(object? sender, EventArgs e)
+        {
+            UpdateSpreadFromText();
+        }
+
+        /// <summary>
+        /// Sets the camera's target to the clicked tile.
+        /// </summary>
+        private void RoomRenderer_TileMouseClick(object? sender, TileEventArgs e)
+        {
+            _camera.Target = e.Tile;
         }
 
         #endregion
@@ -195,10 +157,9 @@ namespace LevelEditor.Forms.Prompts
         /// </summary>
         /// <param name="room">The room currently being edited.</param>
         /// <param name="camera">The camera to have the user edit.</param>
-        /// <returns>The user's selected position, or null if they closed the form manually.</returns>
-        public static void Prompt(Room room, Camera camera, Point position)
+        public static void Prompt(Room room, Camera camera)
         {
-            CameraForm form = new CameraForm(room, camera, position);
+            CameraForm form = new CameraForm(room, camera);
             form.ShowDialog();
         }
     }

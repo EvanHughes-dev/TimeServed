@@ -8,9 +8,8 @@ using static System.Windows.Forms.LinkLabel;
 using LevelEditor.Classes;
 using LevelEditor.Classes.Props;
 using System.Threading.Channels;
-using System.CodeDom;
 
-namespace LevelEditor
+namespace LevelEditor.Helpers
 {
     /// <summary>
     /// A static helper class to handle all necessary file IO with different formats.
@@ -113,18 +112,15 @@ namespace LevelEditor
             string roomPath = Path.Join(folderPath, $"{room.Name}.room");
             BinaryWriter writer = new(new FileStream(roomPath, FileMode.Create));
 
-            int height = room.Tiles.GetLength(0);
-            int width = room.Tiles.GetLength(1);
-
-            writer.Write(width);
-            writer.Write(height);
+            writer.Write(room.Width);
+            writer.Write(room.Height);
 
             // Tiles are written in rows, from the top to the bottom and left to right
-            for (int y = 0; y < height; y++)
+            for (int y = 0; y < room.Height; y++)
             {
-                for (int x = 0; x < width; x++)
+                for (int x = 0; x < room.Width; x++)
                 {
-                    Tile toWrite = room.Tiles[y, x];
+                    Tile toWrite = room[x, y];
                     writer.Write(toWrite.IsWalkable);
                     writer.Write(Array.IndexOf(tilesArray, toWrite));
                 }
@@ -294,7 +290,7 @@ namespace LevelEditor
                     int tileIndex = reader.ReadInt32();
                     Tile tile = allTiles.ElementAt(tileIndex);
 
-                    room.Tiles[y, x] = tile;
+                    room[x, y] = tile;
                 }
             }
 
@@ -311,19 +307,19 @@ namespace LevelEditor
                 {
                     case ObjectType.Item:
                         _ = reader.ReadInt32();// Don't need the key type
-                        room.Props.Add(allProps.ElementAt(imageIndex).Instantiate(propPosition));
+                        room.AddProp(allProps.ElementAt(imageIndex).Instantiate(propPosition));
                         break;
                     case ObjectType.Box:
-                        room.Props.Add(allProps.ElementAt(imageIndex + 5).Instantiate(propPosition));
+                        room.AddProp(allProps.ElementAt(imageIndex + 5).Instantiate(propPosition));
                         break;
                     case ObjectType.Door:
                         _ = reader.ReadInt32(); //Don't need the key type
                         int destRoom = reader.ReadInt32();
                         Point destPoint = new Point(reader.ReadInt32(), reader.ReadInt32());
-                        room.Props.Add(((Door)allProps.ElementAt(imageIndex + 6)).Instantiate(propPosition, destPoint, destRoom));
+                        room.AddProp(((Door)allProps.ElementAt(imageIndex + 6)).Instantiate(propPosition, destPoint, destRoom));
                         break;
                     case ObjectType.Camera:
-                        throw new NotImplementedException();
+                        break;
                 }
 
                 numOfProps--;

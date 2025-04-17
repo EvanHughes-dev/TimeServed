@@ -40,9 +40,6 @@
     <Compile Update="Controls\PropBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Update="Forms\Prompts\CameraForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
   </ItemGroup>
 
   <ItemGroup>

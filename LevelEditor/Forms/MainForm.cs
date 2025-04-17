@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using LevelEditor.Classes;
 using LevelEditor.Classes.Props;
+using LevelEditor.Helpers;
 
 namespace LevelEditor
 {
