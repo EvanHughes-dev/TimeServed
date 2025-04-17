@@ -9,7 +9,6 @@ namespace LevelEditor.Helpers
     /// </summary>
     internal static class FileIOHelpers
     {
-
         #region File Saving
 
         /// <summary>
@@ -97,10 +96,14 @@ namespace LevelEditor.Helpers
              *       int destRoomId
              *       int destX
              *       int destY
+             *       
+             *   if objectType == 1
+             *       int targetX
+             *       int targetY
+             *       double spreadRadians // Will be parsed as a float, but has to be saved and loaded as a double because Evan says so
              */
 
             Tile[] tilesArray = [.. allTiles];
-
 
             string roomPath = Path.Join(folderPath, $"{room.Name}.room");
             BinaryWriter writer = new BinaryWriter(new FileStream(roomPath, FileMode.Create));
@@ -136,12 +139,20 @@ namespace LevelEditor.Helpers
                         Item item = (Item)prop;
                         writer.Write((int)item.KeyType);
                         break;
+
                     case ObjectType.Camera:
-                        // TODO Add camera saving when the file format has been decided
+                        Camera camera = (Camera)prop;
+                        Point target = (Point)camera.Target!;
+
+                        writer.Write(target.X);
+                        writer.Write(target.Y);
+                        writer.Write((double)camera.RadianSpread);
                         break;
+
                     case ObjectType.Box:
                         // Don't need to save any extra data for the box
                         break;
+
                     case ObjectType.Door:
                         Door door = (Door)prop;
                         writer.Write((int)door.KeyToOpen);
@@ -260,6 +271,11 @@ namespace LevelEditor.Helpers
             *       int destRoomId
             *       int destX
             *       int destY
+             *       
+             *   if objectType == 1
+             *       int targetX
+             *       int targetY
+             *       double spreadRadians // Will be parsed as a float, but has to be saved and loaded as a double because Evan says so
             */
 
             BinaryReader reader = new BinaryReader(new FileStream(filePath, FileMode.Open));
@@ -286,7 +302,6 @@ namespace LevelEditor.Helpers
                 }
             }
 
-            // TODO: ADD LOADING OF PROPS
             int numOfProps = reader.ReadInt32();
 
             while (numOfProps > 0)
@@ -311,6 +326,9 @@ namespace LevelEditor.Helpers
                         room.AddProp(((Door)allProps.ElementAt(imageIndex + 6)).Instantiate(propPosition, destPoint, destRoom));
                         break;
                     case ObjectType.Camera:
+                        Point target = new Point(reader.ReadInt32(), reader.ReadInt32());
+                        float spread = (float)reader.ReadDouble();
+                        room.AddProp(((Camera)allProps.ElementAt(imageIndex + 10)).Instantiate(propPosition, target, spread));
                         break;
                 }
 
@@ -501,6 +519,5 @@ namespace LevelEditor.Helpers
         }
 
         #endregion
-
     }
 }
