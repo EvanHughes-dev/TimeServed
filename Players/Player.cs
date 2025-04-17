@@ -192,13 +192,11 @@ namespace MakeEveryDayRecount.Players
 
                     SoundManager.PlaySFX(SoundManager.PlayerStepSound, -40, 40);
                 }
-                // else
-                // {
-                // TODO implement this after we rework the player animation system -Evan
-                //     _playerState = PlayerState.Standing;
-                // }
+                else
+                {
+                    _playerState = PlayerState.Standing;
+                }
             }
-
 
             if (HoldingBox)
             {
