@@ -11,7 +11,7 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
     internal class Checkpoint : Trigger
     {
         //Fields
-        private int _index;
+        private int _index; //DELETE THIS personal note: index starts at 0 (of course!)
         private bool _active;
         private int _roomIndex;
 
@@ -29,11 +29,11 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
             get { return _roomIndex; }
         }
 
-        public Checkpoint(Point location, Texture2D sprite, int index, int width, int height)
+        public Checkpoint(Point location, Texture2D sprite, int index, int width, int height, bool active)
             : base(location, sprite, width, height)
         {
-            _active = true;
             _index = index;
+            _active = active;
         }
 
 
@@ -49,13 +49,17 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
         {
             //Makes sure the prior checkpoint has been activatated
             //unless this is the first checkpoint, in which case it's always good to activate
-            if (Index != 1)
+            if (Index != 0)
                 if (!TriggerManager.Checkpoints[Index - 1].Active)
                     return;
 
             if (_active)
             {
                 string baseFolder = "./CheckpointData";
+
+                //Deactivate the checkpoint after it has saved the data
+                //Need to do this before data gets saved
+                _active = false;
 
                 //Always want to overwrite the folder if it exists
                 if (Directory.Exists(baseFolder))
@@ -76,9 +80,6 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
 
                 //Call the replay manager function
                 ReplayManager.SaveData(GameplayManager.Level, _index);
-
-                //Deactivate the checkpoint after it has saved the data
-                _active = false;
             }
         }
 

@@ -108,11 +108,6 @@ namespace MakeEveryDayRecount.Map
             Cameras = new List<Camera>();
             Doors = new List<Door> { };
             ParseData(filePath);
-
-            //DELETE THIS
-            Checkpoint c = new Checkpoint(new Point(1, 1), null, 1, 1, 1);
-            _triggersInRoom.Add(c);
-            TriggerManager.AddCheckpoint(c);
         }
 
         #region  Drawing Logic
@@ -335,39 +330,40 @@ namespace MakeEveryDayRecount.Map
                                 Doors.Add(doorFromFile);
                                 break;
                         }
-                        //Define number of triggers in the room
-                        //TODO: update files so that triggers are implemented
-                        //For rooms with no triggers we can slap a 0 at the end and everything will be fine
-                        //As of right now they are not updated, so the following line has been commented out
-                        //int numberOfTriggers = binaryReader.ReadInt32();
-                        int numberOfTriggers = 0; //DELETE THIS
-
-                        //Parse all needed triggers from file
-                        while (numberOfTriggers > 0)
-                        {
-                            Point triggerPos = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
-                            int triggerWidth = binaryReader.ReadInt32();
-                            int triggerHeight = binaryReader.ReadInt32();
-
-                            TriggerTypes triggerType = (TriggerTypes)binaryReader.ReadInt32();
-
-                            if (triggerType == TriggerTypes.Checkpoint)
-                            {
-                                Checkpoint checkpoint = new Checkpoint(triggerPos, null, binaryReader.ReadInt32(), triggerWidth, triggerHeight);
-                                _triggersInRoom.Add(checkpoint);
-
-                                //Add it to the trigger manager
-                                TriggerManager.AddCheckpoint(checkpoint);
-
-                                //If it's the first checkpoint, make that the player's spawn
-                                if (TriggerManager.Checkpoints.Count == 1)
-                                {
-                                    TriggerManager.SetPlayerSpawn(checkpoint);
-                                }
-                            }
-                        }
+                        
                      
                         numberOfGameObjects--;
+                    }
+                    //Define number of triggers in the room
+                    //TODO: update files so that triggers are implemented
+                    //For rooms with no triggers we can slap a 0 at the end and everything will be fine
+                    //As of right now they are not updated, so the following line has been commented out
+                    //int numberOfTriggers = binaryReader.ReadInt32();
+                    int numberOfTriggers = binaryReader.ReadInt32();
+
+                    //Parse all needed triggers from file
+                    while (numberOfTriggers > 0)
+                    {
+                        Point triggerPos = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
+                        int triggerWidth = binaryReader.ReadInt32();
+                        int triggerHeight = binaryReader.ReadInt32();
+
+                        TriggerTypes triggerType = (TriggerTypes)binaryReader.ReadInt32();
+
+                        if (triggerType == TriggerTypes.Checkpoint)
+                        {
+                            Checkpoint checkpoint = new Checkpoint(triggerPos, null, binaryReader.ReadInt32(), triggerWidth, triggerHeight, binaryReader.ReadBoolean());
+                            _triggersInRoom.Add(checkpoint);
+
+                            //Add it to the trigger manager
+                            TriggerManager.AddCheckpoint(checkpoint);
+
+                            //If it's the first checkpoint, make that the player's spawn
+                            if (TriggerManager.Checkpoints.Count == 1)
+                            {
+                                TriggerManager.SetPlayerSpawn(checkpoint);
+                            }
+                        }
                     }
                 }
             }
@@ -375,7 +371,6 @@ namespace MakeEveryDayRecount.Map
             {
                 System.Diagnostics.Debug.Write(e.Message);
             }
-            
         }
 
         /// <summary>
@@ -518,9 +513,9 @@ namespace MakeEveryDayRecount.Map
                 binaryWriter.Write(MapSize.Y);
 
                 //Write out all the tiles
-                for (int x = 0; x < MapSize.X; x++)
+                for (int y = 0; y < MapSize.Y; y++)
                 {
-                    for (int y = 0; y < MapSize.Y; y++)
+                    for (int x = 0; x < MapSize.X; x++)
                     {
                         binaryWriter.Write(_map[x, y].IsWalkable);
                         binaryWriter.Write(_map[x, y].SpriteIndex);
@@ -592,6 +587,7 @@ namespace MakeEveryDayRecount.Map
                     {
                         binaryWriter.Write((int)TriggerTypes.Checkpoint);
                         binaryWriter.Write(((Checkpoint)_triggersInRoom[i]).Index);
+                        binaryWriter.Write(((Checkpoint)_triggersInRoom[i]).Active);
                     }
                 }
             }
