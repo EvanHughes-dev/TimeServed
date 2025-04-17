@@ -177,34 +177,47 @@ namespace MakeEveryDayRecount.Players
         /// <param name="directionMove">Direction of movement</param>
         private void PlayerMovement(float deltaTime, Point movement, Direction directionMove)
         {
-            // Drop the box if the player is holding it and they attempt to move a direction the 
-            // box can't be moved in
-            if (HoldingBox && IsPerpendicular(directionMove, _currentHeldBox.AttachmentDirection))
-                DropBox();
-
-            // Stop the player from turing around if they're holding the box
-            if (HoldingBox)
-                directionMove = _currentHeldBox.AttachmentDirection;
-
             if (!_readyToMove)
                 UpdateWalkingTime(deltaTime);
-
-            if (_readyToMove && _gameplayManager.Map.CheckPlayerCollision(Location + movement) &&
-                (!HoldingBox || _gameplayManager.Map.CheckPlayerCollision(_currentHeldBox.Location + movement)))
+            if (_readyToMove)
             {
+                if (_gameplayManager.Map.CheckPlayerCollision(Location + movement) &&
+                    (!HoldingBox || _gameplayManager.Map.CheckPlayerCollision(_currentHeldBox.Location + movement)))
+                {
+                    Location += movement;
+                    _readyToMove = false;
 
-                Location += movement;
-                _readyToMove = false;
-                if (_playerState == PlayerState.Standing)
-                    _playerState = PlayerState.Walking;
-                if (HoldingBox)
-                    _currentHeldBox.UpdatePosition(Location);
-                SoundManager.PlaySFX(SoundManager.PlayerStepSound, -20, 20);
+                    if (_playerState != PlayerState.Walking)
+                        _playerState = PlayerState.Walking;
+
+                    SoundManager.PlaySFX(SoundManager.PlayerStepSound, -40, 40);
+                }
+                // else
+                // {
+                // TODO implement this after we rework the player animation system -Evan
+                //     _playerState = PlayerState.Standing;
+                // }
             }
 
-            // Update the player's walking state if needed
+
+            if (HoldingBox)
+            {
+                // Drop the box if the player is holding it and they attempt to move a direction the 
+                // box can't be moved in
+                if (IsPerpendicular(directionMove, _currentHeldBox.AttachmentDirection))
+                    DropBox();
+                else
+                {
+                    // Otherwise update need variable for the box
+                    directionMove = _currentHeldBox.AttachmentDirection;
+                    _currentHeldBox.UpdatePosition(Location);
+                }
+            }
+
+            // Update the player's direction
             if (_playerCurrentDirection != directionMove)
                 _playerCurrentDirection = directionMove;
+
         }
 
         /// <summary>
@@ -214,10 +227,18 @@ namespace MakeEveryDayRecount.Players
         private void UpdateWalkingTime(float deltaTime)
         {
             _walkingSeconds += deltaTime;
-            if (_walkingSeconds >= SecondsPerTile)
+
+            // This variable allows for the time between movements to be changed depending on what state 
+            // the player is coming from
+            int timeAdjustment = 1;
+
+            if (_playerState == PlayerState.Standing)
+                timeAdjustment = 2;
+
+            if (_walkingSeconds >= SecondsPerTile / timeAdjustment)
             {
                 _readyToMove = true;
-                _walkingSeconds -= SecondsPerTile;
+                _walkingSeconds -= SecondsPerTile / timeAdjustment;
             }
         }
         #endregion
@@ -248,8 +269,8 @@ namespace MakeEveryDayRecount.Players
         /// As it is setup now, the player changes walking animation once per tile
         /// at the same rate the player walks.
         /// </summary>
-        /// <param name="deltaTime"></param>
-        /// <returns></returns>
+        /// <param name="deltaTime">Time since last frame</param>
+        /// <returns>Rectangle for player animation</returns>
         private Rectangle AnimationUpdate(float deltaTime)
         {
             // Change the animation based on what state the player is currently in
@@ -350,13 +371,9 @@ namespace MakeEveryDayRecount.Players
                 case Direction.Down:
                     objectToInteract = _gameplayManager.Map.CheckInteractable(Location + new Point(0, 1));
                     break;
-                    //add code that makes the interaction happen
             }
 
-            if (objectToInteract == null)
-                return;
-
-            objectToInteract.Interact(this);
+            objectToInteract?.Interact(this);
         }
 
         /// <summary>
@@ -382,8 +399,7 @@ namespace MakeEveryDayRecount.Players
         /// </summary>
         private void DropBox()
         {
-            if(HoldingBox)
-             _currentHeldBox.DropBox();
+            _currentHeldBox?.DropBox();
             _currentHeldBox = null;
         }
 
