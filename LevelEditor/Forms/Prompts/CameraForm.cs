@@ -43,7 +43,7 @@ namespace LevelEditor.Forms.Prompts
             // Set the text box and track bar to show the camera's existing RadianSpread
             float degreeSpread = float.RadiansToDegrees(camera.RadianSpread);
             textBoxSpread.Text = degreeSpread.ToString();
-            trackBarSpread.Value = (int)degreeSpread;
+            trackBarSpread.Value = int.Clamp((int)degreeSpread, trackBarSpread.Minimum, trackBarSpread.Maximum);
 
             _lastValidInput = textBoxSpread.Text;
 
@@ -75,7 +75,7 @@ namespace LevelEditor.Forms.Prompts
             {
                 _camera.RadianSpread = float.DegreesToRadians(degSpread);
 
-                trackBarSpread.Value = (int)float.Round(degSpread);
+                trackBarSpread.Value = int.Clamp((int)float.Round(degSpread), trackBarSpread.Minimum, trackBarSpread.Maximum);
 
                 _lastValidInput = textBoxSpread.Text;
             }

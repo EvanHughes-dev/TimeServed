@@ -91,7 +91,7 @@ namespace LevelEditor
             _mainForm = mainForm;
 
             Room = null!;
-            TileGrid = null!;
+            _currentlySelectedTileBox = null!;
             _currentlySelectedPropBox = null!;
 
             TabState = TabState.Tiles;
@@ -183,7 +183,7 @@ namespace LevelEditor
                 {
                     Room[e.Tile] = SelectedTile;
                     // Handle setting tiles to the save value
-                    if (Room[e.Tile] == SelectedTile)
+                    if (Room[e.Tile].Sprite == SelectedTile.Sprite)
                         return;
 
                     if (Room.SavedState == SavedState.Saved)
@@ -301,7 +301,7 @@ namespace LevelEditor
                 {
                     Room[e.Tile] = SelectedTile;
 
-                    if (Room[e.Tile] != SelectedTile && Room.SavedState == SavedState.Saved)
+                    if (Room[e.Tile].Sprite != SelectedTile.Sprite && Room.SavedState == SavedState.Saved)
                     {
                         Room.SavedState = SavedState.Unsaved;
                         UpdateFormName($"{_formNameBase} *");
