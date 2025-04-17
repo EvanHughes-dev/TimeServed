@@ -35,11 +35,6 @@ namespace MakeEveryDayRecount
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        //Buttons
-        private List<Button> pauseButtons;
-        private List<Button> menuButtons;
-        private Texture2D defaultButtonTexture;
-
         private GameState _state;
 
         private GameplayManager _gameplayManager;
