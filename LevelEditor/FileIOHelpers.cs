@@ -28,12 +28,13 @@ namespace LevelEditor
              *    - string roomName
              *    - int roomID
              */
-
+            if (level == null)
+                return;
             // Path.Join is technically safer than $"{folderPath}/level.level" since different OSs use different path join characters
             // Does that *really* matter for this program's use case? Not really! But it's good practice
             string levelPath = Path.Join(folderPath, "level.level");
             BinaryWriter writer = new BinaryWriter(new FileStream(levelPath, FileMode.Create));
-
+           
             int roomCount = level.Rooms.Count;
 
             writer.Write(roomCount);

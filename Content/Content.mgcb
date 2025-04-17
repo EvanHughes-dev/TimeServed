@@ -221,20 +221,10 @@
 /processorParam:TextureFormat=Color
 /build:Items/wireCutters.png
 
-#begin Levels/Level Camera/Camera Puzzle.room
-/copy:Levels/Level Camera/Camera Puzzle.room
 
-#begin Levels/Level Camera/level.level
-/copy:Levels/Level Camera/level.level
 
-#begin Levels/Level1/level.level
-/copy:Levels/Level1/level.level
 
-#begin Levels/Level1/TestRoom1.room
-/copy:Levels/Level1/TestRoom1.room
 
-#begin Levels/Level1/TestRoom2.room
-/copy:Levels/Level1/TestRoom2.room
 
 #begin Player/Inventory/InventoryBox_hover.png
 /importer:TextureImporter
@@ -703,3 +693,12 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:UI/ui_cursorHover.png
+
+#begin Levels/Level1/level.level
+/copy:Levels/Level1/level.level
+
+#begin Levels/Level1/CaF.room
+/copy:Levels/Level1/CaF.room
+
+#begin Levels/Level1/Room2.room
+/copy:Levels/Level1/Room2.room

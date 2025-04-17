@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Data.Common;
 using System.IO;
 using MakeEveryDayRecount.GameObjects.Props;
 using MakeEveryDayRecount.Map;
@@ -30,7 +31,7 @@ namespace MakeEveryDayRecount.Managers
         {
             get => _currentRoom;
         }
-        private Room[] _rooms;
+        private Dictionary<int, Room> _rooms;
 
         private readonly GameplayManager _gameplayManager;
 
@@ -41,12 +42,14 @@ namespace MakeEveryDayRecount.Managers
         public MapManager(GameplayManager gameplayManager)
         {
             _gameplayManager = gameplayManager;
-            _rooms = LoadMapData(_gameplayManager.Level);
-            _currentRoom = _rooms[0];
+            _rooms = new Dictionary<int, Room> { };
+            Room[] rooms = LoadMapData(_gameplayManager.Level);
+            _currentRoom = rooms[0];
             OnRoomUpdate?.Invoke(_currentRoom);
-            foreach (Room room in _rooms)
+            foreach (Room room in rooms)
             {
                 room.DoorTransition += TransitionRoom;
+                _rooms.Add(room.RoomIndex, room);
             }
         }
         /// <summary>
@@ -159,11 +162,14 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public void ChangeLevel()
         {
-            _rooms = LoadMapData(_gameplayManager.Level);
-            ChangeRoom(0);
-            foreach (Room room in _rooms)
+            Room[] rooms = LoadMapData(_gameplayManager.Level);
+            _rooms.Clear();
+            _currentRoom = rooms[0];
+            OnRoomUpdate?.Invoke(_currentRoom);
+            foreach (Room room in rooms)
             {
                 room.DoorTransition += TransitionRoom;
+                _rooms.Add(room.RoomIndex, room);
             }
         }
     }
