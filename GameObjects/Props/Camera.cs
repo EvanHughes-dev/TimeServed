@@ -401,7 +401,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         public Camera(Point location, Texture2D sprite, Room containingRoom, Point centerPoint, float spread, Point boxLocation)
             : this(location, sprite, containingRoom, centerPoint, spread)
         {
-
+            //TODO: Add the wire box to the list of props in the room so that it gets drawn
         }
 
         public void Update(float deltaTime)
@@ -577,6 +577,12 @@ namespace MakeEveryDayRecount.GameObjects.Props
         public override void Interact(Player player)
         {
             throw new NotImplementedException("Interact has not been created yet in Camera");
+        }
+
+        //TODO: Ask Evan if making this method is efficent, or if I should use events/delegates instead?
+        public void Deactivate()
+        {
+            _active = false;
         }
     }
 }
