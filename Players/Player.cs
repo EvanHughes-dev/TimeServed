@@ -45,6 +45,11 @@ namespace MakeEveryDayRecount.Players
         /// </summary>
         public Point PlayerScreenPosition { get; private set; }
 
+        /// <summary>
+        /// Player's current position in the world
+        /// </summary>
+        public Point PlayerWorldPosition { get; private set; }
+
         private Direction _playerCurrentDirection;
         private PlayerState _playerState;
 
@@ -65,6 +70,10 @@ namespace MakeEveryDayRecount.Players
         }
 
         private const float SecondsPerTile = .2f;
+        private const float SecondsPerAnimation = .1f;
+        private const float SecondsPerPositionUpdate = .1f;
+
+        private float _timeBetweenPositionUpdate;
         private float _walkingSeconds;
         private bool _readyToMove;
 
@@ -72,6 +81,10 @@ namespace MakeEveryDayRecount.Players
         private int _animationFrame;
         private Rectangle _playerFrameRectangle;
         private readonly Point _playerSize;
+        private bool _justMoved;
+        private bool _reachedDest;
+
+        private Point _destDirection;
 
         //A reference to the gameplay manager which has a reference
         //to the map which lets the player know what's near them
@@ -104,6 +117,8 @@ namespace MakeEveryDayRecount.Players
             //Create an inventory
             _inventory = new Inventory(screenSize);
             _currentHeldBox = null;
+            _reachedDest = true;
+            _justMoved = false;
         }
 
         /// <summary>
@@ -113,7 +128,7 @@ namespace MakeEveryDayRecount.Players
         public void Update(float deltaTime)
         {
             KeyboardInput(deltaTime);
-            UpdatePlayerPos();
+            UpdatePlayerPos(deltaTime);
             _playerFrameRectangle = AnimationUpdate(deltaTime);
             _inventory.Update();
         }
@@ -141,7 +156,7 @@ namespace MakeEveryDayRecount.Players
             {
                 PlayerMovement(deltaTime, new Point(0, 1), Direction.Down);
             }
-            else
+            else if (_reachedDest)
             {
                 //if we were walking and we stop pressing a key, go back to standing
                 _playerState = PlayerState.Standing;
@@ -173,7 +188,7 @@ namespace MakeEveryDayRecount.Players
         /// as there isn't an issue with collision
         /// </summary>
         /// <param name="deltaTime">Time since last frame</param>
-        /// <param name="movement">Vector to move</param>
+        /// <param name="movement">Point to move</param>
         /// <param name="directionMove">Direction of movement</param>
         private void PlayerMovement(float deltaTime, Point movement, Direction directionMove)
         {
@@ -184,9 +199,10 @@ namespace MakeEveryDayRecount.Players
                 if (_gameplayManager.Map.CheckPlayerCollision(Location + movement) &&
                     (!HoldingBox || _gameplayManager.Map.CheckPlayerCollision(_currentHeldBox.Location + movement)))
                 {
-                    Location += movement;
                     _readyToMove = false;
-
+                    _destDirection = movement;
+                    _justMoved = true;
+                    _reachedDest = false;
                     if (_playerState != PlayerState.Walking)
                         _playerState = PlayerState.Walking;
 
@@ -239,6 +255,7 @@ namespace MakeEveryDayRecount.Players
                 _walkingSeconds -= SecondsPerTile / timeAdjustment;
             }
         }
+
         #endregion
 
         #region Drawing Logic
@@ -283,9 +300,9 @@ namespace MakeEveryDayRecount.Players
                 case PlayerState.Walking:
                     _animationTimeElapsed += deltaTime;
                     // Check if the animation is ready to update
-                    if (_animationTimeElapsed >= SecondsPerTile)
+                    if (_animationTimeElapsed >= SecondsPerAnimation)
                     {
-                        _animationTimeElapsed -= SecondsPerTile;
+                        _animationTimeElapsed -= SecondsPerAnimation;
                         _animationFrame++;
                         // Walking animations range from 0-3 in the Sprite Sheet
                         // _animationFrame being < 0 is probably not going to happen
@@ -311,12 +328,29 @@ namespace MakeEveryDayRecount.Players
         /// <summary>
         /// Convert from the player's tile position to screen position
         /// </summary>
-        private void UpdatePlayerPos()
+        private void UpdatePlayerPos(float deltaTime)
         {
-            Point playerWorldPos = MapUtils.TileToWorld(Location);
-            Point worldToScreen = MapUtils.WorldToScreen();
+            _timeBetweenPositionUpdate += deltaTime;
+            if (_timeBetweenPositionUpdate > SecondsPerPositionUpdate)
+            {
+                PlayerWorldPosition = MapUtils.TileToWorld(Location);
 
-            PlayerScreenPosition = playerWorldPos - worldToScreen + MapUtils.PixelOffset();
+                // This handle moving the player half a tile to start then the full tile
+                // .1 seconds later and updating the tile position
+                if (_justMoved)
+                {
+                    PlayerWorldPosition += new Point(AssetManager.TileSize.X * _destDirection.X / 2, AssetManager.TileSize.Y * _destDirection.Y / 2);
+                    _justMoved = false;
+                    Location += _destDirection;
+                }
+                else
+                {
+                    _reachedDest = true;
+                }
+                Point worldToScreen = MapUtils.WorldToScreen();
+                _timeBetweenPositionUpdate -= SecondsPerPositionUpdate;
+                PlayerScreenPosition = PlayerWorldPosition - worldToScreen + MapUtils.PixelOffset();
+            }
         }
 
         #endregion
