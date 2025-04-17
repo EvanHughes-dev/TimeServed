@@ -3,17 +3,48 @@
 // The EditorForm, with a palette, selected color, save and load buttons, and a grid of PictureBoxes the user can draw on
 
 using LevelEditor.Classes;
+using LevelEditor.Classes.Props;
 using LevelEditor.Controls;
+using LevelEditor.Extensions;
+using LevelEditor.Forms.Prompts;
+using System.Diagnostics;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ScrollBar;
+using System.Linq;
 
 namespace LevelEditor
 {
+    /// <summary>
+    /// Keeps track of tab state
+    /// </summary>
+    internal enum TabState
+    {
+        Tiles,
+        Props
+    };
+
     /// <summary>
     /// The EditorForm, with a palette, selected color, save and load buttons, and a grid of PictureBoxes the user can draw on.
     /// </summary>
     public partial class EditorForm : Form
     {
+        #region Fields and Properties
         // A reference to the MainForm that created this EditorForm
         private readonly MainForm _mainForm;
+
+
+        /// <summary>
+        /// The Room this editor is editing. Stored within roomRenderer to avoid duplicating state.
+        /// </summary>
+        private Room Room
+        {
+            get => roomRenderer.Room;
+            set => roomRenderer.Room = value;
+        }
+
+        /// <summary>
+        /// Which tab is currently open within the EditorForm
+        /// </summary>
+        private TabState TabState { get; set; }
 
         /// <summary>
         /// Gets or sets the color the user currently has selected from the palette.
@@ -21,64 +52,82 @@ namespace LevelEditor
         private Tile SelectedTile { get; set; }
 
         /// <summary>
-        /// Gets or sets the 2D array of grid tiles the user can draw on.
+        /// Gets or sets the prop the user currently has selected from the palette.
         /// </summary>
-        private TileBox[,] TileGrid { get; set; }
+        private Prop SelectedProp { get; set; }
 
         /// <summary>
-        /// Gets or sets the Room this editor is editing.
+        /// Gets the palette of props the user may select from
         /// </summary>
-        private Room Room { get; set; }
+        private Prop[,] PropPalette { get; }
 
         /// <summary>
-        /// Gets the palette of tiles the user may select from.
+        /// Holds the tile box of the tile that is currently selected on the palette.
         /// </summary>
-        private Tile[,] Palette { get; }
-
+        private TileBox _currentlySelectedTileBox;
         /// <summary>
-        /// Creates a new EditorForm, editing an existing room.
+        /// Holds the prop box of the prop that is currently selected on the palette.
+        /// </summary>
+        private PropBox _currentlySelectedPropBox;
+
+        private string _formName;
+        private readonly string _formNameBase;
+
+        private bool _keyDownInputRead;
+
+        #endregion
+        #region Constructors
+        /// <summary>
+        /// Creates a new EditorForm with a reference to the MainForm.
         /// </summary>
         private EditorForm(MainForm mainForm)
         {
             InitializeComponent();
+            _formName = "Room Editor";
+            _formNameBase = "Room Editor";
+
+            _keyDownInputRead = false;
 
             _mainForm = mainForm;
 
-            int numOfTiles = _mainForm.Tiles.Count;
+            Room = null!;
+            _currentlySelectedTileBox = null!;
+            _currentlySelectedPropBox = null!;
 
-            int numOfRows = (int)Math.Ceiling((float)numOfTiles / 4);
-            Palette = new Tile[numOfRows, 4];
+            TabState = TabState.Tiles;
 
-            for (int i = 0; i < numOfTiles; i++)
+            // Defines how large each swatch should be on each palette. Users of the level editor, change this as is convenient for you!
+            const int SwatchSize = 75;
+
+            // Create both palettes
+            CreatePalette<Tile, TileBox>(_mainForm.Tiles, SwatchSize, flowLayoutPanelTiles, (swatch, tile) =>
             {
-                int y = (int)Math.Floor((float)i / 4);
-                int x = i % 4;
+                swatch.Tile = tile;
+                swatch.Click += Swatch_Click;
 
-                Palette[y, x] = _mainForm.Tiles.ElementAt(i);
-            }
+                swatch.BorderColor = Color.Blue;
 
-            // Creates all of the buttons in the palette
-            CreatePaletteTileBoxes();
+                swatch.SizeMode = PictureBoxSizeMode.Zoom;
+            });
 
-            // Sets the selected color to some sort of reasonable default -- Palette[0, 0] is the only place we can guarantee there's a color in the palette
-            //   (assuming the developer didn't change Palette to an entirely empty array)
-            SelectedTile = Palette[0, 0];
-        }
+            CreatePalette<Prop, PropBox>(_mainForm.Props, SwatchSize, flowLayoutPanelProps, (swatch, prop) =>
+            {
+                swatch.Prop = prop;
+                swatch.Click += PropSwatch_Click;
 
-        /// <summary>
-        /// Creates a new EditorForm by creating a new room.
-        /// </summary>
-        /// <param name="mainForm">A reference to the MainForm.</param>
-        /// <param name="name">The name of the new room.</param>
-        /// <param name="width">The width of the new room.</param>
-        /// <param name="height">The height of the new room.</param>
-        public EditorForm(MainForm mainForm, string name, int width, int height)
-            : this(mainForm)
-        {
-            Room = new(name, width, height, mainForm.Tiles.ElementAt(0));
-            InitializeMap(Room);
+                swatch.BorderColor = Color.Blue;
 
-            _mainForm.AddNewRoom(Room);
+                swatch.SizeMode = PictureBoxSizeMode.Zoom;
+            });
+
+            //setup keyboard capturing
+            this.KeyPreview = true;
+            this.KeyDown += RoomEditor_KeyDown;
+            this.KeyUp += RoomEditor_KeyUp;
+
+            this.FormClosing += RoomEditor_FormClosing;
+            // Whenever the splitter of the splitContainer moves, we have to reformat the whole EditorForm
+            splitContainer.SplitterMoved += (object? _, SplitterEventArgs _) => Reformat();
         }
 
         /// <summary>
@@ -90,48 +139,179 @@ namespace LevelEditor
             : this(mainForm)
         {
             Room = room;
-            InitializeMap(Room);
+
+            Reformat();
+            _formName = $"Room Editor - {Room.Name} {(Room.SavedState == SavedState.Unsaved ? "*" : "")}";
+            _formNameBase = $"Room Editor - {Room.Name}";
+
+            this.Text = _formName;
         }
 
-
         /// <summary>
-        /// Creates the color selection buttons corresponding with the palette. Should only be run once!
+        /// Creates a new EditorForm by creating a new room.
         /// </summary>
-        private void CreatePaletteTileBoxes()
+        /// <param name="mainForm">A reference to the MainForm.</param>
+        /// <param name="name">The name of the new room.</param>
+        /// <param name="width">The width of the new room.</param>
+        /// <param name="height">The height of the new room.</param>
+        public EditorForm(MainForm mainForm, string name, int width, int height)
+            : this(mainForm, new Room(name, width, height, mainForm.Tiles.ElementAt(0)))
         {
-            // Shortcut variables for the width and height
-            int height = Palette.GetLength(0);
-            int width = Palette.GetLength(1);
+            _mainForm.AddNewRoom(Room);
+        }
 
-            // 5-unit padding on each side and 20-unit padding on the top just happens to look nice
-            Rectangle paletteBounds = PadRectInwards(tabPageTiles.ClientRectangle, 5, 5, 20, 5);
+        #endregion
+        #region Form Events
+        /// <summary>
+        /// Reformats the form.
+        /// </summary>
+        private void EditorForm_Resize(object sender, EventArgs e)
+        {
+            Reformat();
+        }
 
-            // Give it 5 units of padding between each button just because it happens to look nice
-            TileBox[,] swatches = GenerateGrid<TileBox>(width, height, paletteBounds, 5, tabPageTiles);
-
-            for (int x = 0; x < width; x++)
+        #endregion
+        #region Room Events
+        /// <summary>
+        /// Places a tile or adds/removes/edits a prop depending on the tile clicked and the tab state.
+        /// </summary>
+        private void roomRenderer_TileMouseDown(object? sender, TileEventArgs e)
+        {
+            if (TabState == TabState.Tiles)
             {
-                for (int y = 0; y < height; y++)
+                if (e.Button == MouseButtons.Left)
                 {
-                    // We're going to store the color associated with each button in its back color, and then read the back color
-                    //   when the button is clicked. Ideally we would track a color index so we could dramatically reduce the
-                    //   file size of the saved maps, but again that's hard and not necessary
-                    swatches[y, x].Tile = Palette[y, x];
-                    swatches[y, x].Click += Swatch_Click;
+                    Room[e.Tile] = SelectedTile;
+                    // Handle setting tiles to the save value
+                    if (Room[e.Tile].Sprite == SelectedTile.Sprite)
+                        return;
+
+                    if (Room.SavedState == SavedState.Saved)
+                    {
+                        Room.SavedState = SavedState.Unsaved;
+                        UpdateFormName($"{_formNameBase} *");
+                    }
+                }
+
+                // Right click picks tile! Because that's convenient and I wanted it to be a feature!
+                if (e.Button == MouseButtons.Right)
+                    SelectedTile = Room[e.Tile];
+            }
+            else if (TabState == TabState.Props)
+            {
+                // Left click should either place the selected prop if the clicked tile has no prop on it, or it should simply edit the existing prop there
+                if (e.Button == MouseButtons.Left)
+                {
+                    if (e.Prop == null)
+                    {
+                        Prop createdProp = null!;
+
+                        // Different props have to be created in different ways
+                        switch (SelectedProp.PropType)
+                        {
+                            case ObjectType.Item: // Items, boxes, and cameras are created the same
+                            case ObjectType.Box:
+                            case ObjectType.Camera:
+                                createdProp = SelectedProp.Instantiate(e.Tile);
+                                break;
+
+                            case ObjectType.Door:
+                                Door door = (Door)SelectedProp;
+
+                                Room room = RoomSelectForm.Prompt(_mainForm.GetAllRooms());
+                                if (room == null) return;
+
+                                Point? destination = PositionSelectForm.Prompt(room);
+                                if (destination == null) return;
+
+                                createdProp = door.Instantiate(e.Tile, (Point)destination, room.Id);
+                                break;
+                        }
+
+                        Room.AddProp(createdProp);
+
+                        // Cameras require some post-creation setup
+                        switch (createdProp.PropType)
+                        {
+                            case ObjectType.Camera:
+                                CameraForm.Prompt(Room, (Camera)createdProp);
+                                break;
+                        }
+
+                        // Should this be reworked to make it so *all* props are created the same way, and door editing happens post-placement? Probably!
+                    } 
+                    else
+                    {
+                        // Edit the clicked prop
+                        switch (e.Prop.PropType)
+                        {
+                            case ObjectType.Item:
+                            case ObjectType.Box:
+                                // Boxes and items have no data, so they cannot be edited
+                                break;
+
+                            case ObjectType.Camera:
+                                CameraForm.Prompt(Room, (Camera)e.Prop);
+                                break;
+
+                            case ObjectType.Door:
+                                // Re-prompt for all of the door's data
+                                Door door = (Door)e.Prop;
+
+                                Room room = RoomSelectForm.Prompt(_mainForm.GetAllRooms());
+                                if (room == null) return;
+
+                                Point? destination = PositionSelectForm.Prompt(room);
+                                if (destination == null) return;
+
+                                door.ConnectedTo = room.Id;
+                                door.Destination = destination;
+                                break;
+                        }
+                    }
+
+                    if (Room.SavedState == SavedState.Saved)
+                    {
+                        Room.SavedState = SavedState.Unsaved;
+                        UpdateFormName($"{_formNameBase} *");
+                    }
+                }
+                else if (e.Button == MouseButtons.Right) //Right click will...
+                {
+                    // Remove! That! Prop!
+                    bool removalSuccessful = Room.RemovePropAt(e.Tile);
+
+                    if (removalSuccessful && Room.SavedState == SavedState.Saved)
+                    {
+                        Room.SavedState = SavedState.Unsaved;
+                        UpdateFormName($"{_formNameBase} *");
+                    }
                 }
             }
         }
 
         /// <summary>
-        /// Immediately after the form finishes loading.
+        /// If left click is held, draws tiles.
         /// </summary>
-        private void EditorForm_Load(object sender, EventArgs e)
+        private void roomRenderer_TileMouseMove(object? sender, TileEventArgs e)
         {
-            // Left... semi-intentionally blank? This function is completely unnecessary
-            //   but deleting it would mean I'd have to fix the designer file and I
-            //   don't wanna have to deal with that hassle. Maybe it'll have a use!
+            if (TabState == TabState.Tiles)
+            {
+                if (e.Button == MouseButtons.Left)
+                {
+                    Room[e.Tile] = SelectedTile;
+
+                    if (Room[e.Tile].Sprite != SelectedTile.Sprite && Room.SavedState == SavedState.Saved)
+                    {
+                        Room.SavedState = SavedState.Unsaved;
+                        UpdateFormName($"{_formNameBase} *");
+                    }
+                }
+            }
         }
 
+        #endregion
+        #region Swatch Events
         /// <summary>
         /// When a "swatch" button is clicked, select its color.
         /// </summary>
@@ -140,158 +320,165 @@ namespace LevelEditor
         {
             if (sender is not TileBox swatch) throw new Exception();
 
+            if (_currentlySelectedTileBox != null) _currentlySelectedTileBox.BorderWidth = 0;
+            swatch.BorderWidth = 5;
+            _currentlySelectedTileBox = swatch;
             SelectedTile = swatch.Tile;
         }
+        /// <summary>
+        /// When a prop button is clicked, select its object.
+        /// </summary>
+        /// <exception cref="Exception">Thrown when this method is called with a non-Button sender.</exception>
+        private void PropSwatch_Click(object? sender, EventArgs e)
+        {
+            if (sender is not PropBox prop) throw new Exception("Invalid call to PropSwatch_Click");
+
+            if (_currentlySelectedPropBox != null) _currentlySelectedPropBox.BorderWidth = 0;
+            prop.BorderWidth = 5;
+            _currentlySelectedPropBox = prop;
+            SelectedProp = prop.Prop;
+        }
+
+        #endregion
+
+        #region Tab Events
+        /// <summary>
+        /// Changes the state based on the current tab selected and decides what to do with that info
+        /// </summary>
+        /// <exception cref="Exception"></exception>
+        private void tabControlTilesProps_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (sender is not TabControl tabby) throw new Exception("Invalid sender to tabControlTilesProps_SelectedIndexChanged");
+
+            TabState newState = (TabState)tabby.SelectedIndex;
+
+            TabState = newState;
+
+            // Switching tabs requires a reformat for reasons kind of beyond me but if we don't do it it doesn't look right
+            Reformat();
+        }
+        #endregion
+
+        #region Helpers
+        /// <summary>
+        /// Auto-formats the form.
+        /// </summary>
+        private void Reformat()
+        {
+            // The split container IS the form -- it should take up all the space it can
+            splitContainer.Bounds = ClientRectangle;
+
+            // Each of the split container panels has its own container that should completely fill it
+            tabControlPalettes.Bounds = splitContainer.Panel1.ClientRectangle;
+            groupBoxMap.Bounds = splitContainer.Panel2.ClientRectangle;
+
+            // Makes the tile and prop palettes fill their parents
+            flowLayoutPanelTiles.Bounds = flowLayoutPanelTiles.Parent!.ClientRectangle;
+            flowLayoutPanelProps.Bounds = flowLayoutPanelProps.Parent!.ClientRectangle;
+
+            if (roomRenderer != null)
+            {
+                roomRenderer.Bounds = groupBoxMap.ClientRectangle.NudgeSides(-20, -5, -5, -5);
+            }
+        }
 
         /// <summary>
-        /// Initializes the grid of TileBoxes and sets their display to facilitate editing of a given Room.
+        /// Creates the controls necessary for a palette.
         /// </summary>
-        /// <param name="room">The room to be edited.</param>
-        private void InitializeMap(Room room)
+        /// <typeparam name="TValue">The type of value the palette will be used to select.</typeparam>
+        /// <typeparam name="TControl">The type of control the palette will be made out of.</typeparam>
+        /// <param name="elements">The elements to store in the palette.</param>
+        /// <param name="size">How large each control in the palette should be, in pixels.</param>
+        /// <param name="parent">The FlowLayoutPanel this palette should be contained in.</param>
+        /// <param name="setupCallback">The callback to invoke to setup each of the palette controls.</param>
+        private void CreatePalette<TValue, TControl>(IEnumerable<TValue> elements, int size, FlowLayoutPanel parent, Action<TControl, TValue> setupCallback)
+            where TControl : Control, new()
         {
-            int height = room.Tiles.GetLength(0);
-            int width = room.Tiles.GetLength(1);
-
-            // If Tiles isn't null, then this function has been called before and we need to delete (or re-use?) all of the prior existing tiles
-            if (TileGrid != null)
+            foreach (TValue item in elements)
             {
-                // It would be best to reuse all of the existing tiles (with like a pool system) but this is easier
-                foreach (TileBox tile in TileGrid)
+                TControl control = new TControl()
                 {
-                    // I'm not totally sure what the best thing to do is to destroy these tiles, and this does still seem to cause a memory leak...
-                    //   but this is good enough I suppose
-                    Controls.Remove(tile);
-                    tile.Dispose();
+                    Size = new Size(size, size),
+                    Parent = parent,
+                };
+
+                parent.Controls.Add(control);
+
+                setupCallback(control, item);
+            }
+        }
+
+
+        /// <summary>
+        /// Update the name of the form
+        /// </summary>
+        /// <param name="newName">New name for the form</param>
+        private void UpdateFormName(string newName)
+        {
+            _formName = newName;
+            this.Text = _formName;
+        }
+
+        /// <summary>
+        /// Prevent the user from leaving the form with unsaved changes without confirming they 
+        /// wish to do so
+        /// </summary>
+        private void RoomEditor_FormClosing(object? sender, FormClosingEventArgs e)
+        {
+            if (Room.SavedState == SavedState.Unsaved)
+            {
+                switch (MessageBox.Show("Unsaved changes to room. Do you want to save before exiting?", "Warning",
+                                 MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning))
+                {
+                    case DialogResult.Cancel:
+                        e.Cancel = true;
+                        break;
+                    case DialogResult.Yes:
+                        Room.SavedState = SavedState.Saved;
+                        _mainForm.SaveLevel();
+                        break;
+                    case DialogResult.No:
+                        e.Cancel = false;
+                        break;
                 }
             }
+        }
+        #endregion
 
-            // We need the overall form window to adapt to the size of the map, so if we measure how much the groupBoxMap changes
-            //   width then we can apply that same width change to the form window
-            int priorWidth = groupBoxMap.Width;
+        #region Keyboard Input
 
-            groupBoxMap.Width = groupBoxMap.Height / height * width;
+        /// <summary>
+        /// Read keyboard input and take the needed actions based off which
+        /// keys are pressed at the same time
+        /// </summary>
+        private void RoomEditor_KeyDown(object? sender, KeyEventArgs e)
+        {
+            // prevent multiple inputs from being read at the same time
+            if (_keyDownInputRead)
+                return;
 
-            int widthChange = groupBoxMap.Width - priorWidth;
-            Width += widthChange;
-
-            // Padding of 5 units on each side and 20 units on the top just happens to look good
-            Rectangle mapBounds = PadRectInwards(groupBoxMap.ClientRectangle, 5, 5, 20, 5);
-            TileGrid = GenerateGrid<TileBox>(width, height, mapBounds, parent: groupBoxMap);
-
-            // Now, lastly, we set up every individual TileBox to show the proper tile
-            //   and respond properly when clicked on or dragged over
-            for (int y = 0; y < height; y++)
+            if (e.Control && e.KeyCode == Keys.S)
             {
-                for (int x = 0; x < width; x++)
-                {
-                    TileBox tileBox = TileGrid[y, x];
-                    tileBox.Tile = Room.Tiles[y, x];
-                    tileBox.MouseDown += Tile_MouseDown;
-                    tileBox.MouseMove += Tile_MouseMove;
-                }
+
+                e.SuppressKeyPress = true;
+                _mainForm.SaveLevel();
+                _keyDownInputRead = true;
+
+                Room.SavedState = SavedState.Saved;
+                UpdateFormName($"{_formNameBase}");
             }
+
         }
 
         /// <summary>
-        /// When a tile is clicked, either change its color or select its color (for left and right click, respectively).
+        /// On the key up event, allow key input to be read again
         /// </summary>
-        /// <exception cref="Exception">Thrown when this method is called with a non-Control sender.</exception>
-        private void Tile_MouseDown(object? sender, MouseEventArgs e)
+        private void RoomEditor_KeyUp(object? sender, KeyEventArgs e)
         {
-            if (sender is not TileBox tile) throw new Exception();
-
-            // We have to disable this control capturing the mouse so that future MouseMove events can be fired on *other* tiles
-            //   (to make clicking and dragging work)
-            tile.Capture = false;
-
-            (int y, int x) = TileGrid.IndexesOf(tile);
-
-            if (e.Button == MouseButtons.Left)
-            {
-                tile.Tile = SelectedTile;
-
-                Room.Tiles[y, x] = SelectedTile;
-            }
-
-            // Right click picks color! Because that's convenient and I wanted it to be a feature!
-            if (e.Button == MouseButtons.Right)
-                SelectedTile = tile.Tile;
+            _keyDownInputRead = false;
         }
 
-        /// <summary>
-        /// When the mouse moves over top of a tile, if left click is pressed, change its color.
-        /// </summary>
-        /// <exception cref="Exception">Thrown when this method is called with a non-Control sender.</exception>
-        private void Tile_MouseMove(object? sender, MouseEventArgs e)
-        {
-            if (sender is not TileBox tile) throw new Exception();
-
-            (int y, int x) = TileGrid.IndexesOf(tile);
-
-            if (e.Button == MouseButtons.Left)
-            {
-                tile.Tile = SelectedTile;
-
-                Room.Tiles[y, x] = SelectedTile;
-            }
-        }
-
-        /// <summary>
-        /// Creates a uniform grid of controls following a number of parameters.
-        /// </summary>
-        /// <typeparam name="T">The type of control to create a grid of.</typeparam>
-        /// <param name="width">The width of the grid to create, in "number of controls".</param>
-        /// <param name="height">The height of the grid to create, in "number of controls".</param>
-        /// <param name="rect">The rectangle to fit the grid in. The individual controls will be resized to fit the grid entirely within this rectangle.</param>
-        /// <param name="padding">The padding to apply between each individual control.</param>
-        /// <param name="parent">A Control to make all of the grid elements a child of.</param>
-        /// <returns>A 2D array with all of the controls in the grid.</returns>
-        private T[,] GenerateGrid<T>(int width, int height, Rectangle rect, int padding = 0, Control? parent = null) where T : Control, new()
-        {
-            T[,] controls = new T[height, width];
-
-            int controlWidth = rect.Width / width;
-            int controlHeight = rect.Height / height;
-
-            // The grid is generated in columns, from left to right and top to bottom
-            for (int x = 0; x < width; x++)
-            {
-                for (int y = 0; y < height; y++)
-                {
-                    T control = new();
-                    Controls.Add(control);
-
-                    // Doesn't matter that the parent argument might be null here -- control.Parent is nullable already!
-                    control.Parent = parent;
-
-                    control.SetBounds(x * controlWidth + rect.Left + padding,
-                        y * controlHeight + rect.Top + padding,
-                        controlWidth - padding,
-                        controlHeight - padding);
-
-                    controls[y, x] = control;
-                }
-            }
-
-            return controls;
-        }
-
-        /// <summary>
-        /// Takes a rectangle and pads each individual side inwards by the given amounts.
-        /// </summary>
-        /// <param name="rect">The rectangle to pad.</param>
-        /// <param name="padLeft">How far to move the left side inwards.</param>
-        /// <param name="padRight">How far to move the right side inwards.</param>
-        /// <param name="padTop">How far to move the top side inwards.</param>
-        /// <param name="padBottom">How far to move the bottom side inwards.</param>
-        /// <returns>The padded rectangle.</returns>
-        private static Rectangle PadRectInwards(Rectangle rect, int padLeft, int padRight, int padTop, int padBottom)
-        {
-            return new Rectangle(rect.Left + padLeft,
-                rect.Top + padTop,
-                rect.Width - padLeft - padRight,
-                rect.Height - padTop - padBottom);
-        }
+        #endregion
 
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Data.Common;
 using System.IO;
 using MakeEveryDayRecount.GameObjects.Props;
 using MakeEveryDayRecount.Map;
@@ -30,7 +31,7 @@ namespace MakeEveryDayRecount.Managers
         {
             get => _currentRoom;
         }
-        private Room[] _rooms;
+        private Dictionary<int, Room> _rooms;
 
         private readonly GameplayManager _gameplayManager;
 
@@ -41,12 +42,14 @@ namespace MakeEveryDayRecount.Managers
         public MapManager(GameplayManager gameplayManager)
         {
             _gameplayManager = gameplayManager;
-            _rooms = LoadMapData(_gameplayManager.Level);
-            _currentRoom = _rooms[0];
+            _rooms = new Dictionary<int, Room> { };
+            Room[] rooms = LoadMapData(_gameplayManager.Level);
+            _currentRoom = rooms[0];
             OnRoomUpdate?.Invoke(_currentRoom);
-            foreach (Room room in _rooms)
+            foreach (Room room in rooms)
             {
                 room.DoorTransition += TransitionRoom;
+                _rooms.Add(room.RoomIndex, room);
             }
         }
         /// <summary>
@@ -127,7 +130,6 @@ namespace MakeEveryDayRecount.Managers
             Room[] rooms = new Room[0];
             if (File.Exists(folderPath + "/level.level"))
             {
-                Dictionary<(int roomIndex, int doorIndex), Door> doorLookup = new Dictionary<(int roomIndex, int doorIndex), Door>();
                 Stream streamReader = File.OpenRead(folderPath + "/level.level");
                 BinaryReader binaryReader = new BinaryReader(streamReader);
 
@@ -141,22 +143,9 @@ namespace MakeEveryDayRecount.Managers
                     int roomIndex = binaryReader.ReadInt32();
                     Room room = new Room(roomFilePath, roomName, roomIndex);
                     rooms[currentRoom] = room;
-                    // Store doors in lookup for fast access
-                    foreach (Door door in room.Doors)
-                    {
-                        doorLookup[(roomIndex, door.DoorIndex)] = door;
-                    }
                 }
 
                 binaryReader.Close();
-                // Assign corresponding doors efficiently
-                foreach (Door door in doorLookup.Values)
-                {
-                    if (doorLookup.TryGetValue((door.DestRoom, door.DoorIndex), out Door matchingDoor))
-                    {
-                        door.AssignDoor(matchingDoor);
-                    }
-                }
             }
             else
             {
@@ -173,11 +162,14 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public void ChangeLevel()
         {
-            _rooms = LoadMapData(_gameplayManager.Level);
-            ChangeRoom(0);
-            foreach (Room room in _rooms)
+            Room[] rooms = LoadMapData(_gameplayManager.Level);
+            _rooms.Clear();
+            _currentRoom = rooms[0];
+            OnRoomUpdate?.Invoke(_currentRoom);
+            foreach (Room room in rooms)
             {
                 room.DoorTransition += TransitionRoom;
+                _rooms.Add(room.RoomIndex, room);
             }
         }
     }

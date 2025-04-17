@@ -116,7 +116,7 @@ namespace MakeEveryDayRecount.Map
         /// <returns>Point that corresponds to the distance between world and screen pos</returns>
         public static Point WorldToScreen()
         {
-            Point worldToScreen = TileToWorld(_currentPlayer.Location) - ScreenCenter;
+            Point worldToScreen = _currentPlayer.PlayerWorldPosition - ScreenCenter;
             // Clamp the screen's position so only tiles will be displayed without any empty space
             return new Point(
                 MathHelper.Clamp(worldToScreen.X, 0, MapSizePixels.X - ScreenSize.X),

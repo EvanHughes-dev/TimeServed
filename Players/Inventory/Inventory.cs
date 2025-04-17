@@ -3,13 +3,13 @@ using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using MakeEveryDayRecount.GameObjects.Props;
 using MakeEveryDayRecount.Managers;
-
+using MakeEveryDayRecount.UI;
 
 namespace MakeEveryDayRecount.Players.InventoryFiles
 {
     internal class Inventory
     {
-        int _boxSize = AssetManager.InventoryBoxes[0].Width / 2;
+        private Point _boxSize;
 
         /// <summary>
         /// Array of buttons used to display the inventory
@@ -34,15 +34,19 @@ namespace MakeEveryDayRecount.Players.InventoryFiles
         /// <param name="screenSize">The size of the screen</param>
         public Inventory(Point screenSize)
         {
-            _selectedSpace = null;
+            _boxSize = new Point(screenSize.X / 32, screenSize.X / 32);
+            int testValue = (int)(InterfaceManager.ScaleFactorX / 2);
             _inventoryUI = new InventorySpace[4];
+            _selectedSpace = null;
+
             for (int i = 0; i < _inventoryUI.Length; i++)
             {
+                Point drawPoint = new Point(screenSize.X / 2 - (_boxSize.X * _inventoryUI.Length / 2 + _boxSize.X / 2 * (_inventoryUI.Length % 2)) + (_boxSize.X * i),
+                screenSize.Y - _boxSize.Y);
+
                 //create a button and offset the x
                 _inventoryUI[i] = new InventorySpace(AssetManager.InventoryBoxes[0], AssetManager.InventoryBoxes[1],
-                    new Rectangle(screenSize.X / 2 - (_boxSize * 2) + (_boxSize * i),
-                    screenSize.Y - (_boxSize + 30),
-                    _boxSize, _boxSize), true, AssetManager.InventoryBoxes[2]);
+                    new Rectangle(drawPoint, _boxSize), true, AssetManager.InventoryBoxes[2]);
                 _inventoryUI[i].OnInventorySpaceSelected += SwitchActiveInventorySpace;
             }
 
@@ -61,12 +65,11 @@ namespace MakeEveryDayRecount.Players.InventoryFiles
         /// <summary>
         /// Draws the inventory's UI using a button array 
         /// </summary>
-        /// <param name="sb"></param>
+        /// <param name="sb">SpriteBatch to draw with</param>
         public void Draw(SpriteBatch sb, Point screenSize)
         {
             for (int i = 0; i < _inventoryUI.Length; i++)
             {
-                _inventoryUI[i].Rectangle = new Rectangle(screenSize.X / 2 - (_boxSize * 2) + (_boxSize * i), screenSize.Y - (_boxSize + 30), _boxSize, _boxSize);
                 _inventoryUI[i].Draw(sb);
             }
 

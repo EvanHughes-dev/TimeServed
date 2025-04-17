@@ -6,10 +6,7 @@ namespace MakeEveryDayRecount.Managers
 {
     public static class AssetManager
     {
-
-
-        //PLAYER ASSETS
-
+        #region Player Assets
 
         /// <summary>
         /// Sprite sheet for the player
@@ -21,9 +18,9 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static Texture2D PlayerDisguisedTexture { get; private set; }
 
+        #endregion
 
-        //MAP ASSETS
-
+        #region Map Assets
 
         /// <summary>
         /// Array with every type of tile asset we have in the game
@@ -35,9 +32,9 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static Texture2D[] DoorTexture { get; private set; }
 
+        #endregion
 
-        //DEBUG ASSETS
-
+        #region Debug Assets
 
         /// <summary>
         /// Texture for the debug tile for walkable tiles
@@ -49,9 +46,9 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static Texture2D DebugNotWalkableTile { get; private set; }
 
+        #endregion
 
-        //UI ASSETS
-
+        #region UI Assets
         /// <summary>
         /// Default texture for all buttons
         /// </summary>
@@ -63,7 +60,7 @@ namespace MakeEveryDayRecount.Managers
         public static Texture2D[] InventoryBoxes { get; private set; }
 
         /// <summary>
-        /// UI desplay for tiles the camera can see
+        /// UI display for tiles the camera can see
         /// </summary>
         public static Texture2D CameraSight { get; private set; }
 
@@ -72,9 +69,9 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static Texture2D[] CursorStates { get; private set; }
 
+        #endregion
 
-        //PROP ASSETS
-
+        #region Prop Assets
 
         /// <summary>
         /// Array of the assets for the props in the game
@@ -96,23 +93,21 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static Texture2D[] Boxes { get; private set; }
 
+        #endregion
 
-        //FONT STUFF
-
+        #region Font Assets
 
         /// <summary>
         /// Default font for debugging
         /// </summary>
         public static SpriteFont Arial20 { get; private set; }
+        public static SpriteFont[] ArialFonts;
+        #endregion
 
         /// <summary>
         /// The size of each tile, in pixels
         /// </summary>
         public static Point TileSize { get; private set; }
-
-
-        //METHODS BEGIN
-
 
         public static void LoadContent(ContentManager content)
         {
@@ -127,17 +122,51 @@ namespace MakeEveryDayRecount.Managers
             TileMap = new Texture2D[]
             {
                 content.Load<Texture2D>("Tiles/void"),
-                content.Load<Texture2D>("Tiles/testWalkable"),
-                content.Load<Texture2D>("Tiles/testWall"),
+
+                content.Load<Texture2D>("Tiles/tile_wall_corner_inner_tr"),
+                content.Load<Texture2D>("Tiles/tile_wall_corner_inner_tl"),
+                content.Load<Texture2D>("Tiles/tile_wall_corner_inner_br"),
+                content.Load<Texture2D>("Tiles/tile_wall_corner_inner_bl"),
+
+                content.Load<Texture2D>("Tiles/tile_wall_corner_outer_tr"),
+                content.Load<Texture2D>("Tiles/tile_wall_corner_outer_tl"),
+                content.Load<Texture2D>("Tiles/tile_wall_corner_outer_br"),
+                content.Load<Texture2D>("Tiles/tile_wall_corner_outer_bl"),
+
+                content.Load<Texture2D>("Tiles/tile_wall0_top"),
+                content.Load<Texture2D>("Tiles/tile_wall1_top"),
+                content.Load<Texture2D>("Tiles/tile_wall2_top"),
+                content.Load<Texture2D>("Tiles/tile_wall3_top"),
+
+                content.Load<Texture2D>("Tiles/tile_wall0_right"),
+                content.Load<Texture2D>("Tiles/tile_wall1_right"),
+                content.Load<Texture2D>("Tiles/tile_wall2_right"),
+                content.Load<Texture2D>("Tiles/tile_wall3_right"),
+
+                content.Load<Texture2D>("Tiles/tile_wall0_bottom"),
+                content.Load<Texture2D>("Tiles/tile_wall1_bottom"),
+                content.Load<Texture2D>("Tiles/tile_wall2_bottom"),
+                content.Load<Texture2D>("Tiles/tile_wall3_bottom"),
+
+                content.Load<Texture2D>("Tiles/tile_wall0_left"),
+                content.Load<Texture2D>("Tiles/tile_wall1_left"),
+                content.Load<Texture2D>("Tiles/tile_wall2_left"),
+                content.Load<Texture2D>("Tiles/tile_wall3_left"),
+
+                content.Load<Texture2D>("Tiles/tile_walkable0"),
+                content.Load<Texture2D>("Tiles/tile_walkable1"),
+                content.Load<Texture2D>("Tiles/tile_walkable2"),
+                content.Load<Texture2D>("Tiles/tile_walkable3"),
+                content.Load<Texture2D>("Tiles/tile_walkable4"),
             };
             DoorTexture = new Texture2D[]
             {
-                content.Load<Texture2D>("Doors/TempDoor-Top"),
-                content.Load<Texture2D>("Doors/TempDoor-Right"),
-                content.Load<Texture2D>("Doors/TempDoor-Bottom"),
-                content.Load<Texture2D>("Doors/TempDoor-Left")
+                content.Load<Texture2D>("Doors/Door-Top"),
+                content.Load<Texture2D>("Doors/Door-Right"),
+                content.Load<Texture2D>("Doors/Door-Bottom"),
+                content.Load<Texture2D>("Doors/Door-Left")
             };
-            TileSize = new Point(TileMap[0].Width, TileMap[0].Height);
+            TileSize = InterfaceManager.ScalePointUniform(new Point(TileMap[0].Width / 2, TileMap[0].Height / 2));
 
             //LOAD DEBUG ASSETS
             DebugWalkableTile = content.Load<Texture2D>("DebugAssets/WALKABLE");
@@ -155,6 +184,7 @@ namespace MakeEveryDayRecount.Managers
 
             DefaultButton = content.Load<Texture2D>("UI/DefaultButton");
             CameraSight = content.Load<Texture2D>("UI/UI_cameraSight");
+
             CursorStates = new Texture2D[]
             {
                 content.Load<Texture2D>("UI/ui_cursor"),
@@ -183,6 +213,13 @@ namespace MakeEveryDayRecount.Managers
 
             //FONT STUFF
             Arial20 = content.Load<SpriteFont>("Fonts/Arial20");
+
+            ArialFonts = new SpriteFont[]{
+                content.Load<SpriteFont>("Fonts/Arial5"),
+                content.Load<SpriteFont>("Fonts/Arial10"),
+                content.Load<SpriteFont>("Fonts/Arial20"),
+                content.Load<SpriteFont>("Fonts/Arial30"),
+            };
 
         }
     }
