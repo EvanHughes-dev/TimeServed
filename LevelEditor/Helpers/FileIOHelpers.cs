@@ -101,6 +101,21 @@ namespace LevelEditor.Helpers
              *       int targetX
              *       int targetY
              *       double spreadRadians // Will be parsed as a float, but has to be saved and loaded as a double because Evan says so
+             *       
+             * int triggerCount
+             * 
+             * Trigger:
+             *    int positionX
+             *    int positionY
+             *      Positions are of the top-left corner of the trigger
+             *    int width
+             *    int height
+             *    int triggerType
+             *      0 = Checkpoint
+             *      
+             *      if triggerType == 1
+             *        int index
+             *        bool activated // In the level editor, should always be saved as false
              */
 
             Tile[] tilesArray = [.. allTiles];
@@ -276,6 +291,21 @@ namespace LevelEditor.Helpers
              *       int targetX
              *       int targetY
              *       double spreadRadians // Will be parsed as a float, but has to be saved and loaded as a double because Evan says so
+             *       
+             * int triggerCount
+             * 
+             * Trigger:
+             *    int positionX
+             *    int positionY
+             *      Positions are of the top-left corner of the trigger
+             *    int width
+             *    int height
+             *    int triggerType
+             *      0 = Checkpoint
+             *      
+             *      if triggerType == 1
+             *        int index
+             *        bool activated // In the level editor, should always be saved as false
             */
 
             BinaryReader reader = new BinaryReader(new FileStream(filePath, FileMode.Open));
