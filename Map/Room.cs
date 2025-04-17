@@ -318,7 +318,6 @@ namespace MakeEveryDayRecount.Map
                                 Doors.Add(doorFromFile);
                                 break;
                         }
-
                         numberOfGameObjects--;
                     }
 

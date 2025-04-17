@@ -8,6 +8,7 @@ using MakeEveryDayRecount.Players;
 using MakeEveryDayRecount.Managers;
 using MakeEveryDayRecount.Map.Tiles;
 using System.Linq;
+using System.Net;
 
 namespace MakeEveryDayRecount.GameObjects.Props
 {
@@ -190,11 +191,11 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //Now do all the stuff we did above for the clockwise points
             if (clockwisePoints[0] == clockwisePoint)
             {
-                for (int i = 0; i < clockwisePoints.Count; i++) endPoints.Add(clockwisePoints[i]);
+                for (int i = clockwisePoints.Count - 1; i >= 0; i--) endPoints.Add(clockwisePoints[i]);
             }
             else
             {
-                for (int i = clockwisePoints.Count - 1; i >= 0; i--) endPoints.Add(clockwisePoints[i]);
+                for (int i = 0; i < clockwisePoints.Count; i++) endPoints.Add(clockwisePoints[i]);
             }
             //Now save this into the field of the class
             _endPoints = endPoints.ToArray();
@@ -382,7 +383,8 @@ namespace MakeEveryDayRecount.GameObjects.Props
                         &&
                         (clockwiseRay.Y * candidateVector.X - clockwiseRay.X * candidateVector.Y) *
                         (clockwiseRay.Y * counterclockwiseRay.X - clockwiseRay.X * counterclockwiseRay.Y) >= 0
-                        && candidateVector.Length() <= centerRay.Length()) //TODO: Is there a better way to keep it from going over the end?
+                        && candidateVector.Length() <= centerRay.Length() //TODO: Is there a better way to keep it from going over the end?
+                        && _room.VerifyWalkable(new Point(x, y)))
                     {
                         _watchedTiles.Add(new Point(x, y));
                     }
@@ -448,31 +450,43 @@ namespace MakeEveryDayRecount.GameObjects.Props
                                     foreach (Point blockedTile in Rasterize(box, _endPoints[i])) _watchedTiles.Remove(blockedTile);
                                     //Now check the rays on either side of the ray you just found and treat them as blocked also
                                     //TODO: There is probably a more efficent way to do this, I'm just trying it out
-                                    foreach (Point blockedTile in ``1233444Rasterize(box, _endPoints[i-1])) _watchedTiles.Remove(blockedTile);
-                                    foreach (Point blockedTile in Rasterize(box, _endPoints[i+1])) _watchedTiles.Remove(blockedTile);
+                                    if (i > 0) foreach (Point blockedTile in Rasterize(box, _endPoints[i-1])) _watchedTiles.Remove(blockedTile);
+                                    if (i < _endPoints.Length-1) foreach (Point blockedTile in Rasterize(box, _endPoints[i+1])) _watchedTiles.Remove(blockedTile);
                                 }
                             }
                         }
                     }
 
                     //Now do one more check of the watched tiles. If any of them is isolated, remove it
-                    //NOTE: If there's lag or bugs in this area, this might be the cause
-                    foreach (Point watchedTile in _watchedTiles)
+                    //NOTE: If there's lag or bugs in this area, this might be the cause. This is doing a lot of looping 
+                    for (int i = 0; i < _watchedTiles.Count; )
                     {
                         //Check the tiles above, below, and to either side of this tile.
-                        //TODO: This may also be inefficanet. Using a dictionary instead of a list of points might help with this, but I'm not sure yet
+                        //TODO: This may also be inefficent. Using a dictionary instead of a list of points might help with this, but I'm not sure yet
+                        //In this case, unwalkable tiles also count as watched tiles basically
+                        //Let's see if this causes problems
+
+                        //TODO: Only check if the tile is further from the camera than the box is
+                        //But what if there are multiple boxes?
                         int watchedNeighbors = 0;
+                        Point watchedNeighbor = _watchedTiles[i];
                         //Left
-                        if (_watchedTiles.Contains(new Point(watchedTile.X - 1, watchedTile.Y))) watchedNeighbors++;
+                        watchedNeighbor.X -= 1;
+                        if (_watchedTiles.Contains(watchedNeighbor) || !_room.VerifyWalkable(watchedNeighbor)) watchedNeighbors++;
                         //Right
-                        if (_watchedTiles.Contains(new Point(watchedTile.X + 1, watchedTile.Y))) watchedNeighbors++;
+                        watchedNeighbor.X += 2;
+                        if (_watchedTiles.Contains(watchedNeighbor) || !_room.VerifyWalkable(watchedNeighbor)) watchedNeighbors++;
                         //Above
-                        if (_watchedTiles.Contains(new Point(watchedTile.X, watchedTile.Y - 1))) watchedNeighbors++;
+                        watchedNeighbor.X -= 1;
+                        watchedNeighbor.Y -= 1;
+                        if (_watchedTiles.Contains(watchedNeighbor) || !_room.VerifyWalkable(watchedNeighbor)) watchedNeighbors++;
                         //Below
-                        if (_watchedTiles.Contains(new Point(watchedTile.X, watchedTile.Y + 1))) watchedNeighbors++;
+                        watchedNeighbor.Y += 2;
+                        if (_watchedTiles.Contains(watchedNeighbor) || !_room.VerifyWalkable(watchedNeighbor)) watchedNeighbors++;
 
                         //If the tile has one watched neighbor or less, then remove it
-                        if (watchedNeighbors <= 1) _watchedTiles.Remove(watchedTile);
+                        if (watchedNeighbors <= 1) _watchedTiles.Remove(_watchedTiles[i]);
+                        else i++;
                     }
 
                     //Now check for the player :)
@@ -490,9 +504,9 @@ namespace MakeEveryDayRecount.GameObjects.Props
 
                 _previousBoxes = boxes;
             }
-
         }
 
+        //int endpointnumber = 0;
         public override void Draw(SpriteBatch sb, Point worldToScreen, Point pixelOffset)
         {
             sb.Draw(Sprite, new Rectangle(MapUtils.TileToWorld(Location) - worldToScreen + pixelOffset + _drawOrigin, AssetManager.TileSize), null, //no source rectangle
@@ -502,10 +516,16 @@ namespace MakeEveryDayRecount.GameObjects.Props
                 sb.Draw(AssetManager.CameraSight, new Rectangle(MapUtils.TileToWorld(tile) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
             }
             //TESTING - show all the endpoints with hooks
-            foreach (Point endpoint in _endPoints) sb.Draw(AssetManager.PropTextures[3], new Rectangle(MapUtils.TileToWorld(endpoint) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
+            //foreach (Point endpoint in _endPoints) sb.Draw(AssetManager.PropTextures[3], new Rectangle(MapUtils.TileToWorld(endpoint) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
 
-            foreach (Point EndPoint in _endPoints)
-                foreach (Point endpoint in Rasterize(_rayBase, EndPoint)) sb.Draw(AssetManager.PropTextures[3], new Rectangle(MapUtils.TileToWorld(endpoint) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
+            //TESTING - Animate through all the endpoints in order
+            //sb.Draw(AssetManager.PropTextures[3], new Rectangle(MapUtils.TileToWorld(_endPoints[endpointnumber]) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
+            //if (endpointnumber == _endPoints.Length - 1) endpointnumber = 0;
+            //else endpointnumber++;
+
+            //TESTING - show everything the rays are hitting with hooks
+            //foreach (Point EndPoint in _endPoints)
+            //    foreach (Point endpoint in Rasterize(_rayBase, EndPoint)) sb.Draw(AssetManager.PropTextures[3], new Rectangle(MapUtils.TileToWorld(endpoint) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
         }
 
         private List<Point> Rasterize(Point p1, Point p2)
