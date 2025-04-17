@@ -8,9 +8,9 @@ using LevelEditor.Classes.Props;
 namespace LevelEditor.Controls
 {
     /// <summary>
-    /// An extension of PixelBox specialized to store a Prop.
+    /// An extension of BorderBox specialized to store a Prop.
     /// </summary>
-    internal class PropBox : PixelBox
+    internal class PropBox : BorderBox
     {
         private Prop _prop;
 

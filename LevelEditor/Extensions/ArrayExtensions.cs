@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LevelEditor
+namespace LevelEditor.Extensions
 {
     /// <summary>
-    /// A static class of whatever extension methods happen to be useful for this project.
+    /// A static class of extension method(s) that have to do with arrays.
     /// </summary>
-    public static class Extensions
+    public static class ArrayExtensions
     {
         /// <summary>
         /// Finds both indexes of a given value within this 2D array.
