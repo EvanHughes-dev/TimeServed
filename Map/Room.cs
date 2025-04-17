@@ -37,8 +37,7 @@ namespace MakeEveryDayRecount.Map
 
     public enum TriggerTypes
     {
-        PlayerSpawn = 0,
-        Checkpoint = 1
+        Checkpoint = 0
     }
 
     /// <summary>
@@ -352,22 +351,23 @@ namespace MakeEveryDayRecount.Map
 
                             TriggerTypes triggerType = (TriggerTypes)binaryReader.ReadInt32();
 
-                            if (triggerType == TriggerTypes.PlayerSpawn)
-                            {
-                                _triggersInRoom.Add(new PlayerSpawn(triggerPos, null));
-                            }
-                            else if (triggerType == TriggerTypes.Checkpoint)
+                            if (triggerType == TriggerTypes.Checkpoint)
                             {
                                 Checkpoint checkpoint = new Checkpoint(triggerPos, null, binaryReader.ReadInt32(), triggerWidth, triggerHeight);
                                 _triggersInRoom.Add(checkpoint);
 
-                                //And add it to the trigger manager!
+                                //Add it to the trigger manager
                                 TriggerManager.AddCheckpoint(checkpoint);
+
+                                //If it's the first checkpoint, make that the player's spawn
+                                if (TriggerManager.Checkpoints.Count == 1)
+                                {
+                                    TriggerManager.SetPlayerSpawn(checkpoint);
+                                }
                             }
                         }
                      
                         numberOfGameObjects--;
-                        //TODO: ask evan why adding "binaryReader.Close()" here makes cameras not show up
                     }
                 }
             }
@@ -588,8 +588,6 @@ namespace MakeEveryDayRecount.Map
                     binaryWriter.Write(_triggersInRoom[i].Height);
 
                     //If statements to determine trigger type
-                    if (_triggersInRoom[i] is PlayerSpawn)
-                        binaryWriter.Write((int)TriggerTypes.PlayerSpawn);
                     if (_triggersInRoom[i] is Checkpoint)
                     {
                         binaryWriter.Write((int)TriggerTypes.Checkpoint);

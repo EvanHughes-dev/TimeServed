@@ -183,16 +183,12 @@ namespace MakeEveryDayRecount.Managers
 
         public static void LoadCheckpoint(Checkpoint c)
         {
-            //TODO: make it so c is never null in the first place
-            if (c != null)
+            _rooms = LoadMapData(1, "./CheckpointData");
+            ChangeRoom(c.RoomIndex);
+            foreach (Room room in _rooms)
             {
-                _rooms = LoadMapData(1, "./CheckpointData");
-                ChangeRoom(c.RoomIndex);
-                foreach (Room room in _rooms)
-                {
-                    room.DoorTransition += TransitionRoom;
-                }
-            }   
+                room.DoorTransition += TransitionRoom;
+            }  
         }
 
         public static void SaveMap(string baseFolder)
@@ -213,6 +209,7 @@ namespace MakeEveryDayRecount.Managers
                 writer.Write(_rooms[i].RoomIndex);
             }
 
+            //Save all the rooms
             for (int i = 0; i < _rooms.Length; i++)
             {
                 _rooms[i].SaveRoom(baseFolder);

@@ -80,12 +80,10 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
                 //Deactivate the checkpoint after it has saved the data
                 _active = false;
             }
-
-            
         }
 
         /// <summary>
-        /// Recursibly delete all contents of a folder
+        /// Recursively delete all contents of a folder
         /// </summary>
         /// <param name="folderPath">Folder to delete</param>
         private void RecursiveDelete(string folderPath)

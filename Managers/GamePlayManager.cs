@@ -4,6 +4,7 @@ using MakeEveryDayRecount.Players;
 using MakeEveryDayRecount.Map;
 using MakeEveryDayRecount.GameObjects.Props;
 using System;
+using System.IO;
 
 namespace MakeEveryDayRecount.Managers
 {
@@ -82,7 +83,7 @@ namespace MakeEveryDayRecount.Managers
         /// Called to reset the level to the starting state
         /// </summary>
         public static void LevelReset(){
-            // TODO eventually change this to a checkpoint system
+            // TODO: This never gets called, I think its safe to delete?
             Level = 1;
             PlayerObject = new Player(new Point(5, 5), AssetManager.PlayerTexture, MapUtils.ScreenSize);
             MapManager.ChangeLevel();
@@ -95,7 +96,32 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static void ClearSavedData()
         {
-            //TODO: Implement this!
+            //Delete saved data
+            if (Directory.Exists("./CheckpointData"))
+                RecursiveDelete("./CheckpointData");
+            if (Directory.Exists("./PlayerData"))
+                RecursiveDelete("./PlayerData");
+
+            //Save the current map data to the initial checkpoint (the "player spawn")
+            TriggerManager.PlayerSpawn.Activate(PlayerObject);
+        }
+
+        /// <summary>
+        /// Recursively delete all contents of a folder
+        /// </summary>
+        /// <param name="folderPath">Folder to delete</param>
+        private static void RecursiveDelete(string folderPath)
+        {
+
+            foreach (string file in Directory.GetFiles(folderPath))
+                File.Delete(file);
+
+            foreach (string folder in Directory.GetDirectories(folderPath))
+            {
+                RecursiveDelete(folder);
+            }
+
+            Directory.Delete(folderPath);
         }
     }
 }

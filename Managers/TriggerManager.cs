@@ -14,6 +14,8 @@ namespace MakeEveryDayRecount.Managers
         //TODO: This probably shouldn't be fully public, ask for feedback
         public static Checkpoint CurrentCheckpoint { get; set; }
 
+        public static Checkpoint PlayerSpawn { get; private set; }
+
         public static void Initialize()
         {
             Checkpoints = new List<Checkpoint>();
@@ -25,6 +27,7 @@ namespace MakeEveryDayRecount.Managers
         public static void Reset()
         {
             Checkpoints.Clear();
+            PlayerSpawn = null; //TODO: is this needed?
             //...and all the other lists of triggers, once they're implemented
         }
 
@@ -35,6 +38,11 @@ namespace MakeEveryDayRecount.Managers
         public static void AddCheckpoint(Checkpoint checkpoint)
         {
             Checkpoints.Add(checkpoint);
+        }
+
+        public static void SetPlayerSpawn(Checkpoint spawn)
+        {
+            PlayerSpawn = spawn;
         }
 
     }

@@ -92,6 +92,8 @@ namespace MakeEveryDayRecount
             //Set initial GameState
             _state = GameState.Menu;
             base.Initialize();
+            //DELETE THIS
+            TriggerManager.SetPlayerSpawn(new GameObjects.Triggers.Checkpoint(new Point(4, 5), null, 1, 1, 1));
         }
 
         protected override void LoadContent()

@@ -88,7 +88,7 @@ namespace MakeEveryDayRecount.Managers
                 Button menuPlay = new Button(menuPlayRect, AssetManager.DefaultButton, AssetManager.DefaultButton, true, "Play", font);
                 menuPlay.OnClick += GameStateChange(GameState.Level);
                 menuPlay.OnClick += MenuChange(MenuModes.Level);
-                menuPlay.OnClick += GameplayManager.ClearSavedData; //TODO: Implement this!
+                menuPlay.OnClick += GameplayManager.ClearSavedData;
 
                 Rectangle menuCheckPointRect = new Rectangle(IncrementScreenPos(drawPoint, 1, buttonSize.Y, buttonSpacing), buttonSize);
                 Button menuCheckPoint = new Button(menuCheckPointRect, AssetManager.DefaultButton, AssetManager.DefaultButton, true, "Checkpoints", font);

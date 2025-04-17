@@ -397,10 +397,7 @@ namespace MakeEveryDayRecount.Players
         /// Called when the player is detected by a camera
         /// </summary>
         public void Detected()
-        {
-            //TODO: This loads checkpoint data from last session. Need to wipe that data if the player wants to start fresh
-            //"Play" instead of "Continue"
-            
+        {   
             //Reset the map to the last checkpoint
             MapManager.LoadCheckpoint(TriggerManager.CurrentCheckpoint);
 
@@ -470,13 +467,14 @@ namespace MakeEveryDayRecount.Players
         public void Load()
         {
             BinaryReader reader = null!;
+            
+            //Clear Player's states
+            ClearStates();
+
             try
             {
                 Stream stream = File.OpenRead("./PlayerData/PlayerData.data");
                 reader = new BinaryReader(stream);
-
-                //Clear Player's states
-                ClearStates();
 
                 //Update player position
                 Location = new Point(reader.ReadInt32(), reader.ReadInt32());
