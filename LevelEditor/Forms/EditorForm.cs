@@ -9,6 +9,7 @@ using LevelEditor.Extensions;
 using LevelEditor.Forms.Prompts;
 using System.Diagnostics;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ScrollBar;
+using System.Linq;
 
 namespace LevelEditor
 {
@@ -29,6 +30,7 @@ namespace LevelEditor
         #region Fields and Properties
         // A reference to the MainForm that created this EditorForm
         private readonly MainForm _mainForm;
+
 
         /// <summary>
         /// The Room this editor is editing. Stored within roomRenderer to avoid duplicating state.
@@ -53,6 +55,7 @@ namespace LevelEditor
         /// Gets or sets the prop the user currently has selected from the palette.
         /// </summary>
         private Prop SelectedProp { get; set; }
+
         /// <summary>
         /// Gets the palette of props the user may select from
         /// </summary>
@@ -67,6 +70,11 @@ namespace LevelEditor
         /// </summary>
         private PropBox _currentlySelectedPropBox;
 
+        private string _formName;
+        private readonly string _formNameBase;
+
+        private bool _keyDownInputRead;
+
         #endregion
         #region Constructors
         /// <summary>
@@ -75,8 +83,16 @@ namespace LevelEditor
         private EditorForm(MainForm mainForm)
         {
             InitializeComponent();
+            _formName = "Room Editor";
+            _formNameBase = "Room Editor";
+
+            _keyDownInputRead = false;
 
             _mainForm = mainForm;
+
+            Room = null!;
+            TileGrid = null!;
+            _currentlySelectedPropBox = null!;
 
             TabState = TabState.Tiles;
 
@@ -104,6 +120,12 @@ namespace LevelEditor
                 swatch.SizeMode = PictureBoxSizeMode.Zoom;
             });
 
+            //setup keyboard capturing
+            this.KeyPreview = true;
+            this.KeyDown += RoomEditor_KeyDown;
+            this.KeyUp += RoomEditor_KeyUp;
+
+            this.FormClosing += RoomEditor_FormClosing;
             // Whenever the splitter of the splitContainer moves, we have to reformat the whole EditorForm
             splitContainer.SplitterMoved += (object? _, SplitterEventArgs _) => Reformat();
         }
@@ -119,6 +141,10 @@ namespace LevelEditor
             Room = room;
 
             Reformat();
+            _formName = $"Room Editor - {Room.Name} {(Room.SavedState == SavedState.Unsaved ? "*" : "")}";
+            _formNameBase = $"Room Editor - {Room.Name}";
+
+            this.Text = _formName;
         }
 
         /// <summary>
@@ -156,6 +182,15 @@ namespace LevelEditor
                 if (e.Button == MouseButtons.Left)
                 {
                     Room[e.Tile] = SelectedTile;
+                    // Handle setting tiles to the save value
+                    if (Room[e.Tile] == SelectedTile)
+                        return;
+
+                    if (Room.SavedState == SavedState.Saved)
+                    {
+                        Room.SavedState = SavedState.Unsaved;
+                        UpdateFormName($"{_formNameBase} *");
+                    }
                 }
 
                 // Right click picks tile! Because that's convenient and I wanted it to be a feature!
@@ -177,7 +212,7 @@ namespace LevelEditor
                             case ObjectType.Item: // Items, boxes, and cameras are created the same
                             case ObjectType.Box:
                             case ObjectType.Camera:
-                                createdProp = ((Camera)SelectedProp).Instantiate(e.Tile, e.Tile, MathF.PI / 4);
+                                createdProp = SelectedProp.Instantiate(e.Tile);
                                 break;
 
                             case ObjectType.Door:
@@ -234,11 +269,23 @@ namespace LevelEditor
                                 break;
                         }
                     }
+
+                    if (Room.SavedState == SavedState.Saved)
+                    {
+                        Room.SavedState = SavedState.Unsaved;
+                        UpdateFormName($"{_formNameBase} *");
+                    }
                 }
                 else if (e.Button == MouseButtons.Right) //Right click will...
                 {
                     // Remove! That! Prop!
-                    Room.RemovePropAt(e.Tile);
+                    bool removalSuccessful = Room.RemovePropAt(e.Tile);
+
+                    if (removalSuccessful && Room.SavedState == SavedState.Saved)
+                    {
+                        Room.SavedState = SavedState.Unsaved;
+                        UpdateFormName($"{_formNameBase} *");
+                    }
                 }
             }
         }
@@ -253,6 +300,12 @@ namespace LevelEditor
                 if (e.Button == MouseButtons.Left)
                 {
                     Room[e.Tile] = SelectedTile;
+
+                    if (Room[e.Tile] != SelectedTile && Room.SavedState == SavedState.Saved)
+                    {
+                        Room.SavedState = SavedState.Unsaved;
+                        UpdateFormName($"{_formNameBase} *");
+                    }
                 }
             }
         }
@@ -287,6 +340,7 @@ namespace LevelEditor
         }
 
         #endregion
+
         #region Tab Events
         /// <summary>
         /// Changes the state based on the current tab selected and decides what to do with that info
@@ -304,6 +358,7 @@ namespace LevelEditor
             Reformat();
         }
         #endregion
+
         #region Helpers
         /// <summary>
         /// Auto-formats the form.
@@ -353,6 +408,77 @@ namespace LevelEditor
             }
         }
 
+
+        /// <summary>
+        /// Update the name of the form
+        /// </summary>
+        /// <param name="newName">New name for the form</param>
+        private void UpdateFormName(string newName)
+        {
+            _formName = newName;
+            this.Text = _formName;
+        }
+
+        /// <summary>
+        /// Prevent the user from leaving the form with unsaved changes without confirming they 
+        /// wish to do so
+        /// </summary>
+        private void RoomEditor_FormClosing(object? sender, FormClosingEventArgs e)
+        {
+            if (Room.SavedState == SavedState.Unsaved)
+            {
+                switch (MessageBox.Show("Unsaved changes to room. Do you want to save before exiting?", "Warning",
+                                 MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning))
+                {
+                    case DialogResult.Cancel:
+                        e.Cancel = true;
+                        break;
+                    case DialogResult.Yes:
+                        Room.SavedState = SavedState.Saved;
+                        _mainForm.SaveLevel();
+                        break;
+                    case DialogResult.No:
+                        e.Cancel = false;
+                        break;
+                }
+            }
+        }
         #endregion
+
+        #region Keyboard Input
+
+        /// <summary>
+        /// Read keyboard input and take the needed actions based off which
+        /// keys are pressed at the same time
+        /// </summary>
+        private void RoomEditor_KeyDown(object? sender, KeyEventArgs e)
+        {
+            // prevent multiple inputs from being read at the same time
+            if (_keyDownInputRead)
+                return;
+
+            if (e.Control && e.KeyCode == Keys.S)
+            {
+
+                e.SuppressKeyPress = true;
+                _mainForm.SaveLevel();
+                _keyDownInputRead = true;
+
+                Room.SavedState = SavedState.Saved;
+                UpdateFormName($"{_formNameBase}");
+            }
+
+        }
+
+        /// <summary>
+        /// On the key up event, allow key input to be read again
+        /// </summary>
+        private void RoomEditor_KeyUp(object? sender, KeyEventArgs e)
+        {
+            _keyDownInputRead = false;
+        }
+
+        #endregion
+
     }
 }

@@ -1,13 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using static System.Windows.Forms.LinkLabel;
-using LevelEditor.Classes;
+﻿using LevelEditor.Classes;
 using LevelEditor.Classes.Props;
-using System.Threading.Channels;
 
 namespace LevelEditor.Helpers
 {
@@ -36,12 +28,13 @@ namespace LevelEditor.Helpers
              *    - string roomName
              *    - int roomID
              */
-
+            if (level == null)
+                return;
             // Path.Join is technically safer than $"{folderPath}/level.level" since different OSs use different path join characters
             // Does that *really* matter for this program's use case? Not really! But it's good practice
             string levelPath = Path.Join(folderPath, "level.level");
-            BinaryWriter writer = new(new FileStream(levelPath, FileMode.Create));
-
+            BinaryWriter writer = new BinaryWriter(new FileStream(levelPath, FileMode.Create));
+           
             int roomCount = level.Rooms.Count;
 
             writer.Write(roomCount);
@@ -110,7 +103,7 @@ namespace LevelEditor.Helpers
 
 
             string roomPath = Path.Join(folderPath, $"{room.Name}.room");
-            BinaryWriter writer = new(new FileStream(roomPath, FileMode.Create));
+            BinaryWriter writer = new BinaryWriter(new FileStream(roomPath, FileMode.Create));
 
             writer.Write(room.Width);
             writer.Write(room.Height);
@@ -191,9 +184,9 @@ namespace LevelEditor.Helpers
              *    - string roomName
              *    - int roomID
              */
-            Level level = new();
+            Level level = new Level();
 
-            BinaryReader reader = new(new FileStream(filePath, FileMode.Open));
+            BinaryReader reader = new BinaryReader(new FileStream(filePath, FileMode.Open));
 
             int roomCount = reader.ReadInt32();
 
@@ -213,9 +206,8 @@ namespace LevelEditor.Helpers
                     level.Rooms.Add(
                         LoadRoom(roomPath, allTiles, allProps)
                         );
-                    level.Rooms[level.Rooms.Count-1].Id = roomIndex;
+                    level.Rooms[level.Rooms.Count - 1].Id = roomIndex;
                 }
-
             }
 
             reader.Close();
@@ -270,7 +262,7 @@ namespace LevelEditor.Helpers
             *       int destY
             */
 
-            BinaryReader reader = new(new FileStream(filePath, FileMode.Open));
+            BinaryReader reader = new BinaryReader(new FileStream(filePath, FileMode.Open));
 
             int width = reader.ReadInt32();
             int height = reader.ReadInt32();

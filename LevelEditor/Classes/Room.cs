@@ -29,6 +29,12 @@ namespace LevelEditor.Classes
 
         private readonly List<Prop> _props;
         /// <summary>
+        /// Get the current save state of this form
+        /// </summary>
+        public SavedState SavedState { get; set; }
+
+
+        /// <summary>
         /// The props that have been placed in this room, read-only.
         /// </summary>
         public ReadOnlyCollection<Prop> Props => _props.AsReadOnly();
@@ -127,6 +133,7 @@ namespace LevelEditor.Classes
 
             _props = new List<Prop>();
             Id = id == null ? Program.Random.Next() : (int)id;
+            SavedState = SavedState.Saved;
         }
 
         /// <summary>
