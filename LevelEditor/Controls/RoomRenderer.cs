@@ -394,7 +394,7 @@ namespace LevelEditor.Controls
 
                 Rectangle drawRect = Rectangle.Union(TileSpaceToPixelSpace(bounds.Location), TileSpaceToPixelSpace(bounds.Location + bounds.Size));
 
-                Pen moana = new Pen(Color.YellowGreen);
+                Pen moana = new Pen(Color.YellowGreen, 4);
 
                 graphics.DrawRectangle(moana, drawRect);
             }
