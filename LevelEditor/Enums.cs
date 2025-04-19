@@ -28,7 +28,7 @@ namespace LevelEditor
         West=3
     }
 
-        /// <summary>
+    /// <summary>
     /// Define what type of object this is
     /// </summary>
     public enum ObjectType
@@ -38,4 +38,13 @@ namespace LevelEditor
         Box = 2,
         Door = 3
     }
+    
+    /// <summary>
+    /// Get if a file's changes have been saved or not
+    /// </summary>
+    public enum SavedState{
+        Unsaved,
+        Saved
+    }
+
 }

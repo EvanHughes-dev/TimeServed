@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,12 +25,84 @@ namespace LevelEditor.Classes
         /// <summary>
         /// The grid of tiles the room is made of.
         /// </summary>
-        public Tile[,] Tiles { get; }
+        private readonly Tile[,] _tiles;
+
+        private readonly List<Prop> _props;
+        /// <summary>
+        /// Get the current save state of this form
+        /// </summary>
+        public SavedState SavedState { get; set; }
+
 
         /// <summary>
-        /// The props that have been placed in this room.
+        /// The props that have been placed in this room, read-only.
         /// </summary>
-        public List<Prop> Props { get; set; }
+        public ReadOnlyCollection<Prop> Props => _props.AsReadOnly();
+
+        /// <summary>
+        /// Gets or sets the tile in the room at the given coordinate.
+        /// </summary>
+        /// <param name="x">The X coordinate of the tile to set. Larger values are further to the right.</param>
+        /// <param name="y">The Y coordinate of the tile to set. Larger values are further down.</param>
+        /// <returns>The found tile.</returns>
+        public Tile this[int x, int y]
+        {
+            // Don't really need to do index validation because, if it would ever be relevant, the array
+            //   would just throw an IndexOutOfRange exception itself
+            get => _tiles[y, x];
+            set
+            {
+                this[new Point(x, y)] = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the tile at the given point.
+        /// </summary>
+        /// <param name="tileCoords">The point, in tilespace, of the tile to get or set.</param>
+        /// <returns>The found tile.</returns>
+        public Tile this[Point tileCoords]
+        {
+            get => this[tileCoords.X, tileCoords.Y];
+            set
+            {
+                _tiles[tileCoords.Y, tileCoords.X] = value;
+                OnTileUpdated?.Invoke(tileCoords, value);
+            }
+        }
+
+        /// <summary>
+        /// How wide this room is, in tiles.
+        /// </summary>
+        public int Width => _tiles.GetLength(1);
+        /// <summary>
+        /// How tall this room is, in tiles.
+        /// </summary>
+        public int Height => _tiles.GetLength(0);
+        /// <summary>
+        /// The dimensions of this room, in tiles.
+        /// </summary>
+        public Size Dimensions
+        {
+            get => new Size(Width, Height);
+        }
+
+        /// <summary>
+        /// Called whenever a tile in the room is changed.
+        /// </summary>
+        public event Action<Point, Tile>? OnTileUpdated;
+        /// <summary>
+        /// Called whenever a prop is added to the room.
+        /// </summary>
+        public event Action<Prop>? OnPropAdded;
+        /// <summary>
+        /// Called whenever a prop is removed from the room.
+        /// </summary>
+        public event Action<Prop>? OnPropRemoved;
+        /// <summary>
+        /// Called whenever a camera in this room updates its view frustum.
+        /// </summary>
+        public event Action<Camera>? OnCameraViewFrustumUpdated;
 
         /// <summary>
         /// Creates a new Room with a name, dimensions, and optional Tile to fill the grid with.
@@ -38,14 +111,14 @@ namespace LevelEditor.Classes
         /// <param name="width">The room's width, in tiles.</param>
         /// <param name="height">The room's height, in tiles.</param>
         /// <param name="bg">
-        /// If provided, every tile in the Room will be set to this tile.
-        /// Should only be excluded if you're planning to immediately set every tile manually!
+        ///   If provided, every tile in the Room will be set to this tile.
+        ///   Should only be excluded if you're planning to immediately set every tile manually!
         /// </param>
         public Room(string name, int width, int height, Tile? bg = null, int? id = null)
         {
             Name = name;
 
-            Tiles = new Tile[height, width];
+            _tiles = new Tile[height, width];
 
             if (bg != null)
             {
@@ -53,12 +126,86 @@ namespace LevelEditor.Classes
                 {
                     for (int x = 0; x < width; x++)
                     {
-                        Tiles[y, x] = (Tile)bg;
+                        _tiles[y, x] = (Tile)bg;
                     }
                 }
             }
-            Props = new List<Prop> { };
+
+            _props = new List<Prop>();
             Id = id == null ? Program.Random.Next() : (int)id;
+            SavedState = SavedState.Saved;
+        }
+
+        /// <summary>
+        /// Adds a new prop to this Room.
+        /// </summary>
+        /// <param name="prop">The prop to add. Must not be null, and must have a set position.</param>
+        /// <exception cref="ArgumentException">Thrown when prop.Position is null.</exception>
+        public void AddProp(Prop prop)
+        {
+            ArgumentNullException.ThrowIfNull(prop);
+            if (prop.Position == null)
+                throw new ArgumentException("Rooms cannot contain positionless props.", nameof(prop));
+
+            _props.Add(prop);
+
+            if (prop is Camera camera)
+            {
+                camera.ViewFrustumUpdate += HandleCameraViewFrustumUpdated;
+            }
+
+            OnPropAdded?.Invoke(prop);
+        }
+
+        /// <summary>
+        /// Invokes the OnCameraViewFrustumUpdated event.
+        /// </summary>
+        /// <param name="sender"></param>
+        private void HandleCameraViewFrustumUpdated(Camera sender)
+        {
+            OnCameraViewFrustumUpdated?.Invoke(sender);
+        }
+
+        /// <summary>
+        /// Removes the given prop from this room.
+        /// </summary>
+        /// <param name="prop">The prop to remove.</param>
+        /// <returns>True if the prop was found and removed, false if the prop was not found.</returns>
+        public bool RemoveProp(Prop prop)
+        {
+            bool removalSuccessful = _props.Remove(prop);
+
+            if (removalSuccessful)
+            {
+                if (prop is Camera camera)
+                {
+                    camera.ViewFrustumUpdate -= HandleCameraViewFrustumUpdated;
+                }
+
+                OnPropRemoved?.Invoke(prop);
+            }
+
+            return removalSuccessful;
+        }
+
+        /// <summary>
+        /// Removes the prop at the given position.
+        /// </summary>
+        /// <param name="tilePosition">The position, in tilespace, of the prop to remove.</param>
+        /// <returns>True if a prop at that position was found and removed, false otherwise.</returns>
+        public bool RemovePropAt(Point tilePosition)
+        {
+            return RemoveProp(GetPropAt(tilePosition)!);
+        }
+
+        /// <summary>
+        /// Gets the prop at the given position, if one exists.
+        /// </summary>
+        /// <param name="tilePosition">The position to find the prop at.</param>
+        /// <returns>The prop, if one is found, or null if no such prop exists.</returns>
+        public Prop? GetPropAt(Point tilePosition)
+        {
+            return _props.Find(prop => prop.Position == tilePosition);
         }
 
         // TODO: Add Resize(north, south, east, west) method

@@ -35,11 +35,6 @@ namespace MakeEveryDayRecount
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        //Buttons
-        private List<Button> pauseButtons;
-        private List<Button> menuButtons;
-        private Texture2D defaultButtonTexture;
-
         private GameState _state;
 
 
@@ -107,8 +102,8 @@ namespace MakeEveryDayRecount
             InterfaceManager.InitializeMenus(ScreenSize);
 
 
-            GameplayManager.Initialize(ScreenSize);
-            MapUtils.Initialize(this);
+            _gameplayManager = new GameplayManager(ScreenSize);
+            MapUtils.Initialize(this, _gameplayManager);
 
             
 
@@ -182,6 +177,8 @@ namespace MakeEveryDayRecount
                     // frame of the ReplayManager and check if you have read all frames
                     if (!ReplayManager.PlayingReplay)
                     {
+                        //TODO: Is this needed?
+                        //ReplayManager.BeginReplay()
                          GameplayManager.ReplayMode();
                     }
                     else if (!ReplayManager.NextFrame())
@@ -193,7 +190,7 @@ namespace MakeEveryDayRecount
                     }
 
                     InputManager.ReplayUpdate();
-                    GameplayManager.Update(gameTime);
+                    _gameplayManager.Update(gameTime);
 
                     break;
             }

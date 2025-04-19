@@ -16,10 +16,10 @@ namespace LevelEditor.Classes.Props
         /// </summary>
         public Image Sprite { get; private set; }
         /// <summary>
-        /// This point's integer position in the room, in tile space.
+        /// This prop's integer position in the room, in tile space.
         /// (0, 0) is the top-left corner of the room.
         /// </summary>
-        public Point? Position { get; set; }
+        public virtual Point? Position { get; set; }
 
         /// <summary>
         /// Index of this image in the game's array

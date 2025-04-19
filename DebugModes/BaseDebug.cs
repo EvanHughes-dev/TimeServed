@@ -22,7 +22,8 @@ namespace MakeEveryDayRecount.DebugModes
         /// Initializes the basic debug system
         /// </summary>
         /// <param name="spriteFont">The font used for debug text</param>
-        public BaseDebug()
+        /// <param name="gameplayManager">Reference to the game's manager for accessing player data</param>
+        public BaseDebug(GameplayManager gameplayManager)
         {
             _spriteFont = AssetManager.Arial20;
             _yAxisIncrement = _spriteFont.LineSpacing;

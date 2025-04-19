@@ -1,14 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Players;
-using MakeEveryDayRecount.Managers;
-using MakeEveryDayRecount.Map.Tiles;
-using System.Linq;
 
 namespace MakeEveryDayRecount.GameObjects.Props
 {

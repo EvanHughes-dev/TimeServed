@@ -84,6 +84,11 @@ namespace MakeEveryDayRecount.Managers
         public static Texture2D[] CameraTextures { get; private set; }
 
         /// <summary>
+        /// An array of all camera textures
+        /// </summary>
+        public static Texture2D[] Cameras { get; private set; }
+
+        /// <summary>
         /// An array of all box textures
         /// </summary>
         public static Texture2D[] Boxes { get; private set; }
@@ -116,22 +121,43 @@ namespace MakeEveryDayRecount.Managers
 
             TileMap = new Texture2D[]
             {
-                //TEMP ASSETS
-                //Only the first 3 assets matter for right now (because of how the test rooms are formatted)
-                content.Load<Texture2D>("Tiles/void"), //Void
-                content.Load<Texture2D>("Tiles/tile_walkable0"), //Walkable
-                content.Load<Texture2D>("Tiles/tile_wall0"), //Wall
+                content.Load<Texture2D>("Tiles/void"),
 
+                content.Load<Texture2D>("Tiles/tile_wall_corner_inner_tr"),
+                content.Load<Texture2D>("Tiles/tile_wall_corner_inner_tl"),
+                content.Load<Texture2D>("Tiles/tile_wall_corner_inner_br"),
+                content.Load<Texture2D>("Tiles/tile_wall_corner_inner_bl"),
 
+                content.Load<Texture2D>("Tiles/tile_wall_corner_outer_tr"),
+                content.Load<Texture2D>("Tiles/tile_wall_corner_outer_tl"),
+                content.Load<Texture2D>("Tiles/tile_wall_corner_outer_br"),
+                content.Load<Texture2D>("Tiles/tile_wall_corner_outer_bl"),
+
+                content.Load<Texture2D>("Tiles/tile_wall0_top"),
+                content.Load<Texture2D>("Tiles/tile_wall1_top"),
+                content.Load<Texture2D>("Tiles/tile_wall2_top"),
+                content.Load<Texture2D>("Tiles/tile_wall3_top"),
+
+                content.Load<Texture2D>("Tiles/tile_wall0_right"),
+                content.Load<Texture2D>("Tiles/tile_wall1_right"),
+                content.Load<Texture2D>("Tiles/tile_wall2_right"),
+                content.Load<Texture2D>("Tiles/tile_wall3_right"),
+
+                content.Load<Texture2D>("Tiles/tile_wall0_bottom"),
+                content.Load<Texture2D>("Tiles/tile_wall1_bottom"),
+                content.Load<Texture2D>("Tiles/tile_wall2_bottom"),
+                content.Load<Texture2D>("Tiles/tile_wall3_bottom"),
+
+                content.Load<Texture2D>("Tiles/tile_wall0_left"),
+                content.Load<Texture2D>("Tiles/tile_wall1_left"),
+                content.Load<Texture2D>("Tiles/tile_wall2_left"),
+                content.Load<Texture2D>("Tiles/tile_wall3_left"),
+
+                content.Load<Texture2D>("Tiles/tile_walkable0"),
                 content.Load<Texture2D>("Tiles/tile_walkable1"),
                 content.Load<Texture2D>("Tiles/tile_walkable2"),
                 content.Load<Texture2D>("Tiles/tile_walkable3"),
                 content.Load<Texture2D>("Tiles/tile_walkable4"),
-
-                
-                content.Load<Texture2D>("Tiles/tile_wall1"),
-                content.Load<Texture2D>("Tiles/tile_wall2"),
-                content.Load<Texture2D>("Tiles/tile_wall3")
             };
             DoorTexture = new Texture2D[]
             {

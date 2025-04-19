@@ -173,12 +173,6 @@ namespace MakeEveryDayRecount.Map
                 {
                     propToDraw.Draw(sb, worldToScreen, pixelOffset);
                 }
-                //Cameras are excluded from this check and are always drawn if they are in the room
-                //This is done to allow the camera's vision cone to be seen even when the camera is not on the screen
-                else if (propToDraw is Camera)
-                {
-                    propToDraw.Draw(sb, worldToScreen, pixelOffset);
-                }
             }
 
             // Display all doors
@@ -252,9 +246,6 @@ namespace MakeEveryDayRecount.Map
                     *       int destRoom
                     *       int outputPosX
                     *       int outputPosY
-                    *  if objectType == 1
-                    *       Point centerPoint point of a camera vision cone
-                    *       float radian value of camera spread
                     */
 
                 // Define the size of the current room and loop to populate tiles
@@ -287,10 +278,9 @@ namespace MakeEveryDayRecount.Map
                     Point tileLocation = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
 
                         ObjectTypes objectType = (ObjectTypes)binaryReader.ReadInt32();
-                        switch (objectType)
+                        if (objectType == ObjectTypes.Item || objectType == ObjectTypes.Door)
                         {
-                            case ObjectTypes.Item:
-                                Door.DoorKeyType keyTypeItem = (Door.DoorKeyType)binaryReader.ReadInt32();
+                            Door.DoorKeyType keyType = (Door.DoorKeyType)binaryReader.ReadInt32();
 
                                 Item newItemInRoom = new Item(
                                     tileLocation,
@@ -320,7 +310,7 @@ namespace MakeEveryDayRecount.Map
                                 Door doorFromFile = new Door(
                                     binaryReader.ReadInt32(),//Read destination room
                                     new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32()),// Read the destination point in the new room
-                                    keyTypeDoor,
+                                    keyType,
                                     tileLocation,
                                     AssetManager.DoorTexture,
                                     propIndex
