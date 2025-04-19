@@ -384,7 +384,7 @@ namespace LevelEditor.Controls
         /// <exception cref="NotImplementedException">ALWAYS THROWN.</exception>
         private void DrawTriggers(Graphics graphics)
         {
-            throw new NotImplementedException();
+            
         }
 
         #endregion 
