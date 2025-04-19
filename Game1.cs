@@ -101,9 +101,7 @@ namespace MakeEveryDayRecount
             // Initialize all items that need assets to be loaded 
             InterfaceManager.InitializeMenus(ScreenSize);
 
-
-            _gameplayManager = new GameplayManager(ScreenSize);
-            MapUtils.Initialize(this, _gameplayManager);
+            MapUtils.Initialize(this);
 
             
 
@@ -190,7 +188,7 @@ namespace MakeEveryDayRecount
                     }
 
                     InputManager.ReplayUpdate();
-                    _gameplayManager.Update(gameTime);
+                    GameplayManager.Update(gameTime);
 
                     break;
             }

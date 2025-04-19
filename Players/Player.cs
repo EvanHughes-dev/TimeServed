@@ -89,7 +89,7 @@ namespace MakeEveryDayRecount.Players
 
         //A reference to the gameplay manager which has a reference
         //to the map which lets the player know what's near them
-        private readonly GameplayManager _gameplayManager;
+        //Outdated, gameplay manager is static
 
         //The player's inventory
         private Inventory _inventory;
@@ -108,11 +108,10 @@ namespace MakeEveryDayRecount.Players
         /// <param name="sprite">Image of the player</param>
         /// <param name="gameplayManager">manager of the game</param>
         /// <param name="screenSize">Size of the screen in pixels</param>
-        public Player(Point location, Texture2D sprite, GameplayManager gameplayManager, Point screenSize)
+        public Player(Point location, Texture2D sprite, Point screenSize)
             : base(location, sprite)
         {
             _walkingSeconds = 0;
-            _gameplayManager = gameplayManager;
             _animationFrame = 0;
             _playerSize = new Point(sprite.Width / 4, sprite.Height / 4);
             //Create an inventory
@@ -205,8 +204,8 @@ namespace MakeEveryDayRecount.Players
             if (_readyToMove && MapManager.CheckPlayerCollision(Location + movement) &&
                 (!HoldingBox || MapManager.CheckPlayerCollision(_currentHeldBox.Location + movement)))
             {
-                if (_gameplayManager.Map.CheckPlayerCollision(Location + movement) &&
-                    (!HoldingBox || _gameplayManager.Map.CheckPlayerCollision(_currentHeldBox.Location + movement)))
+                if (MapManager.CheckPlayerCollision(Location + movement) &&
+                    (!HoldingBox || MapManager.CheckPlayerCollision(_currentHeldBox.Location + movement)))
                 {
                     _readyToMove = false;
                     _destDirection = movement;

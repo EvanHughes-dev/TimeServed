@@ -164,7 +164,7 @@ namespace MakeEveryDayRecount.Map
         /// </summary>
         /// <param name="game1">Reference to this instance of the game</param>
         /// <param name="gameplayManager">Reference to the overall GameplayManager</param>
-        public static void Initialize(Game1 game1, GameplayManager gameplayManager)
+        public static void Initialize(Game1 game1)
         {
             game1Instance = game1;
             GameplayManager.OnPlayerUpdate += SetCurrentPlayer;

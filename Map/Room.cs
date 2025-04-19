@@ -278,9 +278,12 @@ namespace MakeEveryDayRecount.Map
                     Point tileLocation = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
 
                         ObjectTypes objectType = (ObjectTypes)binaryReader.ReadInt32();
-                        if (objectType == ObjectTypes.Item || objectType == ObjectTypes.Door)
+
+                        switch (objectType)
                         {
-                            Door.DoorKeyType keyType = (Door.DoorKeyType)binaryReader.ReadInt32();
+
+                            case ObjectTypes.Item:
+                                Door.DoorKeyType keyTypeItem = (Door.DoorKeyType)binaryReader.ReadInt32();
 
                                 Item newItemInRoom = new Item(
                                     tileLocation,
@@ -310,7 +313,7 @@ namespace MakeEveryDayRecount.Map
                                 Door doorFromFile = new Door(
                                     binaryReader.ReadInt32(),//Read destination room
                                     new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32()),// Read the destination point in the new room
-                                    keyType,
+                                    keyTypeDoor,
                                     tileLocation,
                                     AssetManager.DoorTexture,
                                     propIndex
@@ -319,9 +322,8 @@ namespace MakeEveryDayRecount.Map
                                 doorFromFile.OnDoorInteract += TransitionPlayer;
                                 Doors.Add(doorFromFile);
                                 break;
+
                         }
-                        
-                     
                         numberOfGameObjects--;
                     }
                     //Define number of triggers in the room

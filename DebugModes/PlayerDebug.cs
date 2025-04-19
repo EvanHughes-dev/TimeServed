@@ -24,10 +24,9 @@ namespace MakeEveryDayRecount.DebugModes
         /// </summary>
         /// <param name="spriteFont">The font used for debug text.</param>
         /// <param name="gameplayManager">Reference to the game's manager for accessing player data.</param>
-        public PlayerDebug(GameplayManager gameplayManager)
-            : base(gameplayManager)
+        public PlayerDebug()
         {
-            _player = gameplayManager.PlayerObject;
+            _player = GameplayManager.PlayerObject;
             AddPlayerDebugInfo();
             _walkableTileDebug = AssetManager.DebugWalkableTile;
             _notWalkableTileDebug = AssetManager.DebugNotWalkableTile;
