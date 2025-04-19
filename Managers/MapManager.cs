@@ -152,6 +152,7 @@ namespace MakeEveryDayRecount.Managers
                 {
                     string roomName = binaryReader.ReadString();
                     string roomFilePath = $"{folderPath}/{roomName}.room";
+                    //TODO: change this
                     //Previous code was:
                     //int roomIndex = binaryReader.ReadInt32();
                     //My bandaid fix is:
