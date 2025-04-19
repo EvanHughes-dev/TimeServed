@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using MakeEveryDayRecount.Managers;
 using MakeEveryDayRecount.UI;
+using MakeEveryDayRecount.GameObjects.Triggers;
 
 namespace MakeEveryDayRecount
 {
@@ -69,7 +70,7 @@ namespace MakeEveryDayRecount
             //_graphics.PreferredBackBufferHeight = 360;
 
             _graphics.HardwareModeSwitch = false;
-            _graphics.IsFullScreen = false; //DELETE THIS
+            _graphics.IsFullScreen = false; //DELETE THIS switch to true
             _graphics.ApplyChanges();
 
             _debugState = DebugState.None;
@@ -107,7 +108,10 @@ namespace MakeEveryDayRecount
 
             _debugModes[0] = new PlayerDebug();
             _debugModes[1] = new MapDebug();
-
+            //DELETE THIS
+            Checkpoint c = new Checkpoint(new Point(1, 1), null, 0, 1, 1, true);
+            TriggerManager.SetPlayerSpawn(c);
+            TriggerManager.AddCheckpoint(c);
         }
 
         protected override void Update(GameTime gameTime)

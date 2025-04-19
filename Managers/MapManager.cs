@@ -40,7 +40,6 @@ namespace MakeEveryDayRecount.Managers
         /// <summary>
         /// Initialize the map manger and make rooms
         /// </summary>
-        /// <param name="gameplayManager">Reference to the gamePlayManager</param>
         public static void Initialize()
         {
             _rooms = LoadMapData(GameplayManager.Level);
@@ -70,7 +69,7 @@ namespace MakeEveryDayRecount.Managers
         /// <param name="destRoom">Room index to change to</param>
         public static void ChangeRoom(int destRoom)
         {
-            _currentRoom = _rooms[destRoom];
+            _currentRoom = _rooms[0]; //TODO: actually change to the right room
             OnRoomUpdate?.Invoke(_currentRoom);
         }
 
