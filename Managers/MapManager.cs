@@ -58,7 +58,7 @@ namespace MakeEveryDayRecount.Managers
         /// <param name="destRoom"> Destination room for transition </param>
         public static void TransitionRoom(Door transDoor, int destRoom)
         { 
-             GameplayManager.PlayerObject.ChangeRoom(transDoor.DestinationTile);
+            GameplayManager.PlayerObject.ChangeRoom(transDoor.DestinationTile);
             ChangeRoom(destRoom);
 
         }
@@ -69,7 +69,7 @@ namespace MakeEveryDayRecount.Managers
         /// <param name="destRoom">Room index to change to</param>
         public static void ChangeRoom(int destRoom)
         {
-            _currentRoom = _rooms[0]; //TODO: actually change to the right room
+            _currentRoom = _rooms[destRoom];
             OnRoomUpdate?.Invoke(_currentRoom);
         }
 
@@ -152,7 +152,11 @@ namespace MakeEveryDayRecount.Managers
                 {
                     string roomName = binaryReader.ReadString();
                     string roomFilePath = $"{folderPath}/{roomName}.room";
-                    int roomIndex = binaryReader.ReadInt32();
+                    //Previous code was:
+                    //int roomIndex = binaryReader.ReadInt32();
+                    //My bandaid fix is:
+                    binaryReader.ReadInt32();
+                    int roomIndex = currentRoom;
                     Room room = new Room(roomFilePath, roomName, roomIndex);
                     rooms[currentRoom] = room;
                 }
