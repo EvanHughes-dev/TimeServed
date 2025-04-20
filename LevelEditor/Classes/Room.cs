@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using LevelEditor.Classes.Props;
+using LevelEditor.Classes.Triggers;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using LevelEditor.Classes.Props;
 
 namespace LevelEditor.Classes
 {
@@ -27,17 +23,21 @@ namespace LevelEditor.Classes
         /// </summary>
         private readonly Tile[,] _tiles;
 
-        private readonly List<Prop> _props;
         /// <summary>
         /// Get the current save state of this form
         /// </summary>
         public SavedState SavedState { get; set; }
 
-
+        private readonly List<Prop> _props;
+        private readonly List<Trigger> _triggers;
         /// <summary>
         /// The props that have been placed in this room, read-only.
         /// </summary>
         public ReadOnlyCollection<Prop> Props => _props.AsReadOnly();
+        /// <summary>
+        /// The triggers that have been placed in this room, read-only.
+        /// </summary>
+        public ReadOnlyCollection<Trigger> Triggers => _triggers.AsReadOnly();
 
         /// <summary>
         /// Gets or sets the tile in the room at the given coordinate.
@@ -100,6 +100,14 @@ namespace LevelEditor.Classes
         /// </summary>
         public event Action<Prop>? OnPropRemoved;
         /// <summary>
+        /// Called whenever a trigger is added to the room.
+        /// </summary>
+        public event Action<Trigger>? OnTriggerAdded;
+        /// <summary>
+        /// Called whenever a trigger is removed from the room.
+        /// </summary>
+        public event Action<Trigger>? OnTriggerRemoved;
+        /// <summary>
         /// Called whenever a camera in this room updates its view frustum.
         /// </summary>
         public event Action<Camera>? OnCameraViewFrustumUpdated;
@@ -132,6 +140,7 @@ namespace LevelEditor.Classes
             }
 
             _props = new List<Prop>();
+            _triggers = new List<Trigger>();
             Id = id == null ? Program.Random.Next() : (int)id;
             SavedState = SavedState.Saved;
         }
@@ -208,8 +217,58 @@ namespace LevelEditor.Classes
             return _props.Find(prop => prop.Position == tilePosition);
         }
 
-        // TODO: Add Resize(north, south, east, west) method
-        //   Allows for resizing of room after initial creation by adding or removing rows or columns
-        //   on any of the four edges, referred to by cardinal directions
+        /// <summary>
+        /// Adds a new trigger to this Room.
+        /// </summary>
+        /// <param name="trigger">The trigger to add. Must not be null, and must have a set bounds.</param>
+        /// <exception cref="ArgumentException">Thrown when trigger.Bounds is null.</exception>
+        public void AddTrigger(Trigger trigger)
+        {
+            ArgumentNullException.ThrowIfNull(trigger);
+            if (trigger.Bounds == null)
+                throw new ArgumentException("Rooms cannot contain boundless triggers.", nameof(trigger));
+
+            _triggers.Add(trigger);
+
+            OnTriggerAdded?.Invoke(trigger);
+        }
+
+        /// <summary>
+        /// Removes the given trigger from this room.
+        /// </summary>
+        /// <param name="trigger">The trigger to remove.</param>
+        /// <returns>True if the trigger was found and removed, false if the trigger was not found.</returns>
+        public bool RemoveTrigger(Trigger trigger)
+        {
+            bool removalSuccessful = _triggers.Remove(trigger);
+
+            if (removalSuccessful)
+            {
+
+                OnTriggerRemoved?.Invoke(trigger);
+            }
+
+            return removalSuccessful;
+        }
+
+        /// <summary>
+        /// Removes the trigger at the given position.
+        /// </summary>
+        /// <param name="tilePosition">The position, in tilespace, of the trigger to remove.</param>
+        /// <returns>True if a trigger at that position was found and removed, false otherwise.</returns>
+        public bool RemoveTriggerAt(Point tilePosition)
+        {
+            return RemoveTrigger(GetTriggerAt(tilePosition)!);
+        }
+
+        /// <summary>
+        /// Gets the trigger at the given position, if one exists.
+        /// </summary>
+        /// <param name="tilePosition">The position to find the trigger at.</param>
+        /// <returns>The trigger, if one is found, or null if no such trigger exists.</returns>
+        public Trigger? GetTriggerAt(Point tilePosition)
+        {
+            return _triggers.Find(trigger => trigger.Bounds!.Value.Contains(tilePosition));
+        }
     }
 }
