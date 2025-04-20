@@ -392,11 +392,15 @@ namespace LevelEditor.Controls
                 Debug.Assert(trigger.Bounds != null); // I am moana
                 Rectangle bounds = trigger.Bounds.Value;
 
-                Rectangle drawRect = Rectangle.Union(TileSpaceToPixelSpace(bounds.Location), TileSpaceToPixelSpace(bounds.Location + bounds.Size));
+                Size one = new Size(1, 1);
+
+                Rectangle drawRect = Rectangle.Union(TileSpaceToPixelSpace(bounds.Location), TileSpaceToPixelSpace(bounds.Location + bounds.Size - one));
 
                 Pen moana = new Pen(Color.YellowGreen, 4);
+                Brush maoi = new SolidBrush(Color.FromArgb(63, Color.YellowGreen));
 
                 graphics.DrawRectangle(moana, drawRect);
+                graphics.FillRectangle(maoi, drawRect);
             }
         }
 
@@ -483,8 +487,17 @@ namespace LevelEditor.Controls
                 _room.OnPropAdded -= OnPropChange;
                 _room.OnPropRemoved -= OnPropChange;
                 _room.OnCameraViewFrustumUpdated -= OnPropChange;
+
+                _room.OnTriggerAdded -= OnTriggerChange;
+                _room.OnTriggerRemoved -= OnTriggerChange;
             }
         }
+
+        private void OnTriggerChange(Trigger obj)
+        {
+            Invalidate();
+        }
+
         /// <summary>
         /// Subscribes to all of the room's events.
         /// </summary>
@@ -496,6 +509,9 @@ namespace LevelEditor.Controls
                 _room.OnPropAdded += OnPropChange;
                 _room.OnPropRemoved += OnPropChange;
                 _room.OnCameraViewFrustumUpdated += OnPropChange;
+
+                _room.OnTriggerAdded += OnTriggerChange;
+                _room.OnTriggerRemoved += OnTriggerChange;
             }
         }
 

@@ -124,6 +124,8 @@ namespace LevelEditor
                 swatch.SizeMode = PictureBoxSizeMode.Zoom;
             });
 
+            SelectedTrigger = _mainForm.Triggers.ElementAt(0);
+
             //setup keyboard capturing
             this.KeyPreview = true;
             this.KeyDown += RoomEditor_KeyDown;
@@ -325,6 +327,8 @@ namespace LevelEditor
                     Trigger t = SelectedTrigger.Instantiate(Rectangle.Union(startRect, endRect));
 
                     Room.AddTrigger(t);
+
+                    _triggerStartPoint = null;
                 }
 
             }

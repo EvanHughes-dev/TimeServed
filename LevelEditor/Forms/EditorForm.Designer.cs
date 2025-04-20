@@ -29,15 +29,16 @@
         private void InitializeComponent()
         {
             groupBoxMap = new GroupBox();
-            roomRenderer = new LevelEditor.Controls.RoomRenderer();
+            roomRenderer = new Controls.RoomRenderer();
             openFileDialog = new OpenFileDialog();
             saveFileDialog = new SaveFileDialog();
             tabControlPalettes = new TabControl();
             tabPageTiles = new TabPage();
             flowLayoutPanelTiles = new FlowLayoutPanel();
             tabPageProps = new TabPage();
-            splitContainer = new SplitContainer();
             flowLayoutPanelProps = new FlowLayoutPanel();
+            tabPageTriggers = new TabPage();
+            splitContainer = new SplitContainer();
             groupBoxMap.SuspendLayout();
             tabControlPalettes.SuspendLayout();
             tabPageTiles.SuspendLayout();
@@ -65,12 +66,13 @@
             roomRenderer.Room = null;
             roomRenderer.ShowProps = true;
             roomRenderer.ShowTiles = true;
-            roomRenderer.ShowTriggers = false;
-            roomRenderer.Size = new Size(429, 466);
+            roomRenderer.ShowTriggers = true;
+            roomRenderer.Size = new Size(429, 472);
             roomRenderer.TabIndex = 0;
-            roomRenderer.Text = "roomRenderer1";
+            roomRenderer.Text = "roomRenderer";
             roomRenderer.TileMouseDown += roomRenderer_TileMouseDown;
             roomRenderer.TileMouseMove += roomRenderer_TileMouseMove;
+            roomRenderer.TileMouseUp += roomrenderer_TileMouseUp;
             // 
             // openFileDialog
             // 
@@ -87,6 +89,7 @@
             // 
             tabControlPalettes.Controls.Add(tabPageTiles);
             tabControlPalettes.Controls.Add(tabPageProps);
+            tabControlPalettes.Controls.Add(tabPageTriggers);
             tabControlPalettes.Location = new Point(12, 12);
             tabControlPalettes.Name = "tabControlPalettes";
             tabControlPalettes.SelectedIndex = 0;
@@ -122,6 +125,22 @@
             tabPageProps.Text = "Props";
             tabPageProps.UseVisualStyleBackColor = true;
             // 
+            // flowLayoutPanelProps
+            // 
+            flowLayoutPanelProps.Location = new Point(3, 3);
+            flowLayoutPanelProps.Name = "flowLayoutPanelProps";
+            flowLayoutPanelProps.Size = new Size(201, 460);
+            flowLayoutPanelProps.TabIndex = 0;
+            // 
+            // tabPageTriggers
+            // 
+            tabPageTriggers.Location = new Point(4, 24);
+            tabPageTriggers.Name = "tabPageTriggers";
+            tabPageTriggers.Size = new Size(207, 466);
+            tabPageTriggers.TabIndex = 1;
+            tabPageTriggers.Text = "Triggers";
+            tabPageTriggers.UseVisualStyleBackColor = true;
+            // 
             // splitContainer
             // 
             splitContainer.Location = new Point(0, 0);
@@ -137,13 +156,6 @@
             splitContainer.Size = new Size(690, 514);
             splitContainer.SplitterDistance = 230;
             splitContainer.TabIndex = 3;
-            // 
-            // flowLayoutPanelProps
-            // 
-            flowLayoutPanelProps.Location = new Point(3, 3);
-            flowLayoutPanelProps.Name = "flowLayoutPanelProps";
-            flowLayoutPanelProps.Size = new Size(201, 460);
-            flowLayoutPanelProps.TabIndex = 0;
             // 
             // EditorForm
             // 
@@ -171,9 +183,10 @@
         private TabControl tabControlPalettes;
         private TabPage tabPageTiles;
         private TabPage tabPageProps;
-        private Controls.RoomRenderer roomRenderer;
         private SplitContainer splitContainer;
         private FlowLayoutPanel flowLayoutPanelTiles;
         private FlowLayoutPanel flowLayoutPanelProps;
+        private TabPage tabPageTriggers;
+        private Controls.RoomRenderer roomRenderer;
     }
 }

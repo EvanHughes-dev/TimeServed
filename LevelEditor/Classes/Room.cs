@@ -140,6 +140,7 @@ namespace LevelEditor.Classes
             }
 
             _props = new List<Prop>();
+            _triggers = new List<Trigger>();
             Id = id == null ? Program.Random.Next() : (int)id;
             SavedState = SavedState.Saved;
         }
