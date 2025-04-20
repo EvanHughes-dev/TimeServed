@@ -384,10 +384,26 @@ namespace MakeEveryDayRecount.GameObjects.Props
                         &&
                         (clockwiseRay.Y * candidateVector.X - clockwiseRay.X * candidateVector.Y) *
                         (clockwiseRay.Y * counterclockwiseRay.X - clockwiseRay.X * counterclockwiseRay.Y) >= 0
-                        && candidateVector.Length() <= centerRay.Length() //TODO: Is there a better way to keep it from going over the end?
-                        && _room.VerifyWalkable(new Point(x, y)))
+                        && candidateVector.Length() <= centerRay.Length()) //TODO: Is there a better way to keep it from going over the end?
                     {
-                        _watchedTiles.Add(new Point(x, y));
+                        //Make sure we're not including walls in the vision tile
+                        Point candidatePoint = new Point(x, y);
+                        if (_room.VerifyWalkable(candidatePoint)) //If it's walkable, add it
+                        {
+                            _watchedTiles.Add(candidatePoint);
+                        }
+                        else //if it's not walkable, but it is a prop (a box), still add it
+                        {
+                            foreach (Prop prop in _room.ItemsInRoom)
+                            {
+                                if (prop.Location == candidatePoint)
+                                {
+                                    _watchedTiles.Add(candidatePoint);
+                                    break;
+                                }
+                            }
+                        }
+                        //if it's a wall instead of a prop, don't add it
                     }
                 }
             }
