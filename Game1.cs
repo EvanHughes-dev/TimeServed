@@ -151,13 +151,6 @@ namespace MakeEveryDayRecount
                         _state = GameState.Playback;
                     }
 
-                    //DELETE THIS
-                    //"kill" the player
-                    if (InputManager.GetKeyPress(Keys.P))
-                    {
-                        GameplayManager.PlayerObject.Detected();
-                    }
-
                     break;
 
                 case GameState.Cutscene:
@@ -175,8 +168,7 @@ namespace MakeEveryDayRecount
                     // frame of the ReplayManager and check if you have read all frames
                     if (!ReplayManager.PlayingReplay)
                     {
-                        //TODO: Is this needed?
-                        //ReplayManager.BeginReplay()
+                        ReplayManager.BeginReplay()
                          GameplayManager.ReplayMode();
                     }
                     else if (!ReplayManager.NextFrame())

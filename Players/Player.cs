@@ -106,7 +106,6 @@ namespace MakeEveryDayRecount.Players
         /// </summary>
         /// <param name="location">Location of the player</param>
         /// <param name="sprite">Image of the player</param>
-        /// <param name="gameplayManager">manager of the game</param>
         /// <param name="screenSize">Size of the screen in pixels</param>
         public Player(Point location, Texture2D sprite, Point screenSize)
             : base(location, sprite)
