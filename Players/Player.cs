@@ -6,6 +6,9 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MakeEveryDayRecount.Managers;
 using MakeEveryDayRecount.Players.InventoryFiles;
+using MakeEveryDayRecount.GameObjects.Triggers;
+using System.IO;
+using System;
 
 
 namespace MakeEveryDayRecount.Players
@@ -37,8 +40,6 @@ namespace MakeEveryDayRecount.Players
             Walking = 1,
             Interacting = 2
         }
-
-
 
         /// <summary>
         /// Player's current position on the screen
@@ -86,10 +87,6 @@ namespace MakeEveryDayRecount.Players
 
         private Point _destDirection;
 
-        //A reference to the gameplay manager which has a reference
-        //to the map which lets the player know what's near them
-        private readonly GameplayManager _gameplayManager;
-
         //The player's inventory
         private Inventory _inventory;
 
@@ -105,13 +102,11 @@ namespace MakeEveryDayRecount.Players
         /// </summary>
         /// <param name="location">Location of the player</param>
         /// <param name="sprite">Image of the player</param>
-        /// <param name="gameplayManager">manager of the game</param>
         /// <param name="screenSize">Size of the screen in pixels</param>
-        public Player(Point location, Texture2D sprite, GameplayManager gameplayManager, Point screenSize)
+        public Player(Point location, Texture2D sprite, Point screenSize)
             : base(location, sprite)
         {
             _walkingSeconds = 0;
-            _gameplayManager = gameplayManager;
             _animationFrame = 0;
             _playerSize = new Point(sprite.Width / 4, sprite.Height / 4);
             //Create an inventory
@@ -200,10 +195,12 @@ namespace MakeEveryDayRecount.Players
         {
             if (!_readyToMove)
                 UpdateWalkingTime(deltaTime);
-            if (_readyToMove)
+
+            if (_readyToMove && MapManager.CheckPlayerCollision(Location + movement) &&
+                (!HoldingBox || MapManager.CheckPlayerCollision(_currentHeldBox.Location + movement)))
             {
-                if (_gameplayManager.Map.CheckPlayerCollision(Location + movement) &&
-                    (!HoldingBox || _gameplayManager.Map.CheckPlayerCollision(_currentHeldBox.Location + movement)))
+                if (MapManager.CheckPlayerCollision(Location + movement) &&
+                    (!HoldingBox || MapManager.CheckPlayerCollision(_currentHeldBox.Location + movement)))
                 {
                     _readyToMove = false;
                     _destDirection = movement;
@@ -411,16 +408,16 @@ namespace MakeEveryDayRecount.Players
             switch (_playerCurrentDirection)
             {
                 case Direction.Left:
-                    objectToInteract = _gameplayManager.Map.CheckInteractable(Location + new Point(-1, 0));
+                    objectToInteract = MapManager.CheckInteractable(Location + new Point(-1, 0));
                     break;
                 case Direction.Up:
-                    objectToInteract = _gameplayManager.Map.CheckInteractable(Location + new Point(0, -1));
+                    objectToInteract = MapManager.CheckInteractable(Location + new Point(0, -1));
                     break;
                 case Direction.Right:
-                    objectToInteract = _gameplayManager.Map.CheckInteractable(Location + new Point(1, 0));
+                    objectToInteract = MapManager.CheckInteractable(Location + new Point(1, 0));
                     break;
                 case Direction.Down:
-                    objectToInteract = _gameplayManager.Map.CheckInteractable(Location + new Point(0, 1));
+                    objectToInteract = MapManager.CheckInteractable(Location + new Point(0, 1));
                     break;
             }
 
@@ -455,6 +452,18 @@ namespace MakeEveryDayRecount.Players
             _currentHeldBox = null;
         }
 
+        /// <summary>
+        /// Called when the player is detected by a camera
+        /// </summary>
+        public void Detected()
+        {
+            //Reset the map to the last checkpoint
+            MapManager.LoadCheckpoint(TriggerManager.CurrentCheckpoint);
+
+            //Reset the player data to the last checkpoint
+            Load();
+        }
+
         #endregion
 
         /// <summary>
@@ -466,6 +475,85 @@ namespace MakeEveryDayRecount.Players
             _playerState = PlayerState.Standing;
             DropBox();
             _inventory.ClearInventory();
+        }
+
+        /// <summary>
+        /// Saves the player's position and inventory to a file. Format is as follows:
+        /// int xPos
+        /// int yPos
+        /// 
+        /// int item count
+        /// 
+        /// inventory:
+        ///     int propIndex
+        ///     int keyType
+        /// </summary>
+        public void Save()
+        {
+            //Make the folder if it doesn't already exist
+            if (!Directory.Exists("./PlayerData"))
+                Directory.CreateDirectory("./PlayerData");
+
+            BinaryWriter writer = null;
+            try
+            {
+                Stream stream = File.OpenWrite($"./PlayerData/PlayerData.data");
+                writer = new BinaryWriter(stream);
+
+                //Player position
+                writer.Write(Location.X);
+                writer.Write(Location.Y);
+
+                //Item count
+                writer.Write(_inventory.Contents.Count);
+
+                //Items
+                for (int i = 0; i < _inventory.Contents.Count; i++)
+                {
+                    writer.Write(_inventory.Contents[i].SpriteIndex);
+                    writer.Write((int)_inventory.Contents[i].ItemKeyType);
+                }
+            }
+            finally
+            {
+                writer.Close();
+            }
+        }
+
+        /// <summary>
+        /// Resets all relevant player values to how they were during the last checkpoint
+        /// </summary>
+        public void Load()
+        {
+            BinaryReader reader = null!;
+            
+            //Clear Player's states
+            ClearStates();
+
+            try
+            {
+                Stream stream = File.OpenRead("./PlayerData/PlayerData.data");
+                reader = new BinaryReader(stream);
+
+                //Update player position
+                Location = new Point(reader.ReadInt32(), reader.ReadInt32());
+
+                //Check item count
+                int itemCount = reader.ReadInt32();
+
+                //Give the player their items back
+                for (int i = 0; i < itemCount; i++)
+                {
+                    int spriteIndex = reader.ReadInt32();
+                    int keyType = reader.ReadInt32();
+
+                    _inventory.AddItemToInventory(new Item(Point.Zero, AssetManager.PropTextures, spriteIndex, "TEMP_NAME", (Door.DoorKeyType)keyType));
+                }
+            }
+            finally
+            {
+                reader.Close();
+            }
         }
     }
 }

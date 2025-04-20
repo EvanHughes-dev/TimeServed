@@ -2,9 +2,13 @@
 using System.Data.Common;
 using System.IO;
 using MakeEveryDayRecount.GameObjects.Props;
+using MakeEveryDayRecount.GameObjects.Triggers;
 using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace MakeEveryDayRecount.Managers
 {
@@ -18,32 +22,31 @@ namespace MakeEveryDayRecount.Managers
     /// Keep track of the room the player is currently
     /// in and load the needed map
     /// </summary>
-    internal class MapManager
+    internal static class MapManager
     {
-        public event OnRoomUpdate OnRoomUpdate;
+        public static event OnRoomUpdate OnRoomUpdate;
 
-        private Room _currentRoom;
+        private static Room _currentRoom;
 
         /// <summary>
         /// Get the current room on the map
         /// </summary>
-        public Room CurrentRoom
+        public static Room CurrentRoom
         {
             get => _currentRoom;
         }
-        private Dictionary<int, Room> _rooms;
 
-        private readonly GameplayManager _gameplayManager;
+        //private static Room[] _rooms;
+        private static Dictionary<int, Room> _rooms;
 
         /// <summary>
         /// Initialize the map manger and make rooms
         /// </summary>
-        /// <param name="gameplayManager">Reference to the gamePlayManager</param>
-        public MapManager(GameplayManager gameplayManager)
+        public static void Initialize()
         {
-            _gameplayManager = gameplayManager;
-            _rooms = new Dictionary<int, Room> { };
-            Room[] rooms = LoadMapData(_gameplayManager.Level);
+            _rooms = new Dictionary<int, Room>();
+            Room[] rooms = LoadMapData(GameplayManager.Level);
+            rooms = LoadMapData(GameplayManager.Level);
             _currentRoom = rooms[0];
             OnRoomUpdate?.Invoke(_currentRoom);
             foreach (Room room in rooms)
@@ -57,10 +60,10 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         /// <param name="transDoor">Door to transition from</param>
         /// <param name="destRoom"> Destination room for transition </param>
-        public void TransitionRoom(Door transDoor, int destRoom)
-        {
+        public static void TransitionRoom(Door transDoor, int destRoom)
+        { 
+            GameplayManager.PlayerObject.ChangeRoom(transDoor.DestinationTile);
             ChangeRoom(destRoom);
-            _gameplayManager.PlayerObject.ChangeRoom(transDoor.DestinationTile);
 
         }
 
@@ -68,7 +71,7 @@ namespace MakeEveryDayRecount.Managers
         /// Change to the given room
         /// </summary>
         /// <param name="destRoom">Room index to change to</param>
-        public void ChangeRoom(int destRoom)
+        public static void ChangeRoom(int destRoom)
         {
             _currentRoom = _rooms[destRoom];
             OnRoomUpdate?.Invoke(_currentRoom);
@@ -78,7 +81,7 @@ namespace MakeEveryDayRecount.Managers
         /// Draw the current room to the screen
         /// </summary>
         /// <param name="batch">Batch of sprites to add to</param>
-        public void Draw(SpriteBatch batch)
+        public static void Draw(SpriteBatch batch)
         {
             _currentRoom.Draw(batch);
         }
@@ -88,7 +91,7 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         /// <param name="playerDest">Tile player wants to move to</param>
         /// <returns>If the player is allowed to move there</returns>
-        public bool CheckPlayerCollision(Point playerDest)
+        public static bool CheckPlayerCollision(Point playerDest)
         {
             return _currentRoom.VerifyWalkable(playerDest);
         }
@@ -98,22 +101,37 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         /// <param name="playerFacing">The tile the player wants to interact with</param>
         /// <returns>Current item to interact with in the provided tile</returns>
-        public Prop CheckInteractable(Point playerFacing)
+        public static Prop CheckInteractable(Point playerFacing)
         {
             return _currentRoom.VerifyInteractable(playerFacing);
+        }
+
+        public static Trigger CheckTrigger(Point playerPosition)
+        {
+            return _currentRoom.VerifyTrigger(playerPosition);
         }
 
         /// <summary>
         /// Load all the needed data relating to each room
         /// from the corresponding files and format them
         /// </summary>
-        /// <param name="currentLevel">Current level of the game</param>
+        /// <param name="currentLevel">Integer value of the current level of the game</param>
+        /// <param name="alternative">A string that acts as an alternative way to load the map data, 
+        /// such as if map data isn't being loaded from a level with an integer value</param>
         /// <returns>Formatted data loaded from files</returns>
-        private Room[] LoadMapData(int currentLevel)
+        private static Room[] LoadMapData(int currentLevel, string alternative = "")
         {
             // only read binary data here
             // each room is in charge of parsing itself
-            string folderPath = $"./Content/Levels/Level{currentLevel}";
+            string folderPath;
+            if (alternative != "")
+            {
+                folderPath = alternative;
+            }
+            else
+            {
+                folderPath = $"./Content/Levels/Level{currentLevel}";
+            }
 
             // Level.level should exist in every Level folder
             // Acts as a config file for the .room files
@@ -160,9 +178,11 @@ namespace MakeEveryDayRecount.Managers
         /// <summary>
         /// Switch to the level in gameplayManager
         /// </summary>
-        public void ChangeLevel()
+        public static void ChangeLevel()
         {
-            Room[] rooms = LoadMapData(_gameplayManager.Level);
+            //It might be better to just initialize MapManager again rather than have this method
+            
+            Room[] rooms = LoadMapData(GameplayManager.Level);
             _rooms.Clear();
             _currentRoom = rooms[0];
             OnRoomUpdate?.Invoke(_currentRoom);
@@ -171,6 +191,54 @@ namespace MakeEveryDayRecount.Managers
                 room.DoorTransition += TransitionRoom;
                 _rooms.Add(room.RoomIndex, room);
             }
+        }
+
+        /// <summary>
+        /// Loads the map data for the given checpoint
+        /// </summary>
+        /// <param name="c">Given checkpoint</param>
+        public static void LoadCheckpoint(Checkpoint c)
+        {
+            Room[] rooms = LoadMapData(1, "./CheckpointData");
+            _rooms.Clear();
+            foreach (Room room in rooms)
+            {
+                room.DoorTransition += TransitionRoom; 
+                _rooms.Add(room.RoomIndex, room);
+            }
+            ChangeRoom(c.RoomIndex); 
+        }
+
+        /// <summary>
+        /// Saves the map's data to the baseFolder via creation of a level.level file and all the .room files
+        /// </summary>
+        /// <param name="baseFolder">Folder that the Map data gets saved to</param>
+        public static void SaveMap(string baseFolder)
+        {
+            //Make the .level file
+            BinaryWriter writer = new BinaryWriter(File.OpenWrite(baseFolder + "/level.level"));
+
+            //Save number of rooms
+            writer.Write(_rooms.Count);
+
+            //Write data for each room
+            foreach (KeyValuePair<int, Room> kvp in _rooms)
+            {
+                //Write name
+                writer.Write(_rooms[kvp.Key].RoomName);
+
+                //Write index
+                writer.Write(_rooms[kvp.Key].RoomIndex);
+            }
+
+            //Save all the rooms
+            foreach (KeyValuePair<int, Room> kvp in _rooms)
+            {
+                _rooms[kvp.Key].SaveRoom(baseFolder);
+            }
+
+            //Close the writer
+            writer.Close();
         }
     }
 }

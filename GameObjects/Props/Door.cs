@@ -23,7 +23,10 @@ namespace MakeEveryDayRecount.GameObjects.Props
             Screwdriver = 2
         }
 
-        private DoorKeyType _keyType;
+        /// <summary>
+        /// Type of key that unlocks this door
+        /// </summary>
+        public DoorKeyType KeyType { get; private set; }
 
         /// <summary>
         /// Get the direction the player will be outputted in when interacting with this door
@@ -47,19 +50,21 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// <param name="destRoom">Room index that this door leads to</param>
         /// <param name="keyType">Type of key this door leads to</param>
         /// <param name="location">Position in room</param>
-        /// <param name="sprite">Sprite to display</param>
+        /// <param name="spriteArray">Sprite array of the door</param>
+        /// <param name="spriteIndex">index of the sprite in the sprite array</param>
         public Door(
             int destRoom,
             Point outPosition,
             DoorKeyType keyType,
             Point location,
-            Texture2D sprite
+            Texture2D[] spriteArray,
+            int spriteIndex
         )
-            : base(location, sprite)
+            : base(location, spriteArray, spriteIndex)
         {
             DestRoom = destRoom;
             DestinationTile = outPosition;
-            _keyType = keyType;
+            KeyType = keyType;
         }
 
         /// <summary>
@@ -68,7 +73,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// <returns>If the door can be interacted</returns>
         public override void Interact(Player player)
         {
-            if (_keyType == DoorKeyType.None || player.ContainsKey(_keyType))
+            if (KeyType == DoorKeyType.None || player.ContainsKey(KeyType))
             {
                 OnDoorInteract?.Invoke(this, DestRoom);
                 //Play a sound based on the type of door that was opened

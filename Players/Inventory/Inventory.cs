@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using MakeEveryDayRecount.GameObjects.Props;
 using MakeEveryDayRecount.Managers;
 using MakeEveryDayRecount.UI;
+using System.Collections.ObjectModel;
 
 namespace MakeEveryDayRecount.Players.InventoryFiles
 {
@@ -20,6 +21,14 @@ namespace MakeEveryDayRecount.Players.InventoryFiles
         /// A list of the items the inventory currently holds
         /// </summary>
         private List<Item> _contents;
+
+        /// <summary>
+        /// Read only version of the list of items currently in the inventory
+        /// </summary>
+        public ReadOnlyCollection<Item> Contents
+        {
+            get { return _contents.AsReadOnly(); }
+        }
 
         /// <summary>
         /// Get the current item selected in the inventory

@@ -15,8 +15,10 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// Create an interactable GameObject
         /// </summary>
         /// <param name="location">Location of prop</param>
-        /// <param name="sprite">Image of the prop</param>
-        protected Prop(Point location, Texture2D sprite) : base(location, sprite) { }
+        /// <param name="spriteArray">Array containing the prop's image</param>
+        /// <param name="spriteIndex">Index of the prop's image in its array</param>
+        protected Prop(Point location, Texture2D[] spriteArray, int spriteIndex)
+            : base(location, spriteArray, spriteIndex) { }
 
         /// <summary>
         /// Allow the player to interact with objects

@@ -15,19 +15,15 @@ namespace MakeEveryDayRecount.DebugModes
     {
         protected Dictionary<string, Func<object>> _objectsToDisplay;
         protected SpriteFont _spriteFont;
-        protected GameplayManager _gameplayManager;
 
         private readonly int _yAxisIncrement;
 
         /// <summary>
         /// Initializes the basic debug system
         /// </summary>
-        /// <param name="spriteFont">The font used for debug text</param>
-        /// <param name="gameplayManager">Reference to the game's manager for accessing player data</param>
-        public BaseDebug(GameplayManager gameplayManager)
+        public BaseDebug()
         {
             _spriteFont = AssetManager.Arial20;
-            _gameplayManager = gameplayManager;
             _yAxisIncrement = _spriteFont.LineSpacing;
             _objectsToDisplay = new Dictionary<string, Func<object>> { };
         }
