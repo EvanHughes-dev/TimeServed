@@ -1,6 +1,10 @@
-﻿using LevelEditor.Classes.Props;
-using LevelEditor.Classes.Triggers;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using LevelEditor.Classes.Props;
 
 namespace LevelEditor.Classes
 {
@@ -23,21 +27,17 @@ namespace LevelEditor.Classes
         /// </summary>
         private readonly Tile[,] _tiles;
 
+        private readonly List<Prop> _props;
         /// <summary>
         /// Get the current save state of this form
         /// </summary>
         public SavedState SavedState { get; set; }
 
-        private readonly List<Prop> _props;
-        private readonly List<Trigger> _triggers;
+
         /// <summary>
         /// The props that have been placed in this room, read-only.
         /// </summary>
         public ReadOnlyCollection<Prop> Props => _props.AsReadOnly();
-        /// <summary>
-        /// The triggers that have been placed in this room, read-only.
-        /// </summary>
-        public ReadOnlyCollection<Trigger> Triggers => _triggers.AsReadOnly();
 
         /// <summary>
         /// Gets or sets the tile in the room at the given coordinate.
@@ -99,14 +99,6 @@ namespace LevelEditor.Classes
         /// Called whenever a prop is removed from the room.
         /// </summary>
         public event Action<Prop>? OnPropRemoved;
-        /// <summary>
-        /// Called whenever a trigger is added to the room.
-        /// </summary>
-        public event Action<Trigger>? OnTriggerAdded;
-        /// <summary>
-        /// Called whenever a trigger is removed from the room.
-        /// </summary>
-        public event Action<Trigger>? OnTriggerRemoved;
         /// <summary>
         /// Called whenever a camera in this room updates its view frustum.
         /// </summary>

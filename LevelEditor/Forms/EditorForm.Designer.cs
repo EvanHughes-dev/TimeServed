@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             groupBoxMap = new GroupBox();
-            roomRenderer = new Controls.RoomRenderer();
+            roomRenderer = new LevelEditor.Controls.RoomRenderer();
             openFileDialog = new OpenFileDialog();
             saveFileDialog = new SaveFileDialog();
             tabControlPalettes = new TabControl();
@@ -37,7 +37,6 @@
             flowLayoutPanelTiles = new FlowLayoutPanel();
             tabPageProps = new TabPage();
             flowLayoutPanelProps = new FlowLayoutPanel();
-            tabPageTriggers = new TabPage();
             splitContainer = new SplitContainer();
             groupBoxMap.SuspendLayout();
             tabControlPalettes.SuspendLayout();
@@ -89,7 +88,6 @@
             // 
             tabControlPalettes.Controls.Add(tabPageTiles);
             tabControlPalettes.Controls.Add(tabPageProps);
-            tabControlPalettes.Controls.Add(tabPageTriggers);
             tabControlPalettes.Location = new Point(12, 12);
             tabControlPalettes.Name = "tabControlPalettes";
             tabControlPalettes.SelectedIndex = 0;
@@ -131,15 +129,6 @@
             flowLayoutPanelProps.Name = "flowLayoutPanelProps";
             flowLayoutPanelProps.Size = new Size(201, 460);
             flowLayoutPanelProps.TabIndex = 0;
-            // 
-            // tabPageTriggers
-            // 
-            tabPageTriggers.Location = new Point(4, 24);
-            tabPageTriggers.Name = "tabPageTriggers";
-            tabPageTriggers.Size = new Size(207, 466);
-            tabPageTriggers.TabIndex = 1;
-            tabPageTriggers.Text = "Triggers";
-            tabPageTriggers.UseVisualStyleBackColor = true;
             // 
             // splitContainer
             // 
@@ -186,7 +175,6 @@
         private SplitContainer splitContainer;
         private FlowLayoutPanel flowLayoutPanelTiles;
         private FlowLayoutPanel flowLayoutPanelProps;
-        private TabPage tabPageTriggers;
         private Controls.RoomRenderer roomRenderer;
     }
 }
