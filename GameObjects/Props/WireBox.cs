@@ -23,7 +23,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         {
             _camera = connectedCamera;
             //Add a direction check (copy/paste from the camera) here
-            //Don't forget to also calculate the centerpoint just like you do for 
+            //Don't forget to also calculate the centerpoint just like you do for the cameras
         }
 
         public override void Draw(SpriteBatch sb, Point worldToScreen, Point pixelOffset)

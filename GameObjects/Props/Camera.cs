@@ -17,6 +17,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         //If the camera is on or off
         private bool _active;
         //The direction in which the camera's sprite is facing
+        //This isn't currently used but if we add more features it migth come in handy so I'm keeping it
         private enum CameraDirections
         {
             Up,
@@ -459,7 +460,8 @@ namespace MakeEveryDayRecount.GameObjects.Props
 
                     //Now do one more check of the watched tiles. If any of them is isolated, remove it
                     //NOTE: If there's lag or bugs in this area, this might be the cause. This is doing a lot of looping 
-                    for (int i = 0; i < _watchedTiles.Count; )
+                    List<Point> isolatedTiles = new List<Point>();
+                    foreach (Point watchedTile in _watchedTiles)
                     {
                         //Check the tiles above, below, and to either side of this tile.
                         //TODO: This may also be inefficent. Using a dictionary instead of a list of points might help with this, but I'm not sure yet
@@ -469,7 +471,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                         //TODO: Only check if the tile is further from the camera than the box is
                         //But what if there are multiple boxes?
                         int watchedNeighbors = 0;
-                        Point watchedNeighbor = _watchedTiles[i];
+                        Point watchedNeighbor = watchedTile;
                         //Left
                         watchedNeighbor.X -= 1;
                         if (_watchedTiles.Contains(watchedNeighbor) || !_room.VerifyWalkable(watchedNeighbor)) watchedNeighbors++;
@@ -485,9 +487,10 @@ namespace MakeEveryDayRecount.GameObjects.Props
                         if (_watchedTiles.Contains(watchedNeighbor) || !_room.VerifyWalkable(watchedNeighbor)) watchedNeighbors++;
 
                         //If the tile has one watched neighbor or less, then remove it
-                        if (watchedNeighbors <= 1) _watchedTiles.Remove(_watchedTiles[i]);
-                        else i++;
+                        if (watchedNeighbors <= 1) isolatedTiles.Add(watchedTile);
                     }
+                    //Now remove them all at once
+                    foreach (Point p in isolatedTiles) _watchedTiles.Remove(p);
 
                     //Now check for the player :)
                     foreach (Point watchedTile in _watchedTiles)
@@ -576,13 +579,17 @@ namespace MakeEveryDayRecount.GameObjects.Props
 
         public override void Interact(Player player)
         {
-            throw new NotImplementedException("Interact has not been created yet in Camera");
+            //The cameras can't be interacted with directly so this function doesn't do anything
+            //TODO: I could change the inheritance to GameObject to take this function out of this class
+            //But I think this is fine for now. This function will be called but won't do anything
         }
 
         //TODO: Ask Evan if making this method is efficent, or if I should use events/delegates instead?
         public void Deactivate()
         {
             _active = false;
+            //TODO: Maybe have it play a sound?
+            //The camera can never be reactivated unless it's loaded again by the room
         }
     }
 }
