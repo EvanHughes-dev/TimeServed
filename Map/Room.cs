@@ -67,8 +67,24 @@ namespace MakeEveryDayRecount.Map
         }
         private Tile[,] _map;
         private List<Prop> _itemsInRoom;
-        //I originally wanted to make this a generic list of all the props in the room that might need to be updated
-        //But most props don't have an update function, so it's better to have this list only be concerned with cameras because they can actually update
+        /// <summary>
+        /// A public property for the items in this room.
+        /// You can only add items to the room through this property, you can't remove them
+        /// This property references a private list, so you can't directly use its methods
+        /// </summary>
+        public List<Prop> ItemsInRoom
+        {
+            get { return _itemsInRoom; }
+            set
+            {
+                if (value.Count > _itemsInRoom.Count)
+                {
+                    _itemsInRoom = value;
+                }
+            }
+        }
+        //I originally wanted to make this a generic list of all the dynamic props in the room that might need to be updated
+        //But most props don't have an update function, so it's better to have this list only be concerned with cameras
         /// <summary>
         /// Get the list of cameras in the room
         /// </summary>

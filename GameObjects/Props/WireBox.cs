@@ -16,20 +16,20 @@ namespace MakeEveryDayRecount.GameObjects.Props
         //Boxes need a direction just like the camera 
         private float _direction;
         private Camera _camera;
-        private Point _centerpoint;
+        private Point _drawOrigin;
 
-        public WireBox(Point location, Texture2D sprite, Camera connectedCamera)
+        public WireBox(Point location, Texture2D sprite, float direction, Camera connectedCamera)
             : base (location, sprite)
         {
             _camera = connectedCamera;
-            //Add a direction check (copy/paste from the camera) here
-            //Don't forget to also calculate the centerpoint just like you do for the cameras
+            _direction = direction;
+            _drawOrigin = new Point(AssetManager.TileSize.X / 2, AssetManager.TileSize.Y / 2);
         }
 
         public override void Draw(SpriteBatch sb, Point worldToScreen, Point pixelOffset)
         {
-            sb.Draw(Sprite, new Rectangle(MapUtils.TileToWorld(Location) - worldToScreen + pixelOffset + _centerpoint, AssetManager.TileSize), null, //no source rectangle
-                Color.White, _direction, _centerpoint.ToVector2(), SpriteEffects.None, 0f);
+            sb.Draw(Sprite, new Rectangle(MapUtils.TileToWorld(Location) - worldToScreen + pixelOffset + _drawOrigin, AssetManager.TileSize), null, //no source rectangle
+                Color.White, _direction, _drawOrigin.ToVector2(), SpriteEffects.None, 0f);
         }
 
         public override void Interact(Player player)

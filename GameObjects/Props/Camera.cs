@@ -402,7 +402,33 @@ namespace MakeEveryDayRecount.GameObjects.Props
         public Camera(Point location, Texture2D sprite, Room containingRoom, Point centerPoint, float spread, Point boxLocation)
             : this(location, sprite, containingRoom, centerPoint, spread)
         {
-            //TODO: Add the wire box to the list of props in the room so that it gets drawn
+            //TODO: There's no asset for the box right now, so for now direction will always be 0 because we don't know the starting rotation
+            #region Box Direction Check
+            //TODO: Right now this prioritizes up, down, left, right. If it matters we can change that
+            //Also if we put a wirebox next to a regular box it will cause problems because boxes aren't walkable, but that shouldn't be a huge deal
+            if (_room.VerifyWalkable(new Point(boxLocation.X, boxLocation.Y - 1))) //Point above
+            {
+                //face up
+            }
+            else if (_room.VerifyWalkable(new Point(boxLocation.X, boxLocation.Y + 1))) //Point below
+            {
+                //face down
+            }
+            else if (_room.VerifyWalkable(new Point(boxLocation.X - 1, boxLocation.Y))) //Point left
+            {
+                //face left
+            }
+            else if (_room.VerifyWalkable(new Point(boxLocation.X + 1, boxLocation.Y))) //Point right
+            {
+                //face right
+            }
+            #endregion
+            //Add the wire box to the list of props in the room so that it gets drawn
+            //I think we have to add it this way because we can't call the methods directly on this property. I might be wrong tho
+            //It's like copy-alter-replace
+            List<Prop> alteredRoomItems = _room.ItemsInRoom;
+            alteredRoomItems.Add(new WireBox(boxLocation, AssetManager.PropTextures[2], 0f, this));
+            _room.ItemsInRoom = alteredRoomItems;
         }
 
         public void Update(float deltaTime)
