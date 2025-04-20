@@ -57,8 +57,7 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
             {
                 string baseFolder = "./CheckpointData";
 
-                //Deactivate the checkpoint after it has saved the data
-                //Need to do this before data gets saved
+                //Deactivate the checkpoint, need to before it has saved the data
                 _active = false;
 
                 //Always want to overwrite the folder if it exists

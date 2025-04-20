@@ -467,15 +467,6 @@ namespace MakeEveryDayRecount.Players
 
             //Reset the player data to the last checkpoint
             Load();
-
-            //Things seem to work after being caught twice
-            //Maybe just running these both again will fix things?????
-
-            //Reset the map to the last checkpoint
-            MapManager.LoadCheckpoint(TriggerManager.CurrentCheckpoint);
-
-            //Reset the player data to the last checkpoint
-            Load();
         }
 
         #endregion

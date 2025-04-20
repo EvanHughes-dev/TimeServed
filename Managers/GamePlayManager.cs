@@ -106,11 +106,13 @@ namespace MakeEveryDayRecount.Managers
             //TODO: confirm that this is acceptible
             //I think we dicided hitting the "Play" button starts your progress from the start
             //If this is the case, the initial checkpoint can be hardcoded, which is the easiest solution
-            Checkpoint c = new Checkpoint(new Point(1, 1), null, 0, 1, 1, true);
+            Checkpoint c = new Checkpoint(new Point(4, 5), null, 0, 1, 1, true);
             TriggerManager.SetPlayerSpawn(c);
             TriggerManager.AddCheckpoint(c);
 
             //Save the current map data to the initial checkpoint (the "player spawn")
+            //Consequence of Player being initialized with position 4,5 means this always saves the player with position 4,5
+            //This can be changed but shouldn't matter if that is the actual starting position
             TriggerManager.PlayerSpawn.Activate(PlayerObject);
         }
 
