@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using LevelEditor.Classes;
 using LevelEditor.Classes.Props;
+using LevelEditor.Controls;
 using LevelEditor.Helpers;
 
 namespace LevelEditor
@@ -338,15 +339,14 @@ namespace LevelEditor
         /// <param name="room">The Room to create the button for.</param>
         private void CreateRoomButton(Room room)
         {
-            Button roomButton = new()
+            RoomButton roomButton = new()
             {
                 Size = new(140, 80),
-                TextAlign = ContentAlignment.MiddleCenter,
-                Text = room.Name,
+                Room = room,
                 Parent = flowLayoutPanelRooms
             };
 
-            roomButton.Click += (object? sender, EventArgs e) =>
+            roomButton.Click += (object? _, EventArgs _) =>
             {
                 EditorForm editor = new(this, room);
                 editor.Show();
