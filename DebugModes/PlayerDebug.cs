@@ -22,8 +22,6 @@ namespace MakeEveryDayRecount.DebugModes
         /// Initializes the player debug system.
         /// This must be called before drawing debug information.
         /// </summary>
-        /// <param name="spriteFont">The font used for debug text.</param>
-        /// <param name="gameplayManager">Reference to the game's manager for accessing player data.</param>
         public PlayerDebug()
         {
             _player = GameplayManager.PlayerObject;
