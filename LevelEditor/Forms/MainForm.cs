@@ -1,8 +1,9 @@
-﻿using System.Collections.ObjectModel;
-using LevelEditor.Classes;
+﻿using LevelEditor.Classes;
 using LevelEditor.Classes.Props;
 using LevelEditor.Controls;
+using LevelEditor.Classes.Triggers;
 using LevelEditor.Helpers;
+using System.Collections.ObjectModel;
 
 namespace LevelEditor
 {
@@ -17,6 +18,11 @@ namespace LevelEditor
         /// The gospel determining what Props have what corresponding indexes.
         /// </summary>
         public IReadOnlyCollection<Prop> Props { get; private set; }
+
+        /// <summary>
+        /// The gospel determining what Triggers have what corresponding indexes.
+        /// </summary>
+        public IReadOnlyCollection<Trigger> Triggers { get; private set; }
 
         // The level currently being edited
         private Level _level;
@@ -90,6 +96,11 @@ namespace LevelEditor
         {
             LoadTiles();
             LoadProps();
+
+            Triggers = new Trigger[]
+            {
+                new Checkpoint(-1, null)
+            };
 
             // In case LoadTiles creating a MessageBox, activating this window will ensure it still becomes
             //   the center of attention afterwards
@@ -302,7 +313,7 @@ namespace LevelEditor
                     {
                         try
                         {
-                            Level = FileIOHelpers.LoadLevel(fullPath, Tiles, Props);
+                            Level = FileIOHelpers.LoadLevel(fullPath, Tiles, Props, Triggers);
 
                             Folder = Path.GetDirectoryName(fullPath)!;
 

@@ -1,5 +1,6 @@
 ﻿using LevelEditor.Classes;
 using LevelEditor.Classes.Props;
+using LevelEditor.Classes.Triggers;
 using LevelEditor.Extensions;
 using LevelEditor.Helpers;
 using System.Diagnostics;
@@ -125,7 +126,7 @@ namespace LevelEditor.Controls
 
             ShowTiles = true;
             ShowProps = true;
-            ShowTriggers = false;
+            ShowTriggers = true;
         }
         /// <summary>
         /// Initializes a new RoomRenderer with specific text, size, and location.
@@ -384,7 +385,24 @@ namespace LevelEditor.Controls
         /// <exception cref="NotImplementedException">ALWAYS THROWN.</exception>
         private void DrawTriggers(Graphics graphics)
         {
-            throw new NotImplementedException();
+            // The simple part of drawing! This just draws all of the **trigger** boxes to their corresponding places
+            foreach (Trigger trigger in _room.Triggers)
+            {
+                Debug.Assert(trigger.Bounds != null); // I am moana
+                Rectangle bounds = trigger.Bounds.Value;
+
+                Size one = new Size(1, 1);
+
+                // a union of th etip and bottom rectangles to create one mega rectangle extravaganza
+                Rectangle drawRect = Rectangle.Union(TileSpaceToPixelSpace(bounds.Location), TileSpaceToPixelSpace(bounds.Location + bounds.Size - one));
+
+                //let me have my headcannon
+                Pen moana = new Pen(Color.YellowGreen, 4);
+                Brush maoi = new SolidBrush(Color.FromArgb(63, Color.YellowGreen));
+
+                graphics.DrawRectangle(moana, drawRect);
+                graphics.FillRectangle(maoi, drawRect);
+            }
         }
 
         #endregion 
@@ -470,8 +488,19 @@ namespace LevelEditor.Controls
                 _room.OnPropAdded -= OnPropChange;
                 _room.OnPropRemoved -= OnPropChange;
                 _room.OnCameraViewFrustumUpdated -= OnPropChange;
+
+                _room.OnTriggerAdded -= OnTriggerChange;
+                _room.OnTriggerRemoved -= OnTriggerChange;
             }
         }
+        /// <summary>
+        /// if a trigger is added / removed (i.e. there was a change), the current fporm is invalidated
+        /// </summary>
+        private void OnTriggerChange(Trigger obj)
+        {
+            Invalidate();
+        }
+
         /// <summary>
         /// Subscribes to all of the room's events.
         /// </summary>
@@ -483,6 +512,9 @@ namespace LevelEditor.Controls
                 _room.OnPropAdded += OnPropChange;
                 _room.OnPropRemoved += OnPropChange;
                 _room.OnCameraViewFrustumUpdated += OnPropChange;
+
+                _room.OnTriggerAdded += OnTriggerChange;
+                _room.OnTriggerRemoved += OnTriggerChange;
             }
         }
 
