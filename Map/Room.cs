@@ -397,16 +397,20 @@ namespace MakeEveryDayRecount.Map
         /// Return if a tile can be walk on
         /// </summary>
         /// <param name="pointToCheck">Tile to check</param>
+        /// <param name="isCamera">Is from camera</param>
         /// <returns>If the tile is walkable. True means the tile is walkable</returns>
-        public bool VerifyWalkable(Point pointToCheck)
+        public bool VerifyWalkable(Point pointToCheck, bool isCamera = false)
         {
             foreach (GameObject gameObject in _itemsInRoom)
             {
                 // If the object is a box that is held and in the square, do not let the player enter it
-                if (gameObject is Box && ((Box)gameObject).AttachmentDirection == Players.Direction.None
-                 && gameObject.Location == pointToCheck)
+                if (gameObject is Box && gameObject.Location == pointToCheck)
                 {
-                    return false;
+
+                    if (((Box)gameObject).AttachmentDirection == Players.Direction.None || isCamera)
+                        return false;
+
+                    return true;
                 }
             }
 

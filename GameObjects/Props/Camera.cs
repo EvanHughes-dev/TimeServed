@@ -423,27 +423,36 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //Note that the length of _endPoints may be even or odd depending on rounding
         }
 
-        //TODO: add an alternative constructor that creates an electrical box connected to this camera
-        public Camera(Point location, Texture2D sprite, Room containingRoom, Point centerPoint, float spread, Point boxLocation)
-            : this(location, sprite, containingRoom, centerPoint, spread)
+        /// <summary>
+        /// Makes a security camera that watches a certain vision kite to see if the player is inside it, and has an electrical box which the player can interact with to deactivate it
+        /// </summary>
+        /// <param name="location">The location of the camera, from which the vision kite is projected</param>
+        /// <param name="spriteArray">The array of the camera's sprites</param>
+        /// <param name="spriteIndex">The index of this camera's sprite</param>
+        /// <param name="containingRoom">The room containing the camera. Used to check if tiles are walkable</param>
+        /// <param name="centerPoint">The point that forms the center of the camera's vision kite</param>
+        /// <param name="spread">The arc from the center of the vision kite to the edge, in radians</param>
+        /// <param name="boxLocation">The location of the camera's electrical box</param>
+        public Camera(Point location, Texture2D[] spriteArray, int spriteIndex, Room containingRoom, Point centerPoint, float spread, Point boxLocation)
+            : this(location, spriteArray, spriteIndex, containingRoom, centerPoint, spread)
         {
             //TODO: There's no asset for the box right now, so for now direction will always be 0 because we don't know the starting rotation
             #region Box Direction Check
             //TODO: Right now this prioritizes up, down, left, right. If it matters we can change that
             //Also if we put a wirebox next to a regular box it will cause problems because boxes aren't walkable, but that shouldn't be a huge deal
-            if (_room.VerifyWalkable(new Point(boxLocation.X, boxLocation.Y - 1))) //Point above
+            if (_room.VerifyWalkable(new Point(boxLocation.X, boxLocation.Y - 1), false)) //Point above
             {
                 //face up
             }
-            else if (_room.VerifyWalkable(new Point(boxLocation.X, boxLocation.Y + 1))) //Point below
+            else if (_room.VerifyWalkable(new Point(boxLocation.X, boxLocation.Y + 1), false)) //Point below
             {
                 //face down
             }
-            else if (_room.VerifyWalkable(new Point(boxLocation.X - 1, boxLocation.Y))) //Point left
+            else if (_room.VerifyWalkable(new Point(boxLocation.X - 1, boxLocation.Y), false)) //Point left
             {
                 //face left
             }
-            else if (_room.VerifyWalkable(new Point(boxLocation.X + 1, boxLocation.Y))) //Point right
+            else if (_room.VerifyWalkable(new Point(boxLocation.X + 1, boxLocation.Y), false)) //Point right
             {
                 //face right
             }
@@ -495,7 +504,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                                 //Debug.WriteLine($"Checking {_rayBase} with {endpoint}");
                                 //foreach (Point point in Rasterize(_rayBase, endpoint)) Debug.Write(point + " ");
                                 //Debug.WriteLine(null);
-                                if (Rasterize(_rayBase, endpoint).Contains(box)) //A ray is blocked by the box
+                                if (Rasterize(_rayBase, _endPoints[i]).Contains(box)) //A ray is blocked by the box
                                 {
                                     //Debug.WriteLine($"Endpoint {endpoint.X}, {endpoint.Y} is blocked");
                                     //Remove all the tiles between the box and the end of the ray
