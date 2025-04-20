@@ -8,32 +8,41 @@ using System.Runtime.CompilerServices;
 
 namespace MakeEveryDayRecount.GameObjects.Triggers
 {
+    /// <summary>
+    /// Trigger that saves the player's progress when they trigger it
+    /// </summary>
     internal class Checkpoint : Trigger
     {
-        //Fields
-        private int _index; //DELETE THIS personal note: index starts at 0 (of course!)
-        private bool _active;
-        private int _roomIndex;
-
         //Properties
-        public int Index
-        {
-            get { return _index; }
-        }
-        public bool Active
-        {
-            get { return _active; }
-        }
-        public int RoomIndex
-        {
-            get { return _roomIndex; }
-        }
 
-        public Checkpoint(Point location, Texture2D sprite, int index, int width, int height, bool active)
-            : base(location, sprite, width, height)
+        /// <summary>
+        /// Index of this checkpoint
+        /// </summary>
+        public int Index { get; private set; }
+
+        /// <summary>
+        /// Whether or not this checkpoint can be activated
+        /// </summary>
+        public bool Active { get; private set; }
+
+        /// <summary>
+        /// Index of the room this checkpoint is housed in
+        /// </summary>
+        public int RoomIndex { get; private set; }
+
+        /// <summary>
+        /// Constructs a checkpoint
+        /// </summary>
+        /// <param name="location">Location of the top left-most point of the checkpoint in its room</param>
+        /// <param name="index">Index of the checkpoint</param>
+        /// <param name="width">Width of this checkpoint</param>
+        /// <param name="height">Height of this checkpoint</param>
+        /// <param name="active">Whether or not this checkpoint can be activated</param>
+        public Checkpoint(Point location, int index, int width, int height, bool active)
+            : base(location, width, height)
         {
-            _index = index;
-            _active = active;
+            Index = index;
+            Active = active;
         }
 
 
@@ -52,34 +61,33 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
             if (Index != 0)
                 if (!TriggerManager.Checkpoints[Index - 1].Active)
                     return;
+            if (!Active)
+                return;
+            
+            string baseFolder = "./CheckpointData";
 
-            if (_active)
-            {
-                string baseFolder = "./CheckpointData";
+            //Deactivate the checkpoint, need to before it has saved the data
+            Active = false;
 
-                //Deactivate the checkpoint, need to before it has saved the data
-                _active = false;
+            //Always want to overwrite the folder if it exists
+            if (Directory.Exists(baseFolder))
+                RecursiveDelete(baseFolder);
 
-                //Always want to overwrite the folder if it exists
-                if (Directory.Exists(baseFolder))
-                    RecursiveDelete(baseFolder);
+            //(Re)make the folder
+            Directory.CreateDirectory(baseFolder);
 
-                //(Re)make the folder
-                Directory.CreateDirectory(baseFolder);
+            //Save map and player data
+            MapManager.SaveMap(baseFolder);
+            player.Save(baseFolder);
 
-                //Save map and player data
-                MapManager.SaveMap(baseFolder);
-                player.Save(baseFolder);
+            //Save the room this checkpoint is located in
+            RoomIndex = MapManager.CurrentRoom.RoomIndex;
 
-                //Save the room this checkpoint is located in
-                _roomIndex = MapManager.CurrentRoom.RoomIndex;
+            //Update the current checkpoint
+            TriggerManager.CurrentCheckpoint = this;
 
-                //Update the current checkpoint
-                TriggerManager.CurrentCheckpoint = this;
-
-                //Call the replay manager function
-                ReplayManager.SaveData(GameplayManager.Level, _index);
-            }
+            //Call the replay manager function
+            ReplayManager.SaveData(GameplayManager.Level, Index);
         }
 
         /// <summary>

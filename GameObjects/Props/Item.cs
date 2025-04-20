@@ -23,6 +23,14 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// </summary>
         public Door.DoorKeyType ItemKeyType { get; private set; }
 
+        /// <summary>
+        /// Create an item object
+        /// </summary>
+        /// <param name="location">Location in its room</param>
+        /// <param name="spriteArray">Array of sprites containing this GameObject's sprite</param>
+        /// <param name="spriteIndex">Index of this GameObject's sprite in its spriteArray</param>
+        /// <param name="name">Name of the item</param>
+        /// <param name="keyType">Type of Door that this item unlocks (type None if it doesn't unlock a door)</param>
         public Item(Point location, Texture2D[] spriteArray, int spriteIndex, string name, Door.DoorKeyType keyType)
             : base(location, spriteArray, spriteIndex)
         {

@@ -115,7 +115,9 @@ namespace MakeEveryDayRecount.Managers
         /// Load all the needed data relating to each room
         /// from the corresponding files and format them
         /// </summary>
-        /// <param name="currentLevel">Current level of the game</param>
+        /// <param name="currentLevel">Integer value of the current level of the game</param>
+        /// <param name="alternative">A string that acts as an alternative way to load the map data, 
+        /// such as if map data isn't being loaded from a level with an integer value</param>
         /// <returns>Formatted data loaded from files</returns>
         private static Room[] LoadMapData(int currentLevel, string alternative = "")
         {

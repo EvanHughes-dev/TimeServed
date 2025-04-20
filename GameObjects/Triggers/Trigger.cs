@@ -5,6 +5,9 @@ using MakeEveryDayRecount.Players;
 
 namespace MakeEveryDayRecount.GameObjects.Triggers
 {
+    /// <summary>
+    /// Extension of GameObject that can "trigger" an event if the player steps onto it
+    /// </summary>
     internal abstract class Trigger : GameObject
     {
         //Fields
@@ -12,19 +15,30 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
         protected int _height;
 
         //Properties
+
+        /// <summary>
+        /// Width of the trigger, in tiles
+        /// </summary>
         public int Width
         {
             get { return _width; }
         }
 
+        /// <summary>
+        /// Height of the trigger, in tiles
+        /// </summary>
         public int Height
         {
             get { return _height; }
         }
 
-        //Sprite should always be null, only included so it extends from gameobject
-        //Sprite index should be -1, since there is no sprite
-        protected Trigger(Point location, Texture2D sprite, int width, int height)
+        /// <summary>
+        /// Creates a trigger object
+        /// </summary>
+        /// <param name="location">Location of the top left-most tile</param>
+        /// <param name="width">Width of the trigger, in tiles</param>
+        /// <param name="height">Height of the trigger in tiles</param>
+        protected Trigger(Point location, int width, int height)
             : base(location, null) 
         {
             _width = width;

@@ -168,7 +168,7 @@ namespace MakeEveryDayRecount
                     // frame of the ReplayManager and check if you have read all frames
                     if (!ReplayManager.PlayingReplay)
                     {
-                        ReplayManager.BeginReplay()
+                        ReplayManager.BeginReplay();
                          GameplayManager.ReplayMode();
                     }
                     else if (!ReplayManager.NextFrame())

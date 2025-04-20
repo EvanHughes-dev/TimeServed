@@ -103,12 +103,10 @@ namespace MakeEveryDayRecount.Managers
             if (Directory.Exists("./PlayerData"))
                 RecursiveDelete("./PlayerData");
 
-            //TODO: confirm that this is acceptible
-            //I think we dicided hitting the "Play" button starts your progress from the start
-            //If this is the case, the initial checkpoint can be hardcoded, which is the easiest solution
-            Checkpoint c = new Checkpoint(new Point(4, 5), null, 0, 1, 1, true);
-            TriggerManager.SetPlayerSpawn(c);
-            TriggerManager.AddCheckpoint(c);
+            //This is the hardcoded initial spawn for the first area
+            Checkpoint initialSpawn = new Checkpoint(new Point(4, 5), 0, 1, 1, true);
+            TriggerManager.SetPlayerSpawn(initialSpawn);
+            TriggerManager.AddCheckpoint(initialSpawn);
 
             //Save the current map data to the initial checkpoint (the "player spawn")
             //Consequence of Player being initialized with position 4,5 means this always saves the player with position 4,5

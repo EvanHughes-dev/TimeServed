@@ -23,7 +23,10 @@ namespace MakeEveryDayRecount.GameObjects.Props
             Card = 2
         }
 
-        public readonly DoorKeyType KeyType;
+        /// <summary>
+        /// Type of key that unlocks this door
+        /// </summary>
+        public DoorKeyType KeyType { get; private set; }
 
         /// <summary>
         /// Get the direction the player will be outputted in when interacting with this door
