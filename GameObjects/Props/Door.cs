@@ -77,13 +77,13 @@ namespace MakeEveryDayRecount.GameObjects.Props
             {
                 OnDoorInteract?.Invoke(this, DestRoom);
                 //Play a sound based on the type of door that was opened
-                switch (_keyType)
+                switch (KeyType)
                 {
                     case DoorKeyType.None:
-                        //TODO: add standard door sound
+                        SoundManager.PlaySFX(SoundManager.WoodenDoorOpenSound, -5, 5);
                         break;
                     case DoorKeyType.Screwdriver:
-                        //TODO: Add vent unscrew sound
+                        SoundManager.PlaySFX(SoundManager.VentUnscrewSound, -5, 5);
                         break;
                     case DoorKeyType.Card:
                         SoundManager.PlaySFX(SoundManager.KeycardSwipeSound, -20, 20);

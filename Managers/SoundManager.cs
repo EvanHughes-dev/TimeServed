@@ -31,6 +31,28 @@ namespace MakeEveryDayRecount.Managers
         public static SoundEffect KeycardSwipeSound { get; private set; }
 
         /// <summary>
+        /// Sound effect used for opening a door that doesn't require a key
+        /// </summary>
+        public static SoundEffect WoodenDoorOpenSound { get; private set; }
+
+        /// <summary>
+        /// Sound effect for unscrewing a vent
+        /// </summary>
+        public static SoundEffect VentUnscrewSound { get; private set; }
+
+        //TODO: use the wirecutter sound and camera sound
+
+        /// <summary>
+        /// Sound effect for when the wirecutters cut wire
+        /// </summary>
+        public static SoundEffect WirecutterSound { get; private set; }
+
+        /// <summary>
+        /// Sound effect for cameras being deactivated
+        /// </summary>
+        public static SoundEffect PowerDownSound { get; private set; }
+
+        /// <summary>
         /// If the background music has a track
         /// </summary>
         public static bool PlayingMusic { get; set; }
@@ -52,6 +74,10 @@ namespace MakeEveryDayRecount.Managers
             //Sound effects
             PlayerStepSound = content.Load<SoundEffect>("Audio/Sound Effects/Player Step");
             KeycardSwipeSound = content.Load<SoundEffect>("Audio/Sound Effects/Keycard Swipe");
+            WoodenDoorOpenSound = content.Load<SoundEffect>("Audio/Sound Effects/Wooden Door Open");
+            WirecutterSound = content.Load<SoundEffect>("Audio/Sound Effects/Wirecutter");
+            PowerDownSound = content.Load<SoundEffect>("Audio/Sound Effects/Power Down");
+            VentUnscrewSound = content.Load<SoundEffect>("Audio/Sound Effects/Unscrew");
 
             PlayingMusic = false;
         }
