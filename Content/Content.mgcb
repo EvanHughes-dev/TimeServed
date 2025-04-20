@@ -19,11 +19,41 @@
 /processorParam:Quality=Best
 /build:Audio/Music/Sneaky Snitch.mp3
 
+#begin Audio/Sound Effects/Keycard Swipe.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/Sound Effects/Keycard Swipe.wav
+
 #begin Audio/Sound Effects/Player Step.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Audio/Sound Effects/Player Step.wav
+
+#begin Audio/Sound Effects/Power Down.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/Sound Effects/Power Down.wav
+
+#begin Audio/Sound Effects/Unscrew.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/Sound Effects/Unscrew.wav
+
+#begin Audio/Sound Effects/Wirecutter.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/Sound Effects/Wirecutter.wav
+
+#begin Audio/Sound Effects/Wooden Door Open.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/Sound Effects/Wooden Door Open.wav
 
 #begin DebugAssets/NOT_WALKABLE.png
 /importer:TextureImporter
