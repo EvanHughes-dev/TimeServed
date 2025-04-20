@@ -540,7 +540,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                         if (_player.Location == watchedTile)
                         {
                             //WE FOUND THE PLAYER! GET HIM BOYS!
-                            //_player.Detected();
+                            _player.Detected();
                             break;
                         }
                     }
