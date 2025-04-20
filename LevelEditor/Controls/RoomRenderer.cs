@@ -126,7 +126,7 @@ namespace LevelEditor.Controls
 
             ShowTiles = true;
             ShowProps = true;
-            ShowTriggers = false;
+            ShowTriggers = true;
         }
         /// <summary>
         /// Initializes a new RoomRenderer with specific text, size, and location.

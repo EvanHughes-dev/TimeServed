@@ -4,12 +4,10 @@
 
 using LevelEditor.Classes;
 using LevelEditor.Classes.Props;
+using LevelEditor.Classes.Triggers;
 using LevelEditor.Controls;
 using LevelEditor.Extensions;
 using LevelEditor.Forms.Prompts;
-using System.Diagnostics;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.ScrollBar;
-using System.Linq;
 
 namespace LevelEditor
 {
@@ -19,7 +17,8 @@ namespace LevelEditor
     internal enum TabState
     {
         Tiles,
-        Props
+        Props,
+        Triggers
     };
 
     /// <summary>
@@ -55,7 +54,10 @@ namespace LevelEditor
         /// Gets or sets the prop the user currently has selected from the palette.
         /// </summary>
         private Prop SelectedProp { get; set; }
-
+        /// <summary>
+        /// Gets or sets the trigger the user currently has selected from the palette.
+        /// </summary>
+        private Trigger SelectedTrigger { get; set; }
         /// <summary>
         /// Gets the palette of props the user may select from
         /// </summary>
@@ -69,6 +71,8 @@ namespace LevelEditor
         /// Holds the prop box of the prop that is currently selected on the palette.
         /// </summary>
         private PropBox _currentlySelectedPropBox;
+
+        private Point? _triggerStartPoint;
 
         private string _formName;
         private readonly string _formNameBase;
@@ -239,7 +243,7 @@ namespace LevelEditor
                         }
 
                         // Should this be reworked to make it so *all* props are created the same way, and door editing happens post-placement? Probably!
-                    } 
+                    }
                     else
                     {
                         // Edit the clicked prop
@@ -288,8 +292,43 @@ namespace LevelEditor
                     }
                 }
             }
-        }
+            else if (TabState == TabState.Triggers)
+            {
+                if (e.Button == MouseButtons.Left)
+                {
+                    _triggerStartPoint = e.Tile;
 
+                    if (Room.SavedState == SavedState.Saved)
+                    {
+                        Room.SavedState = SavedState.Unsaved;
+                        UpdateFormName($"{_formNameBase} *");
+                    }
+                }
+
+                // Right click picks tile! Because that's convenient and I wanted it to be a feature!
+                if (e.Button == MouseButtons.Right)
+                {
+                    Room.RemoveTriggerAt(e.Tile);
+                }
+            }
+        }
+        private void roomrenderer_TileMouseUp(object? sender, TileEventArgs e)
+        {
+            if (TabState == TabState.Triggers)
+            {
+                if (_triggerStartPoint != null)
+                {
+                    Rectangle startRect = new Rectangle(_triggerStartPoint!.Value, new Size(1, 1));
+
+                    Rectangle endRect = new Rectangle(e.Tile, new Size(1, 1));
+
+                    Trigger t = SelectedTrigger.Instantiate(Rectangle.Union(startRect, endRect));
+
+                    Room.AddTrigger(t);
+                }
+
+            }
+        }
         /// <summary>
         /// If left click is held, draws tiles.
         /// </summary>
