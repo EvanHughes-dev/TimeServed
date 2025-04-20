@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using MakeEveryDayRecount.Managers;
 using MakeEveryDayRecount.Players;
-using MakeEveryDayRecount.DebugModes;
 
 namespace MakeEveryDayRecount.Map
 {
@@ -117,7 +116,7 @@ namespace MakeEveryDayRecount.Map
         /// <returns>Point that corresponds to the distance between world and screen pos</returns>
         public static Point WorldToScreen()
         {
-            Point worldToScreen = TileToWorld(_currentPlayer.Location) - ScreenCenter;
+            Point worldToScreen = _currentPlayer.PlayerWorldPosition - ScreenCenter;
             // Clamp the screen's position so only tiles will be displayed without any empty space
             return new Point(
                 MathHelper.Clamp(worldToScreen.X, 0, MapSizePixels.X - ScreenSize.X),
@@ -164,15 +163,16 @@ namespace MakeEveryDayRecount.Map
         /// of this file that will change during run time
         /// </summary>
         /// <param name="game1">Reference to this instance of the game</param>
+        /// <param name="gameplayManager">Reference to the overall GameplayManager</param>
         public static void Initialize(Game1 game1)
         {
             game1Instance = game1;
             GameplayManager.OnPlayerUpdate += SetCurrentPlayer;
-            GameplayManager.Map.OnRoomUpdate += SetCurrentRoom;
+            MapManager.OnRoomUpdate += SetCurrentRoom;
             // Despite the delegate event systems, the object have already been initialized in
             // memory before the function is added to the event, so get the initial value manually
             _currentPlayer = GameplayManager.PlayerObject;
-            _currentRoom = GameplayManager.Map.CurrentRoom;
+            _currentRoom = MapManager.CurrentRoom;
         }
     }
 }

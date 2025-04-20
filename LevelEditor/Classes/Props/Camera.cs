@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,13 +13,53 @@ namespace LevelEditor.Classes.Props
     public class Camera : Prop
     {
         /// <summary>
-        /// The point, in tilespace, this camera is pointed at.
+        /// This camera's integer position in the room, in tile space.
+        ///   (0, 0) is the top-left corner of the room.
+        ///   Triggers a view frustum update.
         /// </summary>
-        public Point? Target { get; set; }
+        public override Point? Position {
+            get => base.Position;
+            set 
+            {
+                base.Position = value;
+                ViewFrustumUpdate?.Invoke(this);
+            } 
+        }
+
+        /// <summary>
+        /// The point, in tilespace, this camera is pointed at.
+        ///   Triggers a view frustum update.
+        /// </summary>
+        public Point? Target
+        {
+            get => _target;
+            set
+            {
+                _target = value;
+                ViewFrustumUpdate?.Invoke(this);
+            }
+        }
+        private Point? _target;
         /// <summary>
         /// The spread of this camera, in radians. Equal to the radian distance between the center ray and either side ray.
+        ///   Triggers a view frustum update.
         /// </summary>
-        public float RadianSpread { get; set; }
+        public float RadianSpread
+        {
+            get => _radianSpread;
+            set
+            {
+                _radianSpread = value;
+                ViewFrustumUpdate?.Invoke(this);
+            }
+        }
+        private float _radianSpread;
+
+        /// <summary>
+        /// Invoked whenever a property of this Camera changes that would require a re-rendering of the view frustum.
+        ///   Passes in a reference to this camera when invoked.
+        /// </summary>
+        public event Action<Camera>? ViewFrustumUpdate;
 
         /// <summary>
         /// Creates a new Camera with the given sprite, position, target, and spread.

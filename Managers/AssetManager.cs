@@ -84,6 +84,11 @@ namespace MakeEveryDayRecount.Managers
         public static Texture2D[] CameraTextures { get; private set; }
 
         /// <summary>
+        /// An array of all camera textures
+        /// </summary>
+        public static Texture2D[] Cameras { get; private set; }
+
+        /// <summary>
         /// An array of all box textures
         /// </summary>
         public static Texture2D[] Boxes { get; private set; }
@@ -118,6 +123,16 @@ namespace MakeEveryDayRecount.Managers
             {
                 content.Load<Texture2D>("Tiles/void"),
 
+                content.Load<Texture2D>("Tiles/tile_wall_corner_inner_tr"),
+                content.Load<Texture2D>("Tiles/tile_wall_corner_inner_tl"),
+                content.Load<Texture2D>("Tiles/tile_wall_corner_inner_br"),
+                content.Load<Texture2D>("Tiles/tile_wall_corner_inner_bl"),
+
+                content.Load<Texture2D>("Tiles/tile_wall_corner_outer_tr"),
+                content.Load<Texture2D>("Tiles/tile_wall_corner_outer_tl"),
+                content.Load<Texture2D>("Tiles/tile_wall_corner_outer_br"),
+                content.Load<Texture2D>("Tiles/tile_wall_corner_outer_bl"),
+
                 content.Load<Texture2D>("Tiles/tile_wall0_top"),
                 content.Load<Texture2D>("Tiles/tile_wall1_top"),
                 content.Load<Texture2D>("Tiles/tile_wall2_top"),
@@ -151,7 +166,7 @@ namespace MakeEveryDayRecount.Managers
                 content.Load<Texture2D>("Doors/Door-Bottom"),
                 content.Load<Texture2D>("Doors/Door-Left")
             };
-            TileSize = InterfaceManager.ScalePointUniform(new Point(TileMap[0].Width / 4, TileMap[0].Height / 4));
+            TileSize = InterfaceManager.ScalePointUniform(new Point(TileMap[0].Width / 2, TileMap[0].Height / 2));
 
             //LOAD DEBUG ASSETS
             DebugWalkableTile = content.Load<Texture2D>("DebugAssets/WALKABLE");

@@ -6,6 +6,9 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MakeEveryDayRecount.Managers;
 using MakeEveryDayRecount.Players.InventoryFiles;
+using MakeEveryDayRecount.GameObjects.Triggers;
+using System.IO;
+using System;
 
 
 namespace MakeEveryDayRecount.Players
@@ -38,12 +41,15 @@ namespace MakeEveryDayRecount.Players
             Interacting = 2
         }
 
-
-
         /// <summary>
         /// Player's current position on the screen
         /// </summary>
         public Point PlayerScreenPosition { get; private set; }
+
+        /// <summary>
+        /// Player's current position in the world
+        /// </summary>
+        public Point PlayerWorldPosition { get; private set; }
 
         private Direction _playerCurrentDirection;
         private PlayerState _playerState;
@@ -65,6 +71,10 @@ namespace MakeEveryDayRecount.Players
         }
 
         private const float SecondsPerTile = .2f;
+        private const float SecondsPerAnimation = .1f;
+        private const float SecondsPerPositionUpdate = .1f;
+
+        private float _timeBetweenPositionUpdate;
         private float _walkingSeconds;
         private bool _readyToMove;
 
@@ -72,12 +82,16 @@ namespace MakeEveryDayRecount.Players
         private int _animationFrame;
         private Rectangle _playerFrameRectangle;
         private readonly Point _playerSize;
+        private bool _justMoved;
+        private bool _reachedDest;
+
+        private Point _destDirection;
 
         //The player's inventory
         private Inventory _inventory;
 
         private Box _currentHeldBox;
-
+        private bool _firstUpdate;
         /// <summary>
         /// Get if the player is holing a box 
         /// </summary>
@@ -93,12 +107,14 @@ namespace MakeEveryDayRecount.Players
             : base(location, sprite)
         {
             _walkingSeconds = 0;
-
             _animationFrame = 0;
             _playerSize = new Point(sprite.Width / 4, sprite.Height / 4);
             //Create an inventory
             _inventory = new Inventory(screenSize);
             _currentHeldBox = null;
+            _reachedDest = true;
+            _justMoved = false;
+            _firstUpdate = true;
         }
 
         /// <summary>
@@ -107,8 +123,13 @@ namespace MakeEveryDayRecount.Players
         /// <param name="deltaTime">The elapsed time between frames in seconds</param>
         public void Update(float deltaTime)
         {
+            if (_firstUpdate)
+            {
+                UpdatePlayerPos();
+                _firstUpdate = false;
+            }
             KeyboardInput(deltaTime);
-            UpdatePlayerPos();
+            UpdatePlayerPos(deltaTime);
             _playerFrameRectangle = AnimationUpdate(deltaTime);
             _inventory.Update();
         }
@@ -136,7 +157,7 @@ namespace MakeEveryDayRecount.Players
             {
                 PlayerMovement(deltaTime, new Point(0, 1), Direction.Down);
             }
-            else
+            else if (_reachedDest)
             {
                 //if we were walking and we stop pressing a key, go back to standing
                 _playerState = PlayerState.Standing;
@@ -168,38 +189,51 @@ namespace MakeEveryDayRecount.Players
         /// as there isn't an issue with collision
         /// </summary>
         /// <param name="deltaTime">Time since last frame</param>
-        /// <param name="movement">Vector to move</param>
+        /// <param name="movement">Point to move</param>
         /// <param name="directionMove">Direction of movement</param>
         private void PlayerMovement(float deltaTime, Point movement, Direction directionMove)
         {
-            // Drop the box if the player is holding it and they attempt to move a direction the 
-            // box can't be moved in
-            if (HoldingBox && IsPerpendicular(directionMove, _currentHeldBox.AttachmentDirection))
-                DropBox();
-
-            // Stop the player from turing around if they're holding the box
-            if (HoldingBox)
-                directionMove = _currentHeldBox.AttachmentDirection;
-
             if (!_readyToMove)
                 UpdateWalkingTime(deltaTime);
 
-            if (_readyToMove && GameplayManager.Map.CheckPlayerCollision(Location + movement) &&
-                (!HoldingBox || GameplayManager.Map.CheckPlayerCollision(_currentHeldBox.Location + movement)))
+            if (_readyToMove && MapManager.CheckPlayerCollision(Location + movement) &&
+                (!HoldingBox || MapManager.CheckPlayerCollision(_currentHeldBox.Location + movement)))
             {
+                if (MapManager.CheckPlayerCollision(Location + movement) &&
+                    (!HoldingBox || MapManager.CheckPlayerCollision(_currentHeldBox.Location + movement)))
+                {
+                    _readyToMove = false;
+                    _destDirection = movement;
+                    _justMoved = true;
+                    _reachedDest = false;
+                    if (_playerState != PlayerState.Walking)
+                        _playerState = PlayerState.Walking;
 
-                Location += movement;
-                _readyToMove = false;
-                if (_playerState == PlayerState.Standing)
-                    _playerState = PlayerState.Walking;
-                if (HoldingBox)
-                    _currentHeldBox.UpdatePosition(Location);
-                SoundManager.PlaySFX(SoundManager.PlayerStepSound, -20, 20);
+                    SoundManager.PlaySFX(SoundManager.PlayerStepSound, -40, 40);
+                }
+                else
+                {
+                    _playerState = PlayerState.Standing;
+                }
             }
 
-            // Update the player's walking state if needed
+            if (HoldingBox)
+            {
+                // Drop the box if the player is holding it and they attempt to move a direction the 
+                // box can't be moved in
+                if (IsPerpendicular(directionMove, _currentHeldBox.AttachmentDirection))
+                    DropBox();
+                else
+                {
+                    // Otherwise update need variable for the box
+                    directionMove = _currentHeldBox.AttachmentDirection;
+                }
+            }
+
+            // Update the player's direction
             if (_playerCurrentDirection != directionMove)
                 _playerCurrentDirection = directionMove;
+
         }
 
         /// <summary>
@@ -209,12 +243,21 @@ namespace MakeEveryDayRecount.Players
         private void UpdateWalkingTime(float deltaTime)
         {
             _walkingSeconds += deltaTime;
-            if (_walkingSeconds >= SecondsPerTile)
+
+            // This variable allows for the time between movements to be changed depending on what state 
+            // the player is coming from
+            int timeAdjustment = 1;
+
+            if (_playerState == PlayerState.Standing)
+                timeAdjustment = 2;
+
+            if (_walkingSeconds >= SecondsPerTile / timeAdjustment)
             {
                 _readyToMove = true;
-                _walkingSeconds -= SecondsPerTile;
+                _walkingSeconds -= SecondsPerTile / timeAdjustment;
             }
         }
+
         #endregion
 
         #region Drawing Logic
@@ -243,8 +286,8 @@ namespace MakeEveryDayRecount.Players
         /// As it is setup now, the player changes walking animation once per tile
         /// at the same rate the player walks.
         /// </summary>
-        /// <param name="deltaTime"></param>
-        /// <returns></returns>
+        /// <param name="deltaTime">Time since last frame</param>
+        /// <returns>Rectangle for player animation</returns>
         private Rectangle AnimationUpdate(float deltaTime)
         {
             // Change the animation based on what state the player is currently in
@@ -259,9 +302,9 @@ namespace MakeEveryDayRecount.Players
                 case PlayerState.Walking:
                     _animationTimeElapsed += deltaTime;
                     // Check if the animation is ready to update
-                    if (_animationTimeElapsed >= SecondsPerTile)
+                    if (_animationTimeElapsed >= SecondsPerAnimation)
                     {
-                        _animationTimeElapsed -= SecondsPerTile;
+                        _animationTimeElapsed -= SecondsPerAnimation;
                         _animationFrame++;
                         // Walking animations range from 0-3 in the Sprite Sheet
                         // _animationFrame being < 0 is probably not going to happen
@@ -287,12 +330,43 @@ namespace MakeEveryDayRecount.Players
         /// <summary>
         /// Convert from the player's tile position to screen position
         /// </summary>
+        private void UpdatePlayerPos(float deltaTime)
+        {
+
+            _timeBetweenPositionUpdate += deltaTime;
+            if (_timeBetweenPositionUpdate > SecondsPerPositionUpdate)
+            {
+                PlayerWorldPosition = MapUtils.TileToWorld(Location);
+
+                // This handle moving the player half a tile to start then the full tile
+                // .1 seconds later and updating the tile position
+                if (_justMoved)
+                {
+                    PlayerWorldPosition += new Point(AssetManager.TileSize.X * _destDirection.X / 2, AssetManager.TileSize.Y * _destDirection.Y / 2);
+                    _justMoved = false;
+                    Location += _destDirection;
+                    _currentHeldBox?.UpdateDrawPoint(PlayerWorldPosition);
+                }
+                else
+                {
+                    _reachedDest = true;
+                    _currentHeldBox?.UpdatePosition(Location);
+                }
+                Point worldToScreen = MapUtils.WorldToScreen();
+                _timeBetweenPositionUpdate -= SecondsPerPositionUpdate;
+                PlayerScreenPosition = PlayerWorldPosition - worldToScreen + MapUtils.PixelOffset();
+            }
+        }
+
+        /// <summary>
+        /// Update the player's position regarldess of time
+        /// </summary>
         private void UpdatePlayerPos()
         {
-            Point playerWorldPos = MapUtils.TileToWorld(Location);
-            Point worldToScreen = MapUtils.WorldToScreen();
+            PlayerWorldPosition = MapUtils.TileToWorld(Location);
 
-            PlayerScreenPosition = playerWorldPos - worldToScreen + MapUtils.PixelOffset();
+            Point worldToScreen = MapUtils.WorldToScreen();
+            PlayerScreenPosition = PlayerWorldPosition - worldToScreen + MapUtils.PixelOffset();
         }
 
         #endregion
@@ -334,24 +408,20 @@ namespace MakeEveryDayRecount.Players
             switch (_playerCurrentDirection)
             {
                 case Direction.Left:
-                    objectToInteract = GameplayManager.Map.CheckInteractable(Location + new Point(-1, 0));
+                    objectToInteract = MapManager.CheckInteractable(Location + new Point(-1, 0));
                     break;
                 case Direction.Up:
-                    objectToInteract = GameplayManager.Map.CheckInteractable(Location + new Point(0, -1));
+                    objectToInteract = MapManager.CheckInteractable(Location + new Point(0, -1));
                     break;
                 case Direction.Right:
-                    objectToInteract = GameplayManager.Map.CheckInteractable(Location + new Point(1, 0));
+                    objectToInteract = MapManager.CheckInteractable(Location + new Point(1, 0));
                     break;
                 case Direction.Down:
-                    objectToInteract = GameplayManager.Map.CheckInteractable(Location + new Point(0, 1));
+                    objectToInteract = MapManager.CheckInteractable(Location + new Point(0, 1));
                     break;
-                    //add code that makes the interaction happen
             }
 
-            if (objectToInteract == null)
-                return;
-
-            objectToInteract.Interact(this);
+            objectToInteract?.Interact(this);
         }
 
         /// <summary>
@@ -361,6 +431,7 @@ namespace MakeEveryDayRecount.Players
         public void ChangeRoom(Point new_location)
         {
             Location = new_location;
+            UpdatePlayerPos();
         }
 
         /// <summary>
@@ -377,8 +448,7 @@ namespace MakeEveryDayRecount.Players
         /// </summary>
         private void DropBox()
         {
-            if (HoldingBox)
-                _currentHeldBox.DropBox();
+            _currentHeldBox?.DropBox();
             _currentHeldBox = null;
         }
 
@@ -387,8 +457,11 @@ namespace MakeEveryDayRecount.Players
         /// </summary>
         public void Detected()
         {
-            // TODO rather than restarting the level, just reset the player to the last checkpoint
-            GameplayManager.LevelReset();
+            //Reset the map to the last checkpoint
+            MapManager.LoadCheckpoint(TriggerManager.CurrentCheckpoint);
+
+            //Reset the player data to the last checkpoint
+            Load();
         }
 
         #endregion
@@ -402,6 +475,85 @@ namespace MakeEveryDayRecount.Players
             _playerState = PlayerState.Standing;
             DropBox();
             _inventory.ClearInventory();
+        }
+
+        /// <summary>
+        /// Saves the player's position and inventory to a file. Format is as follows:
+        /// int xPos
+        /// int yPos
+        /// 
+        /// int item count
+        /// 
+        /// inventory:
+        ///     int propIndex
+        ///     int keyType
+        /// </summary>
+        public void Save()
+        {
+            //Make the folder if it doesn't already exist
+            if (!Directory.Exists("./PlayerData"))
+                Directory.CreateDirectory("./PlayerData");
+
+            BinaryWriter writer = null;
+            try
+            {
+                Stream stream = File.OpenWrite($"./PlayerData/PlayerData.data");
+                writer = new BinaryWriter(stream);
+
+                //Player position
+                writer.Write(Location.X);
+                writer.Write(Location.Y);
+
+                //Item count
+                writer.Write(_inventory.Contents.Count);
+
+                //Items
+                for (int i = 0; i < _inventory.Contents.Count; i++)
+                {
+                    writer.Write(_inventory.Contents[i].SpriteIndex);
+                    writer.Write((int)_inventory.Contents[i].ItemKeyType);
+                }
+            }
+            finally
+            {
+                writer.Close();
+            }
+        }
+
+        /// <summary>
+        /// Resets all relevant player values to how they were during the last checkpoint
+        /// </summary>
+        public void Load()
+        {
+            BinaryReader reader = null!;
+            
+            //Clear Player's states
+            ClearStates();
+
+            try
+            {
+                Stream stream = File.OpenRead("./PlayerData/PlayerData.data");
+                reader = new BinaryReader(stream);
+
+                //Update player position
+                Location = new Point(reader.ReadInt32(), reader.ReadInt32());
+
+                //Check item count
+                int itemCount = reader.ReadInt32();
+
+                //Give the player their items back
+                for (int i = 0; i < itemCount; i++)
+                {
+                    int spriteIndex = reader.ReadInt32();
+                    int keyType = reader.ReadInt32();
+
+                    _inventory.AddItemToInventory(new Item(Point.Zero, AssetManager.PropTextures, spriteIndex, "TEMP_NAME", (Door.DoorKeyType)keyType));
+                }
+            }
+            finally
+            {
+                reader.Close();
+            }
         }
     }
 }

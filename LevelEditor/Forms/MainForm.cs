@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using LevelEditor.Classes;
+﻿using LevelEditor.Classes;
 using LevelEditor.Classes.Props;
+using LevelEditor.Classes.Triggers;
+using LevelEditor.Helpers;
+using System.Collections.ObjectModel;
 
 namespace LevelEditor
 {
@@ -25,6 +17,11 @@ namespace LevelEditor
         /// The gospel determining what Props have what corresponding indexes.
         /// </summary>
         public IReadOnlyCollection<Prop> Props { get; private set; }
+
+        /// <summary>
+        /// The gospel determining what Triggers have what corresponding indexes.
+        /// </summary>
+        public IReadOnlyCollection<Trigger> Triggers { get; private set; }
 
         // The level currently being edited
         private Level _level;
@@ -61,6 +58,10 @@ namespace LevelEditor
         /// </summary>
         public string Folder { get; private set; }
 
+        private string _formName;
+        private bool _keyDownInputRead;
+
+
         /// <summary>
         /// Creates a new MainForm.
         /// </summary>
@@ -72,8 +73,19 @@ namespace LevelEditor
 
             _level = null!;
             Tiles = null!;
-
+            Props = null!;
             Folder = null!;
+            OnNewLevelLoaded = null!;
+
+            _formName = "Level Selector";
+            this.Text = _formName;
+
+            this.FormClosing += LevelEditor_FormClosing;
+            //setup keyboard capturing
+            this.KeyPreview = true;
+            this.KeyDown += LevelEditor_KeyDown;
+            this.KeyUp += LevelEditor_KeyUp;
+
         }
 
         /// <summary>
@@ -84,10 +96,17 @@ namespace LevelEditor
             LoadTiles();
             LoadProps();
 
+            Triggers = new Trigger[]
+            {
+                new Checkpoint(-1, null)
+            };
+
             // In case LoadTiles creating a MessageBox, activating this window will ensure it still becomes
             //   the center of attention afterwards
             Activate();
         }
+
+        # region Level Loading and Creation
 
         /// <summary>
         /// Loads all of the tile sprites and initializes the tile array, displaying a MessageBox
@@ -100,11 +119,21 @@ namespace LevelEditor
                 Tile[] tiles = [
                     FileIOHelpers.LoadTile("void.png", false),
 
+                    FileIOHelpers.LoadTile("tile_wall_corner_inner_tr.png", false),
+                    FileIOHelpers.LoadTile("tile_wall_corner_inner_tl.png", false),
+                    FileIOHelpers.LoadTile("tile_wall_corner_inner_br.png", false),
+                    FileIOHelpers.LoadTile("tile_wall_corner_inner_bl.png", false),
+
+                    FileIOHelpers.LoadTile("tile_wall_corner_outer_tr.png", false),
+                    FileIOHelpers.LoadTile("tile_wall_corner_outer_tl.png", false),
+                    FileIOHelpers.LoadTile("tile_wall_corner_outer_br.png", false),
+                    FileIOHelpers.LoadTile("tile_wall_corner_outer_bl.png", false),
+
                     FileIOHelpers.LoadTile("tile_wall0_top.png", false),
                     FileIOHelpers.LoadTile("tile_wall1_top.png", false),
                     FileIOHelpers.LoadTile("tile_wall2_top.png", false),
                     FileIOHelpers.LoadTile("tile_wall3_top.png", false),
-                                                                
+
                     FileIOHelpers.LoadTile("tile_wall0_right.png", false),
                     FileIOHelpers.LoadTile("tile_wall1_right.png", false),
                     FileIOHelpers.LoadTile("tile_wall2_right.png", false),
@@ -239,8 +268,7 @@ namespace LevelEditor
                     {
                         Folder = Path.GetDirectoryName(fullPath)!;
 
-                        FileIOHelpers.SaveLevel(newLevel, Folder, Tiles);
-                        FileIOHelpers.UpdateContentMGCB();
+                        SaveLevel();
                         Level = newLevel;
 
                         OnNewLevelLoaded?.Invoke();
@@ -284,7 +312,7 @@ namespace LevelEditor
                     {
                         try
                         {
-                            Level = FileIOHelpers.LoadLevel(fullPath, Tiles, Props);
+                            Level = FileIOHelpers.LoadLevel(fullPath, Tiles, Props, Triggers);
 
                             Folder = Path.GetDirectoryName(fullPath)!;
 
@@ -350,7 +378,10 @@ namespace LevelEditor
             Level.Rooms.Add(room);
 
             CreateRoomButton(room);
+            SaveLevel();
         }
+
+        #endregion
 
         /// <summary>
         /// Gets all rooms contained within the level currently being edited, or null if no level is open.
@@ -398,8 +429,7 @@ namespace LevelEditor
         /// </summary>
         private void saveLevelToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            FileIOHelpers.SaveLevel(Level, Folder, Tiles);
-            FileIOHelpers.UpdateContentMGCB();
+            SaveLevel();
         }
 
         /// <summary>
@@ -409,5 +439,79 @@ namespace LevelEditor
         {
             LoadProps();
         }
+
+        /// <summary>
+        /// Prevent the user from leaving the form with unsaved changes without confirming they 
+        /// wish to do so
+        /// </summary>
+        private void LevelEditor_FormClosing(object? sender, FormClosingEventArgs e)
+        {
+            if (Level == null || Level.Rooms == null)
+                return;
+            List<Room> unsavedRooms = Level.Rooms.Where(room => room.SavedState == SavedState.Unsaved).ToList();
+            if (unsavedRooms.Count != 0)
+            {
+                switch (MessageBox.Show($"Unsaved changes to {unsavedRooms.Count} room{(unsavedRooms.Count != 1 ? "s" : "")}. Do you want to save before exiting?", "Warning",
+                                 MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning))
+                {
+                    case DialogResult.Cancel:
+                        e.Cancel = true;
+                        break;
+                    case DialogResult.Yes:
+                        foreach (Room room in unsavedRooms) room.SavedState = SavedState.Saved;
+                        SaveLevel();
+                        break;
+                    case DialogResult.No:
+                        e.Cancel = false;
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Save the current level
+        /// </summary>
+        public void SaveLevel()
+        {
+            if (Folder == null)
+                return;
+            FileIOHelpers.SaveLevel(Level, Folder, Tiles);
+            FileIOHelpers.UpdateContentMGCB();
+
+            if (Level != null && Level.Rooms != null)
+                foreach (Room room in Level.Rooms) room.SavedState = SavedState.Saved;
+        }
+
+        #region Keyboard Input
+
+        /// <summary>
+        /// Read keyboard input and take the needed actions based off which
+        /// keys are pressed at the same time
+        /// </summary>
+        private void LevelEditor_KeyDown(object? sender, KeyEventArgs e)
+        {
+            // prevent multiple inputs from being read at the same time
+            if (_keyDownInputRead)
+                return;
+
+            if (e.Control && e.KeyCode == Keys.S)
+            {
+                e.SuppressKeyPress = true;
+                SaveLevel();
+                _keyDownInputRead = true;
+
+            }
+
+        }
+
+        /// <summary>
+        /// On the key up event, allow key input to be read again
+        /// </summary>
+        private void LevelEditor_KeyUp(object? sender, KeyEventArgs e)
+        {
+            _keyDownInputRead = false;
+        }
+
+        #endregion
     }
 }

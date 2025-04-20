@@ -22,8 +22,7 @@ namespace MakeEveryDayRecount.DebugModes
         /// Initializes the player debug system.
         /// This must be called before drawing debug information.
         /// </summary>
-        public PlayerDebug()
-            : base()
+        public PlayerDebug() :  base()
         {
             _player = GameplayManager.PlayerObject;
             AddPlayerDebugInfo();
@@ -66,17 +65,16 @@ namespace MakeEveryDayRecount.DebugModes
         /// <param name="sb">Sprite batch used for rendering.</param>
         private void DrawTileDebug(SpriteBatch sb)
         {
-            MapManager map = GameplayManager.Map;
-            Point playerTilePos = _player.Location;
+            var playerTilePos = _player.Location;
 
             foreach (var direction in _playerMovementDirections)
             {
-                Point playerDest = playerTilePos + direction;
-                Texture2D displayTile = map.CheckPlayerCollision(playerDest)
+                var playerDest = playerTilePos + direction;
+                var displayTile = MapManager.CheckPlayerCollision(playerDest)
                     ? _walkableTileDebug
                     : _notWalkableTileDebug;
 
-                Point screenPos = MapUtils.TileToWorld(playerDest) - MapUtils.WorldToScreen() + MapUtils.PixelOffset();
+                var screenPos = MapUtils.TileToWorld(playerDest) - MapUtils.WorldToScreen();
                 sb.Draw(displayTile, new Rectangle(screenPos, AssetManager.TileSize), Color.White);
             }
         }

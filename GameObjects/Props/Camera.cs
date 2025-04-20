@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Players;
+using MakeEveryDayRecount.Map;
 using MakeEveryDayRecount.Managers;
-using MakeEveryDayRecount.Map.Tiles;
 using System.Linq;
-using System.Net;
+using System.Diagnostics;
 
 namespace MakeEveryDayRecount.GameObjects.Props
 {
@@ -49,16 +47,27 @@ namespace MakeEveryDayRecount.GameObjects.Props
         //It also needs a reference to the player to know if they step into the vision kite
         private Player _player = GameplayManager.PlayerObject;
 
+        public Point CenterPoint
+        {
+            get { return _centerPoint; }
+        }
+
+        public float Spread
+        {
+            get { return _spread; }
+        }
+
         /// <summary>
         /// Makes a security camera that watches a certain vision kite to see if the player is inside it
         /// </summary>
         /// <param name="location">The location of the camera, from which the vision kite is projected</param>
-        /// <param name="sprite">The camera's sprite</param>
+        /// <param name="spriteArray">The array of the camera's sprites</param>
+        /// <param name="spriteIndex">The index of this camera's sprite</param>
         /// <param name="containingRoom">The room containing the camera. Used to check if tiles are walkable</param>
         /// <param name="centerPoint">The point that forms the center of the camera's vision kite</param>
         /// <param name="spread">The arc from the center of the vision kite to the edge, in radians</param>
-        public Camera(Point location, Texture2D sprite, Room containingRoom, Point centerPoint, float spread)
-            : base(location, sprite)
+        public Camera(Point location, Texture2D[] spriteArray, int spriteIndex, Room containingRoom, Point centerPoint, float spread)
+            : base(location, spriteArray, spriteIndex)
         {
             _watchedTiles = new List<Point>(); //This ends up being the same as visionkite by the end of this function
             _previousBoxes = new List<Point>();
@@ -74,15 +83,16 @@ namespace MakeEveryDayRecount.GameObjects.Props
             Vector2 centerRay = new Vector2(_centerPoint.X - location.X, _centerPoint.Y - location.Y); //base of this ray is at location
 
             //TODO: Let the raybase be caty-corners from the camera location
+            //TODO: If a box starts right in front of a camera it will mess up the raybase
             //Please do not put the centerpoint on top of the camera it breaks everything
             if (Math.Abs(centerRay.X) > Math.Abs(centerRay.Y)) //The ray is more horizontal
             {
-                if (centerRay.X < 0 && containingRoom.VerifyWalkable(new Point(location.X - 1, location.Y), true)) //cam is pointing left
+                if (centerRay.X < 0 && containingRoom.VerifyWalkable(new Point(location.X - 1, location.Y), false)) //cam is pointing left
                 {
                     _rayBase = new Point(location.X - 1, location.Y);
                     _direction = 0.5f;
                 }
-                else if (containingRoom.VerifyWalkable(new Point(location.X + 1, location.Y), true))//Cam is pointing right
+                else if (containingRoom.VerifyWalkable(new Point(location.X + 1, location.Y), false))//Cam is pointing right
                 {
                     _rayBase = new Point(location.X + 1, location.Y);
                     _direction = 1.5f;
@@ -90,7 +100,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                 //If both the left and right tiles aren't walkable, try to set the raybase either up or down
                 else
                 {
-                    if (centerRay.Y < 0 && containingRoom.VerifyWalkable(new Point(Location.X, Location.Y - 1), true))
+                    if (centerRay.Y < 0 && containingRoom.VerifyWalkable(new Point(Location.X, Location.Y - 1), false))
                     {
                         _rayBase = new Point(location.X, Location.Y - 1);
                         _direction = 1f;
@@ -105,12 +115,12 @@ namespace MakeEveryDayRecount.GameObjects.Props
 
             else //the ray is more vertical
             {
-                if (centerRay.Y < 0 && containingRoom.VerifyWalkable(new Point(location.X, location.Y - 1), true)) //camera is pointing up
+                if (centerRay.Y < 0 && containingRoom.VerifyWalkable(new Point(location.X, location.Y - 1), false)) //camera is pointing up
                 {
                     _rayBase = new Point(Location.X, location.Y - 1);
                     _direction = 1f;
                 }
-                else if (containingRoom.VerifyWalkable(new Point(location.X, location.Y + 1), true)) //camera is pointing down
+                else if (containingRoom.VerifyWalkable(new Point(location.X, location.Y + 1), false)) //camera is pointing down
                 {
                     _rayBase = new Point(Location.X, location.Y + 1);
                     _direction = 0f;
@@ -118,7 +128,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                 //If both the up and down tiles aren't walkable, try to set the raybase either left or right
                 else
                 {
-                    if (centerRay.X < 0 && containingRoom.VerifyWalkable(new Point(location.X - 1, location.Y), true))
+                    if (centerRay.X < 0 && containingRoom.VerifyWalkable(new Point(location.X - 1, location.Y), false))
                     {
                         _rayBase = new Point(Location.X - 1, location.Y);
                         _direction = 0.5f;
@@ -203,7 +213,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
 
             //Create a rectangle that bounds the entire kite
             //TODO: Could finding the corners be done more efficiently?
-            Point[] corners = { _rayBase, _centerPoint, clockwisePoint, counterclockwisePoint};
+            Point[] corners = { _rayBase, _centerPoint, clockwisePoint, counterclockwisePoint };
             //Find the minimum/maximum X and Y of the 4 bounding points (the edges of the rectangle basically)
             int minX = _rayBase.X;
             int maxX = _rayBase.X;
@@ -407,7 +417,6 @@ namespace MakeEveryDayRecount.GameObjects.Props
                     }
                 }
             }
-
             //Permanantely save this into an array that won't be changed and indicates the full kite with no obstructions
             _visionKite = _watchedTiles.ToArray();
             #endregion
@@ -486,7 +495,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                                 //Debug.WriteLine($"Checking {_rayBase} with {endpoint}");
                                 //foreach (Point point in Rasterize(_rayBase, endpoint)) Debug.Write(point + " ");
                                 //Debug.WriteLine(null);
-                                if (tilesInRay.Contains(box)) //A ray is blocked by the box
+                                if (Rasterize(_rayBase, endpoint).Contains(box)) //A ray is blocked by the box
                                 {
                                     //Debug.WriteLine($"Endpoint {endpoint.X}, {endpoint.Y} is blocked");
                                     //Remove all the tiles between the box and the end of the ray
@@ -541,7 +550,6 @@ namespace MakeEveryDayRecount.GameObjects.Props
                         {
                             //WE FOUND THE PLAYER! GET HIM BOYS!
                             _player.Detected();
-                            break;
                         }
                     }
                 }
@@ -554,8 +562,8 @@ namespace MakeEveryDayRecount.GameObjects.Props
         //int endpointnumber = 0;
         public override void Draw(SpriteBatch sb, Point worldToScreen, Point pixelOffset)
         {
-            sb.Draw(Sprite, new Rectangle(MapUtils.TileToWorld(Location) - worldToScreen + pixelOffset + _drawOrigin, AssetManager.TileSize), null, //no source rectangle
-                Color.White, _direction, _drawOrigin.ToVector2(), SpriteEffects.None, 0f); //Layer depth is not used
+            sb.Draw(Sprite, new Rectangle(MapUtils.TileToWorld(Location) - worldToScreen + pixelOffset, AssetManager.TileSize), null, //no source rectangle
+                Color.White, _direction, Vector2.Zero, SpriteEffects.None, 0f); //Layer depth is not used
             foreach (Point tile in _watchedTiles)
             {
                 sb.Draw(AssetManager.CameraSight, new Rectangle(MapUtils.TileToWorld(tile) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
@@ -617,7 +625,6 @@ namespace MakeEveryDayRecount.GameObjects.Props
 
             return returnPoints;
         }
-
 
         public override void Interact(Player player)
         {

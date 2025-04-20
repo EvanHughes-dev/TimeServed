@@ -21,7 +21,6 @@ namespace MakeEveryDayRecount.DebugModes
         /// <summary>
         /// Initializes the basic debug system
         /// </summary>
-        /// <param name="spriteFont">The font used for debug text</param>
         public BaseDebug()
         {
             _spriteFont = AssetManager.Arial20;
@@ -41,13 +40,13 @@ namespace MakeEveryDayRecount.DebugModes
 
             Vector2 drawPoint = new Vector2(10, 10);
 
-            sb.DrawString(_spriteFont, $"Debug Mode: {debugMode}", drawPoint, Color.White);
+            sb.DrawString(_spriteFont, $"Debug Mode: {debugMode}", drawPoint, Color.Black);
             drawPoint.Y += _yAxisIncrement;
             foreach (KeyValuePair<string, Func<object>> entry in _objectsToDisplay)
             {
                 string displayValue = $"{entry.Key}: {entry.Value()}";
 
-                sb.DrawString(_spriteFont, displayValue, drawPoint, Color.White);
+                sb.DrawString(_spriteFont, displayValue, drawPoint, Color.Black);
                 drawPoint.Y += _yAxisIncrement;
             }
         }

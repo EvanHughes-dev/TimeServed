@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using MakeEveryDayRecount.Managers;
 using MakeEveryDayRecount.UI;
+using MakeEveryDayRecount.GameObjects.Triggers;
 
 namespace MakeEveryDayRecount
 {
@@ -35,12 +36,8 @@ namespace MakeEveryDayRecount
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        //Buttons
-        private List<Button> pauseButtons;
-        private List<Button> menuButtons;
-        private Texture2D defaultButtonTexture;
-
         private GameState _state;
+
 
         /// <summary>
         /// Access the current size of the screen in pixels
@@ -73,7 +70,7 @@ namespace MakeEveryDayRecount
             //_graphics.PreferredBackBufferHeight = 360;
 
             _graphics.HardwareModeSwitch = false;
-            _graphics.IsFullScreen = true;
+            _graphics.IsFullScreen = true; 
             _graphics.ApplyChanges();
 
             _debugState = DebugState.None;
@@ -87,6 +84,7 @@ namespace MakeEveryDayRecount
             InterfaceManager.exitGame += ExitGame;
 
             ReplayManager.Initialize();
+            TriggerManager.Initialize();
             //Set initial GameState
             _state = GameState.Menu;
             base.Initialize();
@@ -99,20 +97,17 @@ namespace MakeEveryDayRecount
             AssetManager.LoadContent(Content);
             SoundManager.LoadContent(Content);
 
-            // Initialize all items that need assets to be loaded 
             GlobalDebug.Initialize();
-
+            GameplayManager.Initialize(ScreenSize);
+            // Initialize all items that need assets to be loaded 
             InterfaceManager.InitializeMenus(ScreenSize);
 
-            GameplayManager.Initialize(ScreenSize);
             MapUtils.Initialize(this);
-
 
             
 
             _debugModes[0] = new PlayerDebug();
             _debugModes[1] = new MapDebug();
-
         }
 
         protected override void Update(GameTime gameTime)
@@ -147,8 +142,7 @@ namespace MakeEveryDayRecount
                         // Don't call anything after the game has paused
                         break;
                     }
-
-                     GameplayManager.Update(gameTime);
+                    GameplayManager.Update(gameTime);
                     // Save the current state of the keyboard
                     ReplayManager.SaveState();
                     if (InputManager.GetKeyPress(Keys.Tab))
@@ -214,20 +208,19 @@ namespace MakeEveryDayRecount
                 case GameState.Menu:
                     // DrawMenu(_spriteBatch);
                     break;
-                case GameState.Pause:
-                    //TODO: Blur the gameplay in the background.
-
-                     GameplayManager.Draw(_spriteBatch);
+                case GameState.Level:
+                    GameplayManager.Draw(_spriteBatch);
                     DisplayDebug();
                     break;
-                case GameState.Level:
-                     GameplayManager.Draw(_spriteBatch);
+                case GameState.Pause:
+                    //TODO: Blur the gameplay in the background.
+                    GameplayManager.Draw(_spriteBatch);
                     DisplayDebug();
                     break;
                 case GameState.Cutscene:
                     break;
                 case GameState.Playback:
-                     GameplayManager.Draw(_spriteBatch);
+                    GameplayManager.Draw(_spriteBatch);
                     DisplayDebug();
                     break;
             }
@@ -298,7 +291,7 @@ namespace MakeEveryDayRecount
                 if (SoundManager.PlayingMusic)
                     SoundManager.ResumeBGM();
                 else
-                    SoundManager.PlayBGM( GameplayManager.Level);
+                    SoundManager.PlayBGM(GameplayManager.Level);
             }
             _state = state;
         }
