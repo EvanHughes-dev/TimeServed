@@ -1,6 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Players;
+using MakeEveryDayRecount.Map;
+using MakeEveryDayRecount.GameObjects.Props;
+using System;
+using System.IO;
+using MakeEveryDayRecount.GameObjects.Triggers;
 
 namespace MakeEveryDayRecount.Managers
 {
@@ -13,50 +18,51 @@ namespace MakeEveryDayRecount.Managers
     /// <summary>
     /// Manager of Player and the Map Manager.
     /// </summary>
-    internal class GameplayManager
+    internal static class GameplayManager
     {
         /// <summary>
         /// The current level being played
         /// </summary>
-        public int Level { get; private set; }
+        public static int Level { get; private set; }
 
         /// <summary>
         /// Access the reference to the Player
         /// </summary>
-        public Player PlayerObject { get; private set; }
+        public static Player PlayerObject { get; private set; }
 
-        /// <summary>
-        /// Access the current MapManager
-        /// </summary>
-        public MapManager Map { get; private set; }
-
-        public OnPlayerUpdate OnPlayerUpdate;
+        public static OnPlayerUpdate OnPlayerUpdate;
 
         /// <summary>
         /// Initialize GameplayManager to create the player and map
         /// </summary>
-        public GameplayManager(Point screenSize)
+        public static void Initialize(Point screenSize)
         {
             Level = 1;
-            PlayerObject = new Player(new Point(5, 5), AssetManager.PlayerTexture, this, screenSize);
-            Map = new MapManager(this);
+            PlayerObject = new Player(new Point(4, 5), AssetManager.PlayerTexture, screenSize);
             OnPlayerUpdate?.Invoke(PlayerObject);
+            MapManager.Initialize();
         }
 
-        public void Update(float deltaTime)
+        public static void Update(float gameTime)
         {
             //Update Player
-            PlayerObject.Update(deltaTime);
+            PlayerObject.Update(gameTime);
+
+            //Update all the cameras in the current room
+            foreach (Camera cam in MapManager.CurrentRoom.Cameras)
+            {
+                cam.Update(gameTime);
+            }
         }
 
         /// <summary>
         /// Draws the map and the player.
         /// </summary>
         /// <param name="sb">sprite batch used to draw</param>
-        public void Draw(SpriteBatch sb)
+        public static void Draw(SpriteBatch sb)
         {
             //Draw the map
-            Map.Draw(sb);
+            MapManager.Draw(sb);
 
             //Draw the player
             PlayerObject.Draw(sb);
@@ -65,12 +71,65 @@ namespace MakeEveryDayRecount.Managers
         /// <summary>
         /// Enter replay mode
         /// </summary>
-        public void ReplayMode()
+        public static void ReplayMode()
         {
             Level = 1;
-            Map.ChangeLevel();
+            MapManager.ChangeLevel();
             PlayerObject.ChangeRoom(new Point(5, 5));
             PlayerObject.ClearStates();
+        }
+
+        /// <summary>
+        /// Called to reset the level to the starting state
+        /// </summary>
+        public static void LevelReset()
+        {
+            // TODO: This never gets called, I think its safe to delete?
+            Level = 1;
+            PlayerObject = new Player(new Point(5, 5), AssetManager.PlayerTexture, MapUtils.ScreenSize);
+            MapManager.ChangeLevel();
+            OnPlayerUpdate?.Invoke(PlayerObject);
+            ReplayManager.ClearData();
+        }
+
+        /// <summary>
+        /// Clears checkpoint data and player data
+        /// </summary>
+        public static void ClearSavedData()
+        {
+            //Delete saved data
+            if (Directory.Exists("./CheckpointData"))
+                RecursiveDelete("./CheckpointData");
+            if (Directory.Exists("./PlayerData"))
+                RecursiveDelete("./PlayerData");
+
+            //This is the hardcoded initial spawn for the first area
+            Checkpoint initialSpawn = new Checkpoint(new Point(4, 5), 0, 1, 1, true);
+            TriggerManager.SetPlayerSpawn(initialSpawn);
+            TriggerManager.AddCheckpoint(initialSpawn);
+
+            //Save the current map data to the initial checkpoint (the "player spawn")
+            //Consequence of Player being initialized with position 4,5 means this always saves the player with position 4,5
+            //This can be changed but shouldn't matter if that is the actual starting position
+            TriggerManager.PlayerSpawn.Activate(PlayerObject);
+        }
+
+        /// <summary>
+        /// Recursively delete all contents of a folder
+        /// </summary>
+        /// <param name="folderPath">Folder to delete</param>
+        private static void RecursiveDelete(string folderPath)
+        {
+
+            foreach (string file in Directory.GetFiles(folderPath))
+                File.Delete(file);
+
+            foreach (string folder in Directory.GetDirectories(folderPath))
+            {
+                RecursiveDelete(folder);
+            }
+
+            Directory.Delete(folderPath);
         }
     }
 }

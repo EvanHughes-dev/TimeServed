@@ -54,6 +54,14 @@ namespace MakeEveryDayRecount.Managers
         }
 
         /// <summary>
+        /// Clear the data saved so far
+        /// </summary>
+        public static void ClearData()
+        {
+            _currentReplyStates.Clear();
+        }
+
+        /// <summary>
         /// Save the current states to a file
         /// </summary>
         /// <param name="level">Level to save to</param>

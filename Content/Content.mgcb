@@ -19,11 +19,41 @@
 /processorParam:Quality=Best
 /build:Audio/Music/Sneaky Snitch.mp3
 
+#begin Audio/Sound Effects/Keycard Swipe.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/Sound Effects/Keycard Swipe.wav
+
 #begin Audio/Sound Effects/Player Step.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Audio/Sound Effects/Player Step.wav
+
+#begin Audio/Sound Effects/Power Down.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/Sound Effects/Power Down.wav
+
+#begin Audio/Sound Effects/Unscrew.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/Sound Effects/Unscrew.wav
+
+#begin Audio/Sound Effects/Wirecutter.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/Sound Effects/Wirecutter.wav
+
+#begin Audio/Sound Effects/Wooden Door Open.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/Sound Effects/Wooden Door Open.wav
 
 #begin DebugAssets/NOT_WALKABLE.png
 /importer:TextureImporter
@@ -221,10 +251,14 @@
 /processorParam:TextureFormat=Color
 /build:Items/wireCutters.png
 
+#begin Levels/Level1/CaF.room
+/copy:Levels/Level1/CaF.room
 
+#begin Levels/Level1/level.level
+/copy:Levels/Level1/level.level
 
-
-
+#begin Levels/Level1/Room2.room
+/copy:Levels/Level1/Room2.room
 
 #begin Player/Inventory/InventoryBox_hover.png
 /importer:TextureImporter
@@ -346,18 +380,6 @@
 /processorParam:TextureFormat=Color
 /build:Tiles/tile_walkable4.png
 
-#begin Tiles/tile_wall_corner_inner_tr.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Tiles/tile_wall_corner_inner_tr.png
-
 #begin Tiles/tile_wall_corner_inner_bl.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -393,6 +415,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Tiles/tile_wall_corner_inner_tl.png
+
+#begin Tiles/tile_wall_corner_inner_tr.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Tiles/tile_wall_corner_inner_tr.png
 
 #begin Tiles/tile_wall_corner_outer_bl.png
 /importer:TextureImporter
@@ -694,11 +728,3 @@
 /processorParam:TextureFormat=Color
 /build:UI/ui_cursorHover.png
 
-#begin Levels/Level1/level.level
-/copy:Levels/Level1/level.level
-
-#begin Levels/Level1/CaF.room
-/copy:Levels/Level1/CaF.room
-
-#begin Levels/Level1/Room2.room
-/copy:Levels/Level1/Room2.room
