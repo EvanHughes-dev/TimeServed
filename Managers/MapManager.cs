@@ -194,13 +194,13 @@ namespace MakeEveryDayRecount.Managers
         public static void LoadCheckpoint(Checkpoint c)
         {
             Room[] rooms = LoadMapData(1, "./CheckpointData");
-            ChangeRoom(c.RoomIndex); //This is probably the line that breaks things ACTUALLY I DON'T THINK IT IS
             _rooms.Clear();
             foreach (Room room in rooms)
             {
-                room.DoorTransition += TransitionRoom; //MAYBE THIS ONE????????????????????????????????
+                room.DoorTransition += TransitionRoom; 
                 _rooms.Add(room.RoomIndex, room);
-            }  
+            }
+            ChangeRoom(c.RoomIndex); 
         }
 
         public static void SaveMap(string baseFolder)
