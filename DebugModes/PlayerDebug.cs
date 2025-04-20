@@ -22,7 +22,7 @@ namespace MakeEveryDayRecount.DebugModes
         /// Initializes the player debug system.
         /// This must be called before drawing debug information.
         /// </summary>
-        public PlayerDebug()
+        public PlayerDebug() :  base()
         {
             _player = GameplayManager.PlayerObject;
             AddPlayerDebugInfo();
