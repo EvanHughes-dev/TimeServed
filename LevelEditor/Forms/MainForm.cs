@@ -312,7 +312,7 @@ namespace LevelEditor
                     {
                         try
                         {
-                            Level = FileIOHelpers.LoadLevel(fullPath, Tiles, Props);
+                            Level = FileIOHelpers.LoadLevel(fullPath, Tiles, Props, Triggers);
 
                             Folder = Path.GetDirectoryName(fullPath)!;
 

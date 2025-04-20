@@ -1,5 +1,7 @@
 ﻿using LevelEditor.Classes;
 using LevelEditor.Classes.Props;
+using LevelEditor.Classes.Triggers;
+using System.Diagnostics;
 
 namespace LevelEditor.Helpers
 {
@@ -115,7 +117,7 @@ namespace LevelEditor.Helpers
              *      
              *      if triggerType == 1
              *        int index
-             *        bool activated // In the level editor, should always be saved as false
+             *        bool active // In the level editor, should always be saved as true
              */
 
             Tile[] tilesArray = [.. allTiles];
@@ -186,6 +188,26 @@ namespace LevelEditor.Helpers
                 }
             }
 
+            writer.Write(room.Triggers.Count);
+
+            foreach (Trigger trigger in room.Triggers)
+            {
+                Debug.Assert(trigger.Bounds != null);
+
+                Rectangle bounds = (Rectangle)trigger.Bounds;
+                writer.Write(bounds.Left); // bounds.Left is equivalent to bounds.Location.X
+                writer.Write(bounds.Top);  // bounds.Top is equivalent to bounds.Location.Y
+                writer.Write(bounds.Width);
+                writer.Write(bounds.Height);
+
+                if (trigger is Checkpoint checkpoint)
+                {
+                    writer.Write(0);
+                    writer.Write(checkpoint.Index);
+                    writer.Write(true);
+                }
+            }
+
             writer.Close();
         }
 
@@ -199,9 +221,10 @@ namespace LevelEditor.Helpers
         /// </summary>
         /// <param name="filePath">The path to the .level file.</param>
         /// <param name="allTiles">A reference to the tile array, so the rooms can be loaded properly.</param>
-        /// <param name="allProps">A reference to the prop array so the room can load any props that have been saved</param>
+        /// <param name="allProps">A reference to the prop array so the room can load any props that have been saved.</param>
+        /// <param name="allTriggers">A reference to the trigger array, so the room can load any triggers that have been saved.</param>
         /// <returns>The loaded level, including all of its contained rooms.</returns>
-        public static Level LoadLevel(string filePath, IEnumerable<Tile> allTiles, IEnumerable<Prop> allProps)
+        public static Level LoadLevel(string filePath, IEnumerable<Tile> allTiles, IEnumerable<Prop> allProps, IEnumerable<Trigger> allTriggers)
         {
             /*
              * THE .level FILE FORMAT:
@@ -230,7 +253,7 @@ namespace LevelEditor.Helpers
                 if (File.Exists(roomPath))
                 {
                     level.Rooms.Add(
-                        LoadRoom(roomPath, allTiles, allProps)
+                        LoadRoom(roomPath, allTiles, allProps, allTriggers)
                         );
                     level.Rooms[level.Rooms.Count - 1].Id = roomIndex;
                 }
@@ -250,7 +273,7 @@ namespace LevelEditor.Helpers
         /// <param name="allTiles">A reference to the tile array, so it can be loaded properly.</param>
         /// <param name="allProps">A reference to the prop array so the room can load any props that have been saved</param>
         /// <returns>The loaded room.</returns>
-        public static Room LoadRoom(string filePath, IEnumerable<Tile> allTiles, IEnumerable<Prop> allProps)
+        public static Room LoadRoom(string filePath, IEnumerable<Tile> allTiles, IEnumerable<Prop> allProps, IEnumerable<Trigger> allTriggers)
         {
             /*
             * Form of the room data is as follows
@@ -305,7 +328,7 @@ namespace LevelEditor.Helpers
              *      
              *      if triggerType == 1
              *        int index
-             *        bool activated // In the level editor, should always be saved as false
+             *        bool active // In the level editor, should always be saved as true
             */
 
             BinaryReader reader = new BinaryReader(new FileStream(filePath, FileMode.Open));
@@ -363,6 +386,24 @@ namespace LevelEditor.Helpers
                 }
 
                 numOfProps--;
+            }
+
+            int numOfTriggers = reader.ReadInt32();
+
+            while (numOfTriggers > 0)
+            {
+                Rectangle bounds = new Rectangle(
+                    reader.ReadInt32(),
+                    reader.ReadInt32(),
+                    reader.ReadInt32(),
+                    reader.ReadInt32()
+                    );
+
+                int type = reader.ReadInt32();
+
+                Trigger trigger = allTriggers.ElementAt(type).Instantiate(bounds);
+                
+                // TODO: ADD THE TRIGGER TO THE ROOM
             }
 
             reader.Close();
