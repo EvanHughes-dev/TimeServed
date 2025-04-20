@@ -35,20 +35,24 @@ namespace MakeEveryDayRecount.Managers
         {
             get => _currentRoom;
         }
-        private static Room[] _rooms;
+
+        //private static Room[] _rooms;
+        private static Dictionary<int, Room> _rooms;
 
         /// <summary>
         /// Initialize the map manger and make rooms
         /// </summary>
         public static void Initialize()
         {
-            _rooms = LoadMapData(GameplayManager.Level);
-            _currentRoom = _rooms[0];
+            _rooms = new Dictionary<int, Room>();
+            Room[] rooms = LoadMapData(GameplayManager.Level);
+            rooms = LoadMapData(GameplayManager.Level);
+            _currentRoom = rooms[0];
             OnRoomUpdate?.Invoke(_currentRoom);
-            foreach (Room room in _rooms)
+            foreach (Room room in rooms)
             {
                 room.DoorTransition += TransitionRoom;
-                //_rooms.Add(room.RoomIndex, room); TODO: is this line needed?
+                _rooms.Add(room.RoomIndex, room);
             }
         }
         /// <summary>
@@ -152,12 +156,7 @@ namespace MakeEveryDayRecount.Managers
                 {
                     string roomName = binaryReader.ReadString();
                     string roomFilePath = $"{folderPath}/{roomName}.room";
-                    //TODO: change this
-                    //Previous code was:
-                    //int roomIndex = binaryReader.ReadInt32();
-                    //My bandaid fix is:
-                    binaryReader.ReadInt32();
-                    int roomIndex = currentRoom;
+                    int roomIndex = binaryReader.ReadInt32();
                     Room room = new Room(roomFilePath, roomName, roomIndex);
                     rooms[currentRoom] = room;
                 }
@@ -179,23 +178,28 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static void ChangeLevel()
         {
+            //It might be better to just initialize MapManager again rather than have this method
+            
             Room[] rooms = LoadMapData(GameplayManager.Level);
-            //_rooms.Clear(); TODO: is this line needed?
+            _rooms.Clear();
             _currentRoom = rooms[0];
             OnRoomUpdate?.Invoke(_currentRoom);
             foreach (Room room in rooms)
             {
                 room.DoorTransition += TransitionRoom;
+                _rooms.Add(room.RoomIndex, room);
             }
         }
 
         public static void LoadCheckpoint(Checkpoint c)
         {
-            _rooms = LoadMapData(1, "./CheckpointData");
-            ChangeRoom(c.RoomIndex);
-            foreach (Room room in _rooms)
+            Room[] rooms = LoadMapData(1, "./CheckpointData");
+            ChangeRoom(c.RoomIndex); //This is probably the line that breaks things ACTUALLY I DON'T THINK IT IS
+            _rooms.Clear();
+            foreach (Room room in rooms)
             {
-                room.DoorTransition += TransitionRoom;
+                room.DoorTransition += TransitionRoom; //MAYBE THIS ONE????????????????????????????????
+                _rooms.Add(room.RoomIndex, room);
             }  
         }
 
@@ -205,22 +209,22 @@ namespace MakeEveryDayRecount.Managers
             BinaryWriter writer = new BinaryWriter(File.OpenWrite(baseFolder + "/level.level"));
 
             //Save number of rooms
-            writer.Write(_rooms.Length);
+            writer.Write(_rooms.Count);
 
             //Write data for each room
-            for (int i = 0; i < _rooms.Length; i++)
+            foreach (KeyValuePair<int, Room> kvp in _rooms)
             {
                 //Write name
-                writer.Write(_rooms[i].RoomName);
+                writer.Write(_rooms[kvp.Key].RoomName);
 
                 //Write index
-                writer.Write(_rooms[i].RoomIndex);
+                writer.Write(_rooms[kvp.Key].RoomIndex);
             }
 
             //Save all the rooms
-            for (int i = 0; i < _rooms.Length; i++)
+            foreach (KeyValuePair<int, Room> kvp in _rooms)
             {
-                _rooms[i].SaveRoom(baseFolder);
+                _rooms[kvp.Key].SaveRoom(baseFolder);
             }
 
             //Close the writer

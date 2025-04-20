@@ -108,10 +108,6 @@ namespace MakeEveryDayRecount
 
             _debugModes[0] = new PlayerDebug();
             _debugModes[1] = new MapDebug();
-            //DELETE THIS
-            Checkpoint c = new Checkpoint(new Point(1, 1), null, 0, 1, 1, true);
-            TriggerManager.SetPlayerSpawn(c);
-            TriggerManager.AddCheckpoint(c);
         }
 
         protected override void Update(GameTime gameTime)

@@ -5,6 +5,7 @@ using MakeEveryDayRecount.Map;
 using MakeEveryDayRecount.GameObjects.Props;
 using System;
 using System.IO;
+using MakeEveryDayRecount.GameObjects.Triggers;
 
 namespace MakeEveryDayRecount.Managers
 {
@@ -101,6 +102,13 @@ namespace MakeEveryDayRecount.Managers
                 RecursiveDelete("./CheckpointData");
             if (Directory.Exists("./PlayerData"))
                 RecursiveDelete("./PlayerData");
+
+            //TODO: confirm that this is acceptible
+            //I think we dicided hitting the "Play" button starts your progress from the start
+            //If this is the case, the initial checkpoint can be hardcoded, which is the easiest solution
+            Checkpoint c = new Checkpoint(new Point(1, 1), null, 0, 1, 1, true);
+            TriggerManager.SetPlayerSpawn(c);
+            TriggerManager.AddCheckpoint(c);
 
             //Save the current map data to the initial checkpoint (the "player spawn")
             TriggerManager.PlayerSpawn.Activate(PlayerObject);

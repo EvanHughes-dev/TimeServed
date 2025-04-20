@@ -358,6 +358,8 @@ namespace MakeEveryDayRecount.Map
                         }
                     }
                 }
+                //DELETE THIS maybe?
+                //_triggersInRoom.Add(new Checkpoint(new Point(1, 1), null, 0, 1, 1, true));
             }
             catch (Exception e)
             {
