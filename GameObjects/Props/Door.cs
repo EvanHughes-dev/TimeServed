@@ -19,8 +19,8 @@ namespace MakeEveryDayRecount.GameObjects.Props
         public enum DoorKeyType
         {
             None = 0,
-            Screwdriver = 1,
-            Card = 2
+            Card = 1,
+            Screwdriver = 2
         }
 
         private DoorKeyType _keyType;
@@ -71,6 +71,21 @@ namespace MakeEveryDayRecount.GameObjects.Props
             if (_keyType == DoorKeyType.None || player.ContainsKey(_keyType))
             {
                 OnDoorInteract?.Invoke(this, DestRoom);
+                //Play a sound based on the type of door that was opened
+                switch (_keyType)
+                {
+                    case DoorKeyType.None:
+                        //TODO: add standard door sound
+                        break;
+                    case DoorKeyType.Screwdriver:
+                        //TODO: Add vent unscrew sound
+                        break;
+                    case DoorKeyType.Card:
+                        SoundManager.PlaySFX(SoundManager.KeycardSwipeSound, -20, 20);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     }
