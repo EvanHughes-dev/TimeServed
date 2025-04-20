@@ -493,7 +493,9 @@ namespace LevelEditor.Controls
                 _room.OnTriggerRemoved -= OnTriggerChange;
             }
         }
-
+        /// <summary>
+        /// if a trigger is added / removed (i.e. there was a change), the current fporm is invalidated
+        /// </summary>
         private void OnTriggerChange(Trigger obj)
         {
             Invalidate();
