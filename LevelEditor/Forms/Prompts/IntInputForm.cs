@@ -13,10 +13,13 @@ namespace LevelEditor.Forms.Prompts
 {
     public partial class IntInputForm : Form
     {
-        private int? _input;
+        private static int? _input;
 
         private string _lastValidInput;
 
+        /// <summary>
+        /// Asks for an int input from the user
+        /// </summary>
         private IntInputForm()
         {
             InitializeComponent();
@@ -27,11 +30,11 @@ namespace LevelEditor.Forms.Prompts
         /// <summary>
         /// Updates the camera's RadianSpread property based on the input to the text box.
         /// </summary>
-        private void UpdateSpreadFromText()
+        private void UpdateInputFromText()
         {
             bool validInput = int.TryParse(textBoxInput.Text, out int parsed);
 
-            if (validInput)
+            if (validInput) // keep valid inputs
             {
                 _input = parsed;
 
@@ -43,13 +46,19 @@ namespace LevelEditor.Forms.Prompts
                 textBoxInput.Text = _lastValidInput;
             }
         }
-
+        /// <summary>
+        /// The submission button of this form
+        /// </summary>
         private void buttonSubmit_Click(object sender, EventArgs e)
         {
+            UpdateInputFromText();
             Close();
         }
-
-        public int? Prompt()
+        /// <summary>
+        /// makes an instance of this form
+        /// </summary>
+        /// <returns>The inputted integer</returns>
+        public static int? Prompt()
         {
             IntInputForm form = new IntInputForm();
 

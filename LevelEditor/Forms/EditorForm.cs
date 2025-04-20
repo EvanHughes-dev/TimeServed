@@ -298,7 +298,7 @@ namespace LevelEditor
             {
                 if (e.Button == MouseButtons.Left)
                 {
-                    _triggerStartPoint = e.Tile;
+                    _triggerStartPoint = e.Tile; // saves the start tile of a trigger for creating it later
 
                     if (Room.SavedState == SavedState.Saved)
                     {
@@ -307,13 +307,16 @@ namespace LevelEditor
                     }
                 }
 
-                // Right click picks tile! Because that's convenient and I wanted it to be a feature!
+                // Right click removes the trigger that contains the mouse (one at a time)
                 if (e.Button == MouseButtons.Right)
                 {
                     Room.RemoveTriggerAt(e.Tile);
                 }
             }
         }
+        /// <summary>
+        /// Tracks the mouseup input for placing triggers when the lwft mouse button is released
+        /// </summary>
         private void roomrenderer_TileMouseUp(object? sender, TileEventArgs e)
         {
             if (TabState == TabState.Triggers)
@@ -324,9 +327,18 @@ namespace LevelEditor
 
                     Rectangle endRect = new Rectangle(e.Tile, new Size(1, 1));
 
-                    Trigger t = SelectedTrigger.Instantiate(Rectangle.Union(startRect, endRect));
+                    Trigger trigger = SelectedTrigger.Instantiate(Rectangle.Union(startRect, endRect));
 
-                    Room.AddTrigger(t);
+                    if (trigger is Checkpoint checkpoint) //if what we are making is a checkpoint
+                    {
+                        int? checkpointIndex = IntInputForm.Prompt();
+
+                        if (checkpointIndex == null) return;
+
+                        checkpoint.Index = (int)checkpointIndex; // give it an index
+                    }
+                    
+                    Room.AddTrigger(trigger);
 
                     _triggerStartPoint = null;
                 }

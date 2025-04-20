@@ -385,8 +385,7 @@ namespace LevelEditor.Controls
         /// <exception cref="NotImplementedException">ALWAYS THROWN.</exception>
         private void DrawTriggers(Graphics graphics)
         {
-            // The simple part of drawing! This just draws all of the **trigger** sprites to their corresponding places
-            //   Please take 15-20 seconds of silence to appreciate how simple and easy to understand this code is :)
+            // The simple part of drawing! This just draws all of the **trigger** boxes to their corresponding places
             foreach (Trigger trigger in _room.Triggers)
             {
                 Debug.Assert(trigger.Bounds != null); // I am moana
@@ -394,8 +393,10 @@ namespace LevelEditor.Controls
 
                 Size one = new Size(1, 1);
 
+                // a union of th etip and bottom rectangles to create one mega rectangle extravaganza
                 Rectangle drawRect = Rectangle.Union(TileSpaceToPixelSpace(bounds.Location), TileSpaceToPixelSpace(bounds.Location + bounds.Size - one));
 
+                //let me have my headcannon
                 Pen moana = new Pen(Color.YellowGreen, 4);
                 Brush maoi = new SolidBrush(Color.FromArgb(63, Color.YellowGreen));
 

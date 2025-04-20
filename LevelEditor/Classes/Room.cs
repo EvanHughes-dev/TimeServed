@@ -218,10 +218,10 @@ namespace LevelEditor.Classes
         }
 
         /// <summary>
-        /// Adds a new prop to this Room.
+        /// Adds a new trigger to this Room.
         /// </summary>
-        /// <param name="prop">The prop to add. Must not be null, and must have a set position.</param>
-        /// <exception cref="ArgumentException">Thrown when prop.Position is null.</exception>
+        /// <param name="trigger">The trigger to add. Must not be null, and must have a set bounds.</param>
+        /// <exception cref="ArgumentException">Thrown when trigger.Bounds is null.</exception>
         public void AddTrigger(Trigger trigger)
         {
             ArgumentNullException.ThrowIfNull(trigger);
@@ -270,9 +270,5 @@ namespace LevelEditor.Classes
         {
             return _triggers.Find(trigger => trigger.Bounds!.Value.Contains(tilePosition));
         }
-
-        // TODO: Add Resize(north, south, east, west) method
-        //   Allows for resizing of room after initial creation by adding or removing rows or columns
-        //   on any of the four edges, referred to by cardinal directions
     }
 }
