@@ -78,7 +78,7 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
 
             //Save map and player data
             MapManager.SaveMap(baseFolder);
-            player.Save(baseFolder);
+            player.Save();
 
             //Save the room this checkpoint is located in
             RoomIndex = MapManager.CurrentRoom.RoomIndex;

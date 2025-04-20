@@ -87,10 +87,6 @@ namespace MakeEveryDayRecount.Players
 
         private Point _destDirection;
 
-        //A reference to the gameplay manager which has a reference
-        //to the map which lets the player know what's near them
-        //Outdated, gameplay manager is static
-
         //The player's inventory
         private Inventory _inventory;
 
@@ -492,7 +488,7 @@ namespace MakeEveryDayRecount.Players
         ///     int propIndex
         ///     int keyType
         /// </summary>
-        public void Save(string baseFolder)
+        public void Save()
         {
             //Make the folder if it doesn't already exist
             if (!Directory.Exists("./PlayerData"))

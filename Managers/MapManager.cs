@@ -193,6 +193,10 @@ namespace MakeEveryDayRecount.Managers
             }
         }
 
+        /// <summary>
+        /// Loads the map data for the given checpoint
+        /// </summary>
+        /// <param name="c">Given checkpoint</param>
         public static void LoadCheckpoint(Checkpoint c)
         {
             Room[] rooms = LoadMapData(1, "./CheckpointData");
@@ -205,6 +209,10 @@ namespace MakeEveryDayRecount.Managers
             ChangeRoom(c.RoomIndex); 
         }
 
+        /// <summary>
+        /// Saves the map's data to the baseFolder via creation of a level.level file and all the .room files
+        /// </summary>
+        /// <param name="baseFolder">Folder that the Map data gets saved to</param>
         public static void SaveMap(string baseFolder)
         {
             //Make the .level file
