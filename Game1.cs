@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using MakeEveryDayRecount.Managers;
 using MakeEveryDayRecount.UI;
+using System.Security.Cryptography;
 
 namespace MakeEveryDayRecount
 {
@@ -110,7 +111,6 @@ namespace MakeEveryDayRecount
 
             _debugModes[0] = new PlayerDebug(_gameplayManager);
             _debugModes[1] = new MapDebug(_gameplayManager);
-
         }
 
         protected override void Update(GameTime gameTime)
@@ -146,9 +146,9 @@ namespace MakeEveryDayRecount
                         break;
                     }
 
-                    _gameplayManager.Update(gameTime);
+                    _gameplayManager.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
                     // Save the current state of the keyboard
-                    ReplayManager.SaveState();
+                    ReplayManager.SaveState((float)gameTime.ElapsedGameTime.TotalSeconds);
                     if (InputManager.GetKeyPress(Keys.Tab))
                     {
                         ReplayManager.SaveData(1, 1);
@@ -170,21 +170,25 @@ namespace MakeEveryDayRecount
                     // This will auto assign the first frame of input and allow the
                     // input manager to work. For rest of the frames, call the next 
                     // frame of the ReplayManager and check if you have read all frames
-                    if (!ReplayManager.PlayingReplay)
+                    for (int i = 0; i < 2; i++)
                     {
-                        ReplayManager.BeginReplay();
-                        _gameplayManager.ReplayMode();
-                    }
-                    else if (!ReplayManager.NextFrame())
-                    {
-                        _state = GameState.Menu;
-                        ReplayManager.EndReplay();
-                        InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.MainMenu;
+                        if (!ReplayManager.PlayingReplay)
+                        {
+                            ReplayManager.BeginReplay();
+                            _gameplayManager.ReplayMode();
+                        }
+                        else if (!ReplayManager.NextFrame())
+                        {
+                            _state = GameState.Menu;
+                            ReplayManager.EndReplay();
+                            InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.MainMenu;
+                            break;
+                        }
+
+                        InputManager.ReplayUpdate();
+                        _gameplayManager.Update(ReplayManager.CurrentReplayState.DeltaTime);
 
                     }
-
-                    InputManager.ReplayUpdate();
-                    _gameplayManager.Update(gameTime);
 
                     break;
             }

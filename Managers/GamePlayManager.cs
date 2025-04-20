@@ -43,10 +43,10 @@ namespace MakeEveryDayRecount.Managers
             OnPlayerUpdate?.Invoke(PlayerObject);
         }
 
-        public void Update(GameTime gameTime)
+        public void Update(float deltaTime)
         {
             //Update Player
-            PlayerObject.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+            PlayerObject.Update(deltaTime);
         }
 
         /// <summary>
