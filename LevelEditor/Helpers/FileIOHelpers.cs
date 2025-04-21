@@ -440,7 +440,15 @@ namespace LevelEditor.Helpers
 
                     Trigger trigger = allTriggers.ElementAt(type).Instantiate(bounds);
 
+                    if (trigger is Checkpoint checkpoint)
+                    {
+                        checkpoint.Index = reader.ReadInt32();
+                        _ = reader.ReadBoolean();
+                    }
+
                     room.AddTrigger(trigger);
+
+                    numOfTriggers--;
                 }
 
                 reader.Close();
