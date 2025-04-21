@@ -187,10 +187,11 @@ namespace LevelEditor
             {
                 if (e.Button == MouseButtons.Left)
                 {
-                    Room[e.Tile] = SelectedTile;
                     // Handle setting tiles to the save value
                     if (Room[e.Tile].Sprite == SelectedTile.Sprite)
                         return;
+
+                    Room[e.Tile] = SelectedTile;
 
                     if (Room.SavedState == SavedState.Saved)
                     {
@@ -310,7 +311,13 @@ namespace LevelEditor
                 // Right click removes the trigger that contains the mouse (one at a time)
                 if (e.Button == MouseButtons.Right)
                 {
-                    Room.RemoveTriggerAt(e.Tile);
+                    bool removed = Room.RemoveTriggerAt(e.Tile);
+
+                    if (removed && Room.SavedState == SavedState.Saved)
+                    {
+                        Room.SavedState = SavedState.Unsaved;
+                        UpdateFormName($"{_formNameBase} *");
+                    }
                 }
             }
         }
