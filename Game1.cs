@@ -182,6 +182,9 @@ namespace MakeEveryDayRecount
                     InputManager.ReplayUpdate();
                     GameplayManager.Update(gameTime);
 
+                    //This is evil, but it will let it error out if we're running too slow
+                    if (gameTime.IsRunningSlowly) throw new Exception("SLOW!! DUMB PROGRAMMER");
+
                     break;
             }
 
