@@ -170,7 +170,7 @@ namespace MakeEveryDayRecount.Players
                 //but don't change the direction you're facing
             }
 
-            if (InputManager.GetKeyPress(Keys.E))
+            if (InputManager.GetKeyPress(Keys.E) || InputManager.GetKeyPress(Keys.Space) || InputManager.GetKeyPress(Keys.Enter))
                 Interact();
         }
 
