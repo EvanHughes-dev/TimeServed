@@ -4,10 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
-using System.Collections.Generic;
 using MakeEveryDayRecount.Managers;
-using MakeEveryDayRecount.UI;
-using MakeEveryDayRecount.GameObjects.Triggers;
 
 namespace MakeEveryDayRecount
 {
@@ -189,9 +186,6 @@ namespace MakeEveryDayRecount
                         GameplayManager.Update(ReplayManager.CurrentReplayState.DeltaTime);
 
                     }
-
-                    //This is evil, but it will let it error out if we're running too slow
-                    if (gameTime.IsRunningSlowly) throw new Exception("SLOW!! DUMB PROGRAMMER");
 
                     break;
             }

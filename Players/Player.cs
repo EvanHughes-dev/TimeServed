@@ -396,6 +396,10 @@ namespace MakeEveryDayRecount.Players
             objectToInteract?.Interact(this);
         }
 
+        /// <summary>
+        /// Check for an interactive item at a clicked point
+        /// </summary>
+        /// <param name="clickedPoint">Point that was clicked in tile space</param>
         public void ClickToInteract(Point clickedPoint)
         {
             if (HoldingBox)
@@ -406,8 +410,8 @@ namespace MakeEveryDayRecount.Players
 
             int xOffset = clickedPoint.X - Location.X;
             int yOffset = clickedPoint.Y - Location.Y;
-            //If the clicked tile isn't adjacent no need to proceed
-            if (Math.Abs(xOffset) != 0 && Math.Abs(yOffset) != 1 && Math.Abs(xOffset) != 1 && Math.Abs(yOffset) != 0 || Math.Abs(xOffset) == Math.Abs(yOffset))
+            //If the clicked tile isn't adjacent to the player, no need to proceed
+            if (!(Math.Abs(xOffset) == 0 && Math.Abs(yOffset) == 1) && !(Math.Abs(xOffset) == 1 && Math.Abs(yOffset) == 0))
                 return;
 
             Prop objectToInteract = MapManager.CheckInteractable(clickedPoint);
