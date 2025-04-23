@@ -344,7 +344,7 @@ namespace LevelEditor
 
                         checkpoint.Index = (int)checkpointIndex; // give it an index
                     }
-                    
+
                     Room.AddTrigger(trigger);
 
                     _triggerStartPoint = null;
@@ -431,7 +431,6 @@ namespace LevelEditor
             splitContainer.Bounds = ClientRectangle;
 
             // Each of the split container panels has its own container that should completely fill it
-            tabControlPalettes.Bounds = splitContainer.Panel1.ClientRectangle;
             groupBoxMap.Bounds = splitContainer.Panel2.ClientRectangle;
 
             // Makes the tile and prop palettes fill their parents
@@ -542,5 +541,20 @@ namespace LevelEditor
 
         #endregion
 
+        /// <summary>
+        /// Saves the level.
+        /// </summary>
+        private void buttonSave_Click(object sender, EventArgs e)
+        {
+            _mainForm.SaveLevel();
+        }
+
+        /// <summary>
+        /// Prompts the user to resize the room.
+        /// </summary>
+        private void buttonResize_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
