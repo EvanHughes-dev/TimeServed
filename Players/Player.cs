@@ -128,8 +128,9 @@ namespace MakeEveryDayRecount.Players
                 UpdatePlayerPos();
                 _firstUpdate = false;
             }
+            UpdatePlayerPos();
             KeyboardInput(deltaTime);
-            UpdatePlayerPos(deltaTime);
+
             _playerFrameRectangle = AnimationUpdate(deltaTime);
             _inventory.Update();
         }
@@ -141,23 +142,23 @@ namespace MakeEveryDayRecount.Players
         /// <param name="deltaTime">The elapsed time between frames in seconds</param>
         private void KeyboardInput(float deltaTime)
         {
-            if (InputManager.GetKeyStatus(Keys.Left) || InputManager.GetKeyStatus(Keys.A))
+            if (InputManager.GetKeyStatus(Keys.A))
             {
                 PlayerMovement(deltaTime, new Point(-1, 0), Direction.Left);
             }
-            else if (InputManager.GetKeyStatus(Keys.Right) || InputManager.GetKeyStatus(Keys.D))
+            else if (InputManager.GetKeyStatus(Keys.D))
             {
                 PlayerMovement(deltaTime, new Point(1, 0), Direction.Right);
             }
-            else if (InputManager.GetKeyStatus(Keys.Up) || InputManager.GetKeyStatus(Keys.W))
+            else if (InputManager.GetKeyStatus(Keys.W))
             {
                 PlayerMovement(deltaTime, new Point(0, -1), Direction.Up);
             }
-            else if (InputManager.GetKeyStatus(Keys.Down) || InputManager.GetKeyStatus(Keys.S))
+            else if (InputManager.GetKeyStatus(Keys.S))
             {
                 PlayerMovement(deltaTime, new Point(0, 1), Direction.Down);
             }
-            else if (_reachedDest)
+            else //if (_reachedDest)
             {
                 //if we were walking and we stop pressing a key, go back to standing
                 _playerState = PlayerState.Standing;
@@ -166,7 +167,11 @@ namespace MakeEveryDayRecount.Players
             }
 
             if (InputManager.GetKeyPress(Keys.E))
+            {
+
                 Interact();
+
+            }
         }
 
         /// <summary>
@@ -203,9 +208,10 @@ namespace MakeEveryDayRecount.Players
                     (!HoldingBox || MapManager.CheckPlayerCollision(_currentHeldBox.Location + movement)))
                 {
                     _readyToMove = false;
-                    _destDirection = movement;
-                    _justMoved = true;
-                    _reachedDest = false;
+                    // _destDirection = movement;
+                    // _justMoved = true;
+                    // _reachedDest = false;
+                    Location += movement;
                     if (_playerState != PlayerState.Walking)
                         _playerState = PlayerState.Walking;
 
@@ -327,36 +333,45 @@ namespace MakeEveryDayRecount.Players
             );
         }
 
-        /// <summary>
-        /// Convert from the player's tile position to screen position
-        /// </summary>
-        private void UpdatePlayerPos(float deltaTime)
-        {
+        // TODO Revisit this later. For some reason, when we try to add half tile walking, the replay system decides it doesn't wnat to work
+        // perfectley. Sometime the player will end up in a diffrent poistion from where they should be, resulting in them missing items.
+        // Most likely, something is wrong with the timing.
+        // /// <summary>
+        // /// Convert from the player's tile position to screen position
+        // /// </summary>
+        // private void UpdatePlayerPos(float deltaTime)
+        // {
 
-            _timeBetweenPositionUpdate += deltaTime;
-            if (_timeBetweenPositionUpdate > SecondsPerPositionUpdate)
-            {
-                PlayerWorldPosition = MapUtils.TileToWorld(Location);
+        //     _timeBetweenPositionUpdate += deltaTime;
+        //     if (_timeBetweenPositionUpdate > SecondsPerPositionUpdate)
+        //     {
+        //         PlayerWorldPosition = MapUtils.TileToWorld(Location);
 
-                // This handle moving the player half a tile to start then the full tile
-                // .1 seconds later and updating the tile position
-                if (_justMoved)
-                {
-                    PlayerWorldPosition += new Point(AssetManager.TileSize.X * _destDirection.X / 2, AssetManager.TileSize.Y * _destDirection.Y / 2);
-                    _justMoved = false;
-                    Location += _destDirection;
-                    _currentHeldBox?.UpdateDrawPoint(PlayerWorldPosition);
-                }
-                else
-                {
-                    _reachedDest = true;
-                    _currentHeldBox?.UpdatePosition(Location);
-                }
-                Point worldToScreen = MapUtils.WorldToScreen();
-                _timeBetweenPositionUpdate -= SecondsPerPositionUpdate;
-                PlayerScreenPosition = PlayerWorldPosition - worldToScreen + MapUtils.PixelOffset();
-            }
-        }
+
+        //         // This handle moving the player half a tile to start then the full tile
+        //         // .1 seconds later and updating the tile position
+        //         if (_justMoved)
+        //         {
+        //             PlayerWorldPosition += new Point(AssetManager.TileSize.X * _destDirection.X / 2, AssetManager.TileSize.Y * _destDirection.Y / 2);
+        //             _justMoved = false;
+
+        //             _currentHeldBox?.UpdateDrawPoint(PlayerWorldPosition);
+        //         }
+        //         else
+        //         {
+        //             if (!_reachedDest)
+        //             {
+        //                 Location += _destDirection;
+        //             }
+        //             PlayerWorldPosition = MapUtils.TileToWorld(Location);
+        //             _reachedDest = true;
+        //             _currentHeldBox?.UpdatePosition(Location);
+        //         }
+        //         Point worldToScreen = MapUtils.WorldToScreen();
+        //         _timeBetweenPositionUpdate -= SecondsPerPositionUpdate;
+        //         PlayerScreenPosition = PlayerWorldPosition - worldToScreen + MapUtils.PixelOffset();
+        //     }
+        // }
 
         /// <summary>
         /// Update the player's position regarldess of time
@@ -367,6 +382,7 @@ namespace MakeEveryDayRecount.Players
 
             Point worldToScreen = MapUtils.WorldToScreen();
             PlayerScreenPosition = PlayerWorldPosition - worldToScreen + MapUtils.PixelOffset();
+            _currentHeldBox?.UpdatePosition(Location);
         }
 
         #endregion
@@ -450,6 +466,7 @@ namespace MakeEveryDayRecount.Players
         {
             _currentHeldBox?.DropBox();
             _currentHeldBox = null;
+
         }
 
         /// <summary>
@@ -526,7 +543,7 @@ namespace MakeEveryDayRecount.Players
         public void Load()
         {
             BinaryReader reader = null!;
-            
+
             //Clear Player's states
             ClearStates();
 

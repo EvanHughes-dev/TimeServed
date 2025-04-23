@@ -83,11 +83,12 @@ namespace MakeEveryDayRecount.GameObjects.Props
         }
 
         /// <summary>
-        /// This box has been dropped
+        /// This box has been dropped. Remove attachment point and reset screen location to a point
         /// </summary>
         public void DropBox()
         {
             AttachmentPoint = Point.Zero;
+            //UpdatePosition(Location);
         }
 
         public override void Draw(SpriteBatch sb, Point worldToScreen, Point pixelOffset)
