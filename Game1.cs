@@ -51,6 +51,8 @@ namespace MakeEveryDayRecount
 
         private BaseDebug[] _debugModes;
 
+        private int _replaySpeed;
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -87,6 +89,8 @@ namespace MakeEveryDayRecount
             TriggerManager.Initialize();
             //Set initial GameState
             _state = GameState.Menu;
+
+            _replaySpeed = 2;
             base.Initialize();
         }
 
@@ -166,7 +170,7 @@ namespace MakeEveryDayRecount
                     // This will auto assign the first frame of input and allow the
                     // input manager to work. For rest of the frames, call the next 
                     // frame of the ReplayManager and check if you have read all frames
-                    for (int i = 0; i < 2; i++)
+                    for (int i = 0; i < _replaySpeed; i++)
                     {
                         if (!ReplayManager.PlayingReplay)
                         {
@@ -185,6 +189,9 @@ namespace MakeEveryDayRecount
                         GameplayManager.Update(ReplayManager.CurrentReplayState.DeltaTime);
 
                     }
+
+                    //This is evil, but it will let it error out if we're running too slow
+                    if (gameTime.IsRunningSlowly) throw new Exception("SLOW!! DUMB PROGRAMMER");
 
                     break;
             }
