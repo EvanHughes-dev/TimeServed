@@ -18,10 +18,39 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static Song[] BackgroundMusic { get; private set; }
 
+
+
         /// <summary>
         /// Sound effect used for when the player moves.
         /// </summary>
         public static SoundEffect PlayerStepSound { get; private set; }
+
+        /// <summary>
+        /// Sound effect used for unlocking a door with the Keycard
+        /// </summary>
+        public static SoundEffect KeycardSwipeSound { get; private set; }
+
+        /// <summary>
+        /// Sound effect used for opening a door that doesn't require a key
+        /// </summary>
+        public static SoundEffect WoodenDoorOpenSound { get; private set; }
+
+        /// <summary>
+        /// Sound effect for unscrewing a vent
+        /// </summary>
+        public static SoundEffect VentUnscrewSound { get; private set; }
+
+        //TODO: use the wirecutter sound and camera sound
+
+        /// <summary>
+        /// Sound effect for when the wirecutters cut wire
+        /// </summary>
+        public static SoundEffect WirecutterSound { get; private set; }
+
+        /// <summary>
+        /// Sound effect for cameras being deactivated
+        /// </summary>
+        public static SoundEffect PowerDownSound { get; private set; }
 
         /// <summary>
         /// If the background music has a track
@@ -36,12 +65,19 @@ namespace MakeEveryDayRecount.Managers
         /// <param name="content">Content manager used to load all music and sound effects.</param>
         public static void LoadContent(ContentManager content)
         {
+            //Background Music
             BackgroundMusic = new Song[]
             {
                 content.Load<Song>("Audio/Music/Sneaky Snitch")
             };
 
+            //Sound effects
             PlayerStepSound = content.Load<SoundEffect>("Audio/Sound Effects/Player Step");
+            KeycardSwipeSound = content.Load<SoundEffect>("Audio/Sound Effects/Keycard Swipe");
+            WoodenDoorOpenSound = content.Load<SoundEffect>("Audio/Sound Effects/Wooden Door Open");
+            WirecutterSound = content.Load<SoundEffect>("Audio/Sound Effects/Wirecutter");
+            PowerDownSound = content.Load<SoundEffect>("Audio/Sound Effects/Power Down");
+            VentUnscrewSound = content.Load<SoundEffect>("Audio/Sound Effects/Unscrew");
 
             PlayingMusic = false;
         }
@@ -54,6 +90,7 @@ namespace MakeEveryDayRecount.Managers
         {
             if (MediaPlayer.State == MediaState.Playing)
                 MediaPlayer.Stop();
+            //TODO: Lower the volume
             MediaPlayer.Play(BackgroundMusic[level - 1]);
             PlayingMusic = true;
         }

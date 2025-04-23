@@ -43,16 +43,15 @@ namespace MakeEveryDayRecount.Managers
             MapManager.Initialize();
         }
 
-        public static void Update(GameTime gameTime)
+        public static void Update(float gameTime)
         {
-            float floatGameTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             //Update Player
-            PlayerObject.Update(floatGameTime);
+            PlayerObject.Update(gameTime);
 
             //Update all the cameras in the current room
             foreach (Camera cam in MapManager.CurrentRoom.Cameras)
             {
-                cam.Update(floatGameTime);
+                cam.Update(gameTime);
             }
         }
 
@@ -83,7 +82,8 @@ namespace MakeEveryDayRecount.Managers
         /// <summary>
         /// Called to reset the level to the starting state
         /// </summary>
-        public static void LevelReset(){
+        public static void LevelReset()
+        {
             // TODO: This never gets called, I think its safe to delete?
             Level = 1;
             PlayerObject = new Player(new Point(5, 5), AssetManager.PlayerTexture, MapUtils.ScreenSize);

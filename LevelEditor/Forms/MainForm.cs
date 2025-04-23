@@ -1,5 +1,6 @@
 ﻿using LevelEditor.Classes;
 using LevelEditor.Classes.Props;
+using LevelEditor.Controls;
 using LevelEditor.Classes.Triggers;
 using LevelEditor.Helpers;
 using System.Collections.ObjectModel;
@@ -312,7 +313,7 @@ namespace LevelEditor
                     {
                         try
                         {
-                            Level = FileIOHelpers.LoadLevel(fullPath, Tiles, Props);
+                            Level = FileIOHelpers.LoadLevel(fullPath, Tiles, Props, Triggers);
 
                             Folder = Path.GetDirectoryName(fullPath)!;
 
@@ -349,15 +350,14 @@ namespace LevelEditor
         /// <param name="room">The Room to create the button for.</param>
         private void CreateRoomButton(Room room)
         {
-            Button roomButton = new()
+            RoomButton roomButton = new()
             {
                 Size = new(140, 80),
-                TextAlign = ContentAlignment.MiddleCenter,
-                Text = room.Name,
+                Room = room,
                 Parent = flowLayoutPanelRooms
             };
 
-            roomButton.Click += (object? sender, EventArgs e) =>
+            roomButton.Click += (object? _, EventArgs _) =>
             {
                 EditorForm editor = new(this, room);
                 editor.Show();

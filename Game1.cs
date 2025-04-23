@@ -51,6 +51,8 @@ namespace MakeEveryDayRecount
 
         private BaseDebug[] _debugModes;
 
+        private int _replaySpeed;
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -70,7 +72,7 @@ namespace MakeEveryDayRecount
             //_graphics.PreferredBackBufferHeight = 360;
 
             _graphics.HardwareModeSwitch = false;
-            _graphics.IsFullScreen = true; 
+            _graphics.IsFullScreen = true;
             _graphics.ApplyChanges();
 
             _debugState = DebugState.None;
@@ -87,6 +89,8 @@ namespace MakeEveryDayRecount
             TriggerManager.Initialize();
             //Set initial GameState
             _state = GameState.Menu;
+
+            _replaySpeed = 2;
             base.Initialize();
         }
 
@@ -104,7 +108,7 @@ namespace MakeEveryDayRecount
 
             MapUtils.Initialize(this);
 
-            
+
 
             _debugModes[0] = new PlayerDebug();
             _debugModes[1] = new MapDebug();
@@ -142,9 +146,9 @@ namespace MakeEveryDayRecount
                         // Don't call anything after the game has paused
                         break;
                     }
-                    GameplayManager.Update(gameTime);
+                    GameplayManager.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
                     // Save the current state of the keyboard
-                    ReplayManager.SaveState();
+                    ReplayManager.SaveState((float)gameTime.ElapsedGameTime.TotalSeconds);
                     if (InputManager.GetKeyPress(Keys.Tab))
                     {
                         ReplayManager.SaveData(1, 1);
@@ -166,21 +170,28 @@ namespace MakeEveryDayRecount
                     // This will auto assign the first frame of input and allow the
                     // input manager to work. For rest of the frames, call the next 
                     // frame of the ReplayManager and check if you have read all frames
-                    if (!ReplayManager.PlayingReplay)
+                    for (int i = 0; i < _replaySpeed; i++)
                     {
-                        ReplayManager.BeginReplay();
-                         GameplayManager.ReplayMode();
-                    }
-                    else if (!ReplayManager.NextFrame())
-                    {
-                        _state = GameState.Menu;
-                        ReplayManager.EndReplay();
-                        InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.MainMenu;
+                        if (!ReplayManager.PlayingReplay)
+                        {
+                            ReplayManager.BeginReplay();
+                            GameplayManager.ReplayMode();
+                        }
+                        else if (!ReplayManager.NextFrame())
+                        {
+                            _state = GameState.Menu;
+                            ReplayManager.EndReplay();
+                            InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.MainMenu;
+                            break;
+                        }
+
+                        InputManager.ReplayUpdate();
+                        GameplayManager.Update(ReplayManager.CurrentReplayState.DeltaTime);
 
                     }
 
-                    InputManager.ReplayUpdate();
-                    GameplayManager.Update(gameTime);
+                    //This is evil, but it will let it error out if we're running too slow
+                    if (gameTime.IsRunningSlowly) throw new Exception("SLOW!! DUMB PROGRAMMER");
 
                     break;
             }
