@@ -198,7 +198,7 @@ namespace MakeEveryDayRecount.Managers
 
             CursorStates = new Texture2D[]
             {
-                content.Load<Texture2D>("UI/ui_cursor"),
+                content.Load<Texture2D>("UI/ui_cursor "),
                 content.Load<Texture2D>("UI/ui_cursorHover")
             };
 
@@ -220,7 +220,7 @@ namespace MakeEveryDayRecount.Managers
                 content.Load<Texture2D>("Items/prop_wireBox") 
             };
             Boxes = new Texture2D[]{
-                content.Load<Texture2D>("Items/Box")
+                content.Load<Texture2D>("Items/prop_box")
             };
 
             //FONT STUFF
