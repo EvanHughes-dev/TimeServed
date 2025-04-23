@@ -572,5 +572,20 @@ namespace MakeEveryDayRecount.Players
                 reader.Close();
             }
         }
+
+        /// <summary>
+        /// Returns a boolean corresponding to whether or not the play has the item with the given sprite index in their inventory
+        /// </summary>
+        /// <param name="index">Sprite index of the item being searched for</param>
+        /// <returns>True if the player has the item, false otherwise</returns>
+        public bool ContainsItem(int index)
+        {
+            for (int i = 0; i < _inventory.Contents.Count; i++)
+            {
+                if (_inventory.Contents[i].SpriteIndex == index)
+                    return true;
+            }
+            return false;
+        }
     }
 }
