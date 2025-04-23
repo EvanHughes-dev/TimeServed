@@ -73,9 +73,11 @@ namespace MakeEveryDayRecount.Players
         private const float SecondsPerTile = .2f;
         private const float SecondsPerAnimation = .1f;
         private const float SecondsPerPositionUpdate = .1f;
+        private const float TimeUntilStand = 0.4f;
 
         private float _timeBetweenPositionUpdate;
         private float _walkingSeconds;
+        private float _standingSeconds;
         private bool _readyToMove;
 
         private float _animationTimeElapsed;
@@ -108,7 +110,6 @@ namespace MakeEveryDayRecount.Players
         {
             _walkingSeconds = 0;
             _animationFrame = 0;
-            _playerSize = new Point(sprite.Width / 4, sprite.Height / 4);
             //Create an inventory
             _inventory = new Inventory(screenSize);
             _currentHeldBox = null;
@@ -123,7 +124,7 @@ namespace MakeEveryDayRecount.Players
         /// <param name="deltaTime">The elapsed time between frames in seconds</param>
         public void Update(float deltaTime)
         {
-            if (_firstUpdate)
+            if (_firstUpdate) //TODO: Remove this because we update the player's position every frame
             {
                 UpdatePlayerPos();
                 _firstUpdate = false;
@@ -160,8 +161,8 @@ namespace MakeEveryDayRecount.Players
             }
             else //if (_reachedDest)
             {
-                //if we were walking and we stop pressing a key, go back to standing
-                _playerState = PlayerState.Standing;
+                UpdateStandingTime(deltaTime);
+                _readyToMove = true;
                 _walkingSeconds = 0;
                 //but don't change the direction you're facing
             }
@@ -198,19 +199,14 @@ namespace MakeEveryDayRecount.Players
         /// <param name="directionMove">Direction of movement</param>
         private void PlayerMovement(float deltaTime, Point movement, Direction directionMove)
         {
-            if (!_readyToMove)
-                UpdateWalkingTime(deltaTime);
+            if (!_readyToMove) UpdateWalkingTime(deltaTime);
 
-            if (_readyToMove && MapManager.CheckPlayerCollision(Location + movement) &&
-                (!HoldingBox || MapManager.CheckPlayerCollision(_currentHeldBox.Location + movement)))
+            else if (_playerState == PlayerState.Walking)
             {
                 if (MapManager.CheckPlayerCollision(Location + movement) &&
                     (!HoldingBox || MapManager.CheckPlayerCollision(_currentHeldBox.Location + movement)))
                 {
                     _readyToMove = false;
-                    // _destDirection = movement;
-                    // _justMoved = true;
-                    // _reachedDest = false;
                     Location += movement;
                     if (_playerState != PlayerState.Walking)
                         _playerState = PlayerState.Walking;
@@ -220,26 +216,30 @@ namespace MakeEveryDayRecount.Players
                 else
                 {
                     _playerState = PlayerState.Standing;
+                    UpdateStandingTime(deltaTime);
                 }
-            }
 
-            if (HoldingBox)
-            {
-                // Drop the box if the player is holding it and they attempt to move a direction the 
-                // box can't be moved in
-                if (IsPerpendicular(directionMove, _currentHeldBox.AttachmentDirection))
-                    DropBox();
-                else
+                if (HoldingBox)
                 {
-                    // Otherwise update need variable for the box
-                    directionMove = _currentHeldBox.AttachmentDirection;
+                    // Drop the box if the player is holding it and they attempt to move a direction the 
+                    // box can't be moved in
+                    if (IsPerpendicular(directionMove, _currentHeldBox.AttachmentDirection))
+                        DropBox();
+                    else
+                    {
+                        // Otherwise update need variable for the box
+                        directionMove = _currentHeldBox.AttachmentDirection;
+                    }
                 }
+
+                // Update the player's direction
+                if (_playerCurrentDirection != directionMove)
+                    _playerCurrentDirection = directionMove;
             }
+            else //player starts out standing or interacting
+            {
 
-            // Update the player's direction
-            if (_playerCurrentDirection != directionMove)
-                _playerCurrentDirection = directionMove;
-
+            }
         }
 
         /// <summary>
@@ -250,17 +250,21 @@ namespace MakeEveryDayRecount.Players
         {
             _walkingSeconds += deltaTime;
 
-            // This variable allows for the time between movements to be changed depending on what state 
-            // the player is coming from
-            int timeAdjustment = 1;
-
-            if (_playerState == PlayerState.Standing)
-                timeAdjustment = 2;
-
-            if (_walkingSeconds >= SecondsPerTile / timeAdjustment)
+            if (_walkingSeconds >= SecondsPerTile)
             {
                 _readyToMove = true;
-                _walkingSeconds -= SecondsPerTile / timeAdjustment;
+                _walkingSeconds -= SecondsPerTile;
+            }
+        }
+
+        private void UpdateStandingTime(float deltaTime)
+        {
+            _standingSeconds += deltaTime;
+
+            if (_standingSeconds >= TimeUntilStand)
+            {
+                _playerState = PlayerState.Standing;
+                _standingSeconds = 0f;
             }
         }
 
@@ -333,46 +337,6 @@ namespace MakeEveryDayRecount.Players
             );
         }
 
-        // TODO Revisit this later. For some reason, when we try to add half tile walking, the replay system decides it doesn't wnat to work
-        // perfectley. Sometime the player will end up in a diffrent poistion from where they should be, resulting in them missing items.
-        // Most likely, something is wrong with the timing.
-        // /// <summary>
-        // /// Convert from the player's tile position to screen position
-        // /// </summary>
-        // private void UpdatePlayerPos(float deltaTime)
-        // {
-
-        //     _timeBetweenPositionUpdate += deltaTime;
-        //     if (_timeBetweenPositionUpdate > SecondsPerPositionUpdate)
-        //     {
-        //         PlayerWorldPosition = MapUtils.TileToWorld(Location);
-
-
-        //         // This handle moving the player half a tile to start then the full tile
-        //         // .1 seconds later and updating the tile position
-        //         if (_justMoved)
-        //         {
-        //             PlayerWorldPosition += new Point(AssetManager.TileSize.X * _destDirection.X / 2, AssetManager.TileSize.Y * _destDirection.Y / 2);
-        //             _justMoved = false;
-
-        //             _currentHeldBox?.UpdateDrawPoint(PlayerWorldPosition);
-        //         }
-        //         else
-        //         {
-        //             if (!_reachedDest)
-        //             {
-        //                 Location += _destDirection;
-        //             }
-        //             PlayerWorldPosition = MapUtils.TileToWorld(Location);
-        //             _reachedDest = true;
-        //             _currentHeldBox?.UpdatePosition(Location);
-        //         }
-        //         Point worldToScreen = MapUtils.WorldToScreen();
-        //         _timeBetweenPositionUpdate -= SecondsPerPositionUpdate;
-        //         PlayerScreenPosition = PlayerWorldPosition - worldToScreen + MapUtils.PixelOffset();
-        //     }
-        // }
-
         /// <summary>
         /// Update the player's position regarldess of time
         /// </summary>
@@ -414,6 +378,7 @@ namespace MakeEveryDayRecount.Players
         /// </summary>
         public void Interact()
         {
+            //TODO: Go back to standing when you interact regardless of the timer
             if (HoldingBox)
             {
                 DropBox();
