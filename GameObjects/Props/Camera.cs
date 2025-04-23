@@ -191,14 +191,14 @@ namespace MakeEveryDayRecount.GameObjects.Props
             else
             {
                 //Otherwise they must be in backwards order so we need to add them backwards
-                for (int i = counterclockwisePoints.Count-1; i >= 0; i--)
+                for (int i = counterclockwisePoints.Count - 1; i >= 0; i--)
                 {
                     endPoints.Add(counterclockwisePoints[i]);
                 }
             }
             //Remove centerpoint because both the lists contain the centerpoint and we don't want it in there twice
             //Centerpoint should currently be the last item in the list
-            endPoints.RemoveAt(endPoints.Count-1);
+            endPoints.RemoveAt(endPoints.Count - 1);
             //Now do all the stuff we did above for the clockwise points
             if (clockwisePoints[0] == clockwisePoint)
             {
@@ -461,7 +461,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //I think we have to add it this way because we can't call the methods directly on this property. I might be wrong tho
             //It's like copy-alter-replace
             List<Prop> alteredRoomItems = _room.ItemsInRoom;
-            alteredRoomItems.Add(new WireBox(boxLocation, AssetManager.PropTextures[2], 0f, this));
+            alteredRoomItems.Add(new WireBox(boxLocation, AssetManager.PropTextures, 0f, this, 2));
             _room.ItemsInRoom = alteredRoomItems;
         }
 
@@ -511,8 +511,8 @@ namespace MakeEveryDayRecount.GameObjects.Props
                                     foreach (Point blockedTile in Rasterize(box, _endPoints[i])) _watchedTiles.Remove(blockedTile);
                                     //Now check the rays on either side of the ray you just found and treat them as blocked also
                                     //TODO: There is probably a more efficent way to do this, I'm just trying it out
-                                    if (i > 0) foreach (Point blockedTile in Rasterize(box, _endPoints[i-1])) _watchedTiles.Remove(blockedTile);
-                                    if (i < _endPoints.Length-1) foreach (Point blockedTile in Rasterize(box, _endPoints[i+1])) _watchedTiles.Remove(blockedTile);
+                                    if (i > 0) foreach (Point blockedTile in Rasterize(box, _endPoints[i - 1])) _watchedTiles.Remove(blockedTile);
+                                    if (i < _endPoints.Length - 1) foreach (Point blockedTile in Rasterize(box, _endPoints[i + 1])) _watchedTiles.Remove(blockedTile);
                                 }
                             }
                         }
