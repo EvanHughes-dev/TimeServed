@@ -18,8 +18,8 @@ namespace MakeEveryDayRecount.GameObjects.Props
         private Camera _camera;
         private Point _drawOrigin;
 
-        public WireBox(Point location, Texture2D sprite, float direction, Camera connectedCamera)
-            : base (location, sprite)
+        public WireBox(Point location, Texture2D[] sprite, float direction, Camera connectedCamera, int spriteIndex)
+            : base(location, sprite, spriteIndex)
         {
             _camera = connectedCamera;
             _direction = direction;
