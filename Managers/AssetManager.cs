@@ -198,7 +198,7 @@ namespace MakeEveryDayRecount.Managers
 
             CursorStates = new Texture2D[]
             {
-                content.Load<Texture2D>("UI/ui_cursor "),
+                content.Load<Texture2D>("UI/ui_cursor "), //DO NOT REMOVE THE SPACE
                 content.Load<Texture2D>("UI/ui_cursorHover")
             };
 
