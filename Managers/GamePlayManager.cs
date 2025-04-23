@@ -75,7 +75,7 @@ namespace MakeEveryDayRecount.Managers
         {
             Level = 1;
             MapManager.ChangeLevel();
-            PlayerObject.ChangeRoom(new Point(5, 5));
+            PlayerObject.ChangeRoom(new Point(4, 5));
             PlayerObject.ClearStates();
         }
 
