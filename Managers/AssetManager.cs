@@ -161,6 +161,7 @@ namespace MakeEveryDayRecount.Managers
             };
             DoorTexture = new Texture2D[]
             {
+
                 content.Load<Texture2D>("Doors/Door-Top"),
                 content.Load<Texture2D>("Doors/Door-Right"),
                 content.Load<Texture2D>("Doors/Door-Bottom"),
