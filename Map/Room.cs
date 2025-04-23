@@ -611,7 +611,5 @@ namespace MakeEveryDayRecount.Map
                 binaryWriter.Close();
             }
         }
-
-        //TODO: add a method that checks the win trigger's Winning property to determine if the level has been won
     }
 }

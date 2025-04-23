@@ -28,6 +28,11 @@ namespace MakeEveryDayRecount.Managers
         public static Checkpoint PlayerSpawn { get; private set; }
 
         /// <summary>
+        /// The win trigger of the current level
+        /// </summary>
+        public static Win WinTrigger { get; private set; }
+
+        /// <summary>
         /// Initializes important properties (currently just the list of checkpoints)
         /// </summary>
         public static void Initialize()
@@ -63,5 +68,13 @@ namespace MakeEveryDayRecount.Managers
             PlayerSpawn = spawn;
         }
 
+        /// <summary>
+        /// JTODO: comment code
+        /// </summary>
+        /// <param name="win"></param>
+        public static void SetWinTrigger(Win win)
+        {
+            WinTrigger = win;
+        }
     }
 }

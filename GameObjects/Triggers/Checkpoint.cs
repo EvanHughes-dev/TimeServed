@@ -54,15 +54,16 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
         /// Saves the map and player data
         /// </summary>
         /// <param name="player">The player object</param>
-        public override void Activate(Player player)
+        /// <returns>True if the checkpoint succesfully activated, false otherwise</returns>
+        public override bool Activate(Player player)
         {
             //Makes sure the prior checkpoint has been activatated
             //unless this is the first checkpoint, in which case it's always good to activate
             if (Index != 0)
                 if (!TriggerManager.Checkpoints[Index - 1].Active)
-                    return;
+                    return false;
             if (!Active)
-                return;
+                return false;
             
             string baseFolder = "./CheckpointData";
 
@@ -88,6 +89,7 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
 
             //Call the replay manager function
             ReplayManager.SaveData(GameplayManager.Level, Index);
+            return true;
         }
 
         /// <summary>
