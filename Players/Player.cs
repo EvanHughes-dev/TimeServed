@@ -75,8 +75,6 @@ namespace MakeEveryDayRecount.Players
         private const float SecondsPerTile = .2f;
         private const float SecondsPerAnimation = .1f;
         private const float SecondsPerPositionUpdate = .1f;
-
-        private float _timeBetweenPositionUpdate;
         private float _walkingSeconds;
         private bool _readyToMove;
 
@@ -110,7 +108,6 @@ namespace MakeEveryDayRecount.Players
             //Create an inventory
             _inventory = new Inventory(screenSize);
             _currentHeldBox = null;
-
         }
 
         /// <summary>
@@ -154,7 +151,7 @@ namespace MakeEveryDayRecount.Players
             {
                 PlayerMovement(deltaTime, new Point(0, 1), Direction.Down);
             }
-            else //if (_reachedDest)
+            else
             {
                 //if we were walking and we stop pressing a key, go back to standing
                 _playerState = PlayerState.Standing;

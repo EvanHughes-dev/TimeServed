@@ -38,7 +38,7 @@ namespace MakeEveryDayRecount.Managers.Replay
         private Dictionary<Keys, bool> _keyStates;
         private Dictionary<MouseButtonState, ButtonState> _mouseState;
 
-        private static readonly List<Keys> WantedKeys = new List<Keys> { Keys.W, Keys.A, Keys.S, Keys.D, Keys.E,
+        private static readonly List<Keys> WantedKeys = new List<Keys> { Keys.W, Keys.A, Keys.S, Keys.D, Keys.E, Keys.Space,
                                                                          Keys.D1, Keys.D2, Keys.D3, Keys.D4 };
 
         private static readonly List<MouseButtonState> WantedState = new List<MouseButtonState> { MouseButtonState.Left, MouseButtonState.Middle,
