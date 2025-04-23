@@ -45,8 +45,9 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// Construct a new box with a location and sprite to display
         /// </summary>
         /// <param name="location">Location to display at</param>
-        /// <param name="sprite">Sprite to display as</param>
-        public Box(Point location, Texture2D sprite) : base(location, sprite)
+        /// <param name="spriteArray">Array of sprites containing this GameObject's sprite</param>
+        /// <param name="spriteIndex">Index of this GameObject's sprite in its spriteArray</param>
+        public Box(Point location, Texture2D[] spriteArray, int spriteIndex) : base(location, spriteArray, spriteIndex)
         {
             AttachmentPoint = Point.Zero;
             _worldPos = MapUtils.TileToWorld(Location);
@@ -82,11 +83,12 @@ namespace MakeEveryDayRecount.GameObjects.Props
         }
 
         /// <summary>
-        /// This box has been dropped
+        /// This box has been dropped. Remove attachment point and reset screen location to a point
         /// </summary>
         public void DropBox()
         {
             AttachmentPoint = Point.Zero;
+            //UpdatePosition(Location);
         }
 
         public override void Draw(SpriteBatch sb, Point worldToScreen, Point pixelOffset)

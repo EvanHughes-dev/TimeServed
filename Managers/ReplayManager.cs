@@ -26,9 +26,8 @@ namespace MakeEveryDayRecount.Managers
 
         private static readonly string BaseFolder = "./Replay";
 
-        private static List<ReplayState> _currentReplyStates;
+        private static Stack<ReplayState> _currentReplyStates;
 
-        private static int _selectedReplayState;
         private static int _currentLevel;
 
         /// <summary>
@@ -39,17 +38,27 @@ namespace MakeEveryDayRecount.Managers
             if (!Directory.Exists(BaseFolder))
                 Directory.CreateDirectory(BaseFolder);
 
-            _currentReplyStates = new List<ReplayState> { };
-            _selectedReplayState = 0;
+            _currentReplyStates = new Stack<ReplayState> { };
             PlayingReplay = false;
+
+            CurrentReplayState = null;
         }
 
         /// <summary>
         /// Save the current state of the keyboard
         /// </summary>
-        public static void SaveState()
+        /// <param name="deltaTime">Time since last frame</param>
+        public static void SaveState(float deltaTime)
         {
-            _currentReplyStates.Add(new ReplayState(Keyboard.GetState(), Mouse.GetState()));
+            _currentReplyStates.Push(new ReplayState(Keyboard.GetState(), Mouse.GetState(), deltaTime));
+        }
+
+        /// <summary>
+        /// Clear the data saved so far
+        /// </summary>
+        public static void ClearData()
+        {
+            _currentReplyStates.Clear();
         }
 
         /// <summary>
@@ -65,9 +74,9 @@ namespace MakeEveryDayRecount.Managers
 
             BinaryWriter binaryWriter = new BinaryWriter(File.OpenWrite(folderPath + $"/checkpoint{checkpoint}.replay"));
             binaryWriter.Write(_currentReplyStates.Count);
-            for (int i = 0; i < _currentReplyStates.Count; i++)
+            while (_currentReplyStates.Count > 0)
             {
-                _currentReplyStates[i].SaveToFile(binaryWriter);
+                _currentReplyStates.Pop().SaveToFile(binaryWriter);
             }
             binaryWriter.Close();
 
@@ -79,11 +88,10 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static void BeginReplay()
         {
-            _selectedReplayState = 0;
             _currentLevel = 1;
             LoadLevel(_currentLevel);
             PlayingReplay = true;
-            CurrentReplayState = _currentReplyStates[_selectedReplayState];
+            CurrentReplayState = _currentReplyStates.Pop(); ;
         }
 
         /// <summary>
@@ -101,10 +109,10 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static bool NextFrame()
         {
-            _selectedReplayState++;
-            if (_selectedReplayState >= _currentReplyStates.Count)
+
+            if (_currentReplyStates.Count == 0)
                 return false;
-            CurrentReplayState = _currentReplyStates[_selectedReplayState];
+            CurrentReplayState = _currentReplyStates.Pop();
             return true;
 
         }
@@ -114,10 +122,9 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static void NextLevel()
         {
-            _selectedReplayState = 0;
             _currentLevel++;
             LoadLevel(_currentLevel);
-            CurrentReplayState = _currentReplyStates[_selectedReplayState];
+            CurrentReplayState = _currentReplyStates.Pop();
         }
 
         /// <summary>
@@ -143,7 +150,7 @@ namespace MakeEveryDayRecount.Managers
 
                 for (int i = 0; i < numberOfReplay; i++)
                 {
-                    _currentReplyStates.Add(new ReplayState(binaryReader));
+                    _currentReplyStates.Push(new ReplayState(binaryReader));
 
                 }
                 binaryReader.Close();

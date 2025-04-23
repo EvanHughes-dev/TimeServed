@@ -4,12 +4,10 @@
 
 using LevelEditor.Classes;
 using LevelEditor.Classes.Props;
+using LevelEditor.Classes.Triggers;
 using LevelEditor.Controls;
 using LevelEditor.Extensions;
 using LevelEditor.Forms.Prompts;
-using System.Diagnostics;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.ScrollBar;
-using System.Linq;
 
 namespace LevelEditor
 {
@@ -19,7 +17,8 @@ namespace LevelEditor
     internal enum TabState
     {
         Tiles,
-        Props
+        Props,
+        Triggers
     };
 
     /// <summary>
@@ -55,7 +54,10 @@ namespace LevelEditor
         /// Gets or sets the prop the user currently has selected from the palette.
         /// </summary>
         private Prop SelectedProp { get; set; }
-
+        /// <summary>
+        /// Gets or sets the trigger the user currently has selected from the palette.
+        /// </summary>
+        private Trigger SelectedTrigger { get; set; }
         /// <summary>
         /// Gets the palette of props the user may select from
         /// </summary>
@@ -69,6 +71,8 @@ namespace LevelEditor
         /// Holds the prop box of the prop that is currently selected on the palette.
         /// </summary>
         private PropBox _currentlySelectedPropBox;
+
+        private Point? _triggerStartPoint;
 
         private string _formName;
         private readonly string _formNameBase;
@@ -119,6 +123,8 @@ namespace LevelEditor
 
                 swatch.SizeMode = PictureBoxSizeMode.Zoom;
             });
+
+            SelectedTrigger = _mainForm.Triggers.ElementAt(0);
 
             //setup keyboard capturing
             this.KeyPreview = true;
@@ -181,10 +187,11 @@ namespace LevelEditor
             {
                 if (e.Button == MouseButtons.Left)
                 {
-                    Room[e.Tile] = SelectedTile;
                     // Handle setting tiles to the save value
                     if (Room[e.Tile].Sprite == SelectedTile.Sprite)
                         return;
+
+                    Room[e.Tile] = SelectedTile;
 
                     if (Room.SavedState == SavedState.Saved)
                     {
@@ -239,7 +246,7 @@ namespace LevelEditor
                         }
 
                         // Should this be reworked to make it so *all* props are created the same way, and door editing happens post-placement? Probably!
-                    } 
+                    }
                     else
                     {
                         // Edit the clicked prop
@@ -288,8 +295,63 @@ namespace LevelEditor
                     }
                 }
             }
-        }
+            else if (TabState == TabState.Triggers)
+            {
+                if (e.Button == MouseButtons.Left)
+                {
+                    _triggerStartPoint = e.Tile; // saves the start tile of a trigger for creating it later
 
+                    if (Room.SavedState == SavedState.Saved)
+                    {
+                        Room.SavedState = SavedState.Unsaved;
+                        UpdateFormName($"{_formNameBase} *");
+                    }
+                }
+
+                // Right click removes the trigger that contains the mouse (one at a time)
+                if (e.Button == MouseButtons.Right)
+                {
+                    bool removed = Room.RemoveTriggerAt(e.Tile);
+
+                    if (removed && Room.SavedState == SavedState.Saved)
+                    {
+                        Room.SavedState = SavedState.Unsaved;
+                        UpdateFormName($"{_formNameBase} *");
+                    }
+                }
+            }
+        }
+        /// <summary>
+        /// Tracks the mouseup input for placing triggers when the lwft mouse button is released
+        /// </summary>
+        private void roomrenderer_TileMouseUp(object? sender, TileEventArgs e)
+        {
+            if (TabState == TabState.Triggers)
+            {
+                if (_triggerStartPoint != null)
+                {
+                    Rectangle startRect = new Rectangle(_triggerStartPoint!.Value, new Size(1, 1));
+
+                    Rectangle endRect = new Rectangle(e.Tile, new Size(1, 1));
+
+                    Trigger trigger = SelectedTrigger.Instantiate(Rectangle.Union(startRect, endRect));
+
+                    if (trigger is Checkpoint checkpoint) //if what we are making is a checkpoint
+                    {
+                        int? checkpointIndex = IntInputForm.Prompt();
+
+                        if (checkpointIndex == null) return;
+
+                        checkpoint.Index = (int)checkpointIndex; // give it an index
+                    }
+                    
+                    Room.AddTrigger(trigger);
+
+                    _triggerStartPoint = null;
+                }
+
+            }
+        }
         /// <summary>
         /// If left click is held, draws tiles.
         /// </summary>

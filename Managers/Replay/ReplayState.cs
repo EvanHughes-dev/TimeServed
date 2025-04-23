@@ -30,6 +30,11 @@ namespace MakeEveryDayRecount.Managers.Replay
         /// </summary>
         public Point CurrentMousePosition { get; private set; }
 
+        /// <summary>
+        /// Time since the previous frame
+        /// </summary>
+        public float DeltaTime { get; private set; }
+
         private Dictionary<Keys, bool> _keyStates;
         private Dictionary<MouseButtonState, ButtonState> _mouseState;
 
@@ -44,13 +49,16 @@ namespace MakeEveryDayRecount.Managers.Replay
         /// </summary>
         /// <param name="kb">Current KeyboardState</param>
         /// <param name="ms">Current MouseState</param>
-        public ReplayState(KeyboardState kb, MouseState ms)
+        /// <param name="deltaTime">Time since last frame</param>
+        public ReplayState(KeyboardState kb, MouseState ms, float deltaTime)
         {
             _keyStates = new Dictionary<Keys, bool> { };
             foreach (Keys key in WantedKeys)
             {
                 _keyStates.Add(key, kb.IsKeyDown(key));
             }
+
+            DeltaTime = deltaTime;
 
             CurrentMousePosition = new Point(ms.X, ms.Y);
 
@@ -89,6 +97,7 @@ namespace MakeEveryDayRecount.Managers.Replay
             }
             binaryWriter.Write(CurrentMousePosition.X);
             binaryWriter.Write(CurrentMousePosition.Y);
+            binaryWriter.Write(DeltaTime);
         }
         /// <summary>
         /// Read data from an incoming file
@@ -96,6 +105,7 @@ namespace MakeEveryDayRecount.Managers.Replay
         /// <param name="binaryReader">Read binary data</param>
         public void LoadData(BinaryReader binaryReader)
         {
+
             foreach (Keys key in WantedKeys)
             {
                 _keyStates.Add(key, binaryReader.ReadBoolean());
@@ -105,6 +115,7 @@ namespace MakeEveryDayRecount.Managers.Replay
                 _mouseState.Add(state, binaryReader.ReadBoolean() ? ButtonState.Pressed : ButtonState.Released);
             }
             CurrentMousePosition = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
+            DeltaTime = binaryReader.ReadSingle();
         }
 
         /// <summary>
@@ -143,6 +154,7 @@ namespace MakeEveryDayRecount.Managers.Replay
         {
             return _mouseState[bs];
         }
+
 
     }
 }

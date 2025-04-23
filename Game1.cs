@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using MakeEveryDayRecount.Managers;
 using MakeEveryDayRecount.UI;
+using MakeEveryDayRecount.GameObjects.Triggers;
 
 namespace MakeEveryDayRecount
 {
@@ -37,8 +38,6 @@ namespace MakeEveryDayRecount
 
         private GameState _state;
 
-        private GameplayManager _gameplayManager;
-
 
         /// <summary>
         /// Access the current size of the screen in pixels
@@ -51,6 +50,8 @@ namespace MakeEveryDayRecount
         private DebugState _debugState;
 
         private BaseDebug[] _debugModes;
+
+        private int _replaySpeed;
 
         public Game1()
         {
@@ -85,8 +86,11 @@ namespace MakeEveryDayRecount
             InterfaceManager.exitGame += ExitGame;
 
             ReplayManager.Initialize();
+            TriggerManager.Initialize();
             //Set initial GameState
             _state = GameState.Menu;
+
+            _replaySpeed = 2;
             base.Initialize();
         }
 
@@ -97,20 +101,17 @@ namespace MakeEveryDayRecount
             AssetManager.LoadContent(Content);
             SoundManager.LoadContent(Content);
 
+            GlobalDebug.Initialize();
+            GameplayManager.Initialize(ScreenSize);
             // Initialize all items that need assets to be loaded 
-
-
             InterfaceManager.InitializeMenus(ScreenSize);
 
-            _gameplayManager = new GameplayManager(ScreenSize);
-            MapUtils.Initialize(this, _gameplayManager);
+            MapUtils.Initialize(this);
 
 
-            GlobalDebug.Initialize();
 
-            _debugModes[0] = new PlayerDebug(_gameplayManager);
-            _debugModes[1] = new MapDebug(_gameplayManager);
-
+            _debugModes[0] = new PlayerDebug();
+            _debugModes[1] = new MapDebug();
         }
 
         protected override void Update(GameTime gameTime)
@@ -145,10 +146,9 @@ namespace MakeEveryDayRecount
                         // Don't call anything after the game has paused
                         break;
                     }
-
-                    _gameplayManager.Update(gameTime);
+                    GameplayManager.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
                     // Save the current state of the keyboard
-                    ReplayManager.SaveState();
+                    ReplayManager.SaveState((float)gameTime.ElapsedGameTime.TotalSeconds);
                     if (InputManager.GetKeyPress(Keys.Tab))
                     {
                         ReplayManager.SaveData(1, 1);
@@ -170,21 +170,28 @@ namespace MakeEveryDayRecount
                     // This will auto assign the first frame of input and allow the
                     // input manager to work. For rest of the frames, call the next 
                     // frame of the ReplayManager and check if you have read all frames
-                    if (!ReplayManager.PlayingReplay)
+                    for (int i = 0; i < _replaySpeed; i++)
                     {
-                        ReplayManager.BeginReplay();
-                        _gameplayManager.ReplayMode();
-                    }
-                    else if (!ReplayManager.NextFrame())
-                    {
-                        _state = GameState.Menu;
-                        ReplayManager.EndReplay();
-                        InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.MainMenu;
+                        if (!ReplayManager.PlayingReplay)
+                        {
+                            ReplayManager.BeginReplay();
+                            GameplayManager.ReplayMode();
+                        }
+                        else if (!ReplayManager.NextFrame())
+                        {
+                            _state = GameState.Menu;
+                            ReplayManager.EndReplay();
+                            InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.MainMenu;
+                            break;
+                        }
+
+                        InputManager.ReplayUpdate();
+                        GameplayManager.Update(ReplayManager.CurrentReplayState.DeltaTime);
 
                     }
 
-                    InputManager.ReplayUpdate();
-                    _gameplayManager.Update(gameTime);
+                    //This is evil, but it will let it error out if we're running too slow
+                    if (gameTime.IsRunningSlowly) throw new Exception("SLOW!! DUMB PROGRAMMER");
 
                     break;
             }
@@ -209,20 +216,19 @@ namespace MakeEveryDayRecount
                 case GameState.Menu:
                     // DrawMenu(_spriteBatch);
                     break;
-                case GameState.Pause:
-                    //TODO: Blur the gameplay in the background.
-
-                    _gameplayManager.Draw(_spriteBatch);
+                case GameState.Level:
+                    GameplayManager.Draw(_spriteBatch);
                     DisplayDebug();
                     break;
-                case GameState.Level:
-                    _gameplayManager.Draw(_spriteBatch);
+                case GameState.Pause:
+                    //TODO: Blur the gameplay in the background.
+                    GameplayManager.Draw(_spriteBatch);
                     DisplayDebug();
                     break;
                 case GameState.Cutscene:
                     break;
                 case GameState.Playback:
-                    _gameplayManager.Draw(_spriteBatch);
+                    GameplayManager.Draw(_spriteBatch);
                     DisplayDebug();
                     break;
             }
@@ -293,7 +299,7 @@ namespace MakeEveryDayRecount
                 if (SoundManager.PlayingMusic)
                     SoundManager.ResumeBGM();
                 else
-                    SoundManager.PlayBGM(_gameplayManager.Level);
+                    SoundManager.PlayBGM(GameplayManager.Level);
             }
             _state = state;
         }

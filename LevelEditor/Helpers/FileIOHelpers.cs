@@ -1,5 +1,7 @@
 ﻿using LevelEditor.Classes;
 using LevelEditor.Classes.Props;
+using LevelEditor.Classes.Triggers;
+using System.Diagnostics;
 
 namespace LevelEditor.Helpers
 {
@@ -29,27 +31,38 @@ namespace LevelEditor.Helpers
              */
             if (level == null)
                 return;
-            // Path.Join is technically safer than $"{folderPath}/level.level" since different OSs use different path join characters
-            // Does that *really* matter for this program's use case? Not really! But it's good practice
-            string levelPath = Path.Join(folderPath, "level.level");
-            BinaryWriter writer = new BinaryWriter(new FileStream(levelPath, FileMode.Create));
-           
-            int roomCount = level.Rooms.Count;
 
-            writer.Write(roomCount);
+            BinaryWriter writer = null!;
 
-            foreach (Room room in level.Rooms)
+            try
             {
-                writer.Write(room.Name);
-                writer.Write(room.Id);
+                // Path.Join is technically safer than $"{folderPath}/level.level" since different OSs use different path join characters
+                // Does that *really* matter for this program's use case? Not really! But it's good practice
+                string levelPath = Path.Join(folderPath, "level.level");
+                writer = new BinaryWriter(new FileStream(levelPath, FileMode.Create));
+
+                int roomCount = level.Rooms.Count;
+
+                writer.Write(roomCount);
+
+                foreach (Room room in level.Rooms)
+                {
+                    writer.Write(room.Name);
+                    writer.Write(room.Id);
+                }
+
+                writer.Close();
+
+                // A level can't really be played without its rooms, so it seems good to just save those too
+                foreach (var room in level.Rooms)
+                {
+                    SaveRoom(room, folderPath, allTiles);
+                }
             }
-
-            writer.Close();
-
-            // A level can't really be played without its rooms, so it seems good to just save those too
-            foreach (var room in level.Rooms)
+            catch (Exception)
             {
-                SaveRoom(room, folderPath, allTiles);
+                writer?.Close();
+                throw;
             }
         }
 
@@ -115,78 +128,109 @@ namespace LevelEditor.Helpers
              *      
              *      if triggerType == 1
              *        int index
-             *        bool activated // In the level editor, should always be saved as false
+             *        bool active // In the level editor, should always be saved as true
              */
 
             Tile[] tilesArray = [.. allTiles];
 
             string roomPath = Path.Join(folderPath, $"{room.Name}.room");
-            BinaryWriter writer = new BinaryWriter(new FileStream(roomPath, FileMode.Create));
 
-            writer.Write(room.Width);
-            writer.Write(room.Height);
-
-            // Tiles are written in rows, from the top to the bottom and left to right
-            for (int y = 0; y < room.Height; y++)
+            BinaryWriter writer = null!;
+            try
             {
-                for (int x = 0; x < room.Width; x++)
+                writer = new BinaryWriter(new FileStream(roomPath, FileMode.Create));
+
+                writer.Write(room.Width);
+                writer.Write(room.Height);
+
+                // Tiles are written in rows, from the top to the bottom and left to right
+                for (int y = 0; y < room.Height; y++)
                 {
-                    Tile toWrite = room[x, y];
-                    writer.Write(toWrite.IsWalkable);
-                    writer.Write(Array.IndexOf(tilesArray, toWrite));
+                    for (int x = 0; x < room.Width; x++)
+                    {
+                        Tile toWrite = room[x, y];
+                        writer.Write(toWrite.IsWalkable);
+                        writer.Write(Array.IndexOf(tilesArray, toWrite));
+                    }
                 }
+
+                writer.Write(room.Props.Count);
+
+                foreach (Prop prop in room.Props)
+                {
+                    writer.Write(prop.ImageIndex);
+                    if (prop.Position.HasValue)
+                    {
+                        writer.Write(prop.Position.Value.X);
+                        writer.Write(prop.Position.Value.Y);
+                    }
+                    writer.Write((int)prop.PropType);
+                    switch (prop.PropType)
+                    {
+                        case ObjectType.Item:
+                            Item item = (Item)prop;
+                            writer.Write((int)item.KeyType);
+                            break;
+
+                        case ObjectType.Camera:
+                            Camera camera = (Camera)prop;
+                            Point target = (Point)camera.Target!;
+
+                            writer.Write(target.X);
+                            writer.Write(target.Y);
+                            writer.Write((double)camera.RadianSpread);
+                            break;
+
+                        case ObjectType.Box:
+                            // Don't need to save any extra data for the box
+                            break;
+
+                        case ObjectType.Door:
+                            Door door = (Door)prop;
+                            writer.Write((int)door.KeyToOpen);
+                            if (door.ConnectedTo != null)
+                                writer.Write(door.ConnectedTo.Value);
+                            if (door.Destination.HasValue)
+                            {
+                                writer.Write(door.Destination.Value.X);
+                                writer.Write(door.Destination.Value.Y);
+                            }
+                            else
+                            {
+                                throw new NullReferenceException("Doors must have a destination value to save");
+                            }
+                            break;
+                    }
+                }
+
+                writer.Write(room.Triggers.Count);
+
+                foreach (Trigger trigger in room.Triggers)
+                {
+                    Debug.Assert(trigger.Bounds != null);
+
+                    Rectangle bounds = (Rectangle)trigger.Bounds;
+                    writer.Write(bounds.Left); // bounds.Left is equivalent to bounds.Location.X
+                    writer.Write(bounds.Top);  // bounds.Top is equivalent to bounds.Location.Y
+                    writer.Write(bounds.Width);
+                    writer.Write(bounds.Height);
+
+                    if (trigger is Checkpoint checkpoint)
+                    {
+                        writer.Write(0);
+                        writer.Write(checkpoint.Index);
+                        writer.Write(true);
+                    }
+                }
+
+                writer.Close();
+
             }
-
-            writer.Write(room.Props.Count);
-
-            foreach (Prop prop in room.Props)
+            catch (Exception)
             {
-                writer.Write(prop.ImageIndex);
-                if (prop.Position.HasValue)
-                {
-                    writer.Write(prop.Position.Value.X);
-                    writer.Write(prop.Position.Value.Y);
-                }
-                writer.Write((int)prop.PropType);
-                switch (prop.PropType)
-                {
-                    case ObjectType.Item:
-                        Item item = (Item)prop;
-                        writer.Write((int)item.KeyType);
-                        break;
-
-                    case ObjectType.Camera:
-                        Camera camera = (Camera)prop;
-                        Point target = (Point)camera.Target!;
-
-                        writer.Write(target.X);
-                        writer.Write(target.Y);
-                        writer.Write((double)camera.RadianSpread);
-                        break;
-
-                    case ObjectType.Box:
-                        // Don't need to save any extra data for the box
-                        break;
-
-                    case ObjectType.Door:
-                        Door door = (Door)prop;
-                        writer.Write((int)door.KeyToOpen);
-                        if (door.ConnectedTo != null)
-                            writer.Write(door.ConnectedTo.Value);
-                        if (door.Destination.HasValue)
-                        {
-                            writer.Write(door.Destination.Value.X);
-                            writer.Write(door.Destination.Value.Y);
-                        }
-                        else
-                        {
-                            throw new NullReferenceException("Doors must have a destination value to save");
-                        }
-                        break;
-                }
+                writer?.Close();
+                throw;
             }
-
-            writer.Close();
         }
 
         #endregion
@@ -199,9 +243,10 @@ namespace LevelEditor.Helpers
         /// </summary>
         /// <param name="filePath">The path to the .level file.</param>
         /// <param name="allTiles">A reference to the tile array, so the rooms can be loaded properly.</param>
-        /// <param name="allProps">A reference to the prop array so the room can load any props that have been saved</param>
+        /// <param name="allProps">A reference to the prop array so the room can load any props that have been saved.</param>
+        /// <param name="allTriggers">A reference to the trigger array, so the room can load any triggers that have been saved.</param>
         /// <returns>The loaded level, including all of its contained rooms.</returns>
-        public static Level LoadLevel(string filePath, IEnumerable<Tile> allTiles, IEnumerable<Prop> allProps)
+        public static Level LoadLevel(string filePath, IEnumerable<Tile> allTiles, IEnumerable<Prop> allProps, IEnumerable<Trigger> allTriggers)
         {
             /*
              * THE .level FILE FORMAT:
@@ -211,34 +256,45 @@ namespace LevelEditor.Helpers
              *    - int roomID
              */
             Level level = new Level();
+            BinaryReader reader = null!;
 
-            BinaryReader reader = new BinaryReader(new FileStream(filePath, FileMode.Open));
-
-            int roomCount = reader.ReadInt32();
-
-            for (int i = 0; i < roomCount; i++)
+            try
             {
-                string roomName = reader.ReadString();
-                int roomIndex = reader.ReadInt32();
+                reader = new BinaryReader(new FileStream(filePath, FileMode.Open));
 
-                string folder = Path.GetDirectoryName(filePath)!;
+                int roomCount = reader.ReadInt32();
 
-                string roomPath = Path.Join(folder, $"{roomName}.room");
-
-                // If the room doesn't exist... actually just don't try and load it
-                //   This way, you can easily remove rooms by just deleting their .room file
-                if (File.Exists(roomPath))
+                for (int i = 0; i < roomCount; i++)
                 {
-                    level.Rooms.Add(
-                        LoadRoom(roomPath, allTiles, allProps)
-                        );
-                    level.Rooms[level.Rooms.Count - 1].Id = roomIndex;
+                    string roomName = reader.ReadString();
+                    int roomIndex = reader.ReadInt32();
+
+                    string folder = Path.GetDirectoryName(filePath)!;
+
+                    string roomPath = Path.Join(folder, $"{roomName}.room");
+
+                    // If the room doesn't exist... actually just don't try and load it
+                    //   This way, you can easily remove rooms by just deleting their .room file
+                    if (File.Exists(roomPath))
+                    {
+                        level.Rooms.Add(
+                            LoadRoom(roomPath, allTiles, allProps, allTriggers)
+                            );
+                        level.Rooms[level.Rooms.Count - 1].Id = roomIndex;
+                    }
                 }
+
+                reader.Close();
+
+                return level;
+            }
+            catch (Exception)
+            {
+                // In the event of an error, make sure to still close the reader
+                reader?.Close();
+                throw;
             }
 
-            reader.Close();
-
-            return level;
         }
 
         /// <summary>
@@ -250,7 +306,7 @@ namespace LevelEditor.Helpers
         /// <param name="allTiles">A reference to the tile array, so it can be loaded properly.</param>
         /// <param name="allProps">A reference to the prop array so the room can load any props that have been saved</param>
         /// <returns>The loaded room.</returns>
-        public static Room LoadRoom(string filePath, IEnumerable<Tile> allTiles, IEnumerable<Prop> allProps)
+        public static Room LoadRoom(string filePath, IEnumerable<Tile> allTiles, IEnumerable<Prop> allProps, IEnumerable<Trigger> allTriggers)
         {
             /*
             * Form of the room data is as follows
@@ -305,69 +361,106 @@ namespace LevelEditor.Helpers
              *      
              *      if triggerType == 1
              *        int index
-             *        bool activated // In the level editor, should always be saved as false
+             *        bool active // In the level editor, should always be saved as true
             */
 
-            BinaryReader reader = new BinaryReader(new FileStream(filePath, FileMode.Open));
+            BinaryReader reader = null!;
 
-            int width = reader.ReadInt32();
-            int height = reader.ReadInt32();
-
-            string roomName = Path.GetFileNameWithoutExtension(filePath);
-
-            Room room = new Room(roomName, width, height);
-
-            for (int y = 0; y < height; y++)
+            try
             {
-                for (int x = 0; x < width; x++)
+                reader = new BinaryReader(new FileStream(filePath, FileMode.Open));
+
+                int width = reader.ReadInt32();
+                int height = reader.ReadInt32();
+
+                string roomName = Path.GetFileNameWithoutExtension(filePath);
+
+                Room room = new Room(roomName, width, height);
+
+                for (int y = 0; y < height; y++)
                 {
-                    // For loading the tiles, we actually don't care whether they were saved
-                    //   as being walkable or not. We treat the tile array as gospel!
-                    _ = reader.ReadBoolean();
+                    for (int x = 0; x < width; x++)
+                    {
+                        // For loading the tiles, we actually don't care whether they were saved
+                        //   as being walkable or not. We treat the tile array as gospel!
+                        _ = reader.ReadBoolean();
 
-                    int tileIndex = reader.ReadInt32();
-                    Tile tile = allTiles.ElementAt(tileIndex);
+                        int tileIndex = reader.ReadInt32();
+                        Tile tile = allTiles.ElementAt(tileIndex);
 
-                    room[x, y] = tile;
-                }
-            }
-
-            int numOfProps = reader.ReadInt32();
-
-            while (numOfProps > 0)
-            {
-                int imageIndex = reader.ReadInt32();
-                Point propPosition = new Point(reader.ReadInt32(), reader.ReadInt32());
-                ObjectType objectType = (ObjectType)reader.ReadInt32();
-
-                switch (objectType)
-                {
-                    case ObjectType.Item:
-                        _ = reader.ReadInt32();// Don't need the key type
-                        room.AddProp(allProps.ElementAt(imageIndex).Instantiate(propPosition));
-                        break;
-                    case ObjectType.Box:
-                        room.AddProp(allProps.ElementAt(imageIndex + 5).Instantiate(propPosition));
-                        break;
-                    case ObjectType.Door:
-                        _ = reader.ReadInt32(); //Don't need the key type
-                        int destRoom = reader.ReadInt32();
-                        Point destPoint = new Point(reader.ReadInt32(), reader.ReadInt32());
-                        room.AddProp(((Door)allProps.ElementAt(imageIndex + 6)).Instantiate(propPosition, destPoint, destRoom));
-                        break;
-                    case ObjectType.Camera:
-                        Point target = new Point(reader.ReadInt32(), reader.ReadInt32());
-                        float spread = (float)reader.ReadDouble();
-                        room.AddProp(((Camera)allProps.ElementAt(imageIndex + 10)).Instantiate(propPosition, target, spread));
-                        break;
+                        room[x, y] = tile;
+                    }
                 }
 
-                numOfProps--;
+                int numOfProps = reader.ReadInt32();
+
+                while (numOfProps > 0)
+                {
+                    int imageIndex = reader.ReadInt32();
+                    Point propPosition = new Point(reader.ReadInt32(), reader.ReadInt32());
+                    ObjectType objectType = (ObjectType)reader.ReadInt32();
+
+                    switch (objectType)
+                    {
+                        case ObjectType.Item:
+                            _ = reader.ReadInt32();// Don't need the key type
+                            room.AddProp(allProps.ElementAt(imageIndex).Instantiate(propPosition));
+                            break;
+                        case ObjectType.Box:
+                            room.AddProp(allProps.ElementAt(imageIndex + 5).Instantiate(propPosition));
+                            break;
+                        case ObjectType.Door:
+                            _ = reader.ReadInt32(); //Don't need the key type
+                            int destRoom = reader.ReadInt32();
+                            Point destPoint = new Point(reader.ReadInt32(), reader.ReadInt32());
+                            room.AddProp(((Door)allProps.ElementAt(imageIndex + 6)).Instantiate(propPosition, destPoint, destRoom));
+                            break;
+                        case ObjectType.Camera:
+                            Point target = new Point(reader.ReadInt32(), reader.ReadInt32());
+                            float spread = (float)reader.ReadDouble();
+                            room.AddProp(((Camera)allProps.ElementAt(imageIndex + 10)).Instantiate(propPosition, target, spread));
+                            break;
+                    }
+
+                    numOfProps--;
+                }
+
+                int numOfTriggers = reader.ReadInt32();
+
+                while (numOfTriggers > 0)
+                {
+                    Rectangle bounds = new Rectangle(
+                        reader.ReadInt32(),
+                        reader.ReadInt32(),
+                        reader.ReadInt32(),
+                        reader.ReadInt32()
+                        );
+
+                    int type = reader.ReadInt32();
+
+                    Trigger trigger = allTriggers.ElementAt(type).Instantiate(bounds);
+
+                    if (trigger is Checkpoint checkpoint)
+                    {
+                        checkpoint.Index = reader.ReadInt32();
+                        _ = reader.ReadBoolean();
+                    }
+
+                    room.AddTrigger(trigger);
+
+                    numOfTriggers--;
+                }
+
+                reader.Close();
+
+                return room;
+            }
+            catch (Exception)
+            {
+                reader?.Close();
+                throw;
             }
 
-            reader.Close();
-
-            return room;
         }
 
         #endregion

@@ -1,5 +1,6 @@
 ﻿using LevelEditor.Classes;
 using LevelEditor.Classes.Props;
+using LevelEditor.Classes.Triggers;
 using LevelEditor.Extensions;
 using LevelEditor.Helpers;
 using System.Diagnostics;
@@ -125,7 +126,7 @@ namespace LevelEditor.Controls
 
             ShowTiles = true;
             ShowProps = true;
-            ShowTriggers = false;
+            ShowTriggers = true;
         }
         /// <summary>
         /// Initializes a new RoomRenderer with specific text, size, and location.
@@ -353,20 +354,52 @@ namespace LevelEditor.Controls
                     Point position = TileSpaceToPixelSpace((Point)camera.Position!).GetCenter();
                     Point target = TileSpaceToPixelSpace((Point)camera.Target!).GetCenter();
 
-                    // Okay from here on out it's gonna be a lot of geometry and you're gonna have to trust me a little
-                    // Do I have a specific algorithm I'm implementing? Hell no! I winged this shit!
-                    float diameter = position.Distance(target) * 2;
-
-                    SizeF circleSize = new SizeF(diameter, diameter);
-
-                    RectangleF fullCircle = new RectangleF(
-                        PointF.Subtract(position, circleSize / 2), // The circle's center should be directly on top of the center of the camera
-                        circleSize);
-
                     // Listen, I'm gonna be honest... if you stare at this code for long enough you could probably understand exactly why I made these decisions
                     //   But it works, okay? Don't think too hard about it
                     Point vectorToTarget = target.Subtract(position);
                     float angleToTargetRads = MathF.Atan2(vectorToTarget.Y, vectorToTarget.X);
+
+                    /*
+                     * Alright, let's talk about this offset
+                     *   It's a tile-space offset depending on the direction the camera is pointing in
+                     *   and the walls around it -- if the camera is pointing down, the offset is one tile down, etc.
+                     *   The camera can't start its view vector inside of a wall, however
+                     * This is a reimplementation of logic that exists in the main game to make the view frustum
+                     *   in the editor slightly more realistic and easier to use
+                     */
+                    Point cameraTile = (Point)camera.Position;
+
+                    // First check if a nudge in the given direction would push us out of bounds
+                    //   (if it would, then that's effectively a wall), then check if the given
+                    //   tile is a wall
+                    bool[] isNotWall = [
+                        cameraTile.X > 0               && Room[cameraTile.Add(new Point(-1, 0))].IsWalkable, // left
+                        cameraTile.X < Room.Width - 1  && Room[cameraTile.Add(new Point(1, 0))].IsWalkable,  // right
+                        cameraTile.Y > 0               && Room[cameraTile.Add(new Point(0, -1))].IsWalkable, // up
+                        cameraTile.Y < Room.Height - 1 && Room[cameraTile.Add(new Point(0, 1))].IsWalkable,  // down
+                        ];
+
+                    Point startOffset;
+                    // Checks are done in left, right, up, down order to exactly mimic the order they are performed in-game
+                    if (isNotWall[0] && vectorToTarget.X < 0) startOffset = new Point(-1, 0);      // left
+                    else if (isNotWall[1] && vectorToTarget.X > 0) startOffset = new Point(1, 0);  // right
+                    else if (isNotWall[2] && vectorToTarget.Y < 0) startOffset = new Point(0, -1); // up
+                    else if (isNotWall[3] && vectorToTarget.Y > 0) startOffset = new Point(0, 1);  // down
+                    // If the camera has no valid offset, show it as just being drawn from the center of the camera
+                    //   Is that *really* accurate? No. But it's fine enough
+                    else startOffset = new Point(0, 0);
+
+                    Point start = position.Add(startOffset.Multiply(_tileSize));
+
+                    // Okay from here on out it's gonna be a lot of geometry and you're gonna have to trust me a little
+                    // Do I have a specific algorithm I'm implementing? Hell no! I winged this shit!
+                    float diameter = start.Distance(target) * 2;
+
+                    SizeF circleSize = new SizeF(diameter, diameter);
+
+                    RectangleF fullCircle = new RectangleF(
+                        PointF.Subtract(start, circleSize / 2), // The circle's center should be directly on top of the center of the camera
+                        circleSize);
 
                     float startAngle = float.RadiansToDegrees(angleToTargetRads - camera.RadianSpread);
                     float sweepAngle = float.RadiansToDegrees(camera.RadianSpread * 2);
@@ -384,7 +417,24 @@ namespace LevelEditor.Controls
         /// <exception cref="NotImplementedException">ALWAYS THROWN.</exception>
         private void DrawTriggers(Graphics graphics)
         {
-            throw new NotImplementedException();
+            // The simple part of drawing! This just draws all of the **trigger** boxes to their corresponding places
+            foreach (Trigger trigger in _room.Triggers)
+            {
+                Debug.Assert(trigger.Bounds != null); // I am moana
+                Rectangle bounds = trigger.Bounds.Value;
+
+                Size one = new Size(1, 1);
+
+                // a union of the tip and bottom rectangles to create one mega rectangle extravaganza
+                Rectangle drawRect = Rectangle.Union(TileSpaceToPixelSpace(bounds.Location), TileSpaceToPixelSpace(bounds.Location + bounds.Size - one));
+
+                //let me have my headcannon
+                Pen moana = new Pen(Color.YellowGreen, 4);
+                Brush maoi = new SolidBrush(Color.FromArgb(63, Color.YellowGreen));
+
+                graphics.DrawRectangle(moana, drawRect);
+                graphics.FillRectangle(maoi, drawRect);
+            }
         }
 
         #endregion 
@@ -470,8 +520,19 @@ namespace LevelEditor.Controls
                 _room.OnPropAdded -= OnPropChange;
                 _room.OnPropRemoved -= OnPropChange;
                 _room.OnCameraViewFrustumUpdated -= OnPropChange;
+
+                _room.OnTriggerAdded -= OnTriggerChange;
+                _room.OnTriggerRemoved -= OnTriggerChange;
             }
         }
+        /// <summary>
+        /// if a trigger is added / removed (i.e. there was a change), the current fporm is invalidated
+        /// </summary>
+        private void OnTriggerChange(Trigger obj)
+        {
+            Invalidate();
+        }
+
         /// <summary>
         /// Subscribes to all of the room's events.
         /// </summary>
@@ -483,11 +544,13 @@ namespace LevelEditor.Controls
                 _room.OnPropAdded += OnPropChange;
                 _room.OnPropRemoved += OnPropChange;
                 _room.OnCameraViewFrustumUpdated += OnPropChange;
+
+                _room.OnTriggerAdded += OnTriggerChange;
+                _room.OnTriggerRemoved += OnTriggerChange;
             }
         }
 
         #endregion
-
         #region Event Callbacks
         /// <summary>
         /// Invalidates the relevant portion of the control.
@@ -518,7 +581,7 @@ namespace LevelEditor.Controls
         /// <param name="newTile">The new tile.</param>
         private void OnTileUpdated(Point tileUpdatedCoords, Tile newTile)
         {
-            Invalidate(TileSpaceToPixelSpace(tileUpdatedCoords));
+            Invalidate();
         }
 
         #endregion

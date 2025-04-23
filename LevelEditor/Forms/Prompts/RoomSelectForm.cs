@@ -1,5 +1,6 @@
 ﻿using LevelEditor.Classes;
 using LevelEditor.Classes.Props;
+using LevelEditor.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -42,11 +43,10 @@ namespace LevelEditor.Forms.Prompts
         private void CreateRoomButton(Room room)
         {
             // Copy+pasted and modified from MainForm!
-            Button roomButton = new()
+            RoomButton roomButton = new()
             {
                 Size = new(140, 80),
-                TextAlign = ContentAlignment.MiddleCenter,
-                Text = room.Name,
+                Room = room,
                 Parent = flowLayoutPanelRooms
             };
 
