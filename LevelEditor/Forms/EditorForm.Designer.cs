@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             groupBoxMap = new GroupBox();
-            roomRenderer = new LevelEditor.Controls.RoomRenderer();
+            roomRenderer = new Controls.RoomRenderer();
             openFileDialog = new OpenFileDialog();
             saveFileDialog = new SaveFileDialog();
             tabControlPalettes = new TabControl();
@@ -37,7 +37,10 @@
             flowLayoutPanelTiles = new FlowLayoutPanel();
             tabPageProps = new TabPage();
             flowLayoutPanelProps = new FlowLayoutPanel();
+            tabPageTriggers = new TabPage();
             splitContainer = new SplitContainer();
+            buttonSave = new Button();
+            buttonResize = new Button();
             groupBoxMap.SuspendLayout();
             tabControlPalettes.SuspendLayout();
             tabPageTiles.SuspendLayout();
@@ -86,12 +89,14 @@
             // 
             // tabControlPalettes
             // 
+            tabControlPalettes.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             tabControlPalettes.Controls.Add(tabPageTiles);
             tabControlPalettes.Controls.Add(tabPageProps);
+            tabControlPalettes.Controls.Add(tabPageTriggers);
             tabControlPalettes.Location = new Point(12, 12);
             tabControlPalettes.Name = "tabControlPalettes";
             tabControlPalettes.SelectedIndex = 0;
-            tabControlPalettes.Size = new Size(215, 494);
+            tabControlPalettes.Size = new Size(215, 465);
             tabControlPalettes.TabIndex = 0;
             tabControlPalettes.SelectedIndexChanged += tabControlTilesProps_SelectedIndexChanged;
             // 
@@ -100,7 +105,7 @@
             tabPageTiles.Controls.Add(flowLayoutPanelTiles);
             tabPageTiles.Location = new Point(4, 24);
             tabPageTiles.Name = "tabPageTiles";
-            tabPageTiles.Size = new Size(207, 466);
+            tabPageTiles.Size = new Size(207, 437);
             tabPageTiles.TabIndex = 0;
             tabPageTiles.Text = "Tiles";
             tabPageTiles.UseVisualStyleBackColor = true;
@@ -110,7 +115,7 @@
             flowLayoutPanelTiles.AutoScroll = true;
             flowLayoutPanelTiles.Location = new Point(3, 3);
             flowLayoutPanelTiles.Name = "flowLayoutPanelTiles";
-            flowLayoutPanelTiles.Size = new Size(201, 460);
+            flowLayoutPanelTiles.Size = new Size(201, 431);
             flowLayoutPanelTiles.TabIndex = 0;
             // 
             // tabPageProps
@@ -118,7 +123,7 @@
             tabPageProps.Controls.Add(flowLayoutPanelProps);
             tabPageProps.Location = new Point(4, 24);
             tabPageProps.Name = "tabPageProps";
-            tabPageProps.Size = new Size(207, 466);
+            tabPageProps.Size = new Size(207, 437);
             tabPageProps.TabIndex = 0;
             tabPageProps.Text = "Props";
             tabPageProps.UseVisualStyleBackColor = true;
@@ -127,8 +132,17 @@
             // 
             flowLayoutPanelProps.Location = new Point(3, 3);
             flowLayoutPanelProps.Name = "flowLayoutPanelProps";
-            flowLayoutPanelProps.Size = new Size(201, 460);
+            flowLayoutPanelProps.Size = new Size(201, 431);
             flowLayoutPanelProps.TabIndex = 0;
+            // 
+            // tabPageTriggers
+            // 
+            tabPageTriggers.Location = new Point(4, 24);
+            tabPageTriggers.Name = "tabPageTriggers";
+            tabPageTriggers.Size = new Size(207, 437);
+            tabPageTriggers.TabIndex = 1;
+            tabPageTriggers.Text = "Triggers";
+            tabPageTriggers.UseVisualStyleBackColor = true;
             // 
             // splitContainer
             // 
@@ -137,6 +151,8 @@
             // 
             // splitContainer.Panel1
             // 
+            splitContainer.Panel1.Controls.Add(buttonSave);
+            splitContainer.Panel1.Controls.Add(buttonResize);
             splitContainer.Panel1.Controls.Add(tabControlPalettes);
             // 
             // splitContainer.Panel2
@@ -145,6 +161,28 @@
             splitContainer.Size = new Size(690, 514);
             splitContainer.SplitterDistance = 230;
             splitContainer.TabIndex = 3;
+            // 
+            // buttonSave
+            // 
+            buttonSave.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            buttonSave.Location = new Point(12, 483);
+            buttonSave.Name = "buttonSave";
+            buttonSave.Size = new Size(103, 28);
+            buttonSave.TabIndex = 1;
+            buttonSave.Text = "Save";
+            buttonSave.UseVisualStyleBackColor = true;
+            buttonSave.Click += buttonSave_Click;
+            // 
+            // buttonResize
+            // 
+            buttonResize.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            buttonResize.Location = new Point(117, 483);
+            buttonResize.Name = "buttonResize";
+            buttonResize.Size = new Size(103, 28);
+            buttonResize.TabIndex = 1;
+            buttonResize.Text = "Resize Room";
+            buttonResize.UseVisualStyleBackColor = true;
+            buttonResize.Click += buttonResize_Click;
             // 
             // EditorForm
             // 
@@ -175,6 +213,9 @@
         private SplitContainer splitContainer;
         private FlowLayoutPanel flowLayoutPanelTiles;
         private FlowLayoutPanel flowLayoutPanelProps;
+        private TabPage tabPageTriggers;
         private Controls.RoomRenderer roomRenderer;
+        private Button buttonResize;
+        private Button buttonSave;
     }
 }

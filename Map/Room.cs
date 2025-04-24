@@ -8,9 +8,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Managers;
 using MakeEveryDayRecount.GameObjects.Triggers;
-using Microsoft.Xna.Framework.Content;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
 
 namespace MakeEveryDayRecount.Map
 {
@@ -179,7 +176,8 @@ namespace MakeEveryDayRecount.Map
             foreach (Prop propToDraw in _itemsInRoom)
             {
                 Point propPosition = propToDraw.Location;
-
+                if (propToDraw is Camera)
+                    continue;
                 if (
                     propPosition.X >= screenMinX
                     && propPosition.X <= screenMaxX
@@ -205,6 +203,11 @@ namespace MakeEveryDayRecount.Map
                 {
                     doorToDraw.Draw(sb, worldToScreen, pixelOffset);
                 }
+            }
+
+            foreach (Camera cam in Cameras)
+            {
+                cam.Draw(sb, worldToScreen, pixelOffset);
             }
         }
 
@@ -343,10 +346,8 @@ namespace MakeEveryDayRecount.Map
                         numberOfGameObjects--;
                     }
                     //Define number of triggers in the room
-                    //TODO: update files so that triggers are implemented
                     //For rooms with no triggers we can slap a 0 at the end and everything will be fine
                     //As of right now they are not updated, so the following line has been commented out
-                    //int numberOfTriggers = binaryReader.ReadInt32();
                     int numberOfTriggers = binaryReader.ReadInt32();
 
                     //Parse all needed triggers from file
@@ -372,10 +373,10 @@ namespace MakeEveryDayRecount.Map
                                 TriggerManager.SetPlayerSpawn(checkpoint);
                             }
                         }
+                        numberOfTriggers--;
                     }
                 }
-                //DELETE THIS maybe?
-                //_triggersInRoom.Add(new Checkpoint(new Point(1, 1), null, 0, 1, 1, true));
+
             }
             catch (Exception e)
             {
@@ -401,16 +402,24 @@ namespace MakeEveryDayRecount.Map
         /// <returns>If the tile is walkable. True means the tile is walkable</returns>
         public bool VerifyWalkable(Point pointToCheck, bool isCamera = false)
         {
-            foreach (GameObject gameObject in _itemsInRoom)
+            foreach (Prop prop in _itemsInRoom)
             {
-                // If the object is a box that is held and in the square, do not let the player enter it
-                if (gameObject is Box && gameObject.Location == pointToCheck)
+                // If the object is a box that is held and in the square, check if it is unwalkable in the context
+                if (prop.Location.Equals(pointToCheck))
                 {
+                    if (prop is Box)
+                    {
+                        // The position is unwalkable if the player isn't holding it or the item requesting the check is a camera
+                        if (((Box)prop).AttachmentDirection == Players.Direction.None || isCamera)
+                            return false;
 
-                    if (((Box)gameObject).AttachmentDirection == Players.Direction.None || isCamera)
+                        return true;
+                    }
+                    else if (!isCamera)
+                    {
+
                         return false;
-
-                    return true;
+                    }
                 }
             }
 
@@ -540,8 +549,11 @@ namespace MakeEveryDayRecount.Map
                 binaryWriter.Write(_itemsInRoom.Count + Doors.Count);
 
                 //Write out all non-door non-camera props
-                for (int i = 0; i < _itemsInRoom.Count - Cameras.Count; i++)
+                for (int i = 0; i < _itemsInRoom.Count; i++)
                 {
+                    if (_itemsInRoom[i] is Camera)
+                        continue;
+
                     binaryWriter.Write(_itemsInRoom[i].SpriteIndex);
                     binaryWriter.Write(_itemsInRoom[i].Location.X);
                     binaryWriter.Write(_itemsInRoom[i].Location.Y);

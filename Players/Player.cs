@@ -9,6 +9,8 @@ using MakeEveryDayRecount.Players.InventoryFiles;
 using MakeEveryDayRecount.GameObjects.Triggers;
 using System.IO;
 using System;
+using System.Diagnostics.Contracts;
+using System.Collections.Generic;
 
 
 namespace MakeEveryDayRecount.Players
@@ -73,8 +75,6 @@ namespace MakeEveryDayRecount.Players
         private const float SecondsPerTile = .2f;
         private const float SecondsPerAnimation = .1f;
         private const float SecondsPerPositionUpdate = .1f;
-
-        private float _timeBetweenPositionUpdate;
         private float _walkingSeconds;
         private bool _readyToMove;
 
@@ -82,10 +82,6 @@ namespace MakeEveryDayRecount.Players
         private int _animationFrame;
         private Rectangle _playerFrameRectangle;
         private readonly Point _playerSize;
-        private bool _justMoved;
-        private bool _reachedDest;
-
-        private Point _destDirection;
 
         //The player's inventory
         private Inventory _inventory;
@@ -112,9 +108,6 @@ namespace MakeEveryDayRecount.Players
             //Create an inventory
             _inventory = new Inventory(screenSize);
             _currentHeldBox = null;
-            _reachedDest = true;
-            _justMoved = false;
-            _firstUpdate = true;
         }
 
         /// <summary>
@@ -133,6 +126,7 @@ namespace MakeEveryDayRecount.Players
 
             _playerFrameRectangle = AnimationUpdate(deltaTime);
             _inventory.Update();
+            CheckTrigger();
         }
 
         #region Player Movement
@@ -158,7 +152,7 @@ namespace MakeEveryDayRecount.Players
             {
                 PlayerMovement(deltaTime, new Point(0, 1), Direction.Down);
             }
-            else //if (_reachedDest)
+            else
             {
                 //if we were walking and we stop pressing a key, go back to standing
                 _playerState = PlayerState.Standing;
@@ -166,11 +160,13 @@ namespace MakeEveryDayRecount.Players
                 //but don't change the direction you're facing
             }
 
-            if (InputManager.GetKeyPress(Keys.E) || InputManager.GetKeyPress(Keys.Enter) || InputManager.GetKeyPress(Keys.Space))
+            if (InputManager.GetKeyPress(Keys.Space) || InputManager.GetKeyPress(Keys.E))
             {
-
                 Interact();
-
+            }
+            else if (InputManager.GetMousePress(MouseButtonState.Left))
+            {
+                ClickToInteract(MapUtils.ScreenToTile(InputManager.GetMousePosition()));
             }
         }
 
@@ -208,9 +204,7 @@ namespace MakeEveryDayRecount.Players
                     (!HoldingBox || MapManager.CheckPlayerCollision(_currentHeldBox.Location + movement)))
                 {
                     _readyToMove = false;
-                    // _destDirection = movement;
-                    // _justMoved = true;
-                    // _reachedDest = false;
+
                     Location += movement;
                     if (_playerState != PlayerState.Walking)
                         _playerState = PlayerState.Walking;
@@ -333,46 +327,6 @@ namespace MakeEveryDayRecount.Players
             );
         }
 
-        // TODO Revisit this later. For some reason, when we try to add half tile walking, the replay system decides it doesn't wnat to work
-        // perfectley. Sometime the player will end up in a diffrent poistion from where they should be, resulting in them missing items.
-        // Most likely, something is wrong with the timing.
-        // /// <summary>
-        // /// Convert from the player's tile position to screen position
-        // /// </summary>
-        // private void UpdatePlayerPos(float deltaTime)
-        // {
-
-        //     _timeBetweenPositionUpdate += deltaTime;
-        //     if (_timeBetweenPositionUpdate > SecondsPerPositionUpdate)
-        //     {
-        //         PlayerWorldPosition = MapUtils.TileToWorld(Location);
-
-
-        //         // This handle moving the player half a tile to start then the full tile
-        //         // .1 seconds later and updating the tile position
-        //         if (_justMoved)
-        //         {
-        //             PlayerWorldPosition += new Point(AssetManager.TileSize.X * _destDirection.X / 2, AssetManager.TileSize.Y * _destDirection.Y / 2);
-        //             _justMoved = false;
-
-        //             _currentHeldBox?.UpdateDrawPoint(PlayerWorldPosition);
-        //         }
-        //         else
-        //         {
-        //             if (!_reachedDest)
-        //             {
-        //                 Location += _destDirection;
-        //             }
-        //             PlayerWorldPosition = MapUtils.TileToWorld(Location);
-        //             _reachedDest = true;
-        //             _currentHeldBox?.UpdatePosition(Location);
-        //         }
-        //         Point worldToScreen = MapUtils.WorldToScreen();
-        //         _timeBetweenPositionUpdate -= SecondsPerPositionUpdate;
-        //         PlayerScreenPosition = PlayerWorldPosition - worldToScreen + MapUtils.PixelOffset();
-        //     }
-        // }
-
         /// <summary>
         /// Update the player's position regarldess of time
         /// </summary>
@@ -441,6 +395,44 @@ namespace MakeEveryDayRecount.Players
         }
 
         /// <summary>
+        /// Check for an interactive item at a clicked point
+        /// </summary>
+        /// <param name="clickedPoint">Point that was clicked in tile space</param>
+        public void ClickToInteract(Point clickedPoint)
+        {
+            if (HoldingBox)
+            {
+                DropBox();
+                return;
+            }
+
+            int xOffset = clickedPoint.X - Location.X;
+            int yOffset = clickedPoint.Y - Location.Y;
+            //If the clicked tile isn't adjacent to the player, no need to proceed
+            if (!(Math.Abs(xOffset) == 0 && Math.Abs(yOffset) == 1) && !(Math.Abs(xOffset) == 1 && Math.Abs(yOffset) == 0))
+                return;
+
+            Prop objectToInteract = MapManager.CheckInteractable(clickedPoint);
+
+            objectToInteract?.Interact(this);
+
+            if (xOffset != 0)
+            {
+                if (xOffset == 1)
+                    _playerCurrentDirection = Direction.Right;
+                else
+                    _playerCurrentDirection = Direction.Left;
+            }
+            else
+            {
+                if (yOffset == 1)
+                    _playerCurrentDirection = Direction.Down;
+                else
+                    _playerCurrentDirection = Direction.Up;
+            }
+        }
+
+        /// <summary>
         /// Called to update the player's location in the new room
         /// </summary>
         /// <param name="new_location">New location for the player</param>
@@ -448,6 +440,14 @@ namespace MakeEveryDayRecount.Players
         {
             Location = new_location;
             UpdatePlayerPos();
+        }
+
+        /// <summary>
+        /// Activate any trigger the player has stepped on
+        /// </summary>
+        public void CheckTrigger()
+        {
+            MapManager.CheckTrigger(Location)?.Activate(this);
         }
 
         /// <summary>
@@ -475,10 +475,7 @@ namespace MakeEveryDayRecount.Players
         public void Detected()
         {
             //Reset the map to the last checkpoint
-            MapManager.LoadCheckpoint(TriggerManager.CurrentCheckpoint);
-
-            //Reset the player data to the last checkpoint
-            Load();
+            TriggerManager.CurrentCheckpoint.LoadCheckpoint(this);
         }
 
         #endregion
@@ -505,71 +502,83 @@ namespace MakeEveryDayRecount.Players
         ///     int propIndex
         ///     int keyType
         /// </summary>
-        public void Save()
-        {
-            //Make the folder if it doesn't already exist
-            if (!Directory.Exists("./PlayerData"))
-                Directory.CreateDirectory("./PlayerData");
+        /// <param name="baseFolder">Folder to save player data to</param>
 
-            BinaryWriter writer = null;
+        public void Save(string baseFolder)
+        {
+
             try
             {
-                Stream stream = File.OpenWrite($"./PlayerData/PlayerData.data");
-                writer = new BinaryWriter(stream);
-
-                //Player position
-                writer.Write(Location.X);
-                writer.Write(Location.Y);
-
-                //Item count
-                writer.Write(_inventory.Contents.Count);
-
-                //Items
-                for (int i = 0; i < _inventory.Contents.Count; i++)
+                using (BinaryWriter binaryWriter = new BinaryWriter(File.OpenWrite($"{baseFolder}/PlayerData.data")))
                 {
-                    writer.Write(_inventory.Contents[i].SpriteIndex);
-                    writer.Write((int)_inventory.Contents[i].ItemKeyType);
+                    //Player position
+                    binaryWriter.Write(Location.X);
+                    binaryWriter.Write(Location.Y);
+
+                    //Item count
+                    binaryWriter.Write(_inventory.Contents.Count);
+
+                    //Items
+                    for (int i = 0; i < _inventory.Contents.Count; i++)
+                    {
+                        binaryWriter.Write(_inventory.Contents[i].SpriteIndex);
+                        binaryWriter.Write((int)_inventory.Contents[i].ItemKeyType);
+                    }
                 }
             }
-            finally
+            catch (Exception e)
             {
-                writer.Close();
+                System.Diagnostics.Debug.Write(e.Message);
             }
+        }
+
+        /// <summary>
+        /// Validate the PLayerData.data file exists
+        /// </summary>
+        /// <param name="baseFolder">Folder to check</param>
+        /// <returns>If the file exists</returns>
+        public bool ValidateData(string baseFolder)
+        {
+            if (File.Exists($"{baseFolder}/PlayerData.data"))
+                return true;
+            return false;
         }
 
         /// <summary>
         /// Resets all relevant player values to how they were during the last checkpoint
         /// </summary>
-        public void Load()
+        /// <param name="baseFolder">Folder to load player data from</param>
+        public void Load(string baseFolder)
         {
-            BinaryReader reader = null!;
+            if (!File.Exists($"{baseFolder}/PlayerData.data"))
+                return;
 
             //Clear Player's states
             ClearStates();
 
             try
             {
-                Stream stream = File.OpenRead("./PlayerData/PlayerData.data");
-                reader = new BinaryReader(stream);
-
-                //Update player position
-                Location = new Point(reader.ReadInt32(), reader.ReadInt32());
-
-                //Check item count
-                int itemCount = reader.ReadInt32();
-
-                //Give the player their items back
-                for (int i = 0; i < itemCount; i++)
+                using (BinaryReader binaryReader = new BinaryReader(File.OpenRead($"{baseFolder}/PlayerData.data")))
                 {
-                    int spriteIndex = reader.ReadInt32();
-                    int keyType = reader.ReadInt32();
+                    //Update player position
+                    Location = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
 
-                    _inventory.AddItemToInventory(new Item(Point.Zero, AssetManager.PropTextures, spriteIndex, "TEMP_NAME", (Door.DoorKeyType)keyType));
+                    //Check item count
+                    int itemCount = binaryReader.ReadInt32();
+
+                    //Give the player their items back
+                    for (int i = 0; i < itemCount; i++)
+                    {
+                        int spriteIndex = binaryReader.ReadInt32();
+                        int keyType = binaryReader.ReadInt32();
+
+                        _inventory.AddItemToInventory(new Item(Point.Zero, AssetManager.PropTextures, spriteIndex, "TEMP_NAME", (Door.DoorKeyType)keyType));
+                    }
                 }
             }
-            finally
+            catch (Exception e)
             {
-                reader.Close();
+                System.Diagnostics.Debug.Write(e.Message);
             }
         }
     }

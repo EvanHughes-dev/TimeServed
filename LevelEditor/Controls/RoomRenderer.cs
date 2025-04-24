@@ -103,6 +103,10 @@ namespace LevelEditor.Controls
         private Rectangle _roomBounds;
         // How large each tile should be drawn, in pixels
         private int _tileSize;
+        // The file path to the wire box sprite
+        private const string WireBoxSpritePath = "./Sprites/prop_wirebox.png";
+        // The wire box sprite itself, loaded in the constructor
+        private readonly Image _wireBoxSprite;
         #endregion
 
         #endregion
@@ -127,6 +131,12 @@ namespace LevelEditor.Controls
             ShowTiles = true;
             ShowProps = true;
             ShowTriggers = true;
+
+            // Is it clean to be doing file IO in RoomRenderer? No. Is it fine? Sure
+            if (File.Exists(WireBoxSpritePath))
+            {
+                _wireBoxSprite = Image.FromFile(WireBoxSpritePath);    
+            }
         }
         /// <summary>
         /// Initializes a new RoomRenderer with specific text, size, and location.
@@ -341,70 +351,79 @@ namespace LevelEditor.Controls
             // The hellish part of drawing -- camera view frustums!
             foreach (Prop prop in _room.Props)
             {
-                // Boils down to "this prop is a camera that's targeting a tile that makes sense"
-                if (prop is Camera camera 
-                    && camera.Target.HasValue 
-                    && camera.Target.Value != camera.Position)
+                if (prop is Camera camera)
                 {
-                    // Defines how the view frustum actually looks! Right now it's 50% opacity yellow
-                    Brush brush = new SolidBrush(Color.FromArgb(122, Color.Yellow));
+                    // Boils down to "this camera is targeting a tile that makes sense"
+                    if (camera.Target.HasValue && camera.Target.Value != camera.Position)
+                    {
+                        // Defines how the view frustum actually looks! Right now it's 50% opacity yellow
+                        Brush brush = new SolidBrush(Color.FromArgb(122, Color.Yellow));
 
-                    // The view frustum starts and ends at the center of the two tiles
-                    //   I'm not sure if it should actually end at the *center* of the target or, like, the end of the target... but this is easier!
-                    Point position = TileSpaceToPixelSpace((Point)camera.Position!).GetCenter();
-                    Point target = TileSpaceToPixelSpace((Point)camera.Target!).GetCenter();
+                        // The view frustum starts and ends at the center of the two tiles
+                        //   I'm not sure if it should actually end at the *center* of the target or, like, the end of the target... but this is easier!
+                        Point position = TileSpaceToPixelSpace((Point)camera.Position!).GetCenter();
+                        Point target = TileSpaceToPixelSpace((Point)camera.Target!).GetCenter();
 
                     // Listen, I'm gonna be honest... if you stare at this code for long enough you could probably understand exactly why I made these decisions
                     //   But it works, okay? Don't think too hard about it
-                    Point vectorToTarget = target.Subtract(position);
-                    float angleToTargetRads = MathF.Atan2(vectorToTarget.Y, vectorToTarget.X);
+                    Point positionToTarget = target.Subtract(position);
 
-                    /*
-                     * Alright, let's talk about this offset
-                     *   It's a tile-space offset depending on the direction the camera is pointing in
-                     *   and the walls around it -- if the camera is pointing down, the offset is one tile down, etc.
-                     *   The camera can't start its view vector inside of a wall, however
-                     * This is a reimplementation of logic that exists in the main game to make the view frustum
-                     *   in the editor slightly more realistic and easier to use
-                     */
-                    Point cameraTile = (Point)camera.Position;
+                        /*
+                         * Alright, let's talk about this offset
+                         *   It's a tile-space offset depending on the direction the camera is pointing in
+                         *   and the walls around it -- if the camera is pointing down, the offset is one tile down, etc.
+                         *   The camera can't start its view vector inside of a wall, however
+                         * This is a reimplementation of logic that exists in the main game to make the view frustum
+                         *   in the editor slightly more realistic and easier to use
+                         */
+                        Point cameraTile = (Point)camera.Position;
 
-                    // First check if a nudge in the given direction would push us out of bounds
-                    //   (if it would, then that's effectively a wall), then check if the given
-                    //   tile is a wall
-                    bool[] isNotWall = [
-                        cameraTile.X > 0               && Room[cameraTile.Add(new Point(-1, 0))].IsWalkable, // left
-                        cameraTile.X < Room.Width - 1  && Room[cameraTile.Add(new Point(1, 0))].IsWalkable,  // right
-                        cameraTile.Y > 0               && Room[cameraTile.Add(new Point(0, -1))].IsWalkable, // up
-                        cameraTile.Y < Room.Height - 1 && Room[cameraTile.Add(new Point(0, 1))].IsWalkable,  // down
-                        ];
+                        // First check if a nudge in the given direction would push us out of bounds
+                        //   (if it would, then that's effectively a wall), then check if the given
+                        //   tile is a wall
+                        bool[] isNotWall = [
+                            cameraTile.X > 0               && Room[cameraTile.Add(new Point(-1, 0))].IsWalkable, // left
+                            cameraTile.X < Room.Width - 1  && Room[cameraTile.Add(new Point(1, 0))].IsWalkable,  // right
+                            cameraTile.Y > 0               && Room[cameraTile.Add(new Point(0, -1))].IsWalkable, // up
+                            cameraTile.Y < Room.Height - 1 && Room[cameraTile.Add(new Point(0, 1))].IsWalkable,  // down
+                            ];
 
                     Point startOffset;
                     // Checks are done in left, right, up, down order to exactly mimic the order they are performed in-game
-                    if (isNotWall[0] && vectorToTarget.X < 0) startOffset = new Point(-1, 0);      // left
-                    else if (isNotWall[1] && vectorToTarget.X > 0) startOffset = new Point(1, 0);  // right
-                    else if (isNotWall[2] && vectorToTarget.Y < 0) startOffset = new Point(0, -1); // up
-                    else if (isNotWall[3] && vectorToTarget.Y > 0) startOffset = new Point(0, 1);  // down
+                    if (isNotWall[0] && positionToTarget.X < 0) startOffset = new Point(-1, 0);      // left
+                    else if (isNotWall[1] && positionToTarget.X > 0) startOffset = new Point(1, 0);  // right
+                    else if (isNotWall[2] && positionToTarget.Y < 0) startOffset = new Point(0, -1); // up
+                    else if (isNotWall[3] && positionToTarget.Y > 0) startOffset = new Point(0, 1);  // down
                     // If the camera has no valid offset, show it as just being drawn from the center of the camera
                     //   Is that *really* accurate? No. But it's fine enough
                     else startOffset = new Point(0, 0);
 
                     Point start = position.Add(startOffset.Multiply(_tileSize));
+                    Point startToTarget = target.Subtract(start);
+                    float angleToTargetRads = MathF.Atan2(startToTarget.Y, startToTarget.X);
 
-                    // Okay from here on out it's gonna be a lot of geometry and you're gonna have to trust me a little
-                    // Do I have a specific algorithm I'm implementing? Hell no! I winged this shit!
-                    float diameter = start.Distance(target) * 2;
+                        // Okay from here on out it's gonna be a lot of geometry and you're gonna have to trust me a little
+                        // Do I have a specific algorithm I'm implementing? Hell no! I winged this shit!
+                        float diameter = start.Distance(target) * 2;
 
-                    SizeF circleSize = new SizeF(diameter, diameter);
+                        SizeF circleSize = new SizeF(diameter, diameter);
 
-                    RectangleF fullCircle = new RectangleF(
-                        PointF.Subtract(start, circleSize / 2), // The circle's center should be directly on top of the center of the camera
-                        circleSize);
+                        RectangleF fullCircle = new RectangleF(
+                            PointF.Subtract(start, circleSize / 2), // The circle's center should be directly on top of the center of the camera
+                            circleSize);
 
-                    float startAngle = float.RadiansToDegrees(angleToTargetRads - camera.RadianSpread);
-                    float sweepAngle = float.RadiansToDegrees(camera.RadianSpread * 2);
+                        float startAngle = float.RadiansToDegrees(angleToTargetRads - camera.RadianSpread);
+                        float sweepAngle = float.RadiansToDegrees(camera.RadianSpread * 2);
 
-                    graphics.FillPie(brush, fullCircle, startAngle, sweepAngle);
+                        graphics.FillPie(brush, fullCircle, startAngle, sweepAngle);
+                    }
+
+                    // Lastly, draw its wire box (just so those are visible)
+                    if (camera.WireBoxPosition != null)
+                    {
+                        Rectangle drawRect = TileSpaceToPixelSpace((Point)camera.WireBoxPosition);
+                        graphics.DrawImage(_wireBoxSprite, drawRect);   
+                    }
                 }
             }
         }
@@ -519,10 +538,12 @@ namespace LevelEditor.Controls
                 _room.OnTileUpdated -= OnTileUpdated;
                 _room.OnPropAdded -= OnPropChange;
                 _room.OnPropRemoved -= OnPropChange;
-                _room.OnCameraViewFrustumUpdated -= OnPropChange;
+                _room.OnCameraUpdate -= OnPropChange;
 
                 _room.OnTriggerAdded -= OnTriggerChange;
                 _room.OnTriggerRemoved -= OnTriggerChange;
+
+                _room.OnRoomResized -= OnRoomResized;
             }
         }
         /// <summary>
@@ -543,10 +564,12 @@ namespace LevelEditor.Controls
                 _room.OnTileUpdated += OnTileUpdated;
                 _room.OnPropAdded += OnPropChange;
                 _room.OnPropRemoved += OnPropChange;
-                _room.OnCameraViewFrustumUpdated += OnPropChange;
+                _room.OnCameraUpdate += OnPropChange;
 
                 _room.OnTriggerAdded += OnTriggerChange;
                 _room.OnTriggerRemoved += OnTriggerChange;
+
+                _room.OnRoomResized += OnRoomResized;
             }
         }
 
@@ -581,6 +604,15 @@ namespace LevelEditor.Controls
         /// <param name="newTile">The new tile.</param>
         private void OnTileUpdated(Point tileUpdatedCoords, Tile newTile)
         {
+            Invalidate();
+        }
+
+        /// <summary>
+        /// Updates the display properties and invalidates the render.
+        /// </summary>
+        private void OnRoomResized()
+        {
+            UpdateDisplayProperties();
             Invalidate();
         }
 
