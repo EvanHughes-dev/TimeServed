@@ -3,6 +3,7 @@ using MakeEveryDayRecount.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using System;
+using MakeEveryDayRecount.GameObjects.Triggers;
 
 namespace MakeEveryDayRecount.Managers
 {
@@ -23,7 +24,6 @@ namespace MakeEveryDayRecount.Managers
         {
             None,
             MainMenu,
-            CheckpointMenu,
             Level,
             PauseMenu,
             ReplayMode
@@ -82,29 +82,29 @@ namespace MakeEveryDayRecount.Managers
 
             {
                 int numberOfButtons = 3;// used to center on the screen
+
                 Point drawPoint = FindFirstPoint(buttonSize, screenSize, numberOfButtons, buttonSpacing);
+
+                List<Button> buttons = new List<Button> { };
 
                 Rectangle menuPlayRect = new Rectangle(drawPoint, buttonSize);
                 Button menuPlay = new Button(menuPlayRect, AssetManager.DefaultButton, AssetManager.DefaultButton, true, "Play", font);
+                menuPlay.OnClick += GameplayManager.ClearSavedData;
                 menuPlay.OnClick += GameStateChange(GameState.Level);
                 menuPlay.OnClick += MenuChange(MenuModes.Level);
-                menuPlay.OnClick += GameplayManager.ClearSavedData;
+                buttons.Add(menuPlay);
+
 
                 Rectangle menuCheckPointRect = new Rectangle(IncrementScreenPos(drawPoint, 1, buttonSize.Y, buttonSpacing), buttonSize);
                 Button menuCheckPoint = new Button(menuCheckPointRect, AssetManager.DefaultButton, AssetManager.DefaultButton, true, "Checkpoints", font);
-                //menuPlay.OnClick += MenuChange(MenuModes.CheckpointMenu);
+                menuPlay.OnClick += TriggerManager.LoadCheckpoint;
+                buttons.Add(menuCheckPoint);
 
 
                 Rectangle menuQuitRect = new Rectangle(IncrementScreenPos(drawPoint, 2, buttonSize.Y, buttonSpacing), buttonSize);
                 Button menuQuit = new Button(menuQuitRect, AssetManager.DefaultButton, AssetManager.DefaultButton, true, "Exit", font);
                 menuQuit.OnClick += ExitGame();
-
-                List<Button> buttons = new List<Button>
-                {
-                    menuPlay,
-                    menuCheckPoint,
-                    menuQuit
-                };
+                buttons.Add(menuQuit);
 
                 _mainMenu = new Menu(null, buttons);
             }
@@ -146,8 +146,6 @@ namespace MakeEveryDayRecount.Managers
                 case MenuModes.MainMenu:
                     _mainMenu.Update();
                     break;
-                case MenuModes.CheckpointMenu:
-                    break;
                 case MenuModes.PauseMenu:
                     _pauseMenu.Update();
                     break;
@@ -169,9 +167,6 @@ namespace MakeEveryDayRecount.Managers
                     break;
                 case MenuModes.MainMenu:
                     _mainMenu.Draw(sb);
-                    break;
-                case MenuModes.CheckpointMenu:
-                    throw new NotImplementedException("Checkpoints have not been implemented yet");
                     break;
                 case MenuModes.PauseMenu:
                     _pauseMenu.Draw(sb);

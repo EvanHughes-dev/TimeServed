@@ -49,17 +49,17 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
         }
 
 
-        //Methods
-
-        //TODO: Maybe add a method to display that progress is being saved in some way? Low priority
-
         /// <summary>
         /// Saves the map and player data
         /// </summary>
         /// <param name="player">The player object</param>
         public override void Activate(Player player)
         {
-            //Makes sure the prior checkpoint has been activatated
+            // Don't use checkpoints if in replay mode.
+            // This would lead to overwriting keyboard data
+            if (ReplayManager.PlayingReplay)
+                return;
+            //Makes sure the prior checkpoint has been activated
             //unless this is the first checkpoint, in which case it's always good to activate
             if (Index != 0)
                 if (!TriggerManager.Checkpoints[Index - 1].Active)
@@ -80,6 +80,13 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
             //Save map and player data
             MapManager.SaveMap(BaseFolder);
             player.Save(BaseFolder);
+
+            // Save the level in case the user wants to quit and come back later
+            using (BinaryWriter binaryWriter = new BinaryWriter(File.OpenWrite($"{BaseFolder}/level.data")))
+            {
+                binaryWriter.Write(GameplayManager.Level);
+                binaryWriter.Write(RoomIndex);
+            }
 
             //Save the room this checkpoint is located in
             RoomIndex = MapManager.CurrentRoom.RoomIndex;
@@ -115,7 +122,11 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
         /// <param name="player">Player that triggered this checkpoint</param>
         public void LoadCheckpoint(Player player)
         {
-            MapManager.LoadCheckpoint(BaseFolder, RoomIndex);
+            int level;
+            using (BinaryReader binaryReader = new BinaryReader(File.OpenRead($"{BaseFolder}/level.data")))
+                level = binaryReader.ReadInt32();
+
+            MapManager.LoadCheckpoint(BaseFolder, RoomIndex, level);
             player.Load(BaseFolder);
         }
 

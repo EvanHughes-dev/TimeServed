@@ -6,7 +6,6 @@ using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-
 namespace MakeEveryDayRecount.Managers
 {
     /// <summary>
@@ -42,36 +41,6 @@ namespace MakeEveryDayRecount.Managers
         public static void Initialize()
         {
             _rooms = new Dictionary<int, Room>();
-            Room[] rooms = LoadMapData(GameplayManager.Level);
-            rooms = LoadMapData(GameplayManager.Level);
-            _currentRoom = rooms[0];
-            OnRoomUpdate?.Invoke(_currentRoom);
-            foreach (Room room in rooms)
-            {
-                room.DoorTransition += TransitionRoom;
-                _rooms.Add(room.RoomIndex, room);
-            }
-        }
-        /// <summary>
-        /// Transition the player to the new room
-        /// </summary>
-        /// <param name="transDoor">Door to transition from</param>
-        /// <param name="destRoom"> Destination room for transition </param>
-        public static void TransitionRoom(Door transDoor, int destRoom)
-        {
-            GameplayManager.PlayerObject.ChangeRoom(transDoor.DestinationTile);
-            ChangeRoom(destRoom);
-
-        }
-
-        /// <summary>
-        /// Change to the given room
-        /// </summary>
-        /// <param name="destRoom">Room index to change to</param>
-        public static void ChangeRoom(int destRoom)
-        {
-            _currentRoom = _rooms[destRoom];
-            OnRoomUpdate?.Invoke(_currentRoom);
         }
 
         /// <summary>
@@ -83,29 +52,24 @@ namespace MakeEveryDayRecount.Managers
             _currentRoom.Draw(batch);
         }
 
-        /// <summary>
-        /// Check if a player is allowed to move to a certain tile
-        /// </summary>
-        /// <param name="playerDest">Tile player wants to move to</param>
-        /// <returns>If the player is allowed to move there</returns>
-        public static bool CheckPlayerCollision(Point playerDest)
-        {
-            return _currentRoom.VerifyWalkable(playerDest);
-        }
+        #region Level Loading
 
         /// <summary>
-        /// Check if the tile in front of the player contains an interactable item
+        /// Switch to the level in gameplayManager
         /// </summary>
-        /// <param name="playerFacing">The tile the player wants to interact with</param>
-        /// <returns>Current item to interact with in the provided tile</returns>
-        public static Prop CheckInteractable(Point playerFacing)
+        public static void ChangeLevel(int level)
         {
-            return _currentRoom.VerifyInteractable(playerFacing);
-        }
+            //It might be better to just initialize MapManager again rather than have this method
 
-        public static Trigger CheckTrigger(Point playerPosition)
-        {
-            return _currentRoom.VerifyTrigger(playerPosition);
+            Room[] rooms = LoadMapData(level);
+            _rooms.Clear();
+            _currentRoom = rooms[0];
+            OnRoomUpdate?.Invoke(_currentRoom);
+            foreach (Room room in rooms)
+            {
+                room.DoorTransition += TransitionRoom;
+                _rooms.Add(room.RoomIndex, room);
+            }
         }
 
         /// <summary>
@@ -170,34 +134,22 @@ namespace MakeEveryDayRecount.Managers
             return rooms;
         }
 
-        /// <summary>
-        /// Switch to the level in gameplayManager
-        /// </summary>
-        public static void ChangeLevel()
-        {
-            //It might be better to just initialize MapManager again rather than have this method
-
-            Room[] rooms = LoadMapData(GameplayManager.Level);
-            _rooms.Clear();
-            _currentRoom = rooms[0];
-            OnRoomUpdate?.Invoke(_currentRoom);
-            foreach (Room room in rooms)
-            {
-                room.DoorTransition += TransitionRoom;
-                _rooms.Add(room.RoomIndex, room);
-            }
-        }
+        #region Checkpoints
 
         /// <summary>
         /// Loads the map data for the given checkpoint
         /// </summary>
         /// <param name="baseFolder">Base folder to load data from</param>
-        public static void LoadCheckpoint(string baseFolder, int roomIndex)
+        /// <param name="roomIndex">Index of the room to load the player into</param>
+        /// <param name="level"> Current level loading </param>
+        public static void LoadCheckpoint(string baseFolder, int roomIndex, int level)
         {
-            Room[] rooms = LoadMapData(1, "./CheckpointData");
+
+            Room[] rooms = LoadMapData(level, baseFolder);
             _rooms.Clear();
             foreach (Room room in rooms)
             {
+                room.DoorTransition += TransitionRoom;
                 room.DoorTransition += TransitionRoom;
                 _rooms.Add(room.RoomIndex, room);
             }
@@ -234,5 +186,95 @@ namespace MakeEveryDayRecount.Managers
 
             }
         }
+
+        /// <summary>
+        /// Validate that the .level file exists and all the needed .room files are there.
+        /// If a .room file is stored in properly, that will not be detected
+        /// </summary>
+        /// <param name="baseFolder">Folder to check</param>
+        /// <returns>If the files are valid to load the map</returns>
+        public static bool ValidateSavedData(string baseFolder)
+        {
+            if (!File.Exists(baseFolder + "/level.level"))
+                return false;
+
+            try
+            {
+                using (BinaryReader binaryReader = new BinaryReader(File.OpenRead(baseFolder + "/level.level")))
+                {
+                    int roomCount = binaryReader.ReadInt32();
+
+                    for (int currentRoom = 0; currentRoom < roomCount; currentRoom++)
+                    {
+                        string roomName = binaryReader.ReadString();
+                        _ = binaryReader.ReadInt32();
+                        if (!File.Exists($"{baseFolder}/{roomName}.room"))
+                            return false;
+                    }
+                }
+            }
+            catch
+            {
+                // If any error is throw, assume data was invalid
+                return false;
+            }
+            return true;
+        }
+        #endregion
+
+        /// <summary>
+        /// Transition the player to the new room
+        /// </summary>
+        /// <param name="transDoor">Door to transition from</param>
+        /// <param name="destRoom"> Destination room for transition </param>
+        public static void TransitionRoom(Door transDoor, int destRoom)
+        {
+            GameplayManager.PlayerObject.ChangeRoom(transDoor.DestinationTile);
+            ChangeRoom(destRoom);
+
+        }
+
+        /// <summary>
+        /// Change to the given room
+        /// </summary>
+        /// <param name="destRoom">Room index to change to</param>
+        public static void ChangeRoom(int destRoom)
+        {
+            _currentRoom = _rooms[destRoom];
+            OnRoomUpdate?.Invoke(_currentRoom);
+        }
+
+        #endregion
+
+
+        #region  Tile Checking
+
+        /// <summary>
+        /// Check if a player is allowed to move to a certain tile
+        /// </summary>
+        /// <param name="playerDest">Tile player wants to move to</param>
+        /// <returns>If the player is allowed to move there</returns>
+        public static bool CheckPlayerCollision(Point playerDest)
+        {
+            return _currentRoom.VerifyWalkable(playerDest);
+        }
+
+        /// <summary>
+        /// Check if the tile in front of the player contains an interactable item
+        /// </summary>
+        /// <param name="playerFacing">The tile the player wants to interact with</param>
+        /// <returns>Current item to interact with in the provided tile</returns>
+        public static Prop CheckInteractable(Point playerFacing)
+        {
+            return _currentRoom.VerifyInteractable(playerFacing);
+        }
+
+        public static Trigger CheckTrigger(Point playerPosition)
+        {
+            return _currentRoom.VerifyTrigger(playerPosition);
+        }
+
+        #endregion
+
     }
 }

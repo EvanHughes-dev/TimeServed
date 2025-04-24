@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
 using MakeEveryDayRecount.Players;
 
 namespace MakeEveryDayRecount.GameObjects.Triggers
@@ -39,7 +37,7 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
         /// <param name="width">Width of the trigger, in tiles</param>
         /// <param name="height">Height of the trigger in tiles</param>
         protected Trigger(Point location, int width, int height)
-            : base(location, null) 
+            : base(location, null)
         {
             _width = width;
             _height = height;

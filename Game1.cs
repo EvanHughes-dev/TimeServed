@@ -72,7 +72,7 @@ namespace MakeEveryDayRecount
             //_graphics.PreferredBackBufferHeight = 360;
 
             _graphics.HardwareModeSwitch = false;
-            _graphics.IsFullScreen = true;
+            _graphics.IsFullScreen = false;
             _graphics.ApplyChanges();
 
             _debugState = DebugState.None;
@@ -296,6 +296,7 @@ namespace MakeEveryDayRecount
         {
             if (state == GameState.Level)
             {
+                GameplayManager.NextLevel();
                 if (SoundManager.PlayingMusic)
                     SoundManager.ResumeBGM();
                 else

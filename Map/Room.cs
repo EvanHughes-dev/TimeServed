@@ -8,9 +8,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Managers;
 using MakeEveryDayRecount.GameObjects.Triggers;
-using Microsoft.Xna.Framework.Content;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
 
 namespace MakeEveryDayRecount.Map
 {
@@ -179,7 +176,8 @@ namespace MakeEveryDayRecount.Map
             foreach (Prop propToDraw in _itemsInRoom)
             {
                 Point propPosition = propToDraw.Location;
-
+                if (propToDraw is Camera)
+                    continue;
                 if (
                     propPosition.X >= screenMinX
                     && propPosition.X <= screenMaxX
@@ -205,6 +203,11 @@ namespace MakeEveryDayRecount.Map
                 {
                     doorToDraw.Draw(sb, worldToScreen, pixelOffset);
                 }
+            }
+
+            foreach (Camera cam in Cameras)
+            {
+                cam.Draw(sb, worldToScreen, pixelOffset);
             }
         }
 
@@ -372,10 +375,10 @@ namespace MakeEveryDayRecount.Map
                                 TriggerManager.SetPlayerSpawn(checkpoint);
                             }
                         }
+                        numberOfTriggers--;
                     }
                 }
-                //DELETE THIS maybe?
-                //_triggersInRoom.Add(new Checkpoint(new Point(1, 1), null, 0, 1, 1, true));
+
             }
             catch (Exception e)
             {
@@ -540,8 +543,11 @@ namespace MakeEveryDayRecount.Map
                 binaryWriter.Write(_itemsInRoom.Count + Doors.Count);
 
                 //Write out all non-door non-camera props
-                for (int i = 0; i < _itemsInRoom.Count - Cameras.Count; i++)
+                for (int i = 0; i < _itemsInRoom.Count; i++)
                 {
+                    if (_itemsInRoom[i] is Camera)
+                        continue;
+
                     binaryWriter.Write(_itemsInRoom[i].SpriteIndex);
                     binaryWriter.Write(_itemsInRoom[i].Location.X);
                     binaryWriter.Write(_itemsInRoom[i].Location.Y);

@@ -1,5 +1,6 @@
 ﻿using MakeEveryDayRecount.GameObjects.Triggers;
 using System.Collections.Generic;
+using System.IO;
 
 namespace MakeEveryDayRecount.Managers
 {
@@ -57,6 +58,24 @@ namespace MakeEveryDayRecount.Managers
         public static void SetPlayerSpawn(Checkpoint spawn)
         {
             PlayerSpawn = spawn;
+        }
+
+        /// <summary>
+        /// Ensure that all data in the checkpoints folder is valid
+        /// </summary>
+        /// <returns>If the data saved is valid</returns>
+        private static bool ValidateCheckpointData()
+        {
+            string baseFolder = Checkpoint.BaseFolder;
+            return File.Exists($"{baseFolder}/level.data") && GameplayManager.PlayerObject.ValidateData(baseFolder)
+             && MapManager.ValidateSavedData(baseFolder);
+        }
+
+        public static void LoadCheckpoint()
+        {
+            if (!ValidateCheckpointData())
+                return;
+
         }
 
     }
