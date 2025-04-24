@@ -58,7 +58,7 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
             // Don't use checkpoints if in replay mode.
             // This would lead to overwriting keyboard data
             if (ReplayManager.PlayingReplay)
-                return;
+                return false;
             //Makes sure the prior checkpoint has been activatated
             //unless this is the first checkpoint, in which case it's always good to activate
             if (Index != 0)
