@@ -217,7 +217,16 @@ namespace MakeEveryDayRecount.Players
                     //Check triggers
                     Trigger trigger = (MapManager.CurrentRoom.VerifyTrigger(Location));
                     if (trigger != null)
-                        trigger.Activate(this);
+                    {
+                        //Only trigger that cares about if it was activated right now is the Win trigger
+                        //If there are more that are created this will turn into a larger if statement
+                        if (trigger.Activate(this) && trigger is Win)
+                        {
+                            //JTODO: Need to change the game state ASAP, need to figure out the best way to do that
+                        }
+                            
+                    }
+                        
 
                     SoundManager.PlaySFX(SoundManager.PlayerStepSound, -40, 40);
                 }
