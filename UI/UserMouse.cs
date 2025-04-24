@@ -25,6 +25,7 @@ namespace MakeEveryDayRecount.UI
         private Texture2D[] _mouseSprites;
 
         private readonly Point _mouseCursorSize;
+        private readonly Point _mouseCursorOffset;
 
         /// <summary>
         /// Create a mouse object to display the mouse location
@@ -34,6 +35,7 @@ namespace MakeEveryDayRecount.UI
             _mouseSprites = AssetManager.CursorStates;
             _mouseState = MouseHover.UnHovered;
             _mouseCursorSize = new Point(mouseSize, mouseSize);
+            _mouseCursorOffset = new Point(mouseSize / 2, mouseSize / 2);
         }
 
         /// <summary>
@@ -42,7 +44,7 @@ namespace MakeEveryDayRecount.UI
         /// <param name="sb">SpriteBatch to draw with</param>
         public void Draw(SpriteBatch sb)
         {
-            sb.Draw(_mouseSprites[(int)_mouseState], new Rectangle(InputManager.GetMousePosition() - new Point(32, 32), _mouseCursorSize), Color.White);
+            sb.Draw(_mouseSprites[(int)_mouseState], new Rectangle(InputManager.GetMousePosition() - _mouseCursorOffset, _mouseCursorSize), Color.White);
         }
 
         /// <summary>
