@@ -133,7 +133,10 @@ namespace LevelEditor.Controls
             ShowTriggers = true;
 
             // Is it clean to be doing file IO in RoomRenderer? No. Is it fine? Sure
-            _wireBoxSprite = Image.FromFile(WireBoxSpritePath);
+            if (File.Exists(WireBoxSpritePath))
+            {
+                _wireBoxSprite = Image.FromFile(WireBoxSpritePath);    
+            }
         }
         /// <summary>
         /// Initializes a new RoomRenderer with specific text, size, and location.
