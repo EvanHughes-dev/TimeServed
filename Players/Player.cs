@@ -73,7 +73,7 @@ namespace MakeEveryDayRecount.Players
         private const float SecondsPerTile = .2f;
         private const float SecondsPerAnimation = .1f;
         private const float SecondsPerPositionUpdate = .1f;
-        private const float TimeUntilStand = 0.4f;
+        private const float TimeUntilStand = 1.5f;
 
         private float _timeBetweenPositionUpdate;
         private float _walkingSeconds;
@@ -116,6 +116,11 @@ namespace MakeEveryDayRecount.Players
             _reachedDest = true;
             _justMoved = false;
             _firstUpdate = true;
+
+            _playerSize = new Point(sprite.Width/4, sprite.Height/4);
+            _playerFrameRectangle = new Rectangle(
+                new Point(_playerSize.X * (int)_playerCurrentDirection, _playerSize.Y * _animationFrame),
+                _playerSize);
         }
 
         /// <summary>
@@ -124,7 +129,7 @@ namespace MakeEveryDayRecount.Players
         /// <param name="deltaTime">The elapsed time between frames in seconds</param>
         public void Update(float deltaTime)
         {
-            if (_firstUpdate) //TODO: Remove this because we update the player's position every frame
+            if (_firstUpdate)
             {
                 UpdatePlayerPos();
                 _firstUpdate = false;
@@ -132,7 +137,7 @@ namespace MakeEveryDayRecount.Players
             UpdatePlayerPos();
             KeyboardInput(deltaTime);
 
-            _playerFrameRectangle = AnimationUpdate(deltaTime);
+
             _inventory.Update();
         }
 
@@ -161,6 +166,7 @@ namespace MakeEveryDayRecount.Players
             }
             else //if (_reachedDest)
             {
+                _playerState = PlayerState.Standing;
                 UpdateStandingTime(deltaTime);
                 _readyToMove = true;
                 _walkingSeconds = 0;
@@ -199,49 +205,77 @@ namespace MakeEveryDayRecount.Players
         /// <param name="directionMove">Direction of movement</param>
         private void PlayerMovement(float deltaTime, Point movement, Direction directionMove)
         {
+            if (HoldingBox)
+            {
+                // Drop the box if the player is holding it and they attempt to move a direction the 
+                // box can't be moved in
+                if (IsPerpendicular(directionMove, _currentHeldBox.AttachmentDirection))
+                    DropBox();
+                else
+                {
+                    // Otherwise update need variable for the box
+                    directionMove = _currentHeldBox.AttachmentDirection;
+                }
+            }
+
             if (!_readyToMove) UpdateWalkingTime(deltaTime);
 
             else if (_playerState == PlayerState.Walking)
             {
-                if (MapManager.CheckPlayerCollision(Location + movement) &&
+                if (directionMove == _playerCurrentDirection &&
+                    MapManager.CheckPlayerCollision(Location + movement) &&
                     (!HoldingBox || MapManager.CheckPlayerCollision(_currentHeldBox.Location + movement)))
                 {
                     _readyToMove = false;
                     Location += movement;
-                    if (_playerState != PlayerState.Walking)
-                        _playerState = PlayerState.Walking;
 
                     SoundManager.PlaySFX(SoundManager.PlayerStepSound, -40, 40);
+
+                    UpdateAnimation(true);
                 }
-                else
+                else //Player can't move where they want to 
                 {
                     _playerState = PlayerState.Standing;
                     UpdateStandingTime(deltaTime);
+                    _walkingSeconds = 0;
+                    //But don't reset animation yet, because that doesn't happen until the timer goes over
                 }
-
-                if (HoldingBox)
-                {
-                    // Drop the box if the player is holding it and they attempt to move a direction the 
-                    // box can't be moved in
-                    if (IsPerpendicular(directionMove, _currentHeldBox.AttachmentDirection))
-                        DropBox();
-                    else
-                    {
-                        // Otherwise update need variable for the box
-                        directionMove = _currentHeldBox.AttachmentDirection;
-                    }
-                }
-
-                // Update the player's direction
-                if (_playerCurrentDirection != directionMove)
-                    _playerCurrentDirection = directionMove;
             }
             else //player starts out standing or interacting
             {
+                if (directionMove == _playerCurrentDirection)
+                {
+                    if (MapManager.CheckPlayerCollision(Location + movement) &&
+                    (!HoldingBox || MapManager.CheckPlayerCollision(_currentHeldBox.Location + movement)))
+                    {
+                        _readyToMove = false;
+                        Location += movement;
+                        if (_playerState != PlayerState.Walking)
+                            _playerState = PlayerState.Walking;
 
+                        SoundManager.PlaySFX(SoundManager.PlayerStepSound, -40, 40);
+
+                        UpdateAnimation(true);
+                        _standingSeconds = 0;
+                    }
+                    else
+                    {
+                        _playerState = PlayerState.Standing;
+                        UpdateStandingTime(deltaTime);
+                        _walkingSeconds = 0;
+                    }
+                }
+                else _readyToMove = false; //stops the player from turning around one frame and then moving the very next frame
+                //They have to either stop for a frame or wait for secondspertile
+            }
+
+            // Update the player's direction
+            if (_playerCurrentDirection != directionMove)
+            {
+                _playerCurrentDirection = directionMove;
+                UpdateAnimation(false);
             }
         }
-
         /// <summary>
         /// Update the time value in between each movements
         /// </summary>
@@ -256,18 +290,23 @@ namespace MakeEveryDayRecount.Players
                 _walkingSeconds -= SecondsPerTile;
             }
         }
-
+        /// <summary>
+        /// Updates the amount of time the player hase been not moving
+        /// if they stand long enough, it resets their animation to the standing frame
+        /// </summary>
+        /// <param name="deltaTime"></param>
         private void UpdateStandingTime(float deltaTime)
         {
             _standingSeconds += deltaTime;
 
             if (_standingSeconds >= TimeUntilStand)
             {
+                _animationFrame = 0;
                 _playerState = PlayerState.Standing;
                 _standingSeconds = 0f;
+                UpdateAnimation(false);
             }
         }
-
         #endregion
 
         #region Drawing Logic
@@ -290,51 +329,20 @@ namespace MakeEveryDayRecount.Players
             //Because nothing in the game should be drawn on top of the UI
             _inventory.Draw(sb, MapUtils.ScreenSize);
         }
-
         /// <summary>
-        /// Set the current Rectangle that represents the player's current image.
-        /// As it is setup now, the player changes walking animation once per tile
-        /// at the same rate the player walks.
+        /// Updates the player's animation frame, and advances it to the next frame if necessarry
         /// </summary>
-        /// <param name="deltaTime">Time since last frame</param>
-        /// <returns>Rectangle for player animation</returns>
-        private Rectangle AnimationUpdate(float deltaTime)
+        /// <param name="advance">If true, advances the animation to the next frame</param>
+        private void UpdateAnimation(bool advance)
         {
-            // Change the animation based on what state the player is currently in
-            switch (_playerState)
+            if (advance)
             {
-                case PlayerState.Standing:
-                    // Reset the animation timer to zero so the player doesn't look like
-                    // they're walking of they turn while in the same tile
-                    _animationFrame = 0;
-                    _animationTimeElapsed = 0;
-                    break;
-                case PlayerState.Walking:
-                    _animationTimeElapsed += deltaTime;
-                    // Check if the animation is ready to update
-                    if (_animationTimeElapsed >= SecondsPerAnimation)
-                    {
-                        _animationTimeElapsed -= SecondsPerAnimation;
-                        _animationFrame++;
-                        // Walking animations range from 0-3 in the Sprite Sheet
-                        // _animationFrame being < 0 is probably not going to happen
-                        // but its easy enough to check for so might as well
-                        if (_animationFrame >= 4 || _animationFrame < 0)
-                            _animationFrame = 0;
-                    }
-                    break;
-                case PlayerState.Interacting:
-                    // TODO Add animation for picking up/interacting
-                    break;
+                _animationFrame++;
+                if (_animationFrame > 3) _animationFrame = 0;
             }
-
-            return new Rectangle(
-                new Point(
-                    _playerSize.X * (int)_playerCurrentDirection,
-                    _playerSize.Y * _animationFrame
-                ),
-                _playerSize
-            );
+            _playerFrameRectangle = new Rectangle(
+                new Point(_playerSize.X * (int)_playerCurrentDirection, _playerSize.Y * _animationFrame),
+                _playerSize);
         }
 
         /// <summary>
