@@ -51,7 +51,10 @@ namespace MakeEveryDayRecount.Managers
             Level++;
             MapManager.ChangeLevel(Level);
             PlayerObject.ChangeRoom(TriggerManager.PlayerSpawn.Location);
-            TriggerManager.PlayerSpawn.Activate(PlayerObject);
+
+            // Don't activate triggers if replay mode is active
+            if (!ReplayManager.PlayingReplay)
+                TriggerManager.PlayerSpawn.Activate(PlayerObject);
         }
 
         public static void Update(float gameTime)
@@ -87,7 +90,6 @@ namespace MakeEveryDayRecount.Managers
             Level = 1;
             MapManager.ChangeLevel(Level);
             PlayerObject.ChangeRoom(TriggerManager.PlayerSpawn.Location);
-            TriggerManager.PlayerSpawn.Activate(PlayerObject);
             PlayerObject.ClearStates();
         }
 
