@@ -146,11 +146,6 @@ namespace MakeEveryDayRecount
                     GameplayManager.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
                     // Save the current state of the keyboard
                     ReplayManager.SaveState((float)gameTime.ElapsedGameTime.TotalSeconds);
-                    if (InputManager.GetKeyPress(Keys.Tab))
-                    {
-                        ReplayManager.SaveData(1, 1);
-                        _state = GameState.Playback;
-                    }
 
                     break;
 
@@ -184,7 +179,6 @@ namespace MakeEveryDayRecount
 
                         InputManager.ReplayUpdate();
                         GameplayManager.Update(ReplayManager.CurrentReplayState.DeltaTime);
-
                     }
 
                     break;
