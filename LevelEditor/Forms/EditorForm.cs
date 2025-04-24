@@ -124,6 +124,8 @@ namespace LevelEditor
                 swatch.SizeMode = PictureBoxSizeMode.Zoom;
             });
 
+            SelectedTile = _mainForm.Tiles.ElementAt(0);
+            SelectedProp = _mainForm.Props.ElementAt(0);
             SelectedTrigger = _mainForm.Triggers.ElementAt(0);
 
             //setup keyboard capturing
