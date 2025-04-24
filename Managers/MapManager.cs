@@ -231,11 +231,6 @@ namespace MakeEveryDayRecount.Managers
             return _currentRoom.VerifyInteractable(playerFacing);
         }
 
-        public static Trigger CheckTrigger(Point playerPosition)
-        {
-            return _currentRoom.VerifyTrigger(playerPosition);
-        }
-
         #endregion
 
     }
