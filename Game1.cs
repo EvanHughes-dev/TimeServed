@@ -284,6 +284,7 @@ namespace MakeEveryDayRecount
         {
             if (state == GameState.Level)
             {
+                GameplayManager.NextLevel();
                 if (SoundManager.PlayingMusic)
                     SoundManager.ResumeBGM();
                 else
