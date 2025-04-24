@@ -118,9 +118,6 @@ namespace MakeEveryDayRecount.Players
             _firstUpdate = true;
 
             _playerSize = new Point(sprite.Width/4, sprite.Height/4);
-            _playerFrameRectangle = new Rectangle(
-                new Point(_playerSize.X * (int)_playerCurrentDirection, _playerSize.Y * _animationFrame),
-                _playerSize);
         }
 
         /// <summary>
@@ -465,6 +462,7 @@ namespace MakeEveryDayRecount.Players
             _playerState = PlayerState.Standing;
             DropBox();
             _inventory.ClearInventory();
+            UpdateAnimation(false);
         }
 
         /// <summary>
