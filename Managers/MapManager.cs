@@ -1,14 +1,11 @@
 ﻿using System.Collections.Generic;
-using System.Data.Common;
 using System.IO;
 using MakeEveryDayRecount.GameObjects.Props;
 using MakeEveryDayRecount.GameObjects.Triggers;
 using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using System.Linq;
-using System.Text.RegularExpressions;
+
 
 namespace MakeEveryDayRecount.Managers
 {
@@ -61,7 +58,7 @@ namespace MakeEveryDayRecount.Managers
         /// <param name="transDoor">Door to transition from</param>
         /// <param name="destRoom"> Destination room for transition </param>
         public static void TransitionRoom(Door transDoor, int destRoom)
-        { 
+        {
             GameplayManager.PlayerObject.ChangeRoom(transDoor.DestinationTile);
             ChangeRoom(destRoom);
 
@@ -148,22 +145,20 @@ namespace MakeEveryDayRecount.Managers
             Room[] rooms = new Room[0];
             if (File.Exists(folderPath + "/level.level"))
             {
-                Stream streamReader = File.OpenRead(folderPath + "/level.level");
-                BinaryReader binaryReader = new BinaryReader(streamReader);
-
-                int roomCount = binaryReader.ReadInt32();
-                rooms = new Room[roomCount];
-
-                for (int currentRoom = 0; currentRoom < roomCount; currentRoom++)
+                using (BinaryReader binaryReader = new BinaryReader(File.OpenRead(folderPath + "/level.level")))
                 {
-                    string roomName = binaryReader.ReadString();
-                    string roomFilePath = $"{folderPath}/{roomName}.room";
-                    int roomIndex = binaryReader.ReadInt32();
-                    Room room = new Room(roomFilePath, roomName, roomIndex);
-                    rooms[currentRoom] = room;
-                }
+                    int roomCount = binaryReader.ReadInt32();
+                    rooms = new Room[roomCount];
 
-                binaryReader.Close();
+                    for (int currentRoom = 0; currentRoom < roomCount; currentRoom++)
+                    {
+                        string roomName = binaryReader.ReadString();
+                        string roomFilePath = $"{folderPath}/{roomName}.room";
+                        int roomIndex = binaryReader.ReadInt32();
+                        Room room = new Room(roomFilePath, roomName, roomIndex);
+                        rooms[currentRoom] = room;
+                    }
+                }
             }
             else
             {
@@ -181,7 +176,7 @@ namespace MakeEveryDayRecount.Managers
         public static void ChangeLevel()
         {
             //It might be better to just initialize MapManager again rather than have this method
-            
+
             Room[] rooms = LoadMapData(GameplayManager.Level);
             _rooms.Clear();
             _currentRoom = rooms[0];
@@ -194,19 +189,19 @@ namespace MakeEveryDayRecount.Managers
         }
 
         /// <summary>
-        /// Loads the map data for the given checpoint
+        /// Loads the map data for the given checkpoint
         /// </summary>
-        /// <param name="c">Given checkpoint</param>
-        public static void LoadCheckpoint(Checkpoint c)
+        /// <param name="baseFolder">Base folder to load data from</param>
+        public static void LoadCheckpoint(string baseFolder, int roomIndex)
         {
             Room[] rooms = LoadMapData(1, "./CheckpointData");
             _rooms.Clear();
             foreach (Room room in rooms)
             {
-                room.DoorTransition += TransitionRoom; 
+                room.DoorTransition += TransitionRoom;
                 _rooms.Add(room.RoomIndex, room);
             }
-            ChangeRoom(c.RoomIndex); 
+            ChangeRoom(roomIndex);
         }
 
         /// <summary>
@@ -216,29 +211,28 @@ namespace MakeEveryDayRecount.Managers
         public static void SaveMap(string baseFolder)
         {
             //Make the .level file
-            BinaryWriter writer = new BinaryWriter(File.OpenWrite(baseFolder + "/level.level"));
-
-            //Save number of rooms
-            writer.Write(_rooms.Count);
-
-            //Write data for each room
-            foreach (KeyValuePair<int, Room> kvp in _rooms)
+            using (BinaryWriter writer = new BinaryWriter(File.OpenWrite(baseFolder + "/level.level")))
             {
-                //Write name
-                writer.Write(_rooms[kvp.Key].RoomName);
+                //Save number of rooms
+                writer.Write(_rooms.Count);
 
-                //Write index
-                writer.Write(_rooms[kvp.Key].RoomIndex);
+                //Write data for each room
+                foreach (KeyValuePair<int, Room> kvp in _rooms)
+                {
+                    //Write name
+                    writer.Write(_rooms[kvp.Key].RoomName);
+
+                    //Write index
+                    writer.Write(_rooms[kvp.Key].RoomIndex);
+                }
+
+                //Save all the rooms
+                foreach (KeyValuePair<int, Room> kvp in _rooms)
+                {
+                    _rooms[kvp.Key].SaveRoom(baseFolder);
+                }
+
             }
-
-            //Save all the rooms
-            foreach (KeyValuePair<int, Room> kvp in _rooms)
-            {
-                _rooms[kvp.Key].SaveRoom(baseFolder);
-            }
-
-            //Close the writer
-            writer.Close();
         }
     }
 }

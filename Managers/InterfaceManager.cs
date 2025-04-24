@@ -26,7 +26,7 @@ namespace MakeEveryDayRecount.Managers
             CheckpointMenu,
             Level,
             PauseMenu,
-            SettingsMenu,
+            ReplayMode
         }
 
         /// <summary>
@@ -151,8 +151,6 @@ namespace MakeEveryDayRecount.Managers
                 case MenuModes.PauseMenu:
                     _pauseMenu.Update();
                     break;
-                case MenuModes.SettingsMenu:
-                    break;
                 case MenuModes.Level:
                     break;
             }
@@ -177,9 +175,6 @@ namespace MakeEveryDayRecount.Managers
                     break;
                 case MenuModes.PauseMenu:
                     _pauseMenu.Draw(sb);
-                    break;
-                case MenuModes.SettingsMenu:
-                    throw new NotImplementedException("Settings have not been implemented yet");
                     break;
                 case MenuModes.Level:
                     break;

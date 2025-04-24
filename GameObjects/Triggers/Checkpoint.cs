@@ -5,6 +5,7 @@ using MakeEveryDayRecount.Players;
 using MakeEveryDayRecount.Managers;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Reflection.Metadata;
 
 namespace MakeEveryDayRecount.GameObjects.Triggers
 {
@@ -29,6 +30,8 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
         /// Index of the room this checkpoint is housed in
         /// </summary>
         public int RoomIndex { get; private set; }
+
+        public static readonly string BaseFolder = "./CheckpointData";
 
         /// <summary>
         /// Constructs a checkpoint
@@ -63,22 +66,20 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
                     return;
             if (!Active)
                 return;
-            
-            string baseFolder = "./CheckpointData";
 
             //Deactivate the checkpoint, need to before it has saved the data
             Active = false;
 
             //Always want to overwrite the folder if it exists
-            if (Directory.Exists(baseFolder))
-                RecursiveDelete(baseFolder);
+            if (Directory.Exists(BaseFolder))
+                RecursiveDelete(BaseFolder);
 
             //(Re)make the folder
-            Directory.CreateDirectory(baseFolder);
+            Directory.CreateDirectory(BaseFolder);
 
             //Save map and player data
-            MapManager.SaveMap(baseFolder);
-            player.Save();
+            MapManager.SaveMap(BaseFolder);
+            player.Save(BaseFolder);
 
             //Save the room this checkpoint is located in
             RoomIndex = MapManager.CurrentRoom.RoomIndex;
@@ -100,12 +101,23 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
             foreach (string file in Directory.GetFiles(folderPath))
                 File.Delete(file);
 
-            foreach(string folder in Directory.GetDirectories(folderPath))
+            foreach (string folder in Directory.GetDirectories(folderPath))
             {
                 RecursiveDelete(folder);
             }
 
             Directory.Delete(folderPath);
         }
+
+        /// <summary>
+        /// Load this checkpoint's data
+        /// </summary>
+        /// <param name="player">Player that triggered this checkpoint</param>
+        public void LoadCheckpoint(Player player)
+        {
+            MapManager.LoadCheckpoint(BaseFolder, RoomIndex);
+            player.Load(BaseFolder);
+        }
+
     }
 }
