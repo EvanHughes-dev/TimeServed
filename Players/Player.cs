@@ -74,14 +74,12 @@ namespace MakeEveryDayRecount.Players
 
         private const float SecondsPerTile = .2f;
         private const float SecondsPerAnimation = .1f;
-        private const float SecondsPerPositionUpdate = .1f;
         private const float TimeUntilStand = 1.5f;
 
         private float _walkingSeconds;
         private float _standingSeconds;
         private bool _readyToMove;
-
-        private float _animationTimeElapsed;
+        
         private int _animationFrame;
         private Rectangle _playerFrameRectangle;
         private readonly Point _playerSize;
@@ -90,7 +88,6 @@ namespace MakeEveryDayRecount.Players
         private Inventory _inventory;
 
         private Box _currentHeldBox;
-        private bool _firstUpdate;
         /// <summary>
         /// Get if the player is holing a box 
         /// </summary>
@@ -110,9 +107,6 @@ namespace MakeEveryDayRecount.Players
             //Create an inventory
             _inventory = new Inventory(screenSize);
             _currentHeldBox = null;
-            _reachedDest = true;
-            _justMoved = false;
-            _firstUpdate = true;
 
             _playerSize = new Point(sprite.Width/4, sprite.Height/4);
         }
@@ -123,11 +117,6 @@ namespace MakeEveryDayRecount.Players
         /// <param name="deltaTime">The elapsed time between frames in seconds</param>
         public void Update(float deltaTime)
         {
-            if (_firstUpdate)
-            {
-                UpdatePlayerPos();
-                _firstUpdate = false;
-            }
             UpdatePlayerPos();
             KeyboardInput(deltaTime);
 
