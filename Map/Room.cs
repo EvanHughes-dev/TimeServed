@@ -346,10 +346,8 @@ namespace MakeEveryDayRecount.Map
                         numberOfGameObjects--;
                     }
                     //Define number of triggers in the room
-                    //TODO: update files so that triggers are implemented
                     //For rooms with no triggers we can slap a 0 at the end and everything will be fine
                     //As of right now they are not updated, so the following line has been commented out
-                    //int numberOfTriggers = binaryReader.ReadInt32();
                     int numberOfTriggers = binaryReader.ReadInt32();
 
                     //Parse all needed triggers from file

@@ -109,22 +109,20 @@ namespace MakeEveryDayRecount.Managers
             Room[] rooms = new Room[0];
             if (File.Exists(folderPath + "/level.level"))
             {
-                Stream streamReader = File.OpenRead(folderPath + "/level.level");
-                BinaryReader binaryReader = new BinaryReader(streamReader);
-
-                int roomCount = binaryReader.ReadInt32();
-                rooms = new Room[roomCount];
-
-                for (int currentRoom = 0; currentRoom < roomCount; currentRoom++)
+                using (BinaryReader binaryReader = new BinaryReader(File.OpenRead(folderPath + "/level.level")))
                 {
-                    string roomName = binaryReader.ReadString();
-                    string roomFilePath = $"{folderPath}/{roomName}.room";
-                    int roomIndex = binaryReader.ReadInt32();
-                    Room room = new Room(roomFilePath, roomName, roomIndex);
-                    rooms[currentRoom] = room;
-                }
+                    int roomCount = binaryReader.ReadInt32();
+                    rooms = new Room[roomCount];
 
-                binaryReader.Close();
+                    for (int currentRoom = 0; currentRoom < roomCount; currentRoom++)
+                    {
+                        string roomName = binaryReader.ReadString();
+                        string roomFilePath = $"{folderPath}/{roomName}.room";
+                        int roomIndex = binaryReader.ReadInt32();
+                        Room room = new Room(roomFilePath, roomName, roomIndex);
+                        rooms[currentRoom] = room;
+                    }
+                }
             }
             else
             {
@@ -136,20 +134,26 @@ namespace MakeEveryDayRecount.Managers
             return rooms;
         }
 
+        #region Checkpoints
+
         /// <summary>
-        /// Loads the map data for the given checpoint
+        /// Loads the map data for the given checkpoint
         /// </summary>
-        /// <param name="c">Given checkpoint</param>
-        public static void LoadCheckpoint(Checkpoint c)
+        /// <param name="baseFolder">Base folder to load data from</param>
+        /// <param name="roomIndex">Index of the room to load the player into</param>
+        /// <param name="level"> Current level loading </param>
+        public static void LoadCheckpoint(string baseFolder, int roomIndex, int level)
         {
-            Room[] rooms = LoadMapData(1, "./CheckpointData");
+
+            Room[] rooms = LoadMapData(level, baseFolder);
             _rooms.Clear();
             foreach (Room room in rooms)
             {
                 room.DoorTransition += TransitionRoom;
+                room.DoorTransition += TransitionRoom;
                 _rooms.Add(room.RoomIndex, room);
             }
-            ChangeRoom(c.RoomIndex);
+            ChangeRoom(roomIndex);
         }
 
         /// <summary>
@@ -159,30 +163,64 @@ namespace MakeEveryDayRecount.Managers
         public static void SaveMap(string baseFolder)
         {
             //Make the .level file
-            BinaryWriter writer = new BinaryWriter(File.OpenWrite(baseFolder + "/level.level"));
-
-            //Save number of rooms
-            writer.Write(_rooms.Count);
-
-            //Write data for each room
-            foreach (KeyValuePair<int, Room> kvp in _rooms)
+            using (BinaryWriter writer = new BinaryWriter(File.OpenWrite(baseFolder + "/level.level")))
             {
-                //Write name
-                writer.Write(_rooms[kvp.Key].RoomName);
+                //Save number of rooms
+                writer.Write(_rooms.Count);
 
-                //Write index
-                writer.Write(_rooms[kvp.Key].RoomIndex);
+                //Write data for each room
+                foreach (KeyValuePair<int, Room> kvp in _rooms)
+                {
+                    //Write name
+                    writer.Write(_rooms[kvp.Key].RoomName);
+
+                    //Write index
+                    writer.Write(_rooms[kvp.Key].RoomIndex);
+                }
+
+                //Save all the rooms
+                foreach (KeyValuePair<int, Room> kvp in _rooms)
+                {
+                    _rooms[kvp.Key].SaveRoom(baseFolder);
+                }
+
             }
-
-            //Save all the rooms
-            foreach (KeyValuePair<int, Room> kvp in _rooms)
-            {
-                _rooms[kvp.Key].SaveRoom(baseFolder);
-            }
-
-            //Close the writer
-            writer.Close();
         }
+
+        /// <summary>
+        /// Validate that the .level file exists and all the needed .room files are there.
+        /// If a .room file is stored in properly, that will not be detected
+        /// </summary>
+        /// <param name="baseFolder">Folder to check</param>
+        /// <returns>If the files are valid to load the map</returns>
+        public static bool ValidateSavedData(string baseFolder)
+        {
+            if (!File.Exists(baseFolder + "/level.level"))
+                return false;
+
+            try
+            {
+                using (BinaryReader binaryReader = new BinaryReader(File.OpenRead(baseFolder + "/level.level")))
+                {
+                    int roomCount = binaryReader.ReadInt32();
+
+                    for (int currentRoom = 0; currentRoom < roomCount; currentRoom++)
+                    {
+                        string roomName = binaryReader.ReadString();
+                        _ = binaryReader.ReadInt32();
+                        if (!File.Exists($"{baseFolder}/{roomName}.room"))
+                            return false;
+                    }
+                }
+            }
+            catch
+            {
+                // If any error is throw, assume data was invalid
+                return false;
+            }
+            return true;
+        }
+        #endregion
 
         /// <summary>
         /// Transition the player to the new room

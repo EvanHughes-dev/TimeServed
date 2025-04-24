@@ -126,6 +126,7 @@ namespace MakeEveryDayRecount.Players
 
             _playerFrameRectangle = AnimationUpdate(deltaTime);
             _inventory.Update();
+            CheckTrigger();
         }
 
         #region Player Movement
@@ -442,6 +443,14 @@ namespace MakeEveryDayRecount.Players
         }
 
         /// <summary>
+        /// Activate any trigger the player has stepped on
+        /// </summary>
+        public void CheckTrigger()
+        {
+            MapManager.CheckTrigger(Location)?.Activate(this);
+        }
+
+        /// <summary>
         /// Pickup this box and attach it to the player
         /// </summary>
         /// <param name="boxToPickup">Box to attach</param>
@@ -466,10 +475,7 @@ namespace MakeEveryDayRecount.Players
         public void Detected()
         {
             //Reset the map to the last checkpoint
-            MapManager.LoadCheckpoint(TriggerManager.CurrentCheckpoint);
-
-            //Reset the player data to the last checkpoint
-            Load();
+            TriggerManager.CurrentCheckpoint.LoadCheckpoint(this);
         }
 
         #endregion
@@ -496,71 +502,83 @@ namespace MakeEveryDayRecount.Players
         ///     int propIndex
         ///     int keyType
         /// </summary>
-        public void Save()
-        {
-            //Make the folder if it doesn't already exist
-            if (!Directory.Exists("./PlayerData"))
-                Directory.CreateDirectory("./PlayerData");
+        /// <param name="baseFolder">Folder to save player data to</param>
 
-            BinaryWriter writer = null;
+        public void Save(string baseFolder)
+        {
+
             try
             {
-                Stream stream = File.OpenWrite($"./PlayerData/PlayerData.data");
-                writer = new BinaryWriter(stream);
-
-                //Player position
-                writer.Write(Location.X);
-                writer.Write(Location.Y);
-
-                //Item count
-                writer.Write(_inventory.Contents.Count);
-
-                //Items
-                for (int i = 0; i < _inventory.Contents.Count; i++)
+                using (BinaryWriter binaryWriter = new BinaryWriter(File.OpenWrite($"{baseFolder}/PlayerData.data")))
                 {
-                    writer.Write(_inventory.Contents[i].SpriteIndex);
-                    writer.Write((int)_inventory.Contents[i].ItemKeyType);
+                    //Player position
+                    binaryWriter.Write(Location.X);
+                    binaryWriter.Write(Location.Y);
+
+                    //Item count
+                    binaryWriter.Write(_inventory.Contents.Count);
+
+                    //Items
+                    for (int i = 0; i < _inventory.Contents.Count; i++)
+                    {
+                        binaryWriter.Write(_inventory.Contents[i].SpriteIndex);
+                        binaryWriter.Write((int)_inventory.Contents[i].ItemKeyType);
+                    }
                 }
             }
-            finally
+            catch (Exception e)
             {
-                writer.Close();
+                System.Diagnostics.Debug.Write(e.Message);
             }
+        }
+
+        /// <summary>
+        /// Validate the PLayerData.data file exists
+        /// </summary>
+        /// <param name="baseFolder">Folder to check</param>
+        /// <returns>If the file exists</returns>
+        public bool ValidateData(string baseFolder)
+        {
+            if (File.Exists($"{baseFolder}/PlayerData.data"))
+                return true;
+            return false;
         }
 
         /// <summary>
         /// Resets all relevant player values to how they were during the last checkpoint
         /// </summary>
-        public void Load()
+        /// <param name="baseFolder">Folder to load player data from</param>
+        public void Load(string baseFolder)
         {
-            BinaryReader reader = null!;
+            if (!File.Exists($"{baseFolder}/PlayerData.data"))
+                return;
 
             //Clear Player's states
             ClearStates();
 
             try
             {
-                Stream stream = File.OpenRead("./PlayerData/PlayerData.data");
-                reader = new BinaryReader(stream);
-
-                //Update player position
-                Location = new Point(reader.ReadInt32(), reader.ReadInt32());
-
-                //Check item count
-                int itemCount = reader.ReadInt32();
-
-                //Give the player their items back
-                for (int i = 0; i < itemCount; i++)
+                using (BinaryReader binaryReader = new BinaryReader(File.OpenRead($"{baseFolder}/PlayerData.data")))
                 {
-                    int spriteIndex = reader.ReadInt32();
-                    int keyType = reader.ReadInt32();
+                    //Update player position
+                    Location = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
 
-                    _inventory.AddItemToInventory(new Item(Point.Zero, AssetManager.PropTextures, spriteIndex, "TEMP_NAME", (Door.DoorKeyType)keyType));
+                    //Check item count
+                    int itemCount = binaryReader.ReadInt32();
+
+                    //Give the player their items back
+                    for (int i = 0; i < itemCount; i++)
+                    {
+                        int spriteIndex = binaryReader.ReadInt32();
+                        int keyType = binaryReader.ReadInt32();
+
+                        _inventory.AddItemToInventory(new Item(Point.Zero, AssetManager.PropTextures, spriteIndex, "TEMP_NAME", (Door.DoorKeyType)keyType));
+                    }
                 }
             }
-            finally
+            catch (Exception e)
             {
-                reader.Close();
+                System.Diagnostics.Debug.Write(e.Message);
             }
         }
     }
