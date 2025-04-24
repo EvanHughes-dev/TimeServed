@@ -361,10 +361,9 @@ namespace LevelEditor.Controls
                         Point position = TileSpaceToPixelSpace((Point)camera.Position!).GetCenter();
                         Point target = TileSpaceToPixelSpace((Point)camera.Target!).GetCenter();
 
-                        // Listen, I'm gonna be honest... if you stare at this code for long enough you could probably understand exactly why I made these decisions
-                        //   But it works, okay? Don't think too hard about it
-                        Point vectorToTarget = target.Subtract(position);
-                        float angleToTargetRads = MathF.Atan2(vectorToTarget.Y, vectorToTarget.X);
+                    // Listen, I'm gonna be honest... if you stare at this code for long enough you could probably understand exactly why I made these decisions
+                    //   But it works, okay? Don't think too hard about it
+                    Point positionToTarget = target.Subtract(position);
 
                         /*
                          * Alright, let's talk about this offset
@@ -386,17 +385,19 @@ namespace LevelEditor.Controls
                             cameraTile.Y < Room.Height - 1 && Room[cameraTile.Add(new Point(0, 1))].IsWalkable,  // down
                             ];
 
-                        Point startOffset;
-                        // Checks are done in left, right, up, down order to exactly mimic the order they are performed in-game
-                        if (isNotWall[0] && vectorToTarget.X < 0) startOffset = new Point(-1, 0);      // left
-                        else if (isNotWall[1] && vectorToTarget.X > 0) startOffset = new Point(1, 0);  // right
-                        else if (isNotWall[2] && vectorToTarget.Y < 0) startOffset = new Point(0, -1); // up
-                        else if (isNotWall[3] && vectorToTarget.Y > 0) startOffset = new Point(0, 1);  // down
-                        // If the camera has no valid offset, show it as just being drawn from the center of the camera
-                        //   Is that *really* accurate? No. But it's fine enough
-                        else startOffset = new Point(0, 0);
+                    Point startOffset;
+                    // Checks are done in left, right, up, down order to exactly mimic the order they are performed in-game
+                    if (isNotWall[0] && positionToTarget.X < 0) startOffset = new Point(-1, 0);      // left
+                    else if (isNotWall[1] && positionToTarget.X > 0) startOffset = new Point(1, 0);  // right
+                    else if (isNotWall[2] && positionToTarget.Y < 0) startOffset = new Point(0, -1); // up
+                    else if (isNotWall[3] && positionToTarget.Y > 0) startOffset = new Point(0, 1);  // down
+                    // If the camera has no valid offset, show it as just being drawn from the center of the camera
+                    //   Is that *really* accurate? No. But it's fine enough
+                    else startOffset = new Point(0, 0);
 
-                        Point start = position.Add(startOffset.Multiply(_tileSize));
+                    Point start = position.Add(startOffset.Multiply(_tileSize));
+                    Point startToTarget = target.Subtract(start);
+                    float angleToTargetRads = MathF.Atan2(startToTarget.Y, startToTarget.X);
 
                         // Okay from here on out it's gonna be a lot of geometry and you're gonna have to trust me a little
                         // Do I have a specific algorithm I'm implementing? Hell no! I winged this shit!
