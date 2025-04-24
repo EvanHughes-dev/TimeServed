@@ -8,9 +8,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Managers;
 using MakeEveryDayRecount.GameObjects.Triggers;
-using Microsoft.Xna.Framework.Content;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
 
 namespace MakeEveryDayRecount.Map
 {
@@ -179,7 +176,8 @@ namespace MakeEveryDayRecount.Map
             foreach (Prop propToDraw in _itemsInRoom)
             {
                 Point propPosition = propToDraw.Location;
-
+                if (propToDraw is Camera)
+                    continue;
                 if (
                     propPosition.X >= screenMinX
                     && propPosition.X <= screenMaxX
@@ -205,6 +203,11 @@ namespace MakeEveryDayRecount.Map
                 {
                     doorToDraw.Draw(sb, worldToScreen, pixelOffset);
                 }
+            }
+
+            foreach (Camera cam in Cameras)
+            {
+                cam.Draw(sb, worldToScreen, pixelOffset);
             }
         }
 
@@ -264,34 +267,34 @@ namespace MakeEveryDayRecount.Map
                     *       int outputPosY
                     */
 
-                // Define the size of the current room and loop to populate tiles
-                int tileMapWidth = binaryReader.ReadInt32();
-                int tileMapHeight = binaryReader.ReadInt32();
+                    // Define the size of the current room and loop to populate tiles
+                    int tileMapWidth = binaryReader.ReadInt32();
+                    int tileMapHeight = binaryReader.ReadInt32();
 
-                _map = new Tile[tileMapWidth, tileMapHeight];
-                MapSize = new Point(tileMapWidth, tileMapHeight);
-                for (int tileYIndex = 0; tileYIndex < tileMapHeight; tileYIndex++)
-                {
-                    for (int tileXIndex = 0; tileXIndex < tileMapWidth; tileXIndex++)
+                    _map = new Tile[tileMapWidth, tileMapHeight];
+                    MapSize = new Point(tileMapWidth, tileMapHeight);
+                    for (int tileYIndex = 0; tileYIndex < tileMapHeight; tileYIndex++)
                     {
-                        _map[tileXIndex, tileYIndex] = new Tile(
-                            binaryReader.ReadBoolean(),
-                            binaryReader.ReadInt32()
-                        );
+                        for (int tileXIndex = 0; tileXIndex < tileMapWidth; tileXIndex++)
+                        {
+                            _map[tileXIndex, tileYIndex] = new Tile(
+                                binaryReader.ReadBoolean(),
+                                binaryReader.ReadInt32()
+                            );
+                        }
                     }
-                }
 
-                // Define the number of GameObjects in the room
-                // Could be a door
-                int numberOfGameObjects = binaryReader.ReadInt32();
-                Dictionary<int, Point> direction = new Dictionary<int, Point> { { 0, new Point(0, -1) }, { 1, new Point(1, 0) }, { 2, new Point(0, 1) }, { 3, new Point(-1, 0) } };
+                    // Define the number of GameObjects in the room
+                    // Could be a door
+                    int numberOfGameObjects = binaryReader.ReadInt32();
+                    Dictionary<int, Point> direction = new Dictionary<int, Point> { { 0, new Point(0, -1) }, { 1, new Point(1, 0) }, { 2, new Point(0, 1) }, { 3, new Point(-1, 0) } };
 
-                // Parse all needed GameObjects from the file
-                while (numberOfGameObjects > 0)
-                {
-                    int propIndex = binaryReader.ReadInt32();
+                    // Parse all needed GameObjects from the file
+                    while (numberOfGameObjects > 0)
+                    {
+                        int propIndex = binaryReader.ReadInt32();
 
-                    Point tileLocation = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
+                        Point tileLocation = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
 
                         ObjectTypes objectType = (ObjectTypes)binaryReader.ReadInt32();
 
@@ -372,10 +375,10 @@ namespace MakeEveryDayRecount.Map
                                 TriggerManager.SetPlayerSpawn(checkpoint);
                             }
                         }
+                        numberOfTriggers--;
                     }
                 }
-                //DELETE THIS maybe?
-                //_triggersInRoom.Add(new Checkpoint(new Point(1, 1), null, 0, 1, 1, true));
+
             }
             catch (Exception e)
             {
@@ -401,16 +404,24 @@ namespace MakeEveryDayRecount.Map
         /// <returns>If the tile is walkable. True means the tile is walkable</returns>
         public bool VerifyWalkable(Point pointToCheck, bool isCamera = false)
         {
-            foreach (GameObject gameObject in _itemsInRoom)
+            foreach (Prop prop in _itemsInRoom)
             {
-                // If the object is a box that is held and in the square, do not let the player enter it
-                if (gameObject is Box && gameObject.Location == pointToCheck)
+                // If the object is a box that is held and in the square, check if it is unwalkable in the context
+                if (prop.Location.Equals(pointToCheck))
                 {
+                    if (prop is Box)
+                    {
+                        // The position is unwalkable if the player isn't holding it or the item requesting the check is a camera
+                        if (((Box)prop).AttachmentDirection == Players.Direction.None || isCamera)
+                            return false;
 
-                    if (((Box)gameObject).AttachmentDirection == Players.Direction.None || isCamera)
+                        return true;
+                    }
+                    else if (!isCamera)
+                    {
+
                         return false;
-
-                    return true;
+                    }
                 }
             }
 
@@ -540,8 +551,11 @@ namespace MakeEveryDayRecount.Map
                 binaryWriter.Write(_itemsInRoom.Count + Doors.Count);
 
                 //Write out all non-door non-camera props
-                for (int i = 0; i < _itemsInRoom.Count - Cameras.Count; i++)
+                for (int i = 0; i < _itemsInRoom.Count; i++)
                 {
+                    if (_itemsInRoom[i] is Camera)
+                        continue;
+
                     binaryWriter.Write(_itemsInRoom[i].SpriteIndex);
                     binaryWriter.Write(_itemsInRoom[i].Location.X);
                     binaryWriter.Write(_itemsInRoom[i].Location.Y);
@@ -605,7 +619,7 @@ namespace MakeEveryDayRecount.Map
                     }
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 System.Diagnostics.Debug.Write(e.Message);
             }

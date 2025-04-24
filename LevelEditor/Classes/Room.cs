@@ -111,7 +111,7 @@ namespace LevelEditor.Classes
         /// <summary>
         /// Called whenever a camera in this room updates its view frustum.
         /// </summary>
-        public event Action<Camera>? OnCameraViewFrustumUpdated;
+        public event Action<Camera>? OnCameraUpdate;
         /// <summary>
         /// Called whenever this room has its bounds resized.
         /// </summary>
@@ -165,19 +165,19 @@ namespace LevelEditor.Classes
 
             if (prop is Camera camera)
             {
-                camera.ViewFrustumUpdate += HandleCameraViewFrustumUpdated;
+                camera.CameraUpdate += HandleCameraUpdate;
             }
 
             OnPropAdded?.Invoke(prop);
         }
 
         /// <summary>
-        /// Invokes the OnCameraViewFrustumUpdated event.
+        /// Invokes the OnCameraUpdate event.
         /// </summary>
         /// <param name="sender"></param>
-        private void HandleCameraViewFrustumUpdated(Camera sender)
+        private void HandleCameraUpdate(Camera sender)
         {
-            OnCameraViewFrustumUpdated?.Invoke(sender);
+            OnCameraUpdate?.Invoke(sender);
         }
 
         /// <summary>
@@ -193,7 +193,7 @@ namespace LevelEditor.Classes
             {
                 if (prop is Camera camera)
                 {
-                    camera.ViewFrustumUpdate -= HandleCameraViewFrustumUpdated;
+                    camera.CameraUpdate -= HandleCameraUpdate;
                 }
 
                 OnPropRemoved?.Invoke(prop);
