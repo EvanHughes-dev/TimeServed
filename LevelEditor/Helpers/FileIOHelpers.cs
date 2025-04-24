@@ -114,6 +114,8 @@ namespace LevelEditor.Helpers
              *       int targetX
              *       int targetY
              *       double spreadRadians // Will be parsed as a float, but has to be saved and loaded as a double because Evan says so
+             *       int wireBoxX
+             *       int wireBoxY // If the camera has no wire box, save these as (-1, -1)
              *       
              * int triggerCount
              * 
@@ -175,10 +177,14 @@ namespace LevelEditor.Helpers
                         case ObjectType.Camera:
                             Camera camera = (Camera)prop;
                             Point target = (Point)camera.Target!;
+                            Point wireBox = camera.WireBoxPosition ?? new Point(-1, -1);
 
                             writer.Write(target.X);
                             writer.Write(target.Y);
                             writer.Write((double)camera.RadianSpread);
+
+                            writer.Write(wireBox.X);
+                            writer.Write(wireBox.Y);
                             break;
 
                         case ObjectType.Box:
@@ -347,6 +353,8 @@ namespace LevelEditor.Helpers
              *       int targetX
              *       int targetY
              *       double spreadRadians // Will be parsed as a float, but has to be saved and loaded as a double because Evan says so
+             *       int wireBoxX
+             *       int wireBoxY // If the camera has no wire box, save these as (-1, -1)
              *       
              * int triggerCount
              * 
@@ -418,7 +426,11 @@ namespace LevelEditor.Helpers
                         case ObjectType.Camera:
                             Point target = new Point(reader.ReadInt32(), reader.ReadInt32());
                             float spread = (float)reader.ReadDouble();
-                            room.AddProp(((Camera)allProps.ElementAt(imageIndex + 10)).Instantiate(propPosition, target, spread));
+
+                            Point? wireBox = new Point(reader.ReadInt32(), reader.ReadInt32());
+                            if (wireBox == new Point(-1, -1)) wireBox = null;
+
+                            room.AddProp(((Camera)allProps.ElementAt(imageIndex + 10)).Instantiate(propPosition, target, spread, wireBox));
                             break;
                     }
 

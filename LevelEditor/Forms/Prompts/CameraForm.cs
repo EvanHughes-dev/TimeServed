@@ -150,6 +150,23 @@ namespace LevelEditor.Forms.Prompts
             _camera.Target = e.Tile;
         }
 
+        /// <summary>
+        /// Prompts the user for a position and then sets the camera's wire box to that position.
+        /// </summary>
+        private void buttonAddWireBox_Click(object sender, EventArgs e)
+        {
+            Point? newWireBox = PositionSelectForm.Prompt(roomRenderer.Room);
+
+            _camera.WireBoxPosition = newWireBox;
+        }
+
+        /// <summary>
+        /// Sets the camera's wire box position to null.
+        /// </summary>
+        private void buttonRemoveWireBox_Click(object sender, EventArgs e)
+        {
+            _camera.WireBoxPosition = null;
+        }
         #endregion
 
         /// <summary>

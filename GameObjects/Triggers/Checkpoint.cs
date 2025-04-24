@@ -48,8 +48,6 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
 
         //Methods
 
-        //TODO: Maybe add a method to display that progress is being saved in some way? Low priority
-
         /// <summary>
         /// Saves the map and player data
         /// </summary>
@@ -57,6 +55,10 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
         /// <returns>True if the checkpoint succesfully activated, false otherwise</returns>
         public override bool Activate(Player player)
         {
+            // Don't use checkpoints if in replay mode.
+            // This would lead to overwriting keyboard data
+            if (ReplayManager.PlayingReplay)
+                return;
             //Makes sure the prior checkpoint has been activatated
             //unless this is the first checkpoint, in which case it's always good to activate
             if (Index != 0)
@@ -102,7 +104,7 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
             foreach (string file in Directory.GetFiles(folderPath))
                 File.Delete(file);
 
-            foreach(string folder in Directory.GetDirectories(folderPath))
+            foreach (string folder in Directory.GetDirectories(folderPath))
             {
                 RecursiveDelete(folder);
             }
