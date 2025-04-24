@@ -408,7 +408,7 @@ namespace MakeEveryDayRecount.Map
                 {
                     if (prop is Box)
                     {
-                        // The position is unwalkable if the player isn't holding it or the item requesting th check if a camera
+                        // The position is unwalkable if the player isn't holding it or the item requesting the check is a camera
                         if (((Box)prop).AttachmentDirection == Players.Direction.None || isCamera)
                             return false;
 
