@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             groupBoxMap = new GroupBox();
+            roomRenderer = new LevelEditor.Controls.RoomRenderer();
             trackBarSpread = new TrackBar();
             textBoxSpread = new TextBox();
             labelSpread = new Label();
@@ -36,6 +37,7 @@
             splitContainer = new SplitContainer();
             buttonAddWireBox = new Button();
             buttonRemoveWireBox = new Button();
+            groupBoxMap.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)trackBarSpread).BeginInit();
             ((System.ComponentModel.ISupportInitialize)splitContainer).BeginInit();
             splitContainer.Panel1.SuspendLayout();
@@ -45,12 +47,26 @@
             // 
             // groupBoxMap
             // 
+            groupBoxMap.Controls.Add(roomRenderer);
             groupBoxMap.Location = new Point(5, 3);
             groupBoxMap.Name = "groupBoxMap";
-            groupBoxMap.Size = new Size(565, 264);
+            groupBoxMap.Size = new Size(565, 426);
             groupBoxMap.TabIndex = 3;
             groupBoxMap.TabStop = false;
             groupBoxMap.Text = "Map";
+            // 
+            // roomRenderer
+            // 
+            roomRenderer.Location = new Point(6, 22);
+            roomRenderer.Name = "roomRenderer";
+            roomRenderer.Room = null;
+            roomRenderer.ShowProps = true;
+            roomRenderer.ShowTiles = true;
+            roomRenderer.ShowTriggers = true;
+            roomRenderer.Size = new Size(553, 398);
+            roomRenderer.TabIndex = 0;
+            roomRenderer.Text = "roomRenderer1";
+            roomRenderer.TileMouseClick += RoomRenderer_TileMouseClick;
             // 
             // trackBarSpread
             // 
@@ -146,6 +162,7 @@
             Name = "CameraForm";
             Text = "Camera Editor";
             Resize += CameraForm_Resize;
+            groupBoxMap.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)trackBarSpread).EndInit();
             splitContainer.Panel1.ResumeLayout(false);
             splitContainer.Panel2.ResumeLayout(false);

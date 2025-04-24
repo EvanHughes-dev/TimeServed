@@ -133,7 +133,10 @@ namespace LevelEditor.Controls
             ShowTriggers = true;
 
             // Is it clean to be doing file IO in RoomRenderer? No. Is it fine? Sure
-            _wireBoxSprite = Image.FromFile(WireBoxSpritePath);
+            if (File.Exists(WireBoxSpritePath))
+            {
+                _wireBoxSprite = Image.FromFile(WireBoxSpritePath);    
+            }
         }
         /// <summary>
         /// Initializes a new RoomRenderer with specific text, size, and location.
@@ -539,6 +542,8 @@ namespace LevelEditor.Controls
 
                 _room.OnTriggerAdded -= OnTriggerChange;
                 _room.OnTriggerRemoved -= OnTriggerChange;
+
+                _room.OnRoomResized -= OnRoomResized;
             }
         }
         /// <summary>
@@ -563,6 +568,8 @@ namespace LevelEditor.Controls
 
                 _room.OnTriggerAdded += OnTriggerChange;
                 _room.OnTriggerRemoved += OnTriggerChange;
+
+                _room.OnRoomResized += OnRoomResized;
             }
         }
 
@@ -597,6 +604,15 @@ namespace LevelEditor.Controls
         /// <param name="newTile">The new tile.</param>
         private void OnTileUpdated(Point tileUpdatedCoords, Tile newTile)
         {
+            Invalidate();
+        }
+
+        /// <summary>
+        /// Updates the display properties and invalidates the render.
+        /// </summary>
+        private void OnRoomResized()
+        {
+            UpdateDisplayProperties();
             Invalidate();
         }
 

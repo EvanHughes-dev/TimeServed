@@ -100,12 +100,10 @@ namespace MakeEveryDayRecount
 
             GlobalDebug.Initialize();
             GameplayManager.Initialize(ScreenSize);
-            // Initialize all items that need assets to be loaded 
-            InterfaceManager.InitializeMenus(ScreenSize);
-
             MapUtils.Initialize(this);
 
-
+            // Initialize all items that need assets to be loaded 
+            InterfaceManager.InitializeMenus(ScreenSize);
 
             _debugModes[0] = new PlayerDebug();
             _debugModes[1] = new MapDebug();
