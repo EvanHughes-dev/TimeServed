@@ -89,6 +89,7 @@ namespace MakeEveryDayRecount.Managers
 
                 Rectangle menuPlayRect = new Rectangle(drawPoint, buttonSize);
                 Button menuPlay = new Button(menuPlayRect, AssetManager.DefaultButton, AssetManager.DefaultButton, true, "Play", font);
+                menuPlay.OnClick += GameplayManager.NextLevel;
                 menuPlay.OnClick += GameplayManager.ClearSavedData;
                 menuPlay.OnClick += GameStateChange(GameState.Level);
                 menuPlay.OnClick += MenuChange(MenuModes.Level);
@@ -97,7 +98,9 @@ namespace MakeEveryDayRecount.Managers
 
                 Rectangle menuCheckPointRect = new Rectangle(IncrementScreenPos(drawPoint, 1, buttonSize.Y, buttonSpacing), buttonSize);
                 Button menuCheckPoint = new Button(menuCheckPointRect, AssetManager.DefaultButton, AssetManager.DefaultButton, true, "Checkpoints", font);
-                menuPlay.OnClick += TriggerManager.LoadCheckpoint;
+                menuCheckPoint.OnClick += TriggerManager.LoadCheckpoint;
+                menuCheckPoint.OnClick += MenuChange(MenuModes.Level);
+                menuCheckPoint.OnClick += GameStateChange(GameState.Level);
                 buttons.Add(menuCheckPoint);
 
 

@@ -24,7 +24,7 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
         /// <summary>
         /// Whether or not this checkpoint can be activated
         /// </summary>
-        public bool Active { get; private set; }
+        public bool Active { get; set; }
 
         /// <summary>
         /// Index of the room this checkpoint is housed in
@@ -62,7 +62,7 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
             //Makes sure the prior checkpoint has been activated
             //unless this is the first checkpoint, in which case it's always good to activate
             if (Index != 0)
-                if (!TriggerManager.Checkpoints[Index - 1].Active)
+                if (TriggerManager.Checkpoints[Index - 1].Active)
                     return;
             if (!Active)
                 return;
@@ -81,15 +81,18 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
             MapManager.SaveMap(BaseFolder);
             player.Save(BaseFolder);
 
+            //Save the room this checkpoint is located in
+            RoomIndex = MapManager.CurrentRoom.RoomIndex;
+
             // Save the level in case the user wants to quit and come back later
             using (BinaryWriter binaryWriter = new BinaryWriter(File.OpenWrite($"{BaseFolder}/level.data")))
             {
                 binaryWriter.Write(GameplayManager.Level);
                 binaryWriter.Write(RoomIndex);
+                binaryWriter.Write(Index);
             }
 
-            //Save the room this checkpoint is located in
-            RoomIndex = MapManager.CurrentRoom.RoomIndex;
+
 
             //Update the current checkpoint
             TriggerManager.CurrentCheckpoint = this;

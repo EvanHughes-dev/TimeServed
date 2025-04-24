@@ -133,6 +133,7 @@ namespace MakeEveryDayRecount.Players
 
             _playerFrameRectangle = AnimationUpdate(deltaTime);
             _inventory.Update();
+            CheckTrigger();
         }
 
         #region Player Movement
@@ -408,6 +409,14 @@ namespace MakeEveryDayRecount.Players
         {
             Location = new_location;
             UpdatePlayerPos();
+        }
+
+        /// <summary>
+        /// Activate any trigger the player has stepped on
+        /// </summary>
+        public void CheckTrigger()
+        {
+            MapManager.CheckTrigger(Location)?.Activate(this);
         }
 
         /// <summary>
