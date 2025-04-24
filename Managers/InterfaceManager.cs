@@ -135,10 +135,11 @@ namespace MakeEveryDayRecount.Managers
         }
 
         /// <summary>
-        /// Update the elements of the interface
+        /// Update the elements of the interface. For the sake of the ui, we don't need delta time
         /// </summary>
         public static void Update()
         {
+            _mouse.Update();
             switch (CurrentMenu)
             {
                 case MenuModes.None:
