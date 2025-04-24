@@ -73,8 +73,7 @@ namespace MakeEveryDayRecount.Players
         }
 
         private const float SecondsPerTile = .2f;
-        private const float SecondsPerAnimation = .1f;
-        private const float TimeUntilStand = 1.5f;
+        private const float TimeUntilStand = 1f;
 
         private float _walkingSeconds;
         private float _standingSeconds;
@@ -109,6 +108,7 @@ namespace MakeEveryDayRecount.Players
             _currentHeldBox = null;
 
             _playerSize = new Point(sprite.Width/4, sprite.Height/4);
+            UpdateAnimation(false);
         }
 
         /// <summary>
@@ -119,7 +119,6 @@ namespace MakeEveryDayRecount.Players
         {
             UpdatePlayerPos();
             KeyboardInput(deltaTime);
-            if (!_readyToMove) UpdateWalkingTime(deltaTime);
 
             _inventory.Update();
         }
@@ -190,7 +189,9 @@ namespace MakeEveryDayRecount.Players
         /// <param name="directionMove">Direction of movement</param>
         private void PlayerMovement(float deltaTime, Point movement, Direction directionMove)
         {
-            if (HoldingBox)
+            if (!_readyToMove) UpdateWalkingTime(deltaTime);
+
+            else if (HoldingBox)
             {
                 // Drop the box if the player is holding it and they attempt to move a direction the 
                 // box can't be moved in
