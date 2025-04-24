@@ -37,7 +37,7 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static void Initialize(Point screenSize)
         {
-            Level = 1; //JTODO: try testing level 2 when you're able
+            Level = 1; //JTODO: try testing level 2 when you're able (by setting initialized level to 1)
             PlayerObject = new Player(new Point(4, 5), AssetManager.PlayerTexture, screenSize);
             OnPlayerUpdate?.Invoke(PlayerObject);
             MapManager.Initialize();

@@ -363,8 +363,8 @@ namespace MakeEveryDayRecount.Map
                             Checkpoint checkpoint = new Checkpoint(triggerPos, binaryReader.ReadInt32(), triggerWidth, triggerHeight, binaryReader.ReadBoolean());
                             _triggersInRoom.Add(checkpoint);
 
-                            //Add it to the trigger manager
-                            TriggerManager.AddCheckpoint(checkpoint);
+                            //Add it to the trigger manager if it's the first time its been added
+                            TriggerManager.AddUniqueCheckpoint(checkpoint);
 
                             //If it's the first checkpoint, make that the player's spawn
                             if (TriggerManager.Checkpoints.Count == 1)

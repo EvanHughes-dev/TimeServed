@@ -46,17 +46,20 @@ namespace MakeEveryDayRecount.Managers
         public static void Reset()
         {
             Checkpoints.Clear();
-            PlayerSpawn = null; //TODO: is this needed?
+            PlayerSpawn = null;
+            WinTrigger = null;
+
             //...and all the other lists of triggers, once they're implemented
         }
 
         /// <summary>
-        /// Adds the given checkpoint to the list of all checkpoints in the current level
+        /// Adds the given checkpoint to the list of all checkpoints in the current level, if its the first time its being added
         /// </summary>
         /// <param name="checkpoint">Checkpoint to be added</param>
-        public static void AddCheckpoint(Checkpoint checkpoint)
+        public static void AddUniqueCheckpoint(Checkpoint checkpoint)
         {
-            Checkpoints.Add(checkpoint);
+            if (!Checkpoints.Contains(checkpoint))
+                Checkpoints.Add(checkpoint);
         }
 
         /// <summary>

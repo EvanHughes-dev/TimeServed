@@ -159,13 +159,19 @@ namespace MakeEveryDayRecount.Players
                 //but don't change the direction you're facing
             }
 
-            if (InputManager.GetKeyPress(Keys.Space) || InputManager.GetKeyPress(Keys.E))
+            if (InputManager.GetKeyPress(Keys.Space) || InputManager.GetKeyPress(Keys.E) || InputManager.GetKeyPress(Keys.Enter))
             {
                 Interact();
             }
             else if (InputManager.GetMousePress(MouseButtonState.Left))
             {
                 ClickToInteract(MapUtils.ScreenToTile(InputManager.GetMousePosition()));
+            }
+
+            //JTODO: DELETE THIS
+            if (InputManager.GetKeyPress(Keys.P))
+            {
+                Detected();
             }
         }
 
@@ -208,6 +214,11 @@ namespace MakeEveryDayRecount.Players
                     if (_playerState != PlayerState.Walking)
                         _playerState = PlayerState.Walking;
 
+                    //Check triggers
+                    Trigger trigger = (MapManager.CurrentRoom.VerifyTrigger(Location));
+                    if (trigger != null)
+                        trigger.Activate(this);
+
                     SoundManager.PlaySFX(SoundManager.PlayerStepSound, -40, 40);
                 }
                 else
@@ -216,6 +227,7 @@ namespace MakeEveryDayRecount.Players
                 }
             }
 
+            //JTODO: verify triggers work when holding a box, or just make it so you can't have a box and proc a trigger
             if (HoldingBox)
             {
                 // Drop the box if the player is holding it and they attempt to move a direction the 

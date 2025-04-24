@@ -61,7 +61,7 @@ namespace MakeEveryDayRecount.UI
             CursorTilePosition = MapUtils.ScreenToTile(_mouseScreenPos);
 
             // If the cursor is hovering over the ui, don't override that hover state
-            if (_uiHover || MapManager.CurrentRoom==null)
+            if (_uiHover || MapManager.CurrentRoom == null)
                 return;
             // If there isn't a item under the cursor then un-hover the mouse
             if (MapManager.CurrentRoom.VerifyInteractable(CursorTilePosition) == null)
