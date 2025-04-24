@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Managers;
 using MakeEveryDayRecount.Map;
-using MakeEveryDayRecount.DebugModes;
 
 namespace MakeEveryDayRecount.UI
 {
@@ -51,7 +50,6 @@ namespace MakeEveryDayRecount.UI
             _mouseScreenPos = Point.Zero;
             CursorTilePosition = Point.Zero;
             _uiHover = false;
-            GlobalDebug.AddObject("Tile Location", () => CursorTilePosition);
         }
 
         /// <summary>
