@@ -37,10 +37,21 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static void Initialize(Point screenSize)
         {
-            Level = 1;
-            PlayerObject = new Player(new Point(4, 5), AssetManager.PlayerTexture, screenSize);
+            Level = 0;
+            PlayerObject = new Player(new Point(0, 0), AssetManager.PlayerTexture, screenSize);
             OnPlayerUpdate?.Invoke(PlayerObject);
             MapManager.Initialize();
+        }
+
+        /// <summary>
+        /// Begin the next level
+        /// </summary>
+        public static void NextLevel()
+        {
+            Level++;
+            MapManager.ChangeLevel(Level);
+            PlayerObject.ChangeRoom(TriggerManager.PlayerSpawn.Location);
+            TriggerManager.PlayerSpawn.Activate(PlayerObject);
         }
 
         public static void Update(float gameTime)
@@ -74,23 +85,11 @@ namespace MakeEveryDayRecount.Managers
         public static void ReplayMode()
         {
             Level = 1;
-            MapManager.ChangeLevel();
+            MapManager.ChangeLevel(Level);
             PlayerObject.ChangeRoom(new Point(5, 5));
             PlayerObject.ClearStates();
         }
 
-        /// <summary>
-        /// Called to reset the level to the starting state
-        /// </summary>
-        public static void LevelReset()
-        {
-            // TODO: This never gets called, I think its safe to delete?
-            Level = 1;
-            PlayerObject = new Player(new Point(5, 5), AssetManager.PlayerTexture, MapUtils.ScreenSize);
-            MapManager.ChangeLevel();
-            OnPlayerUpdate?.Invoke(PlayerObject);
-            ReplayManager.ClearData();
-        }
 
         /// <summary>
         /// Clears checkpoint data and player data
@@ -102,16 +101,6 @@ namespace MakeEveryDayRecount.Managers
                 RecursiveDelete("./CheckpointData");
             if (Directory.Exists("./PlayerData"))
                 RecursiveDelete("./PlayerData");
-
-            //This is the hardcoded initial spawn for the first area
-            Checkpoint initialSpawn = new Checkpoint(new Point(4, 5), 0, 1, 1, true);
-            TriggerManager.SetPlayerSpawn(initialSpawn);
-            TriggerManager.AddCheckpoint(initialSpawn);
-
-            //Save the current map data to the initial checkpoint (the "player spawn")
-            //Consequence of Player being initialized with position 4,5 means this always saves the player with position 4,5
-            //This can be changed but shouldn't matter if that is the actual starting position
-            TriggerManager.PlayerSpawn.Activate(PlayerObject);
         }
 
         /// <summary>

@@ -333,46 +333,6 @@ namespace MakeEveryDayRecount.Players
             );
         }
 
-        // TODO Revisit this later. For some reason, when we try to add half tile walking, the replay system decides it doesn't wnat to work
-        // perfectley. Sometime the player will end up in a diffrent poistion from where they should be, resulting in them missing items.
-        // Most likely, something is wrong with the timing.
-        // /// <summary>
-        // /// Convert from the player's tile position to screen position
-        // /// </summary>
-        // private void UpdatePlayerPos(float deltaTime)
-        // {
-
-        //     _timeBetweenPositionUpdate += deltaTime;
-        //     if (_timeBetweenPositionUpdate > SecondsPerPositionUpdate)
-        //     {
-        //         PlayerWorldPosition = MapUtils.TileToWorld(Location);
-
-
-        //         // This handle moving the player half a tile to start then the full tile
-        //         // .1 seconds later and updating the tile position
-        //         if (_justMoved)
-        //         {
-        //             PlayerWorldPosition += new Point(AssetManager.TileSize.X * _destDirection.X / 2, AssetManager.TileSize.Y * _destDirection.Y / 2);
-        //             _justMoved = false;
-
-        //             _currentHeldBox?.UpdateDrawPoint(PlayerWorldPosition);
-        //         }
-        //         else
-        //         {
-        //             if (!_reachedDest)
-        //             {
-        //                 Location += _destDirection;
-        //             }
-        //             PlayerWorldPosition = MapUtils.TileToWorld(Location);
-        //             _reachedDest = true;
-        //             _currentHeldBox?.UpdatePosition(Location);
-        //         }
-        //         Point worldToScreen = MapUtils.WorldToScreen();
-        //         _timeBetweenPositionUpdate -= SecondsPerPositionUpdate;
-        //         PlayerScreenPosition = PlayerWorldPosition - worldToScreen + MapUtils.PixelOffset();
-        //     }
-        // }
-
         /// <summary>
         /// Update the player's position regarldess of time
         /// </summary>
