@@ -28,37 +28,90 @@
         /// </summary>
         private void InitializeComponent()
         {
-            roomRenderer1 = new Controls.RoomRenderer();
-            textBox1 = new TextBox();
+            roomRenderer = new LevelEditor.Controls.RoomRenderer();
+            label1 = new Label();
+            intInputBoxTop = new LevelEditor.Controls.IntInputBox();
+            intInputBoxRight = new LevelEditor.Controls.IntInputBox();
+            intInputBoxBottom = new LevelEditor.Controls.IntInputBox();
+            intInputBoxLeft = new LevelEditor.Controls.IntInputBox();
+            buttonDone = new Button();
             SuspendLayout();
             // 
-            // roomRenderer1
+            // roomRenderer
             // 
-            roomRenderer1.BackColor = Color.Black;
-            roomRenderer1.Location = new Point(152, 106);
-            roomRenderer1.Name = "roomRenderer1";
-            roomRenderer1.Room = null;
-            roomRenderer1.ShowProps = true;
-            roomRenderer1.ShowTiles = true;
-            roomRenderer1.ShowTriggers = true;
-            roomRenderer1.Size = new Size(251, 223);
-            roomRenderer1.TabIndex = 0;
-            roomRenderer1.Text = "roomRenderer1";
+            roomRenderer.Location = new Point(152, 106);
+            roomRenderer.Name = "roomRenderer";
+            roomRenderer.Room = null;
+            roomRenderer.ShowProps = true;
+            roomRenderer.ShowTiles = true;
+            roomRenderer.ShowTriggers = true;
+            roomRenderer.Size = new Size(251, 223);
+            roomRenderer.TabIndex = 0;
+            roomRenderer.Text = "roomRenderer1";
             // 
-            // textBox1
+            // label1
             // 
-            textBox1.Location = new Point(224, 47);
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(100, 23);
-            textBox1.TabIndex = 1;
+            label1.AutoSize = true;
+            label1.Location = new Point(61, 9);
+            label1.Name = "label1";
+            label1.Size = new Size(448, 15);
+            label1.TabIndex = 2;
+            label1.Text = "Positive numbers push that wall outwards, negative numbers trim that wall inwards.";
+            // 
+            // intInputBoxTop
+            // 
+            intInputBoxTop.Input = 0;
+            intInputBoxTop.Location = new Point(252, 54);
+            intInputBoxTop.Name = "intInputBoxTop";
+            intInputBoxTop.Size = new Size(49, 23);
+            intInputBoxTop.TabIndex = 3;
+            // 
+            // intInputBoxRight
+            // 
+            intInputBoxRight.Input = 0;
+            intInputBoxRight.Location = new Point(460, 213);
+            intInputBoxRight.Name = "intInputBoxRight";
+            intInputBoxRight.Size = new Size(49, 23);
+            intInputBoxRight.TabIndex = 3;
+            // 
+            // intInputBoxBottom
+            // 
+            intInputBoxBottom.Input = 0;
+            intInputBoxBottom.Location = new Point(252, 376);
+            intInputBoxBottom.Name = "intInputBoxBottom";
+            intInputBoxBottom.Size = new Size(49, 23);
+            intInputBoxBottom.TabIndex = 3;
+            // 
+            // intInputBoxLeft
+            // 
+            intInputBoxLeft.Input = 0;
+            intInputBoxLeft.Location = new Point(49, 213);
+            intInputBoxLeft.Name = "intInputBoxLeft";
+            intInputBoxLeft.Size = new Size(49, 23);
+            intInputBoxLeft.TabIndex = 3;
+            // 
+            // buttonDone
+            // 
+            buttonDone.Location = new Point(460, 419);
+            buttonDone.Name = "buttonDone";
+            buttonDone.Size = new Size(100, 26);
+            buttonDone.TabIndex = 4;
+            buttonDone.Text = "Done";
+            buttonDone.UseVisualStyleBackColor = true;
+            buttonDone.Click += buttonDone_Click;
             // 
             // ResizeForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(568, 450);
-            Controls.Add(textBox1);
-            Controls.Add(roomRenderer1);
+            Controls.Add(buttonDone);
+            Controls.Add(intInputBoxLeft);
+            Controls.Add(intInputBoxBottom);
+            Controls.Add(intInputBoxRight);
+            Controls.Add(intInputBoxTop);
+            Controls.Add(label1);
+            Controls.Add(roomRenderer);
             Name = "ResizeForm";
             Text = "Resize";
             ResumeLayout(false);
@@ -67,7 +120,12 @@
 
         #endregion
 
-        private Controls.RoomRenderer roomRenderer1;
-        private TextBox textBox1;
+        private Controls.RoomRenderer roomRenderer;
+        private Label label1;
+        private Controls.IntInputBox intInputBoxTop;
+        private Controls.IntInputBox intInputBoxRight;
+        private Controls.IntInputBox intInputBoxBottom;
+        private Controls.IntInputBox intInputBoxLeft;
+        private Button buttonDone;
     }
 }

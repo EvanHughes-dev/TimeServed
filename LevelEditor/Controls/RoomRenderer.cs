@@ -523,6 +523,8 @@ namespace LevelEditor.Controls
 
                 _room.OnTriggerAdded -= OnTriggerChange;
                 _room.OnTriggerRemoved -= OnTriggerChange;
+
+                _room.OnRoomResized -= OnRoomResized;
             }
         }
         /// <summary>
@@ -547,6 +549,8 @@ namespace LevelEditor.Controls
 
                 _room.OnTriggerAdded += OnTriggerChange;
                 _room.OnTriggerRemoved += OnTriggerChange;
+
+                _room.OnRoomResized += OnRoomResized;
             }
         }
 
@@ -581,6 +585,15 @@ namespace LevelEditor.Controls
         /// <param name="newTile">The new tile.</param>
         private void OnTileUpdated(Point tileUpdatedCoords, Tile newTile)
         {
+            Invalidate();
+        }
+
+        /// <summary>
+        /// Updates the display properties and invalidates the render.
+        /// </summary>
+        private void OnRoomResized()
+        {
+            UpdateDisplayProperties();
             Invalidate();
         }
 

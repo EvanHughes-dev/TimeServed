@@ -1,5 +1,6 @@
 ﻿using LevelEditor.Classes.Props;
 using LevelEditor.Classes.Triggers;
+using LevelEditor.Extensions;
 using System.Collections.ObjectModel;
 
 namespace LevelEditor.Classes
@@ -21,7 +22,7 @@ namespace LevelEditor.Classes
         /// <summary>
         /// The grid of tiles the room is made of.
         /// </summary>
-        private readonly Tile[,] _tiles;
+        private Tile[,] _tiles;
 
         /// <summary>
         /// Get the current save state of this form
@@ -111,6 +112,10 @@ namespace LevelEditor.Classes
         /// Called whenever a camera in this room updates its view frustum.
         /// </summary>
         public event Action<Camera>? OnCameraViewFrustumUpdated;
+        /// <summary>
+        /// Called whenever this room has its bounds resized.
+        /// </summary>
+        public event Action? OnRoomResized;
 
         /// <summary>
         /// Creates a new Room with a name, dimensions, and optional Tile to fill the grid with.
@@ -269,6 +274,44 @@ namespace LevelEditor.Classes
         public Trigger? GetTriggerAt(Point tilePosition)
         {
             return _triggers.Find(trigger => trigger.Bounds!.Value.Contains(tilePosition));
+        }
+
+        /// <summary>
+        /// Resizes the room by adjusting each side by the given amounts. Positive numbers push the side outwards,
+        ///   negative numbers pull the side inwards.
+        /// </summary>
+        /// <param name="top">How much to adjust the top by.</param>
+        /// <param name="bottom">How much to adjust the bottom by.</param>
+        /// <param name="left">How much to adjust the left by.</param>
+        /// <param name="right">How much to adjust the right by.</param>
+        /// <param name="bg">The background tile to fill each new tile with.</param>
+        public void Resize(int top, int bottom, int left, int right, Tile bg)
+        {
+            Rectangle newBounds = new Rectangle(Point.Empty, Dimensions).NudgeSides(top, bottom, left, right);
+            Tile[,] tiles = new Tile[newBounds.Height, newBounds.Width];
+
+            int verticalOffset = newBounds.Top;
+            int horizontalOffset = newBounds.Left;
+
+            for (int newY = 0; newY < tiles.GetLength(0); newY++)
+            {
+                for (int newX = 0; newX < tiles.GetLength(1); newX++)
+                {
+                    int tileY = newY + verticalOffset;
+                    int tileX = newX + horizontalOffset;
+
+                    Tile tile =
+                        tileY < Height && tileY >= 0
+                        && tileX < Width && tileX >= 0
+                        ? this[tileX, tileY] : bg;
+
+                    tiles[newY, newX] = tile;
+                }
+            }
+
+            _tiles = tiles;
+
+            OnRoomResized?.Invoke();
         }
     }
 }

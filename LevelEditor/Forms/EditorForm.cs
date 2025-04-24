@@ -554,7 +554,7 @@ namespace LevelEditor
         /// </summary>
         private void buttonResize_Click(object sender, EventArgs e)
         {
-
+            ResizeForm.Prompt(Room, _mainForm.Tiles.ElementAt(0));
         }
     }
 }
