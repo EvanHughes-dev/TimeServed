@@ -4,10 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
-using System.Collections.Generic;
 using MakeEveryDayRecount.Managers;
-using MakeEveryDayRecount.UI;
-using MakeEveryDayRecount.GameObjects.Triggers;
 
 namespace MakeEveryDayRecount
 {
@@ -149,11 +146,6 @@ namespace MakeEveryDayRecount
                     GameplayManager.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
                     // Save the current state of the keyboard
                     ReplayManager.SaveState((float)gameTime.ElapsedGameTime.TotalSeconds);
-                    if (InputManager.GetKeyPress(Keys.Tab))
-                    {
-                        ReplayManager.SaveData(1, 1);
-                        _state = GameState.Playback;
-                    }
 
                     break;
 
@@ -187,11 +179,7 @@ namespace MakeEveryDayRecount
 
                         InputManager.ReplayUpdate();
                         GameplayManager.Update(ReplayManager.CurrentReplayState.DeltaTime);
-
                     }
-
-                    //This is evil, but it will let it error out if we're running too slow
-                    if (gameTime.IsRunningSlowly) throw new Exception("SLOW!! DUMB PROGRAMMER");
 
                     break;
             }

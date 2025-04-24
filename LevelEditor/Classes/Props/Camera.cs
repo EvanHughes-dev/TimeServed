@@ -22,7 +22,7 @@ namespace LevelEditor.Classes.Props
             set 
             {
                 base.Position = value;
-                ViewFrustumUpdate?.Invoke(this);
+                CameraUpdate?.Invoke(this);
             } 
         }
 
@@ -36,7 +36,7 @@ namespace LevelEditor.Classes.Props
             set
             {
                 _target = value;
-                ViewFrustumUpdate?.Invoke(this);
+                CameraUpdate?.Invoke(this);
             }
         }
         private Point? _target;
@@ -50,16 +50,30 @@ namespace LevelEditor.Classes.Props
             set
             {
                 _radianSpread = value;
-                ViewFrustumUpdate?.Invoke(this);
+                CameraUpdate?.Invoke(this);
             }
         }
         private float _radianSpread;
 
         /// <summary>
-        /// Invoked whenever a property of this Camera changes that would require a re-rendering of the view frustum.
+        /// The tile-space position of this camera's wire box, or null if it doesn't have one.
+        /// </summary>
+        public Point? WireBoxPosition
+        {
+            get => _wireBoxPosition;
+            set
+            {
+                _wireBoxPosition = value;
+                CameraUpdate?.Invoke(this);
+            }
+        }
+        private Point? _wireBoxPosition;
+
+        /// <summary>
+        /// Invoked whenever a property of this Camera changes that would require a re-rendering of the camera.
         ///   Passes in a reference to this camera when invoked.
         /// </summary>
-        public event Action<Camera>? ViewFrustumUpdate;
+        public event Action<Camera>? CameraUpdate;
 
         /// <summary>
         /// Creates a new Camera with the given sprite, position, target, and spread.
@@ -69,11 +83,13 @@ namespace LevelEditor.Classes.Props
         /// <param name="position">The position of this Camera.</param>
         /// <param name="target">The tile this Camera should point to.</param>
         /// <param name="radianSpread">The angle of spread the camera should have to each side of its center ray, in radians.</param>
-        public Camera(Image sprite, int imageIndex, Point? position = null, Point? target = null, float radianSpread = float.NaN)
+        /// <param name="wireBoxPosition">The position of this camera's wire box, or null if it does not have one.</param>
+        public Camera(Image sprite, int imageIndex, Point? position = null, Point? target = null, float radianSpread = float.NaN, Point? wireBoxPosition = null)
             : base(sprite, imageIndex, ObjectType.Camera, position)
         {
             Target = target;
             RadianSpread = radianSpread;
+            WireBoxPosition = wireBoxPosition;
         }
 
         /// <summary>
@@ -92,10 +108,11 @@ namespace LevelEditor.Classes.Props
         /// <param name="position">The position to copy this Camera to.</param>
         /// <param name="target">The tile this Camera should point to.</param>
         /// <param name="radianSpread">The angle of spread the camera should have to each side of its center ray, in radians.</param>
+        /// <param name="wireBoxPosition">The position of this camera's wire box, or null if it does not have one.</param>
         /// <returns>The created copy.</returns>
-        public Camera Instantiate(Point position, Point target, float radianSpread)
+        public Camera Instantiate(Point position, Point target, float radianSpread, Point? wireBoxPosition)
         {
-            return new Camera(Sprite, ImageIndex, position, target, radianSpread);
+            return new Camera(Sprite, ImageIndex, position, target, radianSpread, wireBoxPosition);
         }
     }
 }

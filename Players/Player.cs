@@ -9,6 +9,8 @@ using MakeEveryDayRecount.Players.InventoryFiles;
 using MakeEveryDayRecount.GameObjects.Triggers;
 using System.IO;
 using System;
+using System.Diagnostics.Contracts;
+using System.Collections.Generic;
 
 
 namespace MakeEveryDayRecount.Players
@@ -73,8 +75,6 @@ namespace MakeEveryDayRecount.Players
         private const float SecondsPerTile = .2f;
         private const float SecondsPerAnimation = .1f;
         private const float SecondsPerPositionUpdate = .1f;
-
-        private float _timeBetweenPositionUpdate;
         private float _walkingSeconds;
         private bool _readyToMove;
 
@@ -82,10 +82,6 @@ namespace MakeEveryDayRecount.Players
         private int _animationFrame;
         private Rectangle _playerFrameRectangle;
         private readonly Point _playerSize;
-        private bool _justMoved;
-        private bool _reachedDest;
-
-        private Point _destDirection;
 
         //The player's inventory
         private Inventory _inventory;
@@ -112,9 +108,6 @@ namespace MakeEveryDayRecount.Players
             //Create an inventory
             _inventory = new Inventory(screenSize);
             _currentHeldBox = null;
-            _reachedDest = true;
-            _justMoved = false;
-            _firstUpdate = true;
         }
 
         /// <summary>
@@ -158,7 +151,7 @@ namespace MakeEveryDayRecount.Players
             {
                 PlayerMovement(deltaTime, new Point(0, 1), Direction.Down);
             }
-            else //if (_reachedDest)
+            else
             {
                 //if we were walking and we stop pressing a key, go back to standing
                 _playerState = PlayerState.Standing;
@@ -166,11 +159,13 @@ namespace MakeEveryDayRecount.Players
                 //but don't change the direction you're facing
             }
 
-            if (InputManager.GetKeyPress(Keys.E) || InputManager.GetKeyPress(Keys.Enter) || InputManager.GetKeyPress(Keys.Space))
+            if (InputManager.GetKeyPress(Keys.Space) || InputManager.GetKeyPress(Keys.E))
             {
-
                 Interact();
-
+            }
+            else if (InputManager.GetMousePress(MouseButtonState.Left))
+            {
+                ClickToInteract(MapUtils.ScreenToTile(InputManager.GetMousePosition()));
             }
         }
 
@@ -208,9 +203,7 @@ namespace MakeEveryDayRecount.Players
                     (!HoldingBox || MapManager.CheckPlayerCollision(_currentHeldBox.Location + movement)))
                 {
                     _readyToMove = false;
-                    // _destDirection = movement;
-                    // _justMoved = true;
-                    // _reachedDest = false;
+
                     Location += movement;
                     if (_playerState != PlayerState.Walking)
                         _playerState = PlayerState.Walking;
@@ -398,6 +391,44 @@ namespace MakeEveryDayRecount.Players
             }
 
             objectToInteract?.Interact(this);
+        }
+
+        /// <summary>
+        /// Check for an interactive item at a clicked point
+        /// </summary>
+        /// <param name="clickedPoint">Point that was clicked in tile space</param>
+        public void ClickToInteract(Point clickedPoint)
+        {
+            if (HoldingBox)
+            {
+                DropBox();
+                return;
+            }
+
+            int xOffset = clickedPoint.X - Location.X;
+            int yOffset = clickedPoint.Y - Location.Y;
+            //If the clicked tile isn't adjacent to the player, no need to proceed
+            if (!(Math.Abs(xOffset) == 0 && Math.Abs(yOffset) == 1) && !(Math.Abs(xOffset) == 1 && Math.Abs(yOffset) == 0))
+                return;
+
+            Prop objectToInteract = MapManager.CheckInteractable(clickedPoint);
+
+            objectToInteract?.Interact(this);
+
+            if (xOffset != 0)
+            {
+                if (xOffset == 1)
+                    _playerCurrentDirection = Direction.Right;
+                else
+                    _playerCurrentDirection = Direction.Left;
+            }
+            else
+            {
+                if (yOffset == 1)
+                    _playerCurrentDirection = Direction.Down;
+                else
+                    _playerCurrentDirection = Direction.Up;
+            }
         }
 
         /// <summary>

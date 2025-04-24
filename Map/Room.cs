@@ -404,16 +404,24 @@ namespace MakeEveryDayRecount.Map
         /// <returns>If the tile is walkable. True means the tile is walkable</returns>
         public bool VerifyWalkable(Point pointToCheck, bool isCamera = false)
         {
-            foreach (GameObject gameObject in _itemsInRoom)
+            foreach (Prop prop in _itemsInRoom)
             {
-                // If the object is a box that is held and in the square, do not let the player enter it
-                if (gameObject is Box && gameObject.Location == pointToCheck)
+                // If the object is a box that is held and in the square, check if it is unwalkable in the context
+                if (prop.Location.Equals(pointToCheck))
                 {
+                    if (prop is Box)
+                    {
+                        // The position is unwalkable if the player isn't holding it or the item requesting the check is a camera
+                        if (((Box)prop).AttachmentDirection == Players.Direction.None || isCamera)
+                            return false;
 
-                    if (((Box)gameObject).AttachmentDirection == Players.Direction.None || isCamera)
+                        return true;
+                    }
+                    else if (!isCamera)
+                    {
+
                         return false;
-
-                    return true;
+                    }
                 }
             }
 
