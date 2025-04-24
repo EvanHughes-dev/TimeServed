@@ -86,7 +86,7 @@ namespace MakeEveryDayRecount.Managers
         {
             // TODO: This never gets called, I think its safe to delete?
             Level = 1;
-            PlayerObject = new Player(new Point(5, 5), AssetManager.PlayerTexture, MapUtils.ScreenSize);
+            PlayerObject = new Player(new Point(4, 5), AssetManager.PlayerTexture, MapUtils.ScreenSize);
             MapManager.ChangeLevel();
             OnPlayerUpdate?.Invoke(PlayerObject);
             ReplayManager.ClearData();
