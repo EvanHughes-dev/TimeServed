@@ -20,7 +20,7 @@ namespace LevelEditor.Controls
         public T? Input
         {
             get => _input;
-            private set
+            set
             {
                 _input = value;
 
