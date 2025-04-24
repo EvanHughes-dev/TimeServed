@@ -119,7 +119,7 @@ namespace MakeEveryDayRecount.Players
         {
             UpdatePlayerPos();
             KeyboardInput(deltaTime);
-
+            if (!_readyToMove) UpdateWalkingTime(deltaTime);
 
             _inventory.Update();
         }
@@ -202,8 +202,6 @@ namespace MakeEveryDayRecount.Players
                     directionMove = _currentHeldBox.AttachmentDirection;
                 }
             }
-
-            if (!_readyToMove) UpdateWalkingTime(deltaTime);
 
             else if (_playerState == PlayerState.Walking)
             {
@@ -371,7 +369,12 @@ namespace MakeEveryDayRecount.Players
         /// </summary>
         public void Interact()
         {
-            //TODO: Go back to standing when you interact regardless of the timer
+            //Go back to standing when you interact with something regardless of the timer
+            _walkingSeconds = 0;
+            _playerState = PlayerState.Standing;
+            _animationFrame = 0;
+            _readyToMove = false;
+
             if (HoldingBox)
             {
                 DropBox();
@@ -434,6 +437,9 @@ namespace MakeEveryDayRecount.Players
                 else
                     _playerCurrentDirection = Direction.Up;
             }
+
+            //This will cause the player's sprite to turn towards the thing they're interacting with if they do it by clicking
+            UpdateAnimation(false);
         }
 
         /// <summary>
