@@ -607,6 +607,8 @@ namespace MakeEveryDayRecount.Map
                     binaryWriter.Write(_triggersInRoom[i].Width);
                     binaryWriter.Write(_triggersInRoom[i].Height);
 
+
+                    //JTODO: I think the triggers get saved wrong in here, specifically the index
                     //If statements to determine trigger type
                     if (_triggersInRoom[i] is Checkpoint)
                     {

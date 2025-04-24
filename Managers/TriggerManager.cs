@@ -58,7 +58,12 @@ namespace MakeEveryDayRecount.Managers
         /// <param name="checkpoint">Checkpoint to be added</param>
         public static void AddUniqueCheckpoint(Checkpoint checkpoint)
         {
-            if (!Checkpoints.Contains(checkpoint))
+            //A checkpoint is designated unique if its position is distinct, since that cannot be altered during runtime
+            foreach (Checkpoint c in Checkpoints)
+            {
+                if (checkpoint.Location == c.Location)
+                    return;
+            }
                 Checkpoints.Add(checkpoint);
         }
 
@@ -78,6 +83,20 @@ namespace MakeEveryDayRecount.Managers
         public static void SetWinTrigger(Win win)
         {
             WinTrigger = win;
+        }
+
+        public static void UpdateCheckpoint(Checkpoint checkpoint)
+        {
+            for (int i = 0; i < Checkpoints.Count; i++)
+            {
+                if (checkpoint.Location == Checkpoints[i].Location)
+                {
+                    Checkpoints[i] = checkpoint;
+                    return;
+                }
+            }
+            //Shouldn't ever run
+            throw new Exception("This checkpoint isn't in triggerArray");
         }
     }
 }

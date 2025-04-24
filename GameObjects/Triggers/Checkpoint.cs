@@ -62,7 +62,7 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
             //Makes sure the prior checkpoint has been activatated
             //unless this is the first checkpoint, in which case it's always good to activate
             if (Index != 0)
-                if (!TriggerManager.Checkpoints[Index - 1].Active)
+                if (TriggerManager.Checkpoints[Index - 1].Active)
                     return false;
             if (!Active)
                 return false;
@@ -86,8 +86,9 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
             //Save the room this checkpoint is located in
             RoomIndex = MapManager.CurrentRoom.RoomIndex;
 
-            //Update the current checkpoint
+            //Update TriggerManager
             TriggerManager.CurrentCheckpoint = this;
+            TriggerManager.UpdateCheckpoint(this);
 
             //Call the replay manager function
             ReplayManager.SaveData(GameplayManager.Level, Index);
