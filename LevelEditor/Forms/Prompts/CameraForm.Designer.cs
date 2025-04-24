@@ -29,13 +29,13 @@
         private void InitializeComponent()
         {
             groupBoxMap = new GroupBox();
-            roomRenderer = new LevelEditor.Controls.RoomRenderer();
             trackBarSpread = new TrackBar();
             textBoxSpread = new TextBox();
             labelSpread = new Label();
             buttonDone = new Button();
             splitContainer = new SplitContainer();
-            groupBoxMap.SuspendLayout();
+            buttonAddWireBox = new Button();
+            buttonRemoveWireBox = new Button();
             ((System.ComponentModel.ISupportInitialize)trackBarSpread).BeginInit();
             ((System.ComponentModel.ISupportInitialize)splitContainer).BeginInit();
             splitContainer.Panel1.SuspendLayout();
@@ -45,26 +45,12 @@
             // 
             // groupBoxMap
             // 
-            groupBoxMap.Controls.Add(roomRenderer);
             groupBoxMap.Location = new Point(5, 3);
             groupBoxMap.Name = "groupBoxMap";
             groupBoxMap.Size = new Size(565, 264);
             groupBoxMap.TabIndex = 3;
             groupBoxMap.TabStop = false;
             groupBoxMap.Text = "Map";
-            // 
-            // roomRenderer
-            // 
-            roomRenderer.Location = new Point(6, 22);
-            roomRenderer.Name = "roomRenderer";
-            roomRenderer.Room = null;
-            roomRenderer.ShowProps = true;
-            roomRenderer.ShowTiles = true;
-            roomRenderer.ShowTriggers = false;
-            roomRenderer.Size = new Size(533, 404);
-            roomRenderer.TabIndex = 0;
-            roomRenderer.Text = "roomRenderer1";
-            roomRenderer.TileMouseClick += RoomRenderer_TileMouseClick;
             // 
             // trackBarSpread
             // 
@@ -118,6 +104,8 @@
             // 
             // splitContainer.Panel2
             // 
+            splitContainer.Panel2.Controls.Add(buttonAddWireBox);
+            splitContainer.Panel2.Controls.Add(buttonRemoveWireBox);
             splitContainer.Panel2.Controls.Add(buttonDone);
             splitContainer.Panel2.Controls.Add(trackBarSpread);
             splitContainer.Panel2.Controls.Add(labelSpread);
@@ -126,6 +114,28 @@
             splitContainer.SplitterDistance = 432;
             splitContainer.TabIndex = 8;
             splitContainer.SplitterMoved += splitContainer_SplitterMoved;
+            // 
+            // buttonAddWireBox
+            // 
+            buttonAddWireBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            buttonAddWireBox.Location = new Point(303, -1);
+            buttonAddWireBox.Name = "buttonAddWireBox";
+            buttonAddWireBox.Size = new Size(122, 26);
+            buttonAddWireBox.TabIndex = 7;
+            buttonAddWireBox.Text = "Add/Move Wire Box";
+            buttonAddWireBox.UseVisualStyleBackColor = true;
+            buttonAddWireBox.Click += buttonAddWireBox_Click;
+            // 
+            // buttonRemoveWireBox
+            // 
+            buttonRemoveWireBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            buttonRemoveWireBox.Location = new Point(303, 26);
+            buttonRemoveWireBox.Name = "buttonRemoveWireBox";
+            buttonRemoveWireBox.Size = new Size(122, 26);
+            buttonRemoveWireBox.TabIndex = 7;
+            buttonRemoveWireBox.Text = "Remove Wire Box";
+            buttonRemoveWireBox.UseVisualStyleBackColor = true;
+            buttonRemoveWireBox.Click += buttonRemoveWireBox_Click;
             // 
             // CameraForm
             // 
@@ -136,7 +146,6 @@
             Name = "CameraForm";
             Text = "Camera Editor";
             Resize += CameraForm_Resize;
-            groupBoxMap.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)trackBarSpread).EndInit();
             splitContainer.Panel1.ResumeLayout(false);
             splitContainer.Panel2.ResumeLayout(false);
@@ -155,5 +164,7 @@
         private Button buttonDone;
         private Controls.RoomRenderer roomRenderer;
         private SplitContainer splitContainer;
+        private Button buttonAddWireBox;
+        private Button buttonRemoveWireBox;
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Managers;
+using MakeEveryDayRecount.Map;
 
 namespace MakeEveryDayRecount.UI
 {
@@ -11,6 +12,8 @@ namespace MakeEveryDayRecount.UI
     /// </summary>
     internal class UserMouse
     {
+
+
         /// <summary>
         /// The mouse hover state
         /// </summary>
@@ -20,11 +23,20 @@ namespace MakeEveryDayRecount.UI
             Hovered = 1
         }
 
+        /// <summary>
+        /// Get the mouse's current position in tile space
+        /// </summary>
+        public Point CursorTilePosition { get; private set; }
+
         private MouseHover _mouseState;
 
         private Texture2D[] _mouseSprites;
 
         private readonly Point _mouseCursorSize;
+        private readonly Point _mouseCursorOffset;
+
+        private bool _uiHover;
+        private Point _mouseScreenPos;
 
         /// <summary>
         /// Create a mouse object to display the mouse location
@@ -34,6 +46,29 @@ namespace MakeEveryDayRecount.UI
             _mouseSprites = AssetManager.CursorStates;
             _mouseState = MouseHover.UnHovered;
             _mouseCursorSize = new Point(mouseSize, mouseSize);
+            _mouseCursorOffset = new Point(mouseSize / 2, mouseSize / 2);
+            _mouseScreenPos = Point.Zero;
+            CursorTilePosition = Point.Zero;
+            _uiHover = false;
+        }
+
+        /// <summary>
+        /// Update the mouse's state and tile position
+        /// </summary>
+        public void Update()
+        {
+            _mouseScreenPos = InputManager.GetMousePosition() - _mouseCursorOffset;
+            CursorTilePosition = MapUtils.ScreenToTile(_mouseScreenPos);
+
+            // If the cursor is hovering over the ui, don't override that hover state
+            if (_uiHover)
+                return;
+            // If there isn't a item under the cursor then un-hover the mouse
+            if (MapManager.CurrentRoom.VerifyInteractable(CursorTilePosition) == null)
+                _mouseState = MouseHover.UnHovered;
+            else
+                _mouseState = MouseHover.Hovered;
+
         }
 
         /// <summary>
@@ -42,7 +77,7 @@ namespace MakeEveryDayRecount.UI
         /// <param name="sb">SpriteBatch to draw with</param>
         public void Draw(SpriteBatch sb)
         {
-            sb.Draw(_mouseSprites[(int)_mouseState], new Rectangle(InputManager.GetMousePosition() - new Point(32, 32), _mouseCursorSize), Color.White);
+            sb.Draw(_mouseSprites[(int)_mouseState], new Rectangle(_mouseScreenPos, _mouseCursorSize), Color.White);
         }
 
         /// <summary>
@@ -52,6 +87,7 @@ namespace MakeEveryDayRecount.UI
         public void UpdateHoverState(MouseHover newState)
         {
             _mouseState = newState;
+            _uiHover = _mouseState == MouseHover.Hovered;
         }
     }
 
