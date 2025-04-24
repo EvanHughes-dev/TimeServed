@@ -146,6 +146,8 @@ namespace MakeEveryDayRecount.Map
         /// <returns>Position in tile space</returns>
         public static Point ScreenToTile(Point screenPos)
         {
+            if (MapManager.CurrentRoom == null)
+                return Point.Zero;
             Point worldToScreen = WorldToScreen();
             Point screenToWorld = new Point(screenPos.X + worldToScreen.X, screenPos.Y + worldToScreen.Y);
 
