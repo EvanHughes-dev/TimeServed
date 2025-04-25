@@ -1,9 +1,6 @@
 ﻿using MakeEveryDayRecount.GameObjects.Triggers;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 
 namespace MakeEveryDayRecount.Managers
 {
@@ -74,6 +71,48 @@ namespace MakeEveryDayRecount.Managers
         public static void SetPlayerSpawn(Checkpoint spawn)
         {
             PlayerSpawn = spawn;
+        }
+
+        /// <summary>
+        /// Ensure that all data in the checkpoints folder is valid
+        /// </summary>
+        /// <returns>If the data saved is valid</returns>
+        private static bool ValidateCheckpointData()
+        {
+            string baseFolder = Checkpoint.BaseFolder;
+            return File.Exists($"{baseFolder}/level.data") && GameplayManager.PlayerObject.ValidateData(baseFolder)
+             && MapManager.ValidateSavedData(baseFolder);
+        }
+
+        /// <summary>
+        /// Load data from a saved checkpoint file
+        /// </summary>
+        public static void LoadCheckpoint()
+        {
+            if (!ValidateCheckpointData())
+                return;
+            int level;
+            int roomIndex;
+            int selectedCheckpointIndex;
+            string baseFolder = Checkpoint.BaseFolder;
+
+            using (BinaryReader binaryReader = new BinaryReader(File.OpenRead($"{baseFolder}/level.data")))
+            {
+                level = binaryReader.ReadInt32();
+                roomIndex = binaryReader.ReadInt32();
+                selectedCheckpointIndex = binaryReader.ReadInt32();
+            }
+
+            MapManager.LoadCheckpoint(baseFolder, roomIndex, level);
+            GameplayManager.PlayerObject.Load(baseFolder);
+
+            CurrentCheckpoint = Checkpoints[selectedCheckpointIndex];
+            for (int i = 0; i < selectedCheckpointIndex; i++)
+            {
+                Checkpoints[i].Active = false;
+            }
+
+            GameplayManager.LoadLevelFromCheckpoint(level);
         }
 
         /// <summary>

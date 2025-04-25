@@ -57,6 +57,15 @@ namespace MakeEveryDayRecount.Managers
                 TriggerManager.PlayerSpawn.Activate(PlayerObject);
         }
 
+        /// <summary>
+        /// Assign the level from a saved checkpoint and update player
+        /// </summary>
+        /// <param name="level">Level to update to</param>
+        public static void LoadLevelFromCheckpoint(int level)
+        {
+            Level = level;
+        }
+
         public static void Update(float gameTime)
         {
             //Update Player

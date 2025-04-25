@@ -5,6 +5,7 @@ using MakeEveryDayRecount.Players;
 using MakeEveryDayRecount.Managers;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Reflection.Metadata;
 
 namespace MakeEveryDayRecount.GameObjects.Triggers
 {
@@ -23,12 +24,14 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
         /// <summary>
         /// Whether or not this checkpoint can be activated
         /// </summary>
-        public bool Active { get; private set; }
+        public bool Active { get; set; }
 
         /// <summary>
         /// Index of the room this checkpoint is housed in
         /// </summary>
         public int RoomIndex { get; private set; }
+
+        public static readonly string BaseFolder = "./CheckpointData";
 
         /// <summary>
         /// Constructs a checkpoint
@@ -46,8 +49,6 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
         }
 
 
-        //Methods
-
         /// <summary>
         /// Saves the map and player data
         /// </summary>
@@ -59,7 +60,7 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
             // This would lead to overwriting keyboard data
             if (ReplayManager.PlayingReplay)
                 return false;
-            //Makes sure the prior checkpoint has been activatated
+            //Makes sure the prior checkpoint has been activated
             //unless this is the first checkpoint, in which case it's always good to activate
             if (Index != 0)
                 if (TriggerManager.Checkpoints[Index - 1].Active)
@@ -73,20 +74,30 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
             Active = false;
 
             //Always want to overwrite the folder if it exists
-            if (Directory.Exists(baseFolder))
-                RecursiveDelete(baseFolder);
+            if (Directory.Exists(BaseFolder))
+                RecursiveDelete(BaseFolder);
 
             //(Re)make the folder
-            Directory.CreateDirectory(baseFolder);
+            Directory.CreateDirectory(BaseFolder);
 
             //Save map and player data
-            MapManager.SaveMap(baseFolder);
-            player.Save();
+            MapManager.SaveMap(BaseFolder);
+            player.Save(BaseFolder);
 
             //Save the room this checkpoint is located in
             RoomIndex = MapManager.CurrentRoom.RoomIndex;
 
-            //Update TriggerManager
+            // Save the level in case the user wants to quit and come back later
+            using (BinaryWriter binaryWriter = new BinaryWriter(File.OpenWrite($"{BaseFolder}/level.data")))
+            {
+                binaryWriter.Write(GameplayManager.Level);
+                binaryWriter.Write(RoomIndex);
+                binaryWriter.Write(Index);
+            }
+
+
+
+            //Update the current checkpoint
             TriggerManager.CurrentCheckpoint = this;
             TriggerManager.UpdateCheckpoint(this);
 
@@ -112,5 +123,20 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
 
             Directory.Delete(folderPath);
         }
+
+        /// <summary>
+        /// Load this checkpoint's data
+        /// </summary>
+        /// <param name="player">Player that triggered this checkpoint</param>
+        public void LoadCheckpoint(Player player)
+        {
+            int level;
+            using (BinaryReader binaryReader = new BinaryReader(File.OpenRead($"{BaseFolder}/level.data")))
+                level = binaryReader.ReadInt32();
+
+            MapManager.LoadCheckpoint(BaseFolder, RoomIndex, level);
+            player.Load(BaseFolder);
+        }
+
     }
 }
