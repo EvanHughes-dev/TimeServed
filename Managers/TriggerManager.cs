@@ -1,6 +1,7 @@
 ﻿using MakeEveryDayRecount.GameObjects.Triggers;
 using System.Collections.Generic;
 using System.IO;
+using System;
 
 namespace MakeEveryDayRecount.Managers
 {
@@ -61,7 +62,7 @@ namespace MakeEveryDayRecount.Managers
                 if (checkpoint.Location == c.Location)
                     return;
             }
-                Checkpoints.Add(checkpoint);
+            Checkpoints.Add(checkpoint);
         }
 
         /// <summary>
