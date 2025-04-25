@@ -249,45 +249,34 @@ namespace MakeEveryDayRecount.Players
                         UpdateStandingTime(deltaTime);
                         _walkingSeconds = 0;
                     }
-            }
-
-            if (HoldingBox)
-            {
-                // Drop the box if the player is holding it and they attempt to move a direction the 
-                // box can't be moved in
-                if (IsPerpendicular(directionMove, _currentHeldBox.AttachmentDirection))
-                    DropBox();
-                else
-                {
-                    // Otherwise update need variable for the box
-                    directionMove = _currentHeldBox.AttachmentDirection;
                 }
+
                 else _readyToMove = false; //stops the player from turning around one frame and then moving the very next frame
-                //They have to either stop for a frame or wait for secondspertile
-            }
+                                           //They have to either stop for a frame or wait for secondspertile
 
-            // Update the player's direction
-            if (_playerCurrentDirection != directionMove)
-            {
-                _playerCurrentDirection = directionMove;
-                UpdateAnimation(false);
-            }
-            
-            //Check triggers
-            Trigger trigger = (MapManager.CurrentRoom.VerifyTrigger(Location));
-            if (trigger != null)
-            {
-                //Only trigger that cares about if it was activated right now is the Win trigger
-                //If there are more that are created this will turn into a larger if statement
-                if (trigger.Activate(this) && trigger is Win)
+                // Update the player's direction
+                if (_playerCurrentDirection != directionMove)
                 {
-                    //TODO: Code in this if statement runs if a player triggers a Win trigger,
-                    //Meaning it should get them to the next level
+                    _playerCurrentDirection = directionMove;
+                    UpdateAnimation(false);
                 }
 
+                //Check triggers
+                Trigger trigger = (MapManager.CurrentRoom.VerifyTrigger(Location));
+                if (trigger != null)
+                {
+                    //Only trigger that cares about if it was activated right now is the Win trigger
+                    //If there are more that are created this will turn into a larger if statement
+                    if (trigger.Activate(this) && trigger is Win)
+                    {
+                        //TODO: Code in this if statement runs if a player triggers a Win trigger,
+                        //Meaning it should get them to the next level
+                    }
+
+                }
+                //Checkpoints are slightly slightly buggy when holding a box and walking on to them (box is saved a tile away from where it should be)
+                //But it's not a big issue, and the player shouldn't be holding a box and proccing a trigger anyways
             }
-            //Checkpoints are slightly slightly buggy when holding a box and walking on to them (box is saved a tile away from where it should be)
-            //But it's not a big issue, and the player shouldn't be holding a box and proccing a trigger anyways
         }
             /// <summary>
             /// Update the time value in between each movements
