@@ -869,3 +869,9 @@
 /processorParam:TextureFormat=Color
 /build:UI/ui_cursorHover.png
 
+
+#begin Levels/Level3/level.level
+/copy:Levels/Level3/level.level
+
+#begin Levels/Level3/maze.room
+/copy:Levels/Level3/maze.room
