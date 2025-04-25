@@ -869,3 +869,6 @@
 
 #begin Levels/Level1/Room2.room
 /copy:Levels/Level1/Room2.room
+
+#begin Levels/Level1/rGwgG.room
+/copy:Levels/Level1/rGwgG.room
