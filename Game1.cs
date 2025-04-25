@@ -69,7 +69,7 @@ namespace MakeEveryDayRecount
             //_graphics.PreferredBackBufferHeight = 360;
 
             _graphics.HardwareModeSwitch = false;
-            _graphics.IsFullScreen = true;
+            _graphics.IsFullScreen = true; 
             _graphics.ApplyChanges();
 
             _debugState = DebugState.None;
@@ -150,11 +150,10 @@ namespace MakeEveryDayRecount
                     break;
 
                 case GameState.Cutscene:
+                    //TODO: This should be triggered after the level ends, and then once it is over it should transition to the next level
+
                     //When the cutscene is over
                     //_state = GameState.Level;
-
-                    //If this is the last cutscene
-                    //_state = GameState.Playback;
                     break;
 
                 case GameState.Playback:

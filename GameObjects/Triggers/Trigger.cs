@@ -43,6 +43,6 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
             _height = height;
         }
 
-        public abstract void Activate(Player player);
+        public abstract bool Activate(Player player);
     }
 }

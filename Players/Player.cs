@@ -156,7 +156,7 @@ namespace MakeEveryDayRecount.Players
                 //but don't change the direction you're facing
             }
 
-            if (InputManager.GetKeyPress(Keys.Space) || InputManager.GetKeyPress(Keys.E))
+            if (InputManager.GetKeyPress(Keys.Space) || InputManager.GetKeyPress(Keys.E) || InputManager.GetKeyPress(Keys.Enter))
             {
                 Interact();
             }
@@ -249,6 +249,18 @@ namespace MakeEveryDayRecount.Players
                         UpdateStandingTime(deltaTime);
                         _walkingSeconds = 0;
                     }
+            }
+
+            if (HoldingBox)
+            {
+                // Drop the box if the player is holding it and they attempt to move a direction the 
+                // box can't be moved in
+                if (IsPerpendicular(directionMove, _currentHeldBox.AttachmentDirection))
+                    DropBox();
+                else
+                {
+                    // Otherwise update need variable for the box
+                    directionMove = _currentHeldBox.AttachmentDirection;
                 }
                 else _readyToMove = false; //stops the player from turning around one frame and then moving the very next frame
                 //They have to either stop for a frame or wait for secondspertile
@@ -260,12 +272,28 @@ namespace MakeEveryDayRecount.Players
                 _playerCurrentDirection = directionMove;
                 UpdateAnimation(false);
             }
+            
+            //Check triggers
+            Trigger trigger = (MapManager.CurrentRoom.VerifyTrigger(Location));
+            if (trigger != null)
+            {
+                //Only trigger that cares about if it was activated right now is the Win trigger
+                //If there are more that are created this will turn into a larger if statement
+                if (trigger.Activate(this) && trigger is Win)
+                {
+                    //TODO: Code in this if statement runs if a player triggers a Win trigger,
+                    //Meaning it should get them to the next level
+                }
+
+            }
+            //Checkpoints are slightly slightly buggy when holding a box and walking on to them (box is saved a tile away from where it should be)
+            //But it's not a big issue, and the player shouldn't be holding a box and proccing a trigger anyways
         }
-        /// <summary>
-        /// Update the time value in between each movements
-        /// </summary>
-        /// <param name="deltaTime">Time that has elapsed since last frame</param>
-        private void UpdateWalkingTime(float deltaTime)
+            /// <summary>
+            /// Update the time value in between each movements
+            /// </summary>
+            /// <param name="deltaTime">Time that has elapsed since last frame</param>
+            private void UpdateWalkingTime(float deltaTime)
         {
             _walkingSeconds += deltaTime;
 
@@ -594,6 +622,21 @@ namespace MakeEveryDayRecount.Players
             {
                 System.Diagnostics.Debug.Write(e.Message);
             }
+        }
+
+        /// <summary>
+        /// Returns a boolean corresponding to whether or not the play has the item with the given sprite index in their inventory
+        /// </summary>
+        /// <param name="index">Sprite index of the item being searched for</param>
+        /// <returns>True if the player has the item, false otherwise</returns>
+        public bool ContainsItem(int index)
+        {
+            for (int i = 0; i < _inventory.Contents.Count; i++)
+            {
+                if (_inventory.Contents[i].SpriteIndex == index)
+                    return true;
+            }
+            return false;
         }
     }
 }

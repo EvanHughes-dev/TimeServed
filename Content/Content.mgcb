@@ -359,8 +359,23 @@
 /processorParam:TextureFormat=Color
 /build:Items/wireCutters.png
 
+#begin Levels/Level1/level.level
+/copy:Levels/Level1/level.level
 
+#begin Levels/Level1/Room1.room
+/copy:Levels/Level1/Room1.room
 
+#begin Levels/Level1/Room2.room
+/copy:Levels/Level1/Room2.room
+
+#begin Levels/Level2/level.level
+/copy:Levels/Level2/level.level
+
+#begin Levels/Level2/Room1.room
+/copy:Levels/Level2/Room1.room
+
+#begin Levels/Level2/Room2.room
+/copy:Levels/Level2/Room2.room
 
 #begin Player/Inventory/InventoryBox_hover.png
 /importer:TextureImporter
@@ -854,18 +869,3 @@
 /processorParam:TextureFormat=Color
 /build:UI/ui_cursorHover.png
 
-
-#begin Levels/TriggerLevel/level.level
-/copy:Levels/TriggerLevel/level.level
-
-#begin Levels/TriggerLevel/TestRoomTrigger.room
-/copy:Levels/TriggerLevel/TestRoomTrigger.room
-
-#begin Levels/Level1/level.level
-/copy:Levels/Level1/level.level
-
-#begin Levels/Level1/Room1.room
-/copy:Levels/Level1/Room1.room
-
-#begin Levels/Level1/Room2.room
-/copy:Levels/Level1/Room2.room

@@ -345,9 +345,8 @@ namespace MakeEveryDayRecount.Map
 
                         numberOfGameObjects--;
                     }
+
                     //Define number of triggers in the room
-                    //For rooms with no triggers we can slap a 0 at the end and everything will be fine
-                    //As of right now they are not updated, so the following line has been commented out
                     int numberOfTriggers = binaryReader.ReadInt32();
 
                     //Parse all needed triggers from file
@@ -364,8 +363,8 @@ namespace MakeEveryDayRecount.Map
                             Checkpoint checkpoint = new Checkpoint(triggerPos, binaryReader.ReadInt32(), triggerWidth, triggerHeight, binaryReader.ReadBoolean());
                             _triggersInRoom.Add(checkpoint);
 
-                            //Add it to the trigger manager
-                            TriggerManager.AddCheckpoint(checkpoint);
+                            //Add it to the trigger manager if it's the first time its been added
+                            TriggerManager.AddUniqueCheckpoint(checkpoint);
 
                             //If it's the first checkpoint, make that the player's spawn
                             if (TriggerManager.Checkpoints.Count == 1)
