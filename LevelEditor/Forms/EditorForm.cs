@@ -417,7 +417,7 @@ namespace LevelEditor
             if (_currentlySelectedPropBox != null) _currentlySelectedPropBox.BorderWidth = 0;
             trigger.BorderWidth = 5;
             _currentlySelectedTriggerBox = trigger;
-            SelectedTrigger = trigger.TriggerType;
+            SelectedTrigger = trigger.Trigger;
         }
         #endregion
 
