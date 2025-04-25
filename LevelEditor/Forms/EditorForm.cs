@@ -71,6 +71,10 @@ namespace LevelEditor
         /// Holds the prop box of the prop that is currently selected on the palette.
         /// </summary>
         private PropBox _currentlySelectedPropBox;
+        /// <summary>
+        /// Holds the trigger box of the trigger that is currently selected on the palette.
+        /// </summary>
+        private TriggerBox _currentlySelectedTriggerBox;
 
         private Point? _triggerStartPoint;
 
@@ -402,7 +406,19 @@ namespace LevelEditor
             _currentlySelectedPropBox = prop;
             SelectedProp = prop.Prop;
         }
+        /// <summary>
+        /// When a trigger button is clicked, select its trigger type.
+        /// </summary>
+        /// <exception cref="Exception">Thrown when this method is called with a non-Button sender.</exception>
+        private void TriggerSwatch_Click(object? sender, EventArgs e)
+        {
+            if (sender is not TriggerBox trigger) throw new Exception("Invalid call to TriggerSwatch_Click");
 
+            if (_currentlySelectedPropBox != null) _currentlySelectedPropBox.BorderWidth = 0;
+            trigger.BorderWidth = 5;
+            _currentlySelectedTriggerBox = trigger;
+            SelectedTrigger = trigger.TriggerType;
+        }
         #endregion
 
         #region Tab Events
