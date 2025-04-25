@@ -108,6 +108,8 @@ namespace MakeEveryDayRecount.Players
             //Create an inventory
             _inventory = new Inventory(screenSize);
             _currentHeldBox = null;
+
+            _firstUpdate = true;
         }
 
         /// <summary>
@@ -476,6 +478,7 @@ namespace MakeEveryDayRecount.Players
         {
             //Reset the map to the last checkpoint
             TriggerManager.CurrentCheckpoint.LoadCheckpoint(this);
+            ReplayManager.ClearData();
         }
 
         #endregion

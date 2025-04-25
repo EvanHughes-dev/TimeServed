@@ -47,6 +47,22 @@ namespace MakeEveryDayRecount.UI
         }
 
         /// <summary>
+        /// Get if this button is hovered this from
+        /// </summary>
+        protected bool ReplayHovered
+        {
+            get
+            {
+                Point ms = new Point(Mouse.GetState().X, Mouse.GetState().Y);
+                Rectangle displayRect = DisplayRect;
+                return (ms.X >= displayRect.Left && ms.X <= displayRect.Right &&
+                ms.Y >= displayRect.Top && ms.Y <= displayRect.Bottom);
+            }
+        }
+
+        private bool _mousePressed;
+
+        /// <summary>
         /// Creates a button with a rectangle, color, image, hover image and is hoverable state
         /// </summary>
         /// <param name="rectangle">Rectangle corresponding to the position of the button</param>
@@ -62,6 +78,7 @@ namespace MakeEveryDayRecount.UI
             _isInteractive = isHoverable;
             _isHovered = false;
             _displayText = textElement;
+            _mousePressed = false;
         }
 
         /// <summary>
@@ -79,6 +96,7 @@ namespace MakeEveryDayRecount.UI
             _isInteractive = isHoverable;
             _isHovered = false;
             _displayText = null;
+            _mousePressed = false;
         }
         /// <summary>
         /// Creates a button with a rectangle, image, hover image and is hoverable state. Color defaulted to white
@@ -94,6 +112,7 @@ namespace MakeEveryDayRecount.UI
             _isInteractive = isHoverable;
             _isHovered = false;
             _displayText = null;
+            _mousePressed = false;
         }
 
         /// <summary>
@@ -110,6 +129,7 @@ namespace MakeEveryDayRecount.UI
             _isInteractive = isHoverable;
             _isHovered = false;
             _displayText = null;
+            _mousePressed = false;
 
             Vector2 textPoint = rectangle.Location.ToVector2() + ((rectangle.Size.ToVector2() - sf.MeasureString(text)) / 2);
             _displayText = new Text(textPoint.ToPoint(), text, sf);
@@ -152,6 +172,28 @@ namespace MakeEveryDayRecount.UI
                 InterfaceManager.HoverModeChange(UserMouse.MouseHover.UnHovered);
                 OnClick?.Invoke();
             }
+        }
+
+        /// <summary>
+        /// Called during replay to get the actual mouse position
+        /// </summary>
+        public void ReplayUpdate()
+        {
+            if (ReplayHovered && Active)
+            {
+                _isHovered = true;
+            }
+            else if (!ReplayHovered && _isHovered)
+            {
+                _isHovered = false;
+            }
+
+            if (_isHovered && Mouse.GetState().LeftButton == ButtonState.Pressed && !_mousePressed)
+            {
+                OnClick?.Invoke();
+            }
+
+            _mousePressed = Mouse.GetState().LeftButton == ButtonState.Pressed;
         }
     }
 }

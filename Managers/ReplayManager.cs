@@ -26,7 +26,7 @@ namespace MakeEveryDayRecount.Managers
 
         private static readonly string BaseFolder = "./Replay";
 
-        private static Stack<ReplayState> _currentReplyStates;
+        private static Queue<ReplayState> _currentReplyStates;
 
         private static int _currentLevel;
 
@@ -38,7 +38,7 @@ namespace MakeEveryDayRecount.Managers
             if (!Directory.Exists(BaseFolder))
                 Directory.CreateDirectory(BaseFolder);
 
-            _currentReplyStates = new Stack<ReplayState> { };
+            _currentReplyStates = new Queue<ReplayState> { };
             PlayingReplay = false;
 
             CurrentReplayState = null;
@@ -50,7 +50,7 @@ namespace MakeEveryDayRecount.Managers
         /// <param name="deltaTime">Time since last frame</param>
         public static void SaveState(float deltaTime)
         {
-            _currentReplyStates.Push(new ReplayState(Keyboard.GetState(), Mouse.GetState(), deltaTime));
+            _currentReplyStates.Enqueue(new ReplayState(Keyboard.GetState(), Mouse.GetState(), deltaTime));
         }
 
         /// <summary>
@@ -59,6 +59,14 @@ namespace MakeEveryDayRecount.Managers
         public static void ClearData()
         {
             _currentReplyStates.Clear();
+        }
+
+        /// <summary>
+        /// Clear all the saved replay data from the file io
+        /// </summary>
+        public static void ClearSavedData()
+        {
+            RecursiveDelete(BaseFolder);
         }
 
         /// <summary>
@@ -76,7 +84,7 @@ namespace MakeEveryDayRecount.Managers
             binaryWriter.Write(_currentReplyStates.Count);
             while (_currentReplyStates.Count > 0)
             {
-                _currentReplyStates.Pop().SaveToFile(binaryWriter);
+                _currentReplyStates.Dequeue().SaveToFile(binaryWriter);
             }
             binaryWriter.Close();
 
@@ -91,7 +99,7 @@ namespace MakeEveryDayRecount.Managers
             _currentLevel = 1;
             LoadLevel(_currentLevel);
             PlayingReplay = true;
-            CurrentReplayState = _currentReplyStates.Pop(); ;
+            CurrentReplayState = _currentReplyStates.Dequeue();
         }
 
         /// <summary>
@@ -109,10 +117,9 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static bool NextFrame()
         {
-
             if (_currentReplyStates.Count == 0)
                 return false;
-            CurrentReplayState = _currentReplyStates.Pop();
+            CurrentReplayState = _currentReplyStates.Dequeue();
             return true;
 
         }
@@ -124,7 +131,7 @@ namespace MakeEveryDayRecount.Managers
         {
             _currentLevel++;
             LoadLevel(_currentLevel);
-            CurrentReplayState = _currentReplyStates.Pop();
+            CurrentReplayState = _currentReplyStates.Dequeue();
         }
 
         /// <summary>
@@ -150,7 +157,7 @@ namespace MakeEveryDayRecount.Managers
 
                 for (int i = 0; i < numberOfReplay; i++)
                 {
-                    _currentReplyStates.Push(new ReplayState(binaryReader));
+                    _currentReplyStates.Enqueue(new ReplayState(binaryReader));
 
                 }
                 binaryReader.Close();
@@ -165,6 +172,25 @@ namespace MakeEveryDayRecount.Managers
         private static List<string> SortCheckpoints(List<string> checkpoints)
         {
             return checkpoints.OrderBy(x => int.Parse(Regex.Match(x, "\\d+").Value)).ToList();
+        }
+
+
+        /// <summary>
+        /// Recursively delete all contents of a folder
+        /// </summary>
+        /// <param name="folderPath">Folder to delete</param>
+        private static void RecursiveDelete(string folderPath)
+        {
+
+            foreach (string file in Directory.GetFiles(folderPath))
+                File.Delete(file);
+
+            foreach (string folder in Directory.GetDirectories(folderPath))
+            {
+                RecursiveDelete(folder);
+            }
+
+            Directory.Delete(folderPath);
         }
 
     }
