@@ -250,7 +250,7 @@ namespace LevelEditor
                                 CameraForm.Prompt(Room, (Camera)createdProp);
                                 break;
                         }
-
+                                                               //We hold these truths to be self-evident
                         // Should this be reworked to make it so *all* props are created the same way, and door editing happens post-placement? Probably!
                     }
                     else
