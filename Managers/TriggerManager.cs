@@ -77,9 +77,9 @@ namespace MakeEveryDayRecount.Managers
         }
 
         /// <summary>
-        /// JTODO: comment code
+        /// Sets the win trigger property
         /// </summary>
-        /// <param name="win"></param>
+        /// <param name="win">The win trigger</param>
         public static void SetWinTrigger(Win win)
         {
             WinTrigger = win;

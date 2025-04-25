@@ -167,12 +167,6 @@ namespace MakeEveryDayRecount.Players
             {
                 ClickToInteract(MapUtils.ScreenToTile(InputManager.GetMousePosition()));
             }
-
-            //JTODO: DELETE THIS
-            if (InputManager.GetKeyPress(Keys.P))
-            {
-                Detected();
-            }
         }
 
         /// <summary>
@@ -222,7 +216,8 @@ namespace MakeEveryDayRecount.Players
                         //If there are more that are created this will turn into a larger if statement
                         if (trigger.Activate(this) && trigger is Win)
                         {
-                            //JTODO: Need to change the game state ASAP, need to figure out the best way to do that
+                            //TODO: Code in this if statement runs if a player triggers a Win trigger,
+                            //Meaning it should get them to the next level
                         }
                             
                     }
@@ -236,7 +231,8 @@ namespace MakeEveryDayRecount.Players
                 }
             }
 
-            //JTODO: verify triggers work when holding a box, or just make it so you can't have a box and proc a trigger
+            //Checkpoints are slightly slightly buggy when holding a box and walking on to them (box is saved a tile away from where it should be)
+            //But it's not a big issue, and the player shouldn't be holding a box and proccing a trigger anyways
             if (HoldingBox)
             {
                 // Drop the box if the player is holding it and they attempt to move a direction the 

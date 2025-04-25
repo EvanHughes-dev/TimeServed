@@ -41,10 +41,5 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
         {
             return player.ContainsItem(ItemIndex);
         }
-
-        //JTODO: Can't open the content file so I'm leaving this as a note to self
-        //In order to test out the levels I want to stick them in the a folder in levels called "Level2"
-        //I can make them with the level editor, but I think they should already be in the content file
-        //Wish I could open it up to look around but c'est la vie
     }
 }

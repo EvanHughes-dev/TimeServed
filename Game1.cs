@@ -148,7 +148,7 @@ namespace MakeEveryDayRecount
                     break;
 
                 case GameState.Cutscene:
-                    //JTODO: This should be triggered after the level ends, and then once it is over it should transition to the next level
+                    //TODO: This should be triggered after the level ends, and then once it is over it should transition to the next level
 
                     //When the cutscene is over
                     //_state = GameState.Level;
