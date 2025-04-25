@@ -39,6 +39,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         //All the rays come out from the point on the floor right "in front of" the camera
         private Point _rayBase;
 
+
         private Point[] _visionKite;
         private List<Point> _watchedTiles;
         private List<Point> _previousBoxes;

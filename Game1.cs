@@ -3,7 +3,6 @@ using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
 using MakeEveryDayRecount.Managers;
 
 namespace MakeEveryDayRecount
@@ -49,6 +48,7 @@ namespace MakeEveryDayRecount
         private BaseDebug[] _debugModes;
 
         private int _replaySpeed;
+        private const int MaxReplaySpeed = 5;
 
         public Game1()
         {
@@ -81,6 +81,7 @@ namespace MakeEveryDayRecount
             InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.MainMenu;
             InterfaceManager.gameStateChange += SwitchState;
             InterfaceManager.exitGame += ExitGame;
+            InterfaceManager.ReplaySpeedChange += ChangeReplaySpeed;
 
             ReplayManager.Initialize();
             TriggerManager.Initialize();
@@ -117,6 +118,8 @@ namespace MakeEveryDayRecount
             switch (_state)
             {
                 case GameState.Menu:
+                    if (IsMouseVisible)
+                        IsMouseVisible = false;
                     break;
 
                 case GameState.Pause:
@@ -144,7 +147,6 @@ namespace MakeEveryDayRecount
                     GameplayManager.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
                     // Save the current state of the keyboard
                     ReplayManager.SaveState((float)gameTime.ElapsedGameTime.TotalSeconds);
-
                     break;
 
                 case GameState.Cutscene:
@@ -166,12 +168,15 @@ namespace MakeEveryDayRecount
                         {
                             ReplayManager.BeginReplay();
                             GameplayManager.ReplayMode();
+                            InterfaceManager.ReplayMode();
+                            IsMouseVisible = true;
                         }
                         else if (!ReplayManager.NextFrame())
                         {
                             _state = GameState.Menu;
                             ReplayManager.EndReplay();
                             InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.MainMenu;
+                            IsMouseVisible = false;
                             break;
                         }
 
@@ -282,7 +287,6 @@ namespace MakeEveryDayRecount
         {
             if (state == GameState.Level)
             {
-                GameplayManager.NextLevel();
                 if (SoundManager.PlayingMusic)
                     SoundManager.ResumeBGM();
                 else
@@ -290,5 +294,22 @@ namespace MakeEveryDayRecount
             }
             _state = state;
         }
+
+        /// <summary>
+        /// Change the speed of the replay
+        /// </summary>
+        /// <param name="changeInSpeed">Value to change the replay by</param>
+        /// <returns>Speed that has been changed to</returns>
+        public int ChangeReplaySpeed(int changeInSpeed)
+        {
+            _replaySpeed += changeInSpeed;
+            if (_replaySpeed < 0)
+                _replaySpeed = 0;
+            else if (_replaySpeed > MaxReplaySpeed)
+                _replaySpeed = MaxReplaySpeed;
+
+            return _replaySpeed;
+        }
+
     }
 }

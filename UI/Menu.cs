@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using MakeEveryDayRecount.Managers;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace MakeEveryDayRecount.UI
@@ -11,7 +12,11 @@ namespace MakeEveryDayRecount.UI
         private Image _backgroundImage;
         private List<Image> _imagesToDisplay;
         private List<Button> _buttonsToDisplay;
-        private List<Text> _textToDisplay;
+
+        /// <summary>
+        /// Get the text to display
+        /// </summary>
+        public List<Text> TextToDisplay { get; private set; }
 
         /// <summary>
         /// Create a menu with all images, buttons, and text
@@ -25,7 +30,7 @@ namespace MakeEveryDayRecount.UI
             _backgroundImage = backgroundImage;
             _imagesToDisplay = images;
             _buttonsToDisplay = buttons;
-            _textToDisplay = text;
+            TextToDisplay = text;
         }
 
         /// <summary>
@@ -80,6 +85,8 @@ namespace MakeEveryDayRecount.UI
         {
             foreach (Button button in _buttonsToDisplay)
             {
+                if (ReplayManager.PlayingReplay)
+                    button.ReplayUpdate();
                 button.Update();
             }
         }
@@ -95,7 +102,7 @@ namespace MakeEveryDayRecount.UI
                 image.Draw(sb);
             foreach (Button button in _buttonsToDisplay)
                 button.Draw(sb);
-            foreach (Text text in _textToDisplay)
+            foreach (Text text in TextToDisplay)
                 text.Draw(sb);
         }
     }
