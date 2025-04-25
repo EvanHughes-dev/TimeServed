@@ -69,7 +69,7 @@ namespace MakeEveryDayRecount
             //_graphics.PreferredBackBufferHeight = 360;
 
             _graphics.HardwareModeSwitch = false;
-            _graphics.IsFullScreen = false; //TODO: revert to true
+            _graphics.IsFullScreen = true; 
             _graphics.ApplyChanges();
 
             _debugState = DebugState.None;
@@ -284,7 +284,6 @@ namespace MakeEveryDayRecount
         /// <param name="state">The state that should be applied when the delegate is called.</param>
         public void SwitchState(GameState state)
         {
-            if (_state == GameState.Menu) //If the prior state was the menu state
             if (state == GameState.Level)
             {
                 if (SoundManager.PlayingMusic)
