@@ -72,9 +72,7 @@ namespace MakeEveryDayRecount.Players
 
         private const float SecondsPerTile = .2f;
         private const float SecondsPerAnimation = .1f;
-        private const float SecondsPerPositionUpdate = .1f;
 
-        private float _timeBetweenPositionUpdate;
         private float _walkingSeconds;
         private bool _readyToMove;
 
@@ -82,10 +80,6 @@ namespace MakeEveryDayRecount.Players
         private int _animationFrame;
         private Rectangle _playerFrameRectangle;
         private readonly Point _playerSize;
-        private bool _justMoved;
-        private bool _reachedDest;
-
-        private Point _destDirection;
 
         //The player's inventory
         private Inventory _inventory;
@@ -112,8 +106,7 @@ namespace MakeEveryDayRecount.Players
             //Create an inventory
             _inventory = new Inventory(screenSize);
             _currentHeldBox = null;
-            _reachedDest = true;
-            _justMoved = false;
+
             _firstUpdate = true;
         }
 
@@ -445,6 +438,7 @@ namespace MakeEveryDayRecount.Players
         {
             //Reset the map to the last checkpoint
             TriggerManager.CurrentCheckpoint.LoadCheckpoint(this);
+            ReplayManager.ClearData();
         }
 
         #endregion
