@@ -50,7 +50,7 @@ namespace MakeEveryDayRecount.Managers
         {
             Level++;
             MapManager.ChangeLevel(Level);
-            PlayerObject.ChangeRoom(TriggerManager.PlayerSpawn.Location);
+            PlayerObject.ChangeRoom(TriggerManager.PlayerSpawn.Location); //TODO: Currently crashes on this line because of wire box shenanigains, make sure to pull main and changes there for functional code
 
             // Don't activate triggers if replay mode is active
             if (!ReplayManager.PlayingReplay)

@@ -359,8 +359,20 @@
 /processorParam:TextureFormat=Color
 /build:Items/wireCutters.png
 
+#begin Levels/Level1/JRoom.room
+/copy:Levels/Level1/JRoom.room
 
+#begin Levels/Level1/JRoom2.room
+/copy:Levels/Level1/JRoom2.room
 
+#begin Levels/Level1/level.level
+/copy:Levels/Level1/level.level
+
+#begin Levels/TriggerLevel/level.level
+/copy:Levels/TriggerLevel/level.level
+
+#begin Levels/TriggerLevel/TestRoomTrigger.room
+/copy:Levels/TriggerLevel/TestRoomTrigger.room
 
 #begin Player/Inventory/InventoryBox_hover.png
 /importer:TextureImporter
@@ -818,18 +830,6 @@
 /processorParam:TextureFormat=Color
 /build:UI/ui_cursor .png
 
-#begin UI/ui_cursor .png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:UI/ui_cursor .png
-
 #begin UI/ui_cursorHover.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -842,30 +842,3 @@
 /processorParam:TextureFormat=Color
 /build:UI/ui_cursorHover.png
 
-#begin UI/ui_cursorHover.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:UI/ui_cursorHover.png
-
-
-#begin Levels/TriggerLevel/level.level
-/copy:Levels/TriggerLevel/level.level
-
-#begin Levels/TriggerLevel/TestRoomTrigger.room
-/copy:Levels/TriggerLevel/TestRoomTrigger.room
-
-#begin Levels/Level1/level.level
-/copy:Levels/Level1/level.level
-
-#begin Levels/Level1/Room1.room
-/copy:Levels/Level1/Room1.room
-
-#begin Levels/Level1/Room2.room
-/copy:Levels/Level1/Room2.room
