@@ -69,7 +69,7 @@ namespace MakeEveryDayRecount
             //_graphics.PreferredBackBufferHeight = 360;
 
             _graphics.HardwareModeSwitch = false;
-            _graphics.IsFullScreen = false;
+            _graphics.IsFullScreen = true;
             _graphics.ApplyChanges();
 
             _debugState = DebugState.None;
@@ -101,10 +101,10 @@ namespace MakeEveryDayRecount
 
             GlobalDebug.Initialize();
             GameplayManager.Initialize(ScreenSize);
+            MapUtils.Initialize(this);
+
             // Initialize all items that need assets to be loaded 
             InterfaceManager.InitializeMenus(ScreenSize);
-
-            MapUtils.Initialize(this);
 
             _debugModes[0] = new PlayerDebug();
             _debugModes[1] = new MapDebug();
@@ -147,12 +147,6 @@ namespace MakeEveryDayRecount
                     GameplayManager.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
                     // Save the current state of the keyboard
                     ReplayManager.SaveState((float)gameTime.ElapsedGameTime.TotalSeconds);
-                    if (InputManager.GetKeyPress(Keys.Tab))
-                    {
-                        ReplayManager.SaveData(1, 2);
-                        _state = GameState.Playback;
-                    }
-
                     break;
 
                 case GameState.Cutscene:

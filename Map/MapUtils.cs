@@ -138,6 +138,21 @@ namespace MakeEveryDayRecount.Map
                 offset.Y = (ScreenSize.Y - MapSizePixels.Y) / 2;
             return offset;
         }
+
+        /// <summary>
+        /// Take in a location on the screen in pixels and return the position in the world in tile
+        /// </summary>
+        /// <param name="screenPos">Position on the screen</param>
+        /// <returns>Position in tile space</returns>
+        public static Point ScreenToTile(Point screenPos)
+        {
+            if (MapManager.CurrentRoom == null)
+                return Point.Zero;
+            Point worldToScreen = WorldToScreen();
+            Point screenToWorld = new Point(screenPos.X + worldToScreen.X, screenPos.Y + worldToScreen.Y);
+
+            return new Point(screenToWorld.X / AssetManager.TileSize.X, screenToWorld.Y / AssetManager.TileSize.Y);
+        }
         #endregion
 
         /// <summary>

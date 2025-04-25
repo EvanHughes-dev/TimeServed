@@ -161,12 +161,23 @@ namespace MakeEveryDayRecount.Managers
             };
             DoorTexture = new Texture2D[]
             {
+
+                content.Load<Texture2D>("Doors/prop_vent-top"),
+                content.Load<Texture2D>("Doors/prop_vent-right"),
+                content.Load<Texture2D>("Doors/prop_vent-bottom"),
+                content.Load<Texture2D>("Doors/prop_vent-left"),
+
+                content.Load<Texture2D>("Doors/prop_door_locked-top"),
+                content.Load<Texture2D>("Doors/prop_door_locked-right"),
+                content.Load<Texture2D>("Doors/prop_door_locked-bottom"),
+                content.Load<Texture2D>("Doors/prop_door_locked-left"),
+
                 content.Load<Texture2D>("Doors/Door-Top"),
                 content.Load<Texture2D>("Doors/Door-Right"),
                 content.Load<Texture2D>("Doors/Door-Bottom"),
                 content.Load<Texture2D>("Doors/Door-Left")
             };
-            TileSize = InterfaceManager.ScalePointUniform(new Point(TileMap[0].Width / 2, TileMap[0].Height / 2));
+            TileSize = InterfaceManager.ScalePointUniform(new Point(TileMap[0].Width / 3, TileMap[0].Height / 3));
 
             //LOAD DEBUG ASSETS
             DebugWalkableTile = content.Load<Texture2D>("DebugAssets/WALKABLE");
@@ -187,7 +198,7 @@ namespace MakeEveryDayRecount.Managers
 
             CursorStates = new Texture2D[]
             {
-                content.Load<Texture2D>("UI/ui_cursor"),
+                content.Load<Texture2D>("UI/ui_cursor "), //DO NOT REMOVE THE SPACE
                 content.Load<Texture2D>("UI/ui_cursorHover")
             };
 
@@ -205,10 +216,11 @@ namespace MakeEveryDayRecount.Managers
             CameraTextures = new Texture2D[]
             {
                 content.Load<Texture2D>("Items/prop_cameraOff"),
-                content.Load<Texture2D>("Items/prop_cameraOn")
+                content.Load<Texture2D>("Items/prop_cameraOn"),
+                content.Load<Texture2D>("Items/prop_wireBox") 
             };
             Boxes = new Texture2D[]{
-                content.Load<Texture2D>("Items/Box")
+                content.Load<Texture2D>("Items/prop_box")
             };
 
             //FONT STUFF

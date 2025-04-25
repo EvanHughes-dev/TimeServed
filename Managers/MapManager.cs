@@ -269,9 +269,14 @@ namespace MakeEveryDayRecount.Managers
             return _currentRoom.VerifyInteractable(playerFacing);
         }
 
-        public static Trigger CheckTrigger(Point playerPosition)
+        /// <summary>
+        /// Check if  a tile has a trigger
+        /// </summary>
+        /// <param name="tile">Tile to check</param>
+        /// <returns>Trigger on that tile or null</returns>
+        public static Trigger CheckTrigger(Point tile)
         {
-            return _currentRoom.VerifyTrigger(playerPosition);
+            return _currentRoom.VerifyTrigger(tile);
         }
 
         #endregion

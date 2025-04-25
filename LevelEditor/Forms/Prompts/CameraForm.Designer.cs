@@ -35,6 +35,8 @@
             labelSpread = new Label();
             buttonDone = new Button();
             splitContainer = new SplitContainer();
+            buttonAddWireBox = new Button();
+            buttonRemoveWireBox = new Button();
             groupBoxMap.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)trackBarSpread).BeginInit();
             ((System.ComponentModel.ISupportInitialize)splitContainer).BeginInit();
@@ -48,7 +50,7 @@
             groupBoxMap.Controls.Add(roomRenderer);
             groupBoxMap.Location = new Point(5, 3);
             groupBoxMap.Name = "groupBoxMap";
-            groupBoxMap.Size = new Size(565, 264);
+            groupBoxMap.Size = new Size(565, 426);
             groupBoxMap.TabIndex = 3;
             groupBoxMap.TabStop = false;
             groupBoxMap.Text = "Map";
@@ -60,8 +62,8 @@
             roomRenderer.Room = null;
             roomRenderer.ShowProps = true;
             roomRenderer.ShowTiles = true;
-            roomRenderer.ShowTriggers = false;
-            roomRenderer.Size = new Size(533, 404);
+            roomRenderer.ShowTriggers = true;
+            roomRenderer.Size = new Size(553, 398);
             roomRenderer.TabIndex = 0;
             roomRenderer.Text = "roomRenderer1";
             roomRenderer.TileMouseClick += RoomRenderer_TileMouseClick;
@@ -118,6 +120,8 @@
             // 
             // splitContainer.Panel2
             // 
+            splitContainer.Panel2.Controls.Add(buttonAddWireBox);
+            splitContainer.Panel2.Controls.Add(buttonRemoveWireBox);
             splitContainer.Panel2.Controls.Add(buttonDone);
             splitContainer.Panel2.Controls.Add(trackBarSpread);
             splitContainer.Panel2.Controls.Add(labelSpread);
@@ -126,6 +130,28 @@
             splitContainer.SplitterDistance = 432;
             splitContainer.TabIndex = 8;
             splitContainer.SplitterMoved += splitContainer_SplitterMoved;
+            // 
+            // buttonAddWireBox
+            // 
+            buttonAddWireBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            buttonAddWireBox.Location = new Point(303, -1);
+            buttonAddWireBox.Name = "buttonAddWireBox";
+            buttonAddWireBox.Size = new Size(122, 26);
+            buttonAddWireBox.TabIndex = 7;
+            buttonAddWireBox.Text = "Add/Move Wire Box";
+            buttonAddWireBox.UseVisualStyleBackColor = true;
+            buttonAddWireBox.Click += buttonAddWireBox_Click;
+            // 
+            // buttonRemoveWireBox
+            // 
+            buttonRemoveWireBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            buttonRemoveWireBox.Location = new Point(303, 26);
+            buttonRemoveWireBox.Name = "buttonRemoveWireBox";
+            buttonRemoveWireBox.Size = new Size(122, 26);
+            buttonRemoveWireBox.TabIndex = 7;
+            buttonRemoveWireBox.Text = "Remove Wire Box";
+            buttonRemoveWireBox.UseVisualStyleBackColor = true;
+            buttonRemoveWireBox.Click += buttonRemoveWireBox_Click;
             // 
             // CameraForm
             // 
@@ -155,5 +181,7 @@
         private Button buttonDone;
         private Controls.RoomRenderer roomRenderer;
         private SplitContainer splitContainer;
+        private Button buttonAddWireBox;
+        private Button buttonRemoveWireBox;
     }
 }
