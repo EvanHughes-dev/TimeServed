@@ -25,6 +25,11 @@ namespace MakeEveryDayRecount.Managers
         public static Checkpoint PlayerSpawn { get; private set; }
 
         /// <summary>
+        /// The win trigger of the current level
+        /// </summary>
+        public static Win WinTrigger { get; private set; }
+
+        /// <summary>
         /// Initializes important properties (currently just the list of checkpoints)
         /// </summary>
         public static void Initialize()
@@ -38,17 +43,25 @@ namespace MakeEveryDayRecount.Managers
         public static void Reset()
         {
             Checkpoints.Clear();
-            PlayerSpawn = null; //TODO: is this needed?
+            PlayerSpawn = null;
+            WinTrigger = null;
+
             //...and all the other lists of triggers, once they're implemented
         }
 
         /// <summary>
-        /// Adds the given checkpoint to the list of all checkpoints in the current level
+        /// Adds the given checkpoint to the list of all checkpoints in the current level, if its the first time its being added
         /// </summary>
         /// <param name="checkpoint">Checkpoint to be added</param>
-        public static void AddCheckpoint(Checkpoint checkpoint)
+        public static void AddUniqueCheckpoint(Checkpoint checkpoint)
         {
-            Checkpoints.Add(checkpoint);
+            //A checkpoint is designated unique if its position is distinct, since that cannot be altered during runtime
+            foreach (Checkpoint c in Checkpoints)
+            {
+                if (checkpoint.Location == c.Location)
+                    return;
+            }
+                Checkpoints.Add(checkpoint);
         }
 
         /// <summary>
@@ -102,5 +115,27 @@ namespace MakeEveryDayRecount.Managers
             GameplayManager.LoadLevelFromCheckpoint(level);
         }
 
+        /// <summary>
+        /// Sets the win trigger property
+        /// </summary>
+        /// <param name="win">The win trigger</param>
+        public static void SetWinTrigger(Win win)
+        {
+            WinTrigger = win;
+        }
+
+        public static void UpdateCheckpoint(Checkpoint checkpoint)
+        {
+            for (int i = 0; i < Checkpoints.Count; i++)
+            {
+                if (checkpoint.Location == Checkpoints[i].Location)
+                {
+                    Checkpoints[i] = checkpoint;
+                    return;
+                }
+            }
+            //Shouldn't ever run
+            throw new Exception("This checkpoint isn't in triggerArray");
+        }
     }
 }
