@@ -27,6 +27,10 @@ namespace LevelEditor.Controls
                 Invalidate();
             }
         }
+        /// <summary>
+        /// Override of onpaint which creates the icon representation of what 
+        /// each trigger looks like in the trigger pallette
+        /// </summary>
         protected override void OnPaint(PaintEventArgs pe)
         {
             Graphics graphics = pe.Graphics;
