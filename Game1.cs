@@ -49,6 +49,11 @@ namespace MakeEveryDayRecount
 
         private int _replaySpeed;
         private const int MaxReplaySpeed = 5;
+        private int _currentAnimationIndex;
+        private const float SecondsPerAnimationFrame = .2f;
+        private float _currentElapsedTimeAnimation;
+        private Texture2D[] _currentAnimation;
+
 
         public Game1()
         {
@@ -69,7 +74,7 @@ namespace MakeEveryDayRecount
             //_graphics.PreferredBackBufferHeight = 360;
 
             _graphics.HardwareModeSwitch = false;
-            _graphics.IsFullScreen = true; 
+            _graphics.IsFullScreen = false;
             _graphics.ApplyChanges();
 
             _debugState = DebugState.None;
@@ -87,8 +92,12 @@ namespace MakeEveryDayRecount
             TriggerManager.Initialize();
             //Set initial GameState
             _state = GameState.Menu;
-
             _replaySpeed = 2;
+
+            _currentAnimation = null;
+            _currentAnimationIndex = 0;
+            _currentElapsedTimeAnimation = 0f;
+
             base.Initialize();
         }
 
@@ -101,6 +110,8 @@ namespace MakeEveryDayRecount
 
             GlobalDebug.Initialize();
             GameplayManager.Initialize(ScreenSize);
+            GameplayManager.WinCondition += () => SwitchState(GameState.Cutscene);
+
             MapUtils.Initialize(this);
 
             // Initialize all items that need assets to be loaded 
@@ -150,10 +161,17 @@ namespace MakeEveryDayRecount
                     break;
 
                 case GameState.Cutscene:
-                    //TODO: This should be triggered after the level ends, and then once it is over it should transition to the next level
-
-                    //When the cutscene is over
-                    //_state = GameState.Level;
+                    _currentElapsedTimeAnimation += (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    if (_currentElapsedTimeAnimation >= SecondsPerAnimationFrame)
+                    {
+                        _currentAnimationIndex++;
+                        _currentElapsedTimeAnimation -= SecondsPerAnimationFrame;
+                        if (_currentAnimationIndex >= _currentAnimation.Length)
+                        {
+                            GameplayManager.NextLevel();
+                            SwitchState(GameState.Level);
+                        }
+                    }
                     break;
 
                 case GameState.Playback:
@@ -216,6 +234,7 @@ namespace MakeEveryDayRecount
                     DisplayDebug();
                     break;
                 case GameState.Cutscene:
+                    _spriteBatch.Draw(_currentAnimation[_currentAnimationIndex], new Rectangle(Point.Zero, ScreenSize), Color.White);
                     break;
                 case GameState.Playback:
                     GameplayManager.Draw(_spriteBatch);
@@ -290,6 +309,12 @@ namespace MakeEveryDayRecount
                     SoundManager.ResumeBGM();
                 else
                     SoundManager.PlayBGM(GameplayManager.Level);
+            }
+            else if (state == GameState.Cutscene)
+            {
+                _currentElapsedTimeAnimation = 0f;
+                _currentAnimationIndex = 0;
+                _currentAnimation = AssetManager.LevelChanges[GameplayManager.Level];
             }
             _state = state;
         }

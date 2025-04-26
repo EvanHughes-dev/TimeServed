@@ -1,6 +1,9 @@
+using System.Collections.Generic;
+using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using System.Linq;
 
 namespace MakeEveryDayRecount.Managers
 {
@@ -94,6 +97,11 @@ namespace MakeEveryDayRecount.Managers
         public static Texture2D[] Boxes { get; private set; }
 
         #endregion
+
+        /// <summary>
+        /// An array of all the level change animations. Indexed around the current level - 1
+        /// </summary>
+        public static Texture2D[][] LevelChanges { get; private set; }
 
         #region Font Assets
 
@@ -217,11 +225,16 @@ namespace MakeEveryDayRecount.Managers
             {
                 content.Load<Texture2D>("Items/prop_cameraOff"),
                 content.Load<Texture2D>("Items/prop_cameraOn"),
-                content.Load<Texture2D>("Items/prop_wireBox") 
+                content.Load<Texture2D>("Items/prop_wireBox")
             };
             Boxes = new Texture2D[]{
                 content.Load<Texture2D>("Items/prop_box")
             };
+
+            // LOAD INTERMEDIARY ANIMATIONS
+            LevelChanges = new Texture2D[2][];
+            LevelChanges[0] = LoadLevelAnimation(1, content);
+            LevelChanges[1] = LoadLevelAnimation(2, content);
 
             //FONT STUFF
             Arial20 = content.Load<SpriteFont>("Fonts/Arial20");
@@ -232,6 +245,41 @@ namespace MakeEveryDayRecount.Managers
                 content.Load<SpriteFont>("Fonts/Arial20"),
                 content.Load<SpriteFont>("Fonts/Arial30"),
             };
+
+        }
+
+        /// <summary>
+        /// Find the images for the animation from one level to the next
+        /// </summary>
+        /// <param name="startingLevel">Level the animation is coming from</param>
+        /// <param name="content">ContentManager to load from</param>
+        /// <returns>Images ordered in ascending order</returns>
+        private static Texture2D[] LoadLevelAnimation(int startingLevel, ContentManager content)
+        {
+            int startingDay = 6 - startingLevel;
+            int destDay = startingDay - 1;
+
+
+            // the files are in the form a-b-c.png where a-b are the same as the starting day
+            // and destDay and c is the order of the image in the overall animation. 
+            // This code parses the name and orders based on the c value in ascending order
+            string[] fileNames = Directory
+                .GetFiles($"./Content/DayChange/{startingDay}-{destDay}")
+                .Select(Path.GetFileNameWithoutExtension)
+                .OrderBy(name =>
+                {
+                    string withoutExtension = Path.GetFileNameWithoutExtension(name);
+                    string[] parts = withoutExtension.Split('-');
+                    return int.Parse(parts[2]);
+                })
+                .ToArray();
+
+            Texture2D[] textures = new Texture2D[fileNames.Length];
+
+            for (int i = 0; i < fileNames.Length; i++)
+                textures[i] = content.Load<Texture2D>($"DayChange/{startingDay}-{destDay}/{fileNames[i]}");
+
+            return textures;
 
         }
     }

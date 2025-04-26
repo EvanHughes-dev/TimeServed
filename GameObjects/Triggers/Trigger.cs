@@ -43,6 +43,11 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
             _height = height;
         }
 
+        /// <summary>
+        /// Allow the player to interact with this trigger
+        /// </summary>
+        /// <param name="player">Player that triggered the trigger</param>
+        /// <returns>If the trigger action was successful</returns>
         public abstract bool Activate(Player player);
     }
 }

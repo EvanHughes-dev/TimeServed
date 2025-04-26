@@ -26,11 +26,6 @@ namespace MakeEveryDayRecount.Managers
         public static Checkpoint PlayerSpawn { get; private set; }
 
         /// <summary>
-        /// The win trigger of the current level
-        /// </summary>
-        public static Win WinTrigger { get; private set; }
-
-        /// <summary>
         /// Initializes important properties (currently just the list of checkpoints)
         /// </summary>
         public static void Initialize()
@@ -45,7 +40,6 @@ namespace MakeEveryDayRecount.Managers
         {
             Checkpoints.Clear();
             PlayerSpawn = null;
-            WinTrigger = null;
 
             //...and all the other lists of triggers, once they're implemented
         }
@@ -116,14 +110,6 @@ namespace MakeEveryDayRecount.Managers
             GameplayManager.LoadLevelFromCheckpoint(level);
         }
 
-        /// <summary>
-        /// Sets the win trigger property
-        /// </summary>
-        /// <param name="win">The win trigger</param>
-        public static void SetWinTrigger(Win win)
-        {
-            WinTrigger = win;
-        }
 
         public static void UpdateCheckpoint(Checkpoint checkpoint)
         {

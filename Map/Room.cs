@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Managers;
 using MakeEveryDayRecount.GameObjects.Triggers;
+using System.ComponentModel.Design;
 
 namespace MakeEveryDayRecount.Map
 {
@@ -34,7 +35,8 @@ namespace MakeEveryDayRecount.Map
 
     public enum TriggerTypes
     {
-        Checkpoint = 0
+        Checkpoint = 0,
+        Win = 1
     }
 
     /// <summary>
@@ -391,6 +393,12 @@ namespace MakeEveryDayRecount.Map
                             {
                                 TriggerManager.SetPlayerSpawn(checkpoint);
                             }
+                        }
+                        else if (triggerType == TriggerTypes.Win)
+                        {
+                            int itemIndex = binaryReader.ReadInt32();
+                            Win winTrigger = new Win(triggerPos, itemIndex, triggerWidth, triggerHeight);
+                            _triggersInRoom.Add(winTrigger);
                         }
                         numberOfTriggers--;
                     }

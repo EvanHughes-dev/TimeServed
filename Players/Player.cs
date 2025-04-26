@@ -128,7 +128,6 @@ namespace MakeEveryDayRecount.Players
 
             _playerFrameRectangle = AnimationUpdate(deltaTime);
             _inventory.Update();
-            CheckTrigger();
         }
 
         #region Player Movement
@@ -212,19 +211,14 @@ namespace MakeEveryDayRecount.Players
                         _playerState = PlayerState.Walking;
 
                     //Check triggers
-                    Trigger trigger = (MapManager.CurrentRoom.VerifyTrigger(Location));
-                    if (trigger != null)
+                    Trigger trigger = MapManager.CurrentRoom.VerifyTrigger(Location);
+
+                    //Only trigger that cares about if it was activated right now is the Win trigger
+                    //If there are more that are created this will turn into a larger if statement
+                    if (trigger != null && trigger.Activate(this) && trigger is Win)
                     {
-                        //Only trigger that cares about if it was activated right now is the Win trigger
-                        //If there are more that are created this will turn into a larger if statement
-                        if (trigger.Activate(this) && trigger is Win)
-                        {
-                            //TODO: Code in this if statement runs if a player triggers a Win trigger,
-                            //Meaning it should get them to the next level
-                        }
-                            
+                        GameplayManager.PlayerWinTrigger();
                     }
-                        
 
                     SoundManager.PlaySFX(SoundManager.PlayerStepSound, -40, 40);
                 }
@@ -459,14 +453,6 @@ namespace MakeEveryDayRecount.Players
         {
             Location = new_location;
             UpdatePlayerPos();
-        }
-
-        /// <summary>
-        /// Activate any trigger the player has stepped on
-        /// </summary>
-        public void CheckTrigger()
-        {
-            MapManager.CheckTrigger(Location)?.Activate(this);
         }
 
         /// <summary>
