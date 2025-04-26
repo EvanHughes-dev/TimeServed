@@ -128,6 +128,16 @@ namespace LevelEditor
                 swatch.SizeMode = PictureBoxSizeMode.Zoom;
             });
 
+            CreatePalette<Trigger, TriggerBox>(_mainForm.Triggers, SwatchSize, flowLayoutPanelTriggers, (swatch, trigger) =>
+            {
+                swatch.Trigger = trigger;
+                swatch.Click += TriggerSwatch_Click;
+
+                swatch.BorderColor = Color.Blue;
+
+                swatch.SizeMode = PictureBoxSizeMode.Zoom;
+            });
+
             SelectedTile = _mainForm.Tiles.ElementAt(0);
             SelectedProp = _mainForm.Props.ElementAt(0);
             SelectedTrigger = _mainForm.Triggers.ElementAt(0);
@@ -454,6 +464,7 @@ namespace LevelEditor
             // Makes the tile and prop palettes fill their parents
             flowLayoutPanelTiles.Bounds = flowLayoutPanelTiles.Parent!.ClientRectangle;
             flowLayoutPanelProps.Bounds = flowLayoutPanelProps.Parent!.ClientRectangle;
+            flowLayoutPanelTriggers.Bounds = flowLayoutPanelTriggers.Parent!.ClientRectangle;
 
             if (roomRenderer != null)
             {

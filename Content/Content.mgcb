@@ -870,11 +870,7 @@
 /build:UI/ui_cursorHover.png
 
 
-#begin Levels/TriggerLevel/level.level
-/copy:Levels/TriggerLevel/level.level
 
-#begin Levels/TriggerLevel/TestRoomTrigger.room
-/copy:Levels/TriggerLevel/TestRoomTrigger.room
 
 #begin Levels/Level1/level.level
 /copy:Levels/Level1/level.level
