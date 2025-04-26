@@ -71,6 +71,10 @@ namespace LevelEditor
         /// Holds the prop box of the prop that is currently selected on the palette.
         /// </summary>
         private PropBox _currentlySelectedPropBox;
+        /// <summary>
+        /// Holds the trigger box of the trigger that is currently selected on the palette.
+        /// </summary>
+        private TriggerBox _currentlySelectedTriggerBox;
 
         private Point? _triggerStartPoint;
 
@@ -118,6 +122,16 @@ namespace LevelEditor
             {
                 swatch.Prop = prop;
                 swatch.Click += PropSwatch_Click;
+
+                swatch.BorderColor = Color.Blue;
+
+                swatch.SizeMode = PictureBoxSizeMode.Zoom;
+            });
+
+            CreatePalette<Trigger, TriggerBox>(_mainForm.Triggers, SwatchSize, flowLayoutPanelTriggers, (swatch, trigger) =>
+            {
+                swatch.Trigger = trigger;
+                swatch.Click += TriggerSwatch_Click;
 
                 swatch.BorderColor = Color.Blue;
 
@@ -246,7 +260,7 @@ namespace LevelEditor
                                 CameraForm.Prompt(Room, (Camera)createdProp);
                                 break;
                         }
-
+                                                               //We hold these truths to be self-evident
                         // Should this be reworked to make it so *all* props are created the same way, and door editing happens post-placement? Probably!
                     }
                     else
@@ -402,7 +416,19 @@ namespace LevelEditor
             _currentlySelectedPropBox = prop;
             SelectedProp = prop.Prop;
         }
+        /// <summary>
+        /// When a trigger button is clicked, select its trigger type.
+        /// </summary>
+        /// <exception cref="Exception">Thrown when this method is called with a non-Button sender.</exception>
+        private void TriggerSwatch_Click(object? sender, EventArgs e)
+        {
+            if (sender is not TriggerBox trigger) throw new Exception("Invalid call to TriggerSwatch_Click");
 
+            if (_currentlySelectedPropBox != null) _currentlySelectedPropBox.BorderWidth = 0;
+            trigger.BorderWidth = 5;
+            _currentlySelectedTriggerBox = trigger;
+            SelectedTrigger = trigger.Trigger;
+        }
         #endregion
 
         #region Tab Events
@@ -438,6 +464,7 @@ namespace LevelEditor
             // Makes the tile and prop palettes fill their parents
             flowLayoutPanelTiles.Bounds = flowLayoutPanelTiles.Parent!.ClientRectangle;
             flowLayoutPanelProps.Bounds = flowLayoutPanelProps.Parent!.ClientRectangle;
+            flowLayoutPanelTriggers.Bounds = flowLayoutPanelTriggers.Parent!.ClientRectangle;
 
             if (roomRenderer != null)
             {

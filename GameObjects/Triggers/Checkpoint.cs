@@ -68,7 +68,6 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
             if (!Active)
                 return false;
 
-            string baseFolder = "./CheckpointData";
 
             //Deactivate the checkpoint, need to before it has saved the data
             Active = false;
@@ -94,8 +93,6 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
                 binaryWriter.Write(RoomIndex);
                 binaryWriter.Write(Index);
             }
-
-
 
             //Update the current checkpoint
             TriggerManager.CurrentCheckpoint = this;

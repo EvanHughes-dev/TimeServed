@@ -448,8 +448,8 @@ namespace LevelEditor.Controls
                 Rectangle drawRect = Rectangle.Union(TileSpaceToPixelSpace(bounds.Location), TileSpaceToPixelSpace(bounds.Location + bounds.Size - one));
 
                 //let me have my headcannon
-                Pen moana = new Pen(Color.YellowGreen, 4);
-                Brush maoi = new SolidBrush(Color.FromArgb(63, Color.YellowGreen));
+                Pen moana = new Pen(trigger.Color, 4);
+                Brush maoi = new SolidBrush(Color.FromArgb(63, trigger.Color));
 
                 graphics.DrawRectangle(moana, drawRect);
                 graphics.FillRectangle(maoi, drawRect);

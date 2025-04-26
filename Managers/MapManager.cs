@@ -245,9 +245,7 @@ namespace MakeEveryDayRecount.Managers
             _currentRoom = _rooms[destRoom];
             OnRoomUpdate?.Invoke(_currentRoom);
         }
-
         #endregion
-
 
         #region  Tile Checking
 
