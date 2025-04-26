@@ -317,7 +317,27 @@ namespace MakeEveryDayRecount.Map
                                 break;
                             case ObjectTypes.Camera:
                                 Point centerCastPoint = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
-                                Camera cam = new Camera(tileLocation, AssetManager.CameraTextures, propIndex, this, centerCastPoint, (float)binaryReader.ReadDouble());
+
+                                Point wireBoxPoint = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
+
+                                Camera cam;
+                                if (wireBoxPoint != new Point(-1, -1))
+                                    cam = new Camera(
+                                        tileLocation,
+                                        AssetManager.CameraTextures,
+                                        propIndex,
+                                        this,
+                                        centerCastPoint,
+                                        (float)binaryReader.ReadDouble(),
+                                        wireBoxPoint);
+                                else
+                                    cam = new Camera(
+                                        tileLocation,
+                                        AssetManager.CameraTextures,
+                                        propIndex,
+                                        this,
+                                        centerCastPoint,
+                                        (float)binaryReader.ReadDouble());
                                 _itemsInRoom.Add(cam);
                                 Cameras.Add(cam);
                                 break;
