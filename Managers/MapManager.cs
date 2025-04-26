@@ -131,6 +131,8 @@ namespace MakeEveryDayRecount.Managers
                     $"No Level.level file located for level {currentLevel}. File path: {folderPath}/level.level"
                 );
             }
+            //Order all the checkpoints
+            TriggerManager.SortCheckpoints();
             return rooms;
         }
 

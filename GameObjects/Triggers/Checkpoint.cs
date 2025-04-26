@@ -67,7 +67,7 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
                     return false;
             if (!Active)
                 return false;
-            
+
             string baseFolder = "./CheckpointData";
 
             //Deactivate the checkpoint, need to before it has saved the data
@@ -99,7 +99,6 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
 
             //Update the current checkpoint
             TriggerManager.CurrentCheckpoint = this;
-            TriggerManager.UpdateCheckpoint(this);
 
             //Call the replay manager function
             ReplayManager.SaveData(GameplayManager.Level, Index);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System;
+using System.Linq;
 
 namespace MakeEveryDayRecount.Managers
 {
@@ -44,19 +45,22 @@ namespace MakeEveryDayRecount.Managers
             //...and all the other lists of triggers, once they're implemented
         }
 
+
         /// <summary>
-        /// Adds the given checkpoint to the list of all checkpoints in the current level, if its the first time its being added
+        /// Add a checkpoint to the list of checkpoints without ordering it
         /// </summary>
-        /// <param name="checkpoint">Checkpoint to be added</param>
-        public static void AddUniqueCheckpoint(Checkpoint checkpoint)
+        /// <param name="checkpoint">Checkpoint to add</param>
+        public static void AddCheckpoint(Checkpoint checkpoint)
         {
-            //A checkpoint is designated unique if its position is distinct, since that cannot be altered during runtime
-            foreach (Checkpoint c in Checkpoints)
-            {
-                if (checkpoint.Location == c.Location)
-                    return;
-            }
             Checkpoints.Add(checkpoint);
+        }
+
+        /// <summary>
+        /// Sort the list of checkpoints in ascending order
+        /// </summary>
+        public static void SortCheckpoints()
+        {
+            Checkpoints.Sort((a, b) => a.Index.CompareTo(b.Index));
         }
 
         /// <summary>
@@ -110,19 +114,5 @@ namespace MakeEveryDayRecount.Managers
             GameplayManager.LoadLevelFromCheckpoint(level);
         }
 
-
-        public static void UpdateCheckpoint(Checkpoint checkpoint)
-        {
-            for (int i = 0; i < Checkpoints.Count; i++)
-            {
-                if (checkpoint.Location == Checkpoints[i].Location)
-                {
-                    Checkpoints[i] = checkpoint;
-                    return;
-                }
-            }
-            //Shouldn't ever run
-            throw new Exception("This checkpoint isn't in triggerArray");
-        }
     }
 }
