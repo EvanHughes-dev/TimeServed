@@ -21,15 +21,34 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// </summary>
         /// <param name="location">Location of creation</param>
         /// <param name="sprite">Sprite array to get the sprite from</param>
-        /// <param name="direction">Direction to face</param>
         /// <param name="connectedCamera">Camera this is connected to</param>
         /// <param name="spriteIndex">Index for the sprite</param>
-        public WireBox(Point location, Texture2D[] sprite, float direction, Camera connectedCamera, int spriteIndex)
+        public WireBox(Point location, Texture2D[] sprite, Camera connectedCamera, int spriteIndex)
             : base(location, sprite, spriteIndex)
         {
+
+            switch (connectedCamera.CameraRoom.GetTileSpriteName(location).Split("_")[2])
+            {
+                case "right":
+                    _direction = MathHelper.PiOver2;
+                    break;
+                case "bottom":
+                    _direction = 0f;
+                    break;
+                case "left":
+                    _direction = MathHelper.PiOver2 * 3;
+                    break;
+                case "top":
+                    _direction = MathHelper.Pi;
+                    break;
+                default:
+                    _direction = 0f;
+                    System.Diagnostics.Debug.Write($"Unknown direction in wireboxes: {connectedCamera.CameraRoom.GetTileSpriteName(location).Split("_")[2]}");
+                    break;
+
+            }
             _camera = connectedCamera;
-            _direction = direction;
-            _drawOrigin = new Point(AssetManager.TileSize.X / 2, AssetManager.TileSize.Y / 2);
+            _drawOrigin = new Point(Sprite.Width / 2, Sprite.Height / 2);
         }
 
         /// <summary>
@@ -40,7 +59,8 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// <param name="pixelOffset">Number of pixels to offset for map offset</param>
         public override void Draw(SpriteBatch sb, Point worldToScreen, Point pixelOffset)
         {
-            sb.Draw(Sprite, new Rectangle(MapUtils.TileToWorld(Location) - worldToScreen + pixelOffset + _drawOrigin, AssetManager.TileSize), null, //no source rectangle
+
+            sb.Draw(Sprite, new Rectangle(MapUtils.TileToWorld(Location) - worldToScreen + pixelOffset + AssetManager.HalfTileSize, AssetManager.TileSize), null, //no source rectangle
                 Color.White, _direction, _drawOrigin.ToVector2(), SpriteEffects.None, 0f);
         }
 
@@ -50,7 +70,8 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// <param name="player">Player that interacted</param>
         public override void Interact(Player player)
         {
-            _camera.Deactivate();
+            if (player.ContainsItem(2))
+                _camera.Deactivate();
             //TODO: This should make itself un-interactable after this function is called once
         }
     }

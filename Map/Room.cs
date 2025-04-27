@@ -676,5 +676,10 @@ namespace MakeEveryDayRecount.Map
                 binaryWriter.Close();
             }
         }
+
+        public string GetTileSpriteName(Point tileLocation)
+        {
+            return AssetManager.TileMap[_map[tileLocation.X, tileLocation.Y].SpriteIndex].Name;
+        }
     }
 }
