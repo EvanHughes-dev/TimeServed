@@ -70,7 +70,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// <param name="player">Player that interacted</param>
         public override void Interact(Player player)
         {
-            if (_camera.SpriteIndex == 0 && player.ContainsItem(2))
+            if (_camera.SpriteIndex == 0 && player.SelectedItem.SpriteIndex == 2)
             {
                 _camera.Deactivate();
                 SpriteIndex = 3;

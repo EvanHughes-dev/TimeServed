@@ -63,7 +63,7 @@ namespace MakeEveryDayRecount.Managers
             Level++;
             MapManager.ChangeLevel(Level);
             PlayerObject.ChangeRoom(TriggerManager.PlayerSpawn.Location);
-            MapManager.ChangeRoom(TriggerManager.PlayerSpawn.RoomIndex); 
+            MapManager.ChangeRoom(TriggerManager.PlayerSpawn.RoomIndex);
             PlayerObject.ClearStates();
             GiveItems(Level);
             // Don't activate triggers if replay mode is active
@@ -113,7 +113,9 @@ namespace MakeEveryDayRecount.Managers
             Level = _highestLevel;
             MapManager.ChangeLevel(Level);
             PlayerObject.ChangeRoom(TriggerManager.PlayerSpawn.Location);
+            MapManager.ChangeRoom(TriggerManager.PlayerSpawn.RoomIndex);
             PlayerObject.ClearStates();
+            GiveItems(Level);
         }
 
 
@@ -140,7 +142,9 @@ namespace MakeEveryDayRecount.Managers
                     ReplayManager.NextLevel();
                     MapManager.ChangeLevel(Level);
                     PlayerObject.ChangeRoom(TriggerManager.PlayerSpawn.Location);
+                    MapManager.ChangeRoom(TriggerManager.PlayerSpawn.RoomIndex);
                     PlayerObject.ClearStates();
+                    GiveItems(Level);
                 }
             }
             else

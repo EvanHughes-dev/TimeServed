@@ -51,6 +51,11 @@ namespace MakeEveryDayRecount.Players
         /// </summary>
         public Point PlayerWorldPosition { get; private set; }
 
+        /// <summary>
+        /// Get the current selected item
+        /// </summary>
+        public Item SelectedItem { get => _inventory.SelectedItem; }
+
         private Direction _playerCurrentDirection;
         private PlayerState _playerState;
 
