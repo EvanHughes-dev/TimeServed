@@ -303,7 +303,7 @@ namespace MakeEveryDayRecount.Map
                     // Parse all needed GameObjects from the file
                     while (numberOfGameObjects > 0)
                     {
-                        int propIndex = binaryReader.ReadInt32(); //JTODO: This gave a bogus number when detected in Wirebox room
+                        int propIndex = binaryReader.ReadInt32(); 
 
                         Point tileLocation = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
 

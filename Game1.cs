@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MakeEveryDayRecount.Managers;
+using System.Net.Security;
 
 namespace MakeEveryDayRecount
 {
@@ -225,7 +226,16 @@ namespace MakeEveryDayRecount
                 case GameState.Level:
                     GameplayManager.Draw(_spriteBatch);
                     DisplayDebug();
-                    //JTODO: hardcode tutorial text for the first level
+                    //If statement in order to display tutorial text
+                    if (GameplayManager.Level == 1)
+                    {
+                        if (MapManager.CurrentRoom.RoomName == "JRoom0")
+                        {
+                            //Press E or Mouse to interact, use Moue to select items from inventory
+                            _spriteBatch.DrawString(AssetManager.Arial20, "Press E or click to Interact.", new Vector2(150, 400), Color.White);
+                            _spriteBatch.DrawString(AssetManager.Arial20, "Use the mouse to select items \nfrom the inventory.", new Vector2(1350, 400), Color.White);
+                        }
+                    }
                     break;
                 case GameState.Pause:
                     GameplayManager.Draw(_spriteBatch);
