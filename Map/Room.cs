@@ -383,6 +383,7 @@ namespace MakeEveryDayRecount.Map
                         if (triggerType == TriggerTypes.Checkpoint)
                         {
                             Checkpoint checkpoint = new Checkpoint(triggerPos, binaryReader.ReadInt32(), triggerWidth, triggerHeight, binaryReader.ReadBoolean());
+                            checkpoint.RoomIndex = RoomIndex;
 
                             _triggersInRoom.Add(checkpoint);
                             TriggerManager.AddCheckpoint(checkpoint);

@@ -63,6 +63,7 @@ namespace MakeEveryDayRecount.Managers
             Level++;
             MapManager.ChangeLevel(Level);
             PlayerObject.ChangeRoom(TriggerManager.PlayerSpawn.Location);
+            MapManager.ChangeRoom(TriggerManager.PlayerSpawn.RoomIndex); 
             PlayerObject.ClearStates();
             //JTODO: This will eventually be a switch statement, hardcoding it for now
             //There's probably a better place for this but its fine

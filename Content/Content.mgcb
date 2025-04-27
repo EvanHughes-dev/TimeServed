@@ -695,8 +695,17 @@
 /processorParam:TextureFormat=Color
 /build:Items/wireCutters.png
 
+#begin Levels/Level1/JRoom.room
+/copy:Levels/Level1/JRoom.room
 
+#begin Levels/Level1/JRoom0.room
+/copy:Levels/Level1/JRoom0.room
 
+#begin Levels/Level1/JRoom2.room
+/copy:Levels/Level1/JRoom2.room
+
+#begin Levels/Level1/level.level
+/copy:Levels/Level1/level.level
 
 #begin Levels/Level2/level.level
 /copy:Levels/Level2/level.level
@@ -1175,23 +1184,3 @@
 /processorParam:TextureFormat=Color
 /build:UI/ui_cursorHover.png
 
-
-
-#begin Levels/Level1/Room1.room
-/copy:Levels/Level1/Room1.room
-
-#begin Levels/Level1/Room2.room
-/copy:Levels/Level1/Room2.room
-
-
-
-
-#begin Levels/Level1/Room1.room
-/copy:Levels/Level1/Room1.room
-
-#begin Levels/Level1/Room2.room
-/copy:Levels/Level1/Room2.room
-
-
-#begin Levels/Level1/level.level
-/copy:Levels/Level1/level.level
