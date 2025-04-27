@@ -73,6 +73,15 @@ namespace MakeEveryDayRecount.Managers
         }
 
         /// <summary>
+        /// Clear all data from the current map
+        /// </summary>
+        public static void ClearMap()
+        {
+            _rooms = new Dictionary<int, Room> { };
+            _currentRoom = null;
+        }
+
+        /// <summary>
         /// Load all the needed data relating to each room
         /// from the corresponding files and format them
         /// </summary>
@@ -97,7 +106,7 @@ namespace MakeEveryDayRecount.Managers
             // Level.level should exist in every Level folder
             // Acts as a config file for the .room files
             // File is structured in the following form:
-
+            TriggerManager.Reset();
             /*
             * int roomCount
             *   Rooms:
@@ -131,6 +140,8 @@ namespace MakeEveryDayRecount.Managers
                     $"No Level.level file located for level {currentLevel}. File path: {folderPath}/level.level"
                 );
             }
+            //Order all the checkpoints
+            TriggerManager.SortCheckpoints();
             return rooms;
         }
 
@@ -243,9 +254,7 @@ namespace MakeEveryDayRecount.Managers
             _currentRoom = _rooms[destRoom];
             OnRoomUpdate?.Invoke(_currentRoom);
         }
-
         #endregion
-
 
         #region  Tile Checking
 

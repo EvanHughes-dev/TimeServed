@@ -1,11 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Players;
-using MakeEveryDayRecount.Map;
 using MakeEveryDayRecount.GameObjects.Props;
-using System;
 using System.IO;
-using MakeEveryDayRecount.GameObjects.Triggers;
+using System.Reflection.Metadata;
 
 namespace MakeEveryDayRecount.Managers
 {
@@ -14,6 +12,11 @@ namespace MakeEveryDayRecount.Managers
     /// </summary>
     /// <param name="player">New player object</param>
     delegate void OnPlayerUpdate(Player player);
+
+    /// <summary>
+    /// Called when the player triggers a win condition trigger
+    /// </summary>
+    delegate void OnWinCondition();
 
     /// <summary>
     /// Manager of Player and the Map Manager.
@@ -25,12 +28,20 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static int Level { get; private set; }
 
+        private readonly static int _highestLevel = 2;
+
+        /// <summary>
+        /// Get the highest level for the game
+        /// </summary>
+        public static int HighestLevel { get => _highestLevel; }
+
         /// <summary>
         /// Access the reference to the Player
         /// </summary>
         public static Player PlayerObject { get; private set; }
 
         public static OnPlayerUpdate OnPlayerUpdate;
+        public static OnWinCondition WinCondition;
 
         /// <summary>
         /// Initialize GameplayManager to create the player and map
@@ -51,7 +62,7 @@ namespace MakeEveryDayRecount.Managers
             Level++;
             MapManager.ChangeLevel(Level);
             PlayerObject.ChangeRoom(TriggerManager.PlayerSpawn.Location);
-
+            PlayerObject.ClearStates();
             // Don't activate triggers if replay mode is active
             if (!ReplayManager.PlayingReplay)
                 TriggerManager.PlayerSpawn.Activate(PlayerObject);
@@ -96,7 +107,7 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static void ReplayMode()
         {
-            Level = 1;
+            Level = _highestLevel;
             MapManager.ChangeLevel(Level);
             PlayerObject.ChangeRoom(TriggerManager.PlayerSpawn.Location);
             PlayerObject.ClearStates();
@@ -111,8 +122,28 @@ namespace MakeEveryDayRecount.Managers
             //Delete saved data
             if (Directory.Exists("./CheckpointData"))
                 RecursiveDelete("./CheckpointData");
-            if (Directory.Exists("./PlayerData"))
-                RecursiveDelete("./PlayerData");
+        }
+
+        /// <summary>
+        /// When the player completes the win condition for the level
+        /// </summary>
+        public static void PlayerWinTrigger()
+        {
+            if (ReplayManager.PlayingReplay)
+            {
+                if (Level != 1)
+                {
+                    Level--;
+                    ReplayManager.NextLevel();
+                    MapManager.ChangeLevel(Level);
+                    PlayerObject.ChangeRoom(TriggerManager.PlayerSpawn.Location);
+                    PlayerObject.ClearStates();
+                }
+            }
+            else
+            {
+                WinCondition?.Invoke();
+            }
         }
 
         /// <summary>

@@ -15,6 +15,10 @@ namespace LevelEditor.Classes.Triggers
         /// Gets or sets the bounds of the Trigger, declaring both its position and size (in tilespace).
         /// </summary>
         public Rectangle? Bounds { get; set; }
+        /// <summary>
+        /// returns the color of the associated trigger
+        /// </summary>
+        public abstract Color Color { get; }
 
         /// <summary>
         /// Creates a new Trigger.

@@ -37,7 +37,12 @@
     <None Update="Sprites\Tiles\testWalkable.png">
 		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	</None>
-	  <Compile Update ="Controls\PropBox.cs"><SubType>Component</SubType></Compile>
+    <Compile Update="Controls\TriggerBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="Controls\PropBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>

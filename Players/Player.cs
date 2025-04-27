@@ -73,12 +73,12 @@ namespace MakeEveryDayRecount.Players
         }
 
         private const float SecondsPerTile = .2f;
-        private const float SecondsPerAnimation = .1f;
-        private const float SecondsPerPositionUpdate = .1f;
+        private const float TimeUntilStand = 1f;
+
         private float _walkingSeconds;
+        private float _standingSeconds;
         private bool _readyToMove;
 
-        private float _animationTimeElapsed;
         private int _animationFrame;
         private Rectangle _playerFrameRectangle;
         private readonly Point _playerSize;
@@ -87,7 +87,6 @@ namespace MakeEveryDayRecount.Players
         private Inventory _inventory;
 
         private Box _currentHeldBox;
-        private bool _firstUpdate;
         /// <summary>
         /// Get if the player is holing a box 
         /// </summary>
@@ -104,12 +103,12 @@ namespace MakeEveryDayRecount.Players
         {
             _walkingSeconds = 0;
             _animationFrame = 0;
-            _playerSize = new Point(sprite.Width / 4, sprite.Height / 4);
             //Create an inventory
             _inventory = new Inventory(screenSize);
             _currentHeldBox = null;
 
-            _firstUpdate = true;
+            _playerSize = new Point(sprite.Width / 4, sprite.Height / 4);
+            UpdateAnimation(false);
         }
 
         /// <summary>
@@ -118,17 +117,12 @@ namespace MakeEveryDayRecount.Players
         /// <param name="deltaTime">The elapsed time between frames in seconds</param>
         public void Update(float deltaTime)
         {
-            if (_firstUpdate)
-            {
-                UpdatePlayerPos();
-                _firstUpdate = false;
-            }
             UpdatePlayerPos();
             KeyboardInput(deltaTime);
 
-            _playerFrameRectangle = AnimationUpdate(deltaTime);
             _inventory.Update();
-            CheckTrigger();
+
+            TriggerInteract();
         }
 
         #region Player Movement
@@ -154,10 +148,11 @@ namespace MakeEveryDayRecount.Players
             {
                 PlayerMovement(deltaTime, new Point(0, 1), Direction.Down);
             }
-            else
+            else //if (_reachedDest)
             {
-                //if we were walking and we stop pressing a key, go back to standing
                 _playerState = PlayerState.Standing;
+                UpdateStandingTime(deltaTime);
+                _readyToMove = true;
                 _walkingSeconds = 0;
                 //but don't change the direction you're facing
             }
@@ -197,45 +192,11 @@ namespace MakeEveryDayRecount.Players
         private void PlayerMovement(float deltaTime, Point movement, Direction directionMove)
         {
             if (!_readyToMove)
-                UpdateWalkingTime(deltaTime);
-
-            if (_readyToMove && MapManager.CheckPlayerCollision(Location + movement) &&
-                (!HoldingBox || MapManager.CheckPlayerCollision(_currentHeldBox.Location + movement)))
             {
-                if (MapManager.CheckPlayerCollision(Location + movement) &&
-                    (!HoldingBox || MapManager.CheckPlayerCollision(_currentHeldBox.Location + movement)))
-                {
-                    _readyToMove = false;
-
-                    Location += movement;
-                    if (_playerState != PlayerState.Walking)
-                        _playerState = PlayerState.Walking;
-
-                    //Check triggers
-                    Trigger trigger = (MapManager.CurrentRoom.VerifyTrigger(Location));
-                    if (trigger != null)
-                    {
-                        //Only trigger that cares about if it was activated right now is the Win trigger
-                        //If there are more that are created this will turn into a larger if statement
-                        if (trigger.Activate(this) && trigger is Win)
-                        {
-                            //TODO: Code in this if statement runs if a player triggers a Win trigger,
-                            //Meaning it should get them to the next level
-                        }
-                            
-                    }
-                        
-
-                    SoundManager.PlaySFX(SoundManager.PlayerStepSound, -40, 40);
-                }
-                else
-                {
-                    _playerState = PlayerState.Standing;
-                }
+                UpdateWalkingTime(deltaTime);
+                return;
             }
 
-            //Checkpoints are slightly slightly buggy when holding a box and walking on to them (box is saved a tile away from where it should be)
-            //But it's not a big issue, and the player shouldn't be holding a box and proccing a trigger anyways
             if (HoldingBox)
             {
                 // Drop the box if the player is holding it and they attempt to move a direction the 
@@ -248,11 +209,63 @@ namespace MakeEveryDayRecount.Players
                     directionMove = _currentHeldBox.AttachmentDirection;
                 }
             }
+            if (_playerState == PlayerState.Walking)
+            {
+                if (directionMove == _playerCurrentDirection &&
+                    MapManager.CheckPlayerCollision(Location + movement) &&
+                    (!HoldingBox || MapManager.CheckPlayerCollision(_currentHeldBox.Location + movement)))
+                {
+                    _readyToMove = false;
+                    Location += movement;
 
-            // Update the player's direction
-            if (_playerCurrentDirection != directionMove)
-                _playerCurrentDirection = directionMove;
+                    SoundManager.PlaySFX(SoundManager.PlayerStepSound, -40, 40);
 
+                    UpdateAnimation(true);
+                }
+                else //Player can't move where they want to 
+                {
+                    _playerState = PlayerState.Standing;
+                    UpdateStandingTime(deltaTime);
+                    _walkingSeconds = 0;
+                    //But don't reset animation yet, because that doesn't happen until the timer goes over
+                }
+            }
+            else //player starts out standing or interacting
+            {
+                if (directionMove == _playerCurrentDirection)
+                {
+                    if (MapManager.CheckPlayerCollision(Location + movement) &&
+                    (!HoldingBox || MapManager.CheckPlayerCollision(_currentHeldBox.Location + movement)))
+                    {
+                        _readyToMove = false;
+                        Location += movement;
+                        if (_playerState != PlayerState.Walking)
+                            _playerState = PlayerState.Walking;
+
+                        SoundManager.PlaySFX(SoundManager.PlayerStepSound, -40, 40);
+
+                        UpdateAnimation(true);
+                        _standingSeconds = 0;
+                    }
+                    else
+                    {
+                        _playerState = PlayerState.Standing;
+                        UpdateStandingTime(deltaTime);
+                        _walkingSeconds = 0;
+                    }
+                }
+
+                else _readyToMove = false; //stops the player from turning around one frame and then moving the very next frame
+                                           //They have to either stop for a frame or wait for secondspertile
+
+                // Update the player's direction
+                if (_playerCurrentDirection != directionMove)
+                {
+                    _playerCurrentDirection = directionMove;
+                    UpdateAnimation(false);
+                }
+
+            }
         }
 
         /// <summary>
@@ -263,20 +276,30 @@ namespace MakeEveryDayRecount.Players
         {
             _walkingSeconds += deltaTime;
 
-            // This variable allows for the time between movements to be changed depending on what state 
-            // the player is coming from
-            int timeAdjustment = 1;
-
-            if (_playerState == PlayerState.Standing)
-                timeAdjustment = 2;
-
-            if (_walkingSeconds >= SecondsPerTile / timeAdjustment)
+            if (_walkingSeconds >= SecondsPerTile)
             {
                 _readyToMove = true;
-                _walkingSeconds -= SecondsPerTile / timeAdjustment;
+                _walkingSeconds -= SecondsPerTile;
             }
         }
 
+        /// <summary>
+        /// Updates the amount of time the player hase been not moving
+        /// if they stand long enough, it resets their animation to the standing frame
+        /// </summary>
+        /// <param name="deltaTime"></param>
+        private void UpdateStandingTime(float deltaTime)
+        {
+            _standingSeconds += deltaTime;
+
+            if (_standingSeconds >= TimeUntilStand)
+            {
+                _animationFrame = 0;
+                _playerState = PlayerState.Standing;
+                _standingSeconds = 0f;
+                UpdateAnimation(false);
+            }
+        }
         #endregion
 
         #region Drawing Logic
@@ -301,49 +324,19 @@ namespace MakeEveryDayRecount.Players
         }
 
         /// <summary>
-        /// Set the current Rectangle that represents the player's current image.
-        /// As it is setup now, the player changes walking animation once per tile
-        /// at the same rate the player walks.
+        /// Updates the player's animation frame, and advances it to the next frame if necessarry
         /// </summary>
-        /// <param name="deltaTime">Time since last frame</param>
-        /// <returns>Rectangle for player animation</returns>
-        private Rectangle AnimationUpdate(float deltaTime)
+        /// <param name="advance">If true, advances the animation to the next frame</param>
+        private void UpdateAnimation(bool advance)
         {
-            // Change the animation based on what state the player is currently in
-            switch (_playerState)
+            if (advance)
             {
-                case PlayerState.Standing:
-                    // Reset the animation timer to zero so the player doesn't look like
-                    // they're walking of they turn while in the same tile
-                    _animationFrame = 0;
-                    _animationTimeElapsed = 0;
-                    break;
-                case PlayerState.Walking:
-                    _animationTimeElapsed += deltaTime;
-                    // Check if the animation is ready to update
-                    if (_animationTimeElapsed >= SecondsPerAnimation)
-                    {
-                        _animationTimeElapsed -= SecondsPerAnimation;
-                        _animationFrame++;
-                        // Walking animations range from 0-3 in the Sprite Sheet
-                        // _animationFrame being < 0 is probably not going to happen
-                        // but its easy enough to check for so might as well
-                        if (_animationFrame >= 4 || _animationFrame < 0)
-                            _animationFrame = 0;
-                    }
-                    break;
-                case PlayerState.Interacting:
-                    // TODO Add animation for picking up/interacting
-                    break;
+                _animationFrame++;
+                if (_animationFrame > 3) _animationFrame = 0;
             }
-
-            return new Rectangle(
-                new Point(
-                    _playerSize.X * (int)_playerCurrentDirection,
-                    _playerSize.Y * _animationFrame
-                ),
-                _playerSize
-            );
+            _playerFrameRectangle = new Rectangle(
+                new Point(_playerSize.X * (int)_playerCurrentDirection, _playerSize.Y * _animationFrame),
+                _playerSize);
         }
 
         /// <summary>
@@ -361,6 +354,25 @@ namespace MakeEveryDayRecount.Players
         #endregion
 
         #region Interaction
+
+        /// <summary>
+        /// Check if there is a trigger to interact with
+        /// </summary>
+        private void TriggerInteract()
+        {
+            //Check triggers
+            Trigger trigger = MapManager.CurrentRoom.VerifyTrigger(Location);
+
+
+            //Only trigger that cares about if it was activated right now is the Win trigger
+            //If there are more that are created this will turn into a larger if statement
+            if (trigger != null && trigger.Activate(this) && trigger is Win)
+            {
+                ReplayManager.SaveData(GameplayManager.Level, TriggerManager.CurrentCheckpoint.Index + 1);
+                GameplayManager.PlayerWinTrigger();
+            }
+        }
+
         /// <summary>
         /// Determines if the player's inventory contains a key of the specified type
         /// </summary>
@@ -387,6 +399,12 @@ namespace MakeEveryDayRecount.Players
         /// </summary>
         public void Interact()
         {
+            //Go back to standing when you interact with something regardless of the timer
+            _walkingSeconds = 0;
+            _playerState = PlayerState.Standing;
+            _animationFrame = 0;
+            _readyToMove = false;
+
             if (HoldingBox)
             {
                 DropBox();
@@ -449,6 +467,9 @@ namespace MakeEveryDayRecount.Players
                 else
                     _playerCurrentDirection = Direction.Up;
             }
+
+            //This will cause the player's sprite to turn towards the thing they're interacting with if they do it by clicking
+            UpdateAnimation(false);
         }
 
         /// <summary>
@@ -459,14 +480,6 @@ namespace MakeEveryDayRecount.Players
         {
             Location = new_location;
             UpdatePlayerPos();
-        }
-
-        /// <summary>
-        /// Activate any trigger the player has stepped on
-        /// </summary>
-        public void CheckTrigger()
-        {
-            MapManager.CheckTrigger(Location)?.Activate(this);
         }
 
         /// <summary>
@@ -509,6 +522,7 @@ namespace MakeEveryDayRecount.Players
             _playerState = PlayerState.Standing;
             DropBox();
             _inventory.ClearInventory();
+            UpdateAnimation(false);
         }
 
         /// <summary>
@@ -523,7 +537,6 @@ namespace MakeEveryDayRecount.Players
         ///     int keyType
         /// </summary>
         /// <param name="baseFolder">Folder to save player data to</param>
-
         public void Save(string baseFolder)
         {
 

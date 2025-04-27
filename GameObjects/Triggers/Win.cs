@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MakeEveryDayRecount.Players;
+﻿using MakeEveryDayRecount.Players;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace MakeEveryDayRecount.GameObjects.Triggers
 {
@@ -26,7 +20,7 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
         /// <param name="itemIndex">Sprite index of the item required to activate the trigger</param>
         /// <param name="width">Width, in tiles</param>
         /// <param name="height">Height, in tiles</param>
-        public Win(Point location, int itemIndex, int width, int height) : 
+        public Win(Point location, int itemIndex, int width, int height) :
             base(location, width, height)
         {
             ItemIndex = itemIndex;

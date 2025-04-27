@@ -4,7 +4,6 @@ using MakeEveryDayRecount.Players;
 using MakeEveryDayRecount.Managers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Net.Mail;
 
 namespace MakeEveryDayRecount.GameObjects.Props
 {
@@ -31,6 +30,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         public Point AttachmentPoint { get; private set; }
 
         private Point _worldPos;
+        private Point _sizeOffset;
 
         private static readonly Dictionary<Point, Direction> _attachmentDirectionFinder =
             new Dictionary<Point, Direction>{
@@ -51,6 +51,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         {
             AttachmentPoint = Point.Zero;
             _worldPos = MapUtils.TileToWorld(Location);
+            _sizeOffset = Point.Zero;
         }
 
         /// <summary>
@@ -63,14 +64,6 @@ namespace MakeEveryDayRecount.GameObjects.Props
             _worldPos = MapUtils.TileToWorld(Location);
         }
 
-        /// <summary>
-        /// Update the box's position in the world without the grid
-        /// </summary>
-        /// <param name="drawpoint">Point to draw</param>
-        public void UpdateDrawPoint(Point drawpoint)
-        {
-            _worldPos = drawpoint + new Point(AssetManager.TileSize.X * AttachmentPoint.X, AssetManager.TileSize.Y * AttachmentPoint.Y);
-        }
 
         /// <summary>
         /// Have the box become "attached" to the player
@@ -80,6 +73,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         {
             AttachmentPoint = Location - player.Location;
             player.PickupBox(this);
+            _sizeOffset = new Point(AssetManager.TileSize.X / 4, AssetManager.TileSize.Y / 4);
         }
 
         /// <summary>
@@ -88,13 +82,19 @@ namespace MakeEveryDayRecount.GameObjects.Props
         public void DropBox()
         {
             AttachmentPoint = Point.Zero;
-            //UpdatePosition(Location);
+            _sizeOffset = Point.Zero;
         }
 
+        /// <summary>
+        /// Draw this box to the screen
+        /// </summary>
+        /// <param name="sb">Sprite batch to draw with</param>
+        /// <param name="worldToScreen">Value to offset by</param>
+        /// <param name="pixelOffset">Value to offset by</param>
         public override void Draw(SpriteBatch sb, Point worldToScreen, Point pixelOffset)
         {
-            sb.Draw(Sprite, new Rectangle(_worldPos - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
-
+            sb.Draw(Sprite, new Rectangle(_worldPos - worldToScreen + pixelOffset +
+            new Point(_sizeOffset.X / 2, _sizeOffset.Y / 2), AssetManager.TileSize - _sizeOffset), Color.White);
         }
     }
 }
