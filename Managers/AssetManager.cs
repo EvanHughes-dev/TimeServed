@@ -223,7 +223,8 @@ namespace MakeEveryDayRecount.Managers
             {
                 content.Load<Texture2D>("Items/prop_cameraOff"),
                 content.Load<Texture2D>("Items/prop_cameraOn"),
-                content.Load<Texture2D>("Items/prop_wireBox")
+                content.Load<Texture2D>("Items/prop_wireBox"),
+                content.Load<Texture2D>("Items/prop_wireBox_snipped")
             };
             Boxes = new Texture2D[]{
                 content.Load<Texture2D>("Items/prop_box")
