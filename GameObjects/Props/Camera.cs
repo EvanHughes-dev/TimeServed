@@ -287,10 +287,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //Add the wire box to the list of props in the room so that it gets drawn
             //I think we have to add it this way because we can't call the methods directly on this property. I might be wrong tho
             //It's like copy-alter-replace
-            List<Prop> alteredRoomItems = CameraRoom.ItemsInRoom;
             WireBox = new WireBox(boxLocation, AssetManager.CameraTextures, this, 2);
-            alteredRoomItems.Add(WireBox);
-            CameraRoom.ItemsInRoom = alteredRoomItems;
         }
 
         public void Update(float deltaTime)
@@ -399,8 +396,9 @@ namespace MakeEveryDayRecount.GameObjects.Props
         //int endpointnumber = 0;
         public override void Draw(SpriteBatch sb, Point worldToScreen, Point pixelOffset)
         {
-            sb.Draw(Sprite, new Rectangle(MapUtils.TileToWorld(Location) - worldToScreen + pixelOffset, AssetManager.TileSize), null, //no source rectangle
-                Color.White, _direction, Vector2.Zero, SpriteEffects.None, 0f); //Layer depth is not used
+            sb.Draw(Sprite, new Rectangle(MapUtils.TileToWorld(Location) - worldToScreen + pixelOffset + AssetManager.HalfTileSize, AssetManager.TileSize), null, //no source rectangle
+                Color.White, _direction, new Point(Sprite.Width / 2, Sprite.Height / 2).ToVector2(), SpriteEffects.None, 0f); //Layer depth is not used
+            WireBox.Draw(sb, worldToScreen, pixelOffset);
             if (_active)
             {
                 foreach (Point tile in _watchedTiles)
