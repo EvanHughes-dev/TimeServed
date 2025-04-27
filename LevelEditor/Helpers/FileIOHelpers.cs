@@ -430,7 +430,7 @@ namespace LevelEditor.Helpers
                             Point? wireBox = new Point(reader.ReadInt32(), reader.ReadInt32());
                             if (wireBox == new Point(-1, -1)) wireBox = null;
 
-                            room.AddProp(((Camera)allProps.ElementAt(imageIndex + 10)).Instantiate(propPosition, target, spread, wireBox));
+                            room.AddProp(((Camera)allProps.ElementAt(imageIndex + 18)).Instantiate(propPosition, target, spread, wireBox));
                             break;
                     }
 
