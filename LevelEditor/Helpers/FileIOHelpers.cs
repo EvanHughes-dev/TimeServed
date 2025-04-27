@@ -227,6 +227,11 @@ namespace LevelEditor.Helpers
                         writer.Write(checkpoint.Index);
                         writer.Write(true);
                     }
+                    else if (trigger is WinTrigger win)
+                    {
+                        writer.Write(1);
+                        writer.Write(win.RequiredItem.ImageIndex);
+                    }
                 }
 
                 writer.Close();
@@ -456,6 +461,10 @@ namespace LevelEditor.Helpers
                     {
                         checkpoint.Index = reader.ReadInt32();
                         _ = reader.ReadBoolean();
+                    }
+                    else if (trigger is WinTrigger win)
+                    {
+                        win.RequiredItem = (Item)allProps.ElementAt(reader.ReadInt32());
                     }
 
                     room.AddTrigger(trigger);
