@@ -48,7 +48,7 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static void Initialize(Point screenSize)
         {
-            Level = 0;
+            Level = 2; // UNDO THIS CHANGE. DO NOT LET THIS REACH MAIN
             PlayerObject = new Player(new Point(0, 0), AssetManager.PlayerTexture, screenSize);
             OnPlayerUpdate?.Invoke(PlayerObject);
             MapManager.Initialize();
