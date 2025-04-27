@@ -229,8 +229,8 @@ namespace MakeEveryDayRecount.Map
             // save the file path for debug uses
             FilePath = filePath;
 
-            try
-            {
+            //try
+            //{
                 using (BinaryReader binaryReader = new BinaryReader(File.OpenRead(filePath)))
                 {
                     /*
@@ -406,11 +406,11 @@ namespace MakeEveryDayRecount.Map
 
                 }
 
-            }
-            catch (Exception e)
-            {
-                System.Diagnostics.Debug.Write(e.Message);
-            }
+            //}
+            //catch (Exception e)
+            //{
+            //    System.Diagnostics.Debug.Write(e.Message);
+            //}
         }
 
         /// <summary>
@@ -451,7 +451,8 @@ namespace MakeEveryDayRecount.Map
                     }
                 }
             }
-
+            if (pointToCheck.X >= _map.GetLength(1) || pointToCheck.X < 0 || pointToCheck.Y >= _map.GetLength(0) || pointToCheck.Y < 0)
+                return false;
             return _map[pointToCheck.X, pointToCheck.Y].IsWalkable;
         }
 
