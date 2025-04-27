@@ -13,11 +13,11 @@ namespace MakeEveryDayRecount.GameObjects
         /// <summary>
         /// The current sprite of the GameObject
         /// </summary>
-        public Texture2D Sprite { get; private set; }
+        public Texture2D Sprite { get; protected set; }
         /// <summary>
         /// The index of this object's sprite in its spriteArray
         /// </summary>
-        public int SpriteIndex { get; private set; }
+        public int SpriteIndex { get; protected set; }
 
         /// <summary>
         /// Create a new GameObject at a location and with an image

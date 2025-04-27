@@ -87,11 +87,6 @@ namespace MakeEveryDayRecount.Managers
         public static Texture2D[] CameraTextures { get; private set; }
 
         /// <summary>
-        /// An array of all camera textures
-        /// </summary>
-        public static Texture2D[] Cameras { get; private set; }
-
-        /// <summary>
         /// An array of all box textures
         /// </summary>
         public static Texture2D[] Boxes { get; private set; }
@@ -116,6 +111,11 @@ namespace MakeEveryDayRecount.Managers
         /// The size of each tile, in pixels
         /// </summary>
         public static Point TileSize { get; private set; }
+
+        /// <summary>
+        /// The size of each tile divided by 2
+        /// </summary>
+        public static Point HalfTileSize => new Point(TileSize.X / 2, TileSize.Y / 2);
 
         public static void LoadContent(ContentManager content)
         {
@@ -218,7 +218,6 @@ namespace MakeEveryDayRecount.Managers
                 content.Load<Texture2D>("Items/wireCutters"),
                 content.Load<Texture2D>("Items/hook"),
                 content.Load<Texture2D>("Items/hookAndRope"),
-
             };
             CameraTextures = new Texture2D[]
             {
