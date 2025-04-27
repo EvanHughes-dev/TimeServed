@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 namespace LevelEditor.Forms.Prompts
 {
+    /// <summary>
+    /// Asks the user for an item input
+    /// </summary>
     public partial class ItemInputForm : Form
     {
         private static Item? _input;
