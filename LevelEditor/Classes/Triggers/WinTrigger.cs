@@ -23,8 +23,8 @@ namespace LevelEditor.Classes.Triggers
         /// <summary>
         /// Creates a new win trigger with the given index.
         /// </summary>
-        /// <param name="index">The index of the checkpoint.</param>
-        /// <param name="bounds">The bounds of the checkpoint, or null if it has none.</param>
+        /// <param name="requiredItem">The item required to trigger winning.</param>
+        /// <param name="bounds">The bounds of the win trigger, or null if it has none.</param>
         public WinTrigger(Item requiredItem, Rectangle? bounds = null)
             : base(bounds)
         {
@@ -35,7 +35,7 @@ namespace LevelEditor.Classes.Triggers
         /// Creates a copy of this win trigger with the given bounds.
         /// </summary>
         /// <param name="bounds">The bounds of the copy.</param>
-        /// <returns>A copy of this Checkpoint.</returns>
+        /// <returns>A copy of this Win trigger.</returns>
         public override WinTrigger Instantiate(Rectangle bounds)
         {
             return new(RequiredItem, bounds);
