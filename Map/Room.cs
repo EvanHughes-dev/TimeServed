@@ -98,8 +98,8 @@ namespace MakeEveryDayRecount.Map
         /// </summary>
         public List<Camera> Cameras { get; private set; }
         private List<Trigger> _triggersInRoom;
-        public List<Door> Doors
-        { get; private set; }
+        public List<Door> Doors { get; private set; }
+        public List<WireBox> WireBoxes { get; private set; }
 
         /// <summary>
         /// Size of current map
@@ -121,6 +121,8 @@ namespace MakeEveryDayRecount.Map
             _itemsInRoom = new List<Prop> { };
             _triggersInRoom = new List<Trigger> { };
             Cameras = new List<Camera>();
+            WireBoxes = new List<WireBox>();
+
             Doors = new List<Door> { };
             ParseData(filePath);
         }
@@ -229,8 +231,8 @@ namespace MakeEveryDayRecount.Map
             // save the file path for debug uses
             FilePath = filePath;
 
-            //try
-            //{
+            try
+            {
                 using (BinaryReader binaryReader = new BinaryReader(File.OpenRead(filePath)))
                 {
                     /*
@@ -405,11 +407,11 @@ namespace MakeEveryDayRecount.Map
 
                 }
 
-            //}
-            //catch (Exception e)
-            //{
-            //    System.Diagnostics.Debug.Write(e.Message);
-            //}
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.Write(e.Message);
+            }
         }
 
         /// <summary>
@@ -482,6 +484,13 @@ namespace MakeEveryDayRecount.Map
                 if (playerFacing == door.Location)
                 {
                     return door;
+                }
+            }
+            foreach (WireBox box in WireBoxes)
+            {
+                if (playerFacing == box.Location)
+                {
+                    return box;
                 }
             }
             return null;
