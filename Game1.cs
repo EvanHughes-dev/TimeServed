@@ -225,9 +225,9 @@ namespace MakeEveryDayRecount
                 case GameState.Level:
                     GameplayManager.Draw(_spriteBatch);
                     DisplayDebug();
+                    //JTODO: hardcode tutorial text for the first level
                     break;
                 case GameState.Pause:
-                    //TODO: Blur the gameplay in the background.
                     GameplayManager.Draw(_spriteBatch);
                     DisplayDebug();
                     break;

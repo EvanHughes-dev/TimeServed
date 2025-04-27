@@ -288,6 +288,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //I think we have to add it this way because we can't call the methods directly on this property. I might be wrong tho
             //It's like copy-alter-replace
             WireBox = new WireBox(boxLocation, AssetManager.CameraTextures, this, 2);
+            CameraRoom.WireBoxes.Add(WireBox);
         }
 
         public void Update(float deltaTime)
@@ -398,7 +399,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         {
             sb.Draw(Sprite, new Rectangle(MapUtils.TileToWorld(Location) - worldToScreen + pixelOffset, AssetManager.TileSize), null, //no source rectangle
                 Color.White, _direction, Vector2.Zero, SpriteEffects.None, 0f); //Layer depth is not used
-            WireBox.Draw(sb, worldToScreen, pixelOffset);
+            WireBox?.Draw(sb, worldToScreen, pixelOffset);
             if (_active)
             {
                 foreach (Point tile in _watchedTiles)
