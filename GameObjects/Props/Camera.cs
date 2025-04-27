@@ -43,7 +43,10 @@ namespace MakeEveryDayRecount.GameObjects.Props
         private List<Point> _watchedTiles;
         private List<Point> _previousBoxes;
         //This is going to need a reference to the room that created it in order to check collision
-        private Room _room;
+        /// <summary>
+        /// Get the room this camera is in
+        /// </summary>
+        public Room CameraRoom { get; private set; }
         //It also needs a reference to the player to know if they step into the vision kite
         private Player _player = GameplayManager.PlayerObject;
 
@@ -77,18 +80,20 @@ namespace MakeEveryDayRecount.GameObjects.Props
             _watchedTiles = new List<Point>(); //This ends up being the same as visionkite by the end of this function
             _previousBoxes = new List<Point>();
             //All cams start active
-            _active = true;
-            _room = containingRoom;
+            _active = SpriteIndex == 0;
+            CameraRoom = containingRoom;
             _drawOrigin = new Point(AssetManager.TileSize.X / 2, AssetManager.TileSize.Y / 2);
             _centerPoint = centerPoint;
             _spread = spread;
 
+            // If the sprite inedx is 1 then it is an inactive camera
+            if (!_active)
+                return;
             #region Raybase Check
             //Check which way the ray for the camera is pointing
             Vector2 centerRay = new Vector2(_centerPoint.X - location.X, _centerPoint.Y - location.Y); //base of this ray is at location
 
-            //TODO: Let the raybase be caty-corners from the camera location
-            //TODO: If a box starts right in front of a camera it will mess up the raybase
+
             //Please do not put the centerpoint on top of the camera it breaks everything
             if (Math.Abs(centerRay.X) > Math.Abs(centerRay.Y)) //The ray is more horizontal
             {
@@ -117,7 +122,6 @@ namespace MakeEveryDayRecount.GameObjects.Props
                     }
                 }
             }
-
             else //the ray is more vertical
             {
                 if (centerRay.Y < 0 && containingRoom.VerifyWalkable(new Point(location.X, location.Y - 1), false)) //camera is pointing up
@@ -149,11 +153,6 @@ namespace MakeEveryDayRecount.GameObjects.Props
             _direction = _direction * MathF.PI;
             //I intentionally wrote the above to prioritize up/down over left/right
             #endregion
-            //TODO: Allow the raybase to be catycorners from the camera's location
-            //Debug.WriteLine($"Raybase is {_rayBase.X}, {_rayBase.Y}");
-
-            //TESTING - show me the center ray
-            //_watchedTiles.AddRange(Rasterize(_rayBase, _centerPoint));
 
             #region Vision Kite
             //---Find the endpoints for the corners of the kite---
@@ -164,20 +163,10 @@ namespace MakeEveryDayRecount.GameObjects.Props
             Vector2 counterclockwiseRay = Vector2.Transform(centerRay, Matrix.CreateRotationZ(-spread));
             //^These built-in methods are *chef kiss*
 
-            //TESTING - tell me the rays
-            //Debug.WriteLine("Center ray is " + centerRay.ToString());
-            //Debug.WriteLine("Counter-clockwise ray is: " + counterclockwiseRay.ToString());
-            //Debug.WriteLine("Clockwise ray is : " + clockwiseRay.ToString());
-
             //Turn these rotated vectors back into points to get the corners of the kite
             Point clockwisePoint = new Point((int)MathF.Round(_rayBase.X + clockwiseRay.X), (int)MathF.Round(_rayBase.Y + clockwiseRay.Y));
             Point counterclockwisePoint = new Point((int)MathF.Round(_rayBase.X + counterclockwiseRay.X), (int)MathF.Round(_rayBase.Y + counterclockwiseRay.Y));
             //Gang why does mathF still return a float when you round to the nearest integer. This is highly unserious
-
-            //TESTING - tell me where the corners are
-            //Debug.WriteLine("Center point is " + _centerPoint.ToString());
-            //Debug.WriteLine("Counter-clockwise point is: " + counterclockwisePoint.ToString());
-            //Debug.WriteLine("Clockwise point is: " + clockwisePoint.ToString());
 
             //Rasterize between the corners and the centerpoint to get all the points we need to send out a ray to
             List<Point> clockwisePoints = Rasterize(clockwisePoint, _centerPoint);
@@ -231,155 +220,6 @@ namespace MakeEveryDayRecount.GameObjects.Props
                 if (corner.Y < minY) minY = corner.Y;
                 if (corner.Y > maxY) maxY = corner.Y;
             }
-            //TODO: Fix this entire switch statement so it's not so hard-coded. There should be a better way to do this
-            #region Broken Switch Statement
-            //switch (_direction)
-            //{
-            //    case 0f: //Down
-            //        //For loop goes top to bottom and left to right
-            //        for (int x = minX; x < maxX; x++)
-            //        {
-            //            int y;
-            //            Point xPoint = Point.Zero;
-            //            foreach (Point endpoint in _endPoints)
-            //            {
-            //                if (endpoint.X == x)
-            //                {
-            //                    xPoint = endpoint;
-            //                }
-            //            }
-            //            if (xPoint != Point.Zero)
-            //            {
-            //                y = xPoint.X;
-            //            }
-            //            else y = minY;
-            //            for (; y < maxY; y++)
-            //            {
-            //                Vector2 candidateVector = new Vector2(x - _rayBase.X, y - _rayBase.Y);
-            //                if ((counterclockwiseRay.Y * candidateVector.X - counterclockwiseRay.X * candidateVector.Y) *
-            //                (counterclockwiseRay.Y * clockwiseRay.X - counterclockwiseRay.X * clockwiseRay.Y) >= 0
-            //                &&
-            //                (clockwiseRay.Y * candidateVector.X - clockwiseRay.X * candidateVector.Y) *
-            //                (clockwiseRay.Y * counterclockwiseRay.X - clockwiseRay.X * counterclockwiseRay.Y) >= 0)
-            //                {
-            //                    _watchedTiles.Add(new Point(x, y));
-            //                }
-            //            }
-            //        }
-            //        break;
-
-            //    case 0.5f: //Left
-            //        //loop goes left to right an top to bottom
-            //        for (int y = minY; y <= maxY; y++)
-            //        {
-            //            int x;
-            //            //If there's an endpoint in this column, and y is further from the camera than that endpoint is
-            //            //TODO: This shit is NOT efficent. HEWLP
-            //            //It's not that bad because this only runs when the cam is created, but it's O(n^2)
-            //            Point yPoint = Point.Zero;
-            //            foreach (Point endpoint in _endPoints)
-            //            {
-            //                if (endpoint.Y == y)
-            //                {
-            //                    yPoint = endpoint;
-            //                }
-            //            }
-            //            if (yPoint != Point.Zero)
-            //            {
-            //                x = yPoint.X;
-            //            }
-            //            else x = minX;
-            //            //Continue
-            //            for (; x <= maxX; x++)
-            //            {
-            //                Vector2 candidateVector = new Vector2(x - _rayBase.X, y - _rayBase.Y);
-            //                if ((counterclockwiseRay.Y * candidateVector.X - counterclockwiseRay.X * candidateVector.Y) *
-            //                (counterclockwiseRay.Y * clockwiseRay.X - counterclockwiseRay.X * clockwiseRay.Y) >= 0
-            //                &&
-            //                (clockwiseRay.Y * candidateVector.X - clockwiseRay.X * candidateVector.Y) *
-            //                (clockwiseRay.Y * counterclockwiseRay.X - clockwiseRay.X * counterclockwiseRay.Y) >= 0)
-            //                {
-            //                    _watchedTiles.Add(new Point(x, y));
-            //                }
-            //            }
-            //        }
-            //        break;
-
-            //    case 1f: //Up
-            //        //For loop goes bottom to top and left to right
-            //        for (int x = minX; x < maxX; x++)
-            //        {
-            //            Point xPoint = Point.Zero;
-            //            foreach (Point endpoint in _endPoints)
-            //            {
-            //                if (endpoint.X == x)
-            //                {
-            //                    xPoint = endpoint;
-            //                }
-            //            }
-            //            if (xPoint != Point.Zero)
-            //            {
-            //                minY = xPoint.X;
-            //            }
-            //            for (int y = maxY; y > minY; y--)
-            //            {
-            //                Vector2 candidateVector = new Vector2(x - _rayBase.X, y - _rayBase.Y);
-            //                if ((counterclockwiseRay.Y * candidateVector.X - counterclockwiseRay.X * candidateVector.Y) *
-            //                (counterclockwiseRay.Y * clockwiseRay.X - counterclockwiseRay.X * clockwiseRay.Y) >= 0
-            //                &&
-            //                (clockwiseRay.Y * candidateVector.X - clockwiseRay.X * candidateVector.Y) *
-            //                (clockwiseRay.Y * counterclockwiseRay.X - clockwiseRay.X * counterclockwiseRay.Y) >= 0)
-            //                {
-            //                    _watchedTiles.Add(new Point(x, y));
-            //                }
-            //            }
-            //        }
-            //        break;
-
-            //    case 1.5f: //Right
-            //               //Nested for loops to go from left to right and then top to bottom
-            //        for (int y = minY; y <= maxY; y++)
-            //        {
-            //            //If there's an endpoint in this column, and y is further from the camera than that endpoint is
-            //            //TODO: This shit is NOT efficent. HEWLP
-            //            //It's not that bad because this only runs when the cam is created, but it's O(n^2)
-            //            Point yPoint = Point.Zero;
-            //            foreach (Point endpoint in _endPoints)
-            //            {
-            //                if (endpoint.Y == y)
-            //                {
-            //                    yPoint = endpoint;
-            //                }
-            //            }
-            //            if (yPoint != Point.Zero)
-            //            {
-            //                maxX = yPoint.X;
-            //            }
-            //            //Continue
-            //            for (int x = minX; x <= maxX; x++)
-            //            {
-            //                //If there's an endpoint in this row, and x is further from the camera than that endpoint is
-            //                //Then break
-
-            //                //For each point in that rectangle, create a vector from the raybase to it
-            //                Vector2 candidateVector = new Vector2(x - _rayBase.X, y - _rayBase.Y);
-            //                //Figure out if that vector is between the two edge vectors. If it is, then it should be inside of the vision kite
-            //                //I got the formula for this from StackOverflow (Andy G)
-            //                //Where A and C are the edge vectors, and B is the candidate vector, and the three vectors are pointing out from the same point
-            //                //if (AxB * AxC >= 0 && CxB * CxA >= 0) then B is between A and C
-            //                if ((counterclockwiseRay.Y * candidateVector.X - counterclockwiseRay.X * candidateVector.Y) *
-            //                    (counterclockwiseRay.Y * clockwiseRay.X - counterclockwiseRay.X * clockwiseRay.Y) >= 0
-            //                    &&
-            //                    (clockwiseRay.Y * candidateVector.X - clockwiseRay.X * candidateVector.Y) *
-            //                    (clockwiseRay.Y * counterclockwiseRay.X - clockwiseRay.X * counterclockwiseRay.Y) >= 0)
-            //                {
-            //                    _watchedTiles.Add(new Point(x, y));
-            //                }
-            //            }
-            //        }
-            //        break;
-            //}
-            #endregion
 
             for (int y = minY; y <= maxY; y++)
             {
@@ -403,13 +243,13 @@ namespace MakeEveryDayRecount.GameObjects.Props
                     {
                         //Make sure we're not including walls in the vision tile
                         Point candidatePoint = new Point(x, y);
-                        if (_room.VerifyWalkable(candidatePoint)) //If it's walkable, add it
+                        if (CameraRoom.VerifyWalkable(candidatePoint)) //If it's walkable, add it
                         {
                             _watchedTiles.Add(candidatePoint);
                         }
                         else //if it's not walkable, but it is a prop (a box), still add it
                         {
-                            foreach (Prop prop in _room.ItemsInRoom)
+                            foreach (Prop prop in CameraRoom.ItemsInRoom)
                             {
                                 if (prop.Location == candidatePoint)
                                 {
@@ -441,13 +281,16 @@ namespace MakeEveryDayRecount.GameObjects.Props
         public Camera(Point location, Texture2D[] spriteArray, int spriteIndex, Room containingRoom, Point centerPoint, float spread, Point boxLocation)
             : this(location, spriteArray, spriteIndex, containingRoom, centerPoint, spread)
         {
+
+
+
             //Add the wire box to the list of props in the room so that it gets drawn
             //I think we have to add it this way because we can't call the methods directly on this property. I might be wrong tho
             //It's like copy-alter-replace
-            List<Prop> alteredRoomItems = _room.ItemsInRoom;
-            WireBox = new WireBox(boxLocation, AssetManager.PropTextures, 0f, this, 2);
+            List<Prop> alteredRoomItems = CameraRoom.ItemsInRoom;
+            WireBox = new WireBox(boxLocation, AssetManager.CameraTextures, this, 2);
             alteredRoomItems.Add(WireBox);
-            _room.ItemsInRoom = alteredRoomItems;
+            CameraRoom.ItemsInRoom = alteredRoomItems;
         }
 
         public void Update(float deltaTime)
@@ -463,7 +306,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                 foreach (Point box in _visionKite)
                 {
                     //Check if there's a box. Any un-walkable tile is treated like a box
-                    if (!_room.VerifyWalkable(box, true))
+                    if (!CameraRoom.VerifyWalkable(box, true))
                     {
                         //Debug.WriteLine($"Found a box at {box.X}, {box.Y}");
                         boxes.Add(box);
@@ -519,17 +362,17 @@ namespace MakeEveryDayRecount.GameObjects.Props
                         Point watchedNeighbor = watchedTile;
                         //Left
                         watchedNeighbor.X -= 1;
-                        if (_watchedTiles.Contains(watchedNeighbor) || !_room.VerifyWalkable(watchedNeighbor)) watchedNeighbors++;
+                        if (_watchedTiles.Contains(watchedNeighbor) || !CameraRoom.VerifyWalkable(watchedNeighbor)) watchedNeighbors++;
                         //Right
                         watchedNeighbor.X += 2;
-                        if (_watchedTiles.Contains(watchedNeighbor) || !_room.VerifyWalkable(watchedNeighbor)) watchedNeighbors++;
+                        if (_watchedTiles.Contains(watchedNeighbor) || !CameraRoom.VerifyWalkable(watchedNeighbor)) watchedNeighbors++;
                         //Above
                         watchedNeighbor.X -= 1;
                         watchedNeighbor.Y -= 1;
-                        if (_watchedTiles.Contains(watchedNeighbor) || !_room.VerifyWalkable(watchedNeighbor)) watchedNeighbors++;
+                        if (_watchedTiles.Contains(watchedNeighbor) || !CameraRoom.VerifyWalkable(watchedNeighbor)) watchedNeighbors++;
                         //Below
                         watchedNeighbor.Y += 2;
-                        if (_watchedTiles.Contains(watchedNeighbor) || !_room.VerifyWalkable(watchedNeighbor)) watchedNeighbors++;
+                        if (_watchedTiles.Contains(watchedNeighbor) || !CameraRoom.VerifyWalkable(watchedNeighbor)) watchedNeighbors++;
 
                         //If the tile has one watched neighbor or less, then remove it
                         if (watchedNeighbors <= 1) isolatedTiles.Add(watchedTile);
@@ -558,21 +401,13 @@ namespace MakeEveryDayRecount.GameObjects.Props
         {
             sb.Draw(Sprite, new Rectangle(MapUtils.TileToWorld(Location) - worldToScreen + pixelOffset, AssetManager.TileSize), null, //no source rectangle
                 Color.White, _direction, Vector2.Zero, SpriteEffects.None, 0f); //Layer depth is not used
-            foreach (Point tile in _watchedTiles)
+            if (_active)
             {
-                sb.Draw(AssetManager.CameraSight, new Rectangle(MapUtils.TileToWorld(tile) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
+                foreach (Point tile in _watchedTiles)
+                {
+                    sb.Draw(AssetManager.CameraSight, new Rectangle(MapUtils.TileToWorld(tile) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
+                }
             }
-            //TESTING - show all the endpoints with hooks
-            //foreach (Point endpoint in _endPoints) sb.Draw(AssetManager.PropTextures[3], new Rectangle(MapUtils.TileToWorld(endpoint) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
-
-            //TESTING - Animate through all the endpoints in order
-            //sb.Draw(AssetManager.PropTextures[3], new Rectangle(MapUtils.TileToWorld(_endPoints[endpointnumber]) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
-            //if (endpointnumber == _endPoints.Length - 1) endpointnumber = 0;
-            //else endpointnumber++;
-
-            //TESTING - show everything the rays are hitting with hooks
-            //foreach (Point EndPoint in _endPoints)
-            //    foreach (Point endpoint in Rasterize(_rayBase, EndPoint)) sb.Draw(AssetManager.PropTextures[3], new Rectangle(MapUtils.TileToWorld(endpoint) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
         }
 
         private List<Point> Rasterize(Point p1, Point p2)
@@ -627,12 +462,14 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //But I think this is fine for now. This function will be called but won't do anything
         }
 
-        //TODO: Ask Evan if making this method is efficent, or if I should use events/delegates instead?
+        /// <summary>
+        /// Deacrivate this camera and stop running all detection logic
+        /// </summary>
         public void Deactivate()
         {
             _active = false;
-            //TODO: Maybe have it play a sound?
-            //The camera can never be reactivated unless it's loaded again by the room
+            SpriteIndex = 1;
+            Sprite = AssetManager.CameraTextures[SpriteIndex];
         }
     }
 }
