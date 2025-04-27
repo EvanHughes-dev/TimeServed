@@ -10,7 +10,6 @@ namespace MakeEveryDayRecount.UI
     {
         private Texture2D _sprite;
 
-
         /// <summary>
         /// Initialize an image to be displayed at a point with a texture
         /// </summary>
@@ -23,6 +22,7 @@ namespace MakeEveryDayRecount.UI
 
             _sprite = texture;
         }
+
         /// <summary>
         /// Initialize an image to be displayed at a point with a texture
         /// </summary>

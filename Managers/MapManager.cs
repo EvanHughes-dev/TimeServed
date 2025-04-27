@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using MakeEveryDayRecount.GameObjects.Props;
-using MakeEveryDayRecount.GameObjects.Triggers;
 using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -20,6 +19,10 @@ namespace MakeEveryDayRecount.Managers
     /// </summary>
     internal static class MapManager
     {
+
+        /// <summary>
+        /// Update what room the displayed
+        /// </summary>
         public static event OnRoomUpdate OnRoomUpdate;
 
         private static Room _currentRoom;

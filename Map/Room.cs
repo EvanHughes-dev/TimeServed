@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using MakeEveryDayRecount.GameObjects;
 using MakeEveryDayRecount.GameObjects.Props;
 using MakeEveryDayRecount.Map.Tiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Managers;
 using MakeEveryDayRecount.GameObjects.Triggers;
-using System.ComponentModel.Design;
+
 
 namespace MakeEveryDayRecount.Map
 {
@@ -25,6 +24,9 @@ namespace MakeEveryDayRecount.Map
     /// <param name="objectToPickup">Object that was picked up</param>
     delegate void ItemPickup(Item objectToPickup);
 
+    /// <summary>
+    /// Type of prop
+    /// </summary>
     public enum ObjectTypes
     {
         Item = 0,
@@ -33,6 +35,10 @@ namespace MakeEveryDayRecount.Map
         Door = 3
     }
 
+
+    /// <summary>
+    /// Type of trigger's that are possible
+    /// </summary>
     public enum TriggerTypes
     {
         Checkpoint = 0,
@@ -91,13 +97,15 @@ namespace MakeEveryDayRecount.Map
                 }
             }
         }
-        //I originally wanted to make this a generic list of all the dynamic props in the room that might need to be updated
-        //But most props don't have an update function, so it's better to have this list only be concerned with cameras
+
         /// <summary>
         /// Get the list of cameras in the room
         /// </summary>
         public List<Camera> Cameras { get; private set; }
-        private List<Trigger> _triggersInRoom;
+
+        /// <summary>
+        /// Get all the doors in the room
+        /// </summary>
         public List<Door> Doors { get; private set; }
 
         /// <summary>
@@ -109,6 +117,8 @@ namespace MakeEveryDayRecount.Map
         /// Size of current map
         /// </summary>
         public Point MapSize { get; private set; }
+
+        private List<Trigger> _triggersInRoom;
 
         /// <summary>
         /// Establish the room object
@@ -235,8 +245,8 @@ namespace MakeEveryDayRecount.Map
             // save the file path for debug uses
             FilePath = filePath;
 
-            //try
-            //{
+            try
+            {
                 using (BinaryReader binaryReader = new BinaryReader(File.OpenRead(filePath)))
                 {
                     /*
@@ -300,7 +310,7 @@ namespace MakeEveryDayRecount.Map
                     // Parse all needed GameObjects from the file
                     while (numberOfGameObjects > 0)
                     {
-                        int propIndex = binaryReader.ReadInt32(); 
+                        int propIndex = binaryReader.ReadInt32();
 
                         Point tileLocation = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
 
@@ -412,11 +422,11 @@ namespace MakeEveryDayRecount.Map
 
                 }
 
-            //}
-            //catch (Exception e)
-            //{
-            //    System.Diagnostics.Debug.Write(e.Message);
-            //}
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.Write(e.Message);
+            }
         }
 
         /// <summary>

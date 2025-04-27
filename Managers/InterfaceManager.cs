@@ -3,13 +3,27 @@ using MakeEveryDayRecount.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using System;
-using System.Net.NetworkInformation;
 using MakeEveryDayRecount.Map;
 namespace MakeEveryDayRecount.Managers
 {
+    /// <summary>
+    /// Called to update the game state in Game1
+    /// </summary>
+    /// <param name="gameState">New game state</param>
     delegate void GameStateChange(GameState gameState);
+
+    /// <summary>
+    /// Called to exit the game in Game1
+    /// </summary>
     delegate void ExitGame();
+
+    /// <summary>
+    /// Called to change the replay speed in Game1
+    /// </summary>
+    /// <param name="change">Change to value</param>
+    /// <returns>New replay speed</returns>
     delegate int ReplaySpeedChange(int change);
+
     /// <summary>
     /// A manager that controls all UI features and creates all UI screen. All menus 
     /// are designed for a screen size of 640x360. Display this size, uncomment the two lines
@@ -47,12 +61,27 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static float ScaleFactorY { get => _scaleFactorY; }
 
+
+        /// <summary>
+        /// Called to update the game state in Gam1
+        /// </summary>
+        public static event GameStateChange GameStateChange;
+
+
+        /// <summary>
+        /// Called to exit the game
+        /// </summary>
+        public static event ExitGame ExitGame;
+
+        /// <summary>
+        /// Called to change the replay speed in Game1
+        /// </summary>
+        public static event ReplaySpeedChange ReplaySpeedChange;
+
         private static Menu _mainMenu;
         private static Menu _pauseMenu;
         private static Menu _replayMenu;
-        public static event GameStateChange gameStateChange;
-        public static event ExitGame exitGame;
-        public static event ReplaySpeedChange ReplaySpeedChange;
+
         private static UserMouse _mouse;
         private static int _replaySpeed;
 
@@ -70,7 +99,8 @@ namespace MakeEveryDayRecount.Managers
         }
 
         /// <summary>
-        /// Initialize all needed menus for the game. Base screen size is 640x360 pixels
+        /// Initialize all needed menus for the game. Base screen size is 640x360 pixels. All menus are generated when the
+        /// game starts and displayed only when their mode is activated    
         /// </summary>
         /// <param name="screenSize">Size of the screen</param>
         public static void InitializeMenus(Point screenSize)
@@ -96,10 +126,12 @@ namespace MakeEveryDayRecount.Managers
                 menuPlay.OnClick += GameplayManager.ClearSavedData;
                 menuPlay.OnClick += ReplayManager.ClearSavedData;
                 menuPlay.OnClick += GameplayManager.NextLevel;
-                menuPlay.OnClick += () => gameStateChange.Invoke(GameState.Level);
+                menuPlay.OnClick += () => GameStateChange.Invoke(GameState.Level);
                 menuPlay.OnClick += () => CurrentMenu = MenuModes.Level;
                 buttons.Add(menuPlay);
 
+                Point titleOffset = AssetManager.TitleFont.MeasureString("TIME SERVED").ToPoint();
+                Text title = new Text(new Point(screenSize.X / 2 - titleOffset.X / 2, drawPoint.Y - titleOffset.Y * 3), Color.White, "TIME SERVED", AssetManager.TitleFont);
 
                 Rectangle menuCheckPointRect = new Rectangle(IncrementScreenPos(drawPoint, 1, buttonSize.Y, buttonSpacing), buttonSize);
                 Button menuCheckPoint = new Button(menuCheckPointRect, AssetManager.DefaultButton, AssetManager.DefaultButton, true, "Checkpoints", font);
@@ -108,7 +140,7 @@ namespace MakeEveryDayRecount.Managers
                     if (TriggerManager.LoadCheckpoint())
                     {
                         CurrentMenu = MenuModes.Level;
-                        gameStateChange.Invoke(GameState.Level);
+                        GameStateChange.Invoke(GameState.Level);
                     }
 
                 };
@@ -117,10 +149,10 @@ namespace MakeEveryDayRecount.Managers
 
                 Rectangle menuQuitRect = new Rectangle(IncrementScreenPos(drawPoint, 2, buttonSize.Y, buttonSpacing), buttonSize);
                 Button menuQuit = new Button(menuQuitRect, AssetManager.DefaultButton, AssetManager.DefaultButton, true, "Exit", font);
-                menuQuit.OnClick += () => exitGame.Invoke();
+                menuQuit.OnClick += () => ExitGame.Invoke();
                 buttons.Add(menuQuit);
 
-                _mainMenu = new Menu(null, buttons);
+                _mainMenu = new Menu(null, buttons, new List<Text> { title });
             }
             {
                 int numberOfButtons = 2;
@@ -128,12 +160,12 @@ namespace MakeEveryDayRecount.Managers
 
                 Rectangle pauseContinueRect = new Rectangle(drawPoint, buttonSize);
                 Button pauseContinue = new Button(pauseContinueRect, AssetManager.DefaultButton, AssetManager.DefaultButton, true, "Resume", font);
-                pauseContinue.OnClick += () => gameStateChange.Invoke(GameState.Level);
+                pauseContinue.OnClick += () => GameStateChange.Invoke(GameState.Level);
                 pauseContinue.OnClick += () => CurrentMenu = MenuModes.Level;
 
                 Rectangle pauseQuitRect = new Rectangle(IncrementScreenPos(drawPoint, 1, buttonSize.Y, buttonSpacing), buttonSize);
                 Button pauseQuit = new Button(pauseQuitRect, AssetManager.DefaultButton, AssetManager.DefaultButton, true, "Exit", font);
-                pauseQuit.OnClick += () => gameStateChange.Invoke(GameState.Menu);
+                pauseQuit.OnClick += () => GameStateChange.Invoke(GameState.Menu);
                 pauseQuit.OnClick += () => CurrentMenu = MenuModes.MainMenu;
 
                 List<Button> buttons = new List<Button>
@@ -150,7 +182,7 @@ namespace MakeEveryDayRecount.Managers
 
                 Rectangle replayQuitRect = new Rectangle(IncrementScreenPos(drawPoint, 1, buttonSize.Y, buttonSpacing), buttonSize);
                 Button replayQuit = new Button(replayQuitRect, AssetManager.DefaultButton, AssetManager.DefaultButton, true, "Menu", font);
-                replayQuit.OnClick += () => gameStateChange.Invoke(GameState.Menu);
+                replayQuit.OnClick += () => GameStateChange.Invoke(GameState.Menu);
 
 
                 Point bottomRightStartPoint = new Point(9 * screenSize.X / 10, 9 * screenSize.Y / 10);

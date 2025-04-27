@@ -6,6 +6,10 @@ using MakeEveryDayRecount.Managers;
 
 namespace MakeEveryDayRecount.UI
 {
+    /// <summary>
+    /// Change to the inventory space
+    /// </summary>
+    /// <param name="inventorySpace">Inventory space that changed</param>
     delegate void OnInventoryChange(InventorySpace inventorySpace);
 
     /// <summary>

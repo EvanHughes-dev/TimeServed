@@ -7,6 +7,11 @@ using System.Linq;
 
 namespace MakeEveryDayRecount.Managers
 {
+
+    /// <summary>
+    /// Take care of all non-sound asset loading here. Create a central location for 
+    /// all gameobjects, tiles, players, and text to get their needed attributes from
+    /// </summary>
     public static class AssetManager
     {
         #region Player Assets
@@ -104,7 +109,16 @@ namespace MakeEveryDayRecount.Managers
         /// Default font for debugging
         /// </summary>
         public static SpriteFont Arial20 { get; private set; }
-        public static SpriteFont[] ArialFonts;
+
+        /// <summary>
+        /// Get scalable arial fonts
+        /// </summary>
+        public static SpriteFont[] ArialFonts { get; private set; }
+
+        /// <summary>
+        /// Get the font for the title
+        /// </summary>
+        public static SpriteFont TitleFont { get; private set; }
         #endregion
 
         /// <summary>
@@ -117,6 +131,10 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static Point HalfTileSize => new Point(TileSize.X / 2, TileSize.Y / 2);
 
+        /// <summary>
+        /// Load all content needed for the game at once
+        /// </summary>
+        /// <param name="content">ContentManager to load with</param>
         public static void LoadContent(ContentManager content)
         {
 
@@ -245,6 +263,7 @@ namespace MakeEveryDayRecount.Managers
                 content.Load<SpriteFont>("Fonts/Arial30"),
             };
 
+            TitleFont = content.Load<SpriteFont>("Fonts/Arial50");
         }
 
         /// <summary>

@@ -3,11 +3,10 @@ using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Players;
-using MakeEveryDayRecount.DebugModes;
 
 namespace MakeEveryDayRecount.GameObjects.Props
 {
-    
+
     /// <summary>
     /// An item the player can pick up and add to their inventory
     /// </summary>

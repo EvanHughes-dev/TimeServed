@@ -52,7 +52,6 @@ namespace LevelEditor
             if (result == DialogResult.OK)
             {
                 Room room = FileIOHelpers.LoadRoom(openFileDialog.FileName, _mainForm.Tiles, _mainForm.Props, _mainForm.Triggers);
-                // TODO figure out room index for this
                 _mainForm.AddNewRoom(room);
 
                 EditorForm editor = new(_mainForm, room);

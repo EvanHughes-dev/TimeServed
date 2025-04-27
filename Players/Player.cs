@@ -321,9 +321,7 @@ namespace MakeEveryDayRecount.Players
                 Color.White
             );
 
-            //Draw the inventory. If the player were to ever overlap the inventory it will disappear behind it
-            //Because nothing in the game should be drawn on top of the UI
-            _inventory.Draw(sb, MapUtils.ScreenSize);
+            _inventory.Draw(sb);
         }
 
         /// <summary>

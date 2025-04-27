@@ -1,13 +1,12 @@
 ﻿using MakeEveryDayRecount.GameObjects.Triggers;
 using System.Collections.Generic;
 using System.IO;
-using System;
-using System.Linq;
 
 namespace MakeEveryDayRecount.Managers
 {
     /// <summary>
-    /// Keeps track of important triggers
+    /// Keeps track of important triggers and loads level
+    /// from checkpoints when needed
     /// </summary>
     internal static class TriggerManager
     {
@@ -41,8 +40,6 @@ namespace MakeEveryDayRecount.Managers
         {
             Checkpoints.Clear();
             PlayerSpawn = null;
-
-            //...and all the other lists of triggers, once they're implemented
         }
 
 

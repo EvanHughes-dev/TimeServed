@@ -4,9 +4,9 @@ using Microsoft.Xna.Framework.Input;
 
 namespace MakeEveryDayRecount.Managers
 {
-    //Enum for different mouse button states
-    //JAMES NOTE
-    //I think it needs a better name
+    /// <summary>
+    /// Which keyboard button to reference
+    /// </summary>
     public enum MouseButtonState
     {
         Left,
@@ -42,6 +42,9 @@ namespace MakeEveryDayRecount.Managers
             _currentMouseState = Mouse.GetState();
         }
 
+        /// <summary>
+        /// Update the keyboard state from the ReplayManager not the keyboard
+        /// </summary>
         public static void ReplayUpdate()
         {
             _priorReplayState = _currentReplayState;

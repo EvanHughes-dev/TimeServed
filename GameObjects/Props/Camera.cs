@@ -9,12 +9,18 @@ using System.Linq;
 
 namespace MakeEveryDayRecount.GameObjects.Props
 {
+
+    /// <summary>
+    /// Create a camera that can watch tiles and detect if the 
+    /// player has entered its view. Allow boxes to block its view and
+    /// update what tiles are watched
+    /// </summary>
     internal class Camera : Prop
     {
         //If the camera is on or off
         private bool _active;
         //The direction in which the camera's sprite is facing
-        //This isn't currently used but if we add more features it migth come in handy so I'm keeping it
+        //This isn't currently used but if we add more features it might come in handy so I'm keeping it
         private enum CameraDirections
         {
             Up,
@@ -22,6 +28,32 @@ namespace MakeEveryDayRecount.GameObjects.Props
             Left,
             Right
         }
+
+        /// <summary>
+        /// The wire box this is connected to
+        /// </summary>
+        public WireBox WireBox { get; private set; }
+
+        /// <summary>
+        /// Center point this camera is watching
+        /// </summary>
+        public Point CenterPoint
+        {
+            get { return _centerPoint; }
+        }
+
+        /// <summary>
+        /// Radian spread of this camera's sight
+        /// </summary>
+        public float Spread
+        {
+            get { return _spread; }
+        }
+
+        /// <summary>
+        /// Get the room this camera is in
+        /// </summary>
+        public Room CameraRoom { get; private set; }
 
         //Specify a point for the center of it's vision and an angle in radians for the width of it's field of vision
 
@@ -32,38 +64,20 @@ namespace MakeEveryDayRecount.GameObjects.Props
         private Point[] _endPoints;
         //This float tells the camera which way it's facing. By default, the camera faces down
         private float _direction;
-        readonly Point _drawOrigin;
 
         //The rays don't project from inside of the wall, where the camera is technically drawn
         //All the rays come out from the point on the floor right "in front of" the camera
         private Point _rayBase;
 
-
         private Point[] _visionKite;
         private List<Point> _watchedTiles;
         private List<Point> _previousBoxes;
         //This is going to need a reference to the room that created it in order to check collision
-        /// <summary>
-        /// Get the room this camera is in
-        /// </summary>
-        public Room CameraRoom { get; private set; }
+
         //It also needs a reference to the player to know if they step into the vision kite
         private Player _player = GameplayManager.PlayerObject;
 
-        /// <summary>
-        /// The wire box this is connected to
-        /// </summary>
-        public WireBox WireBox { get; private set; }
 
-        public Point CenterPoint
-        {
-            get { return _centerPoint; }
-        }
-
-        public float Spread
-        {
-            get { return _spread; }
-        }
 
         /// <summary>
         /// Makes a security camera that watches a certain vision kite to see if the player is inside it
@@ -82,11 +96,10 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //All cams start active
             _active = SpriteIndex == 0;
             CameraRoom = containingRoom;
-            _drawOrigin = new Point(AssetManager.TileSize.X / 2, AssetManager.TileSize.Y / 2);
             _centerPoint = centerPoint;
             _spread = spread;
 
-            // If the sprite inedx is 1 then it is an inactive camera
+            // If the sprite index is 1 then it is an inactive camera
             if (!_active)
                 return;
             #region Raybase Check
@@ -206,7 +219,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
             _endPoints = endPoints.ToArray();
 
             //Create a rectangle that bounds the entire kite
-            //TODO: Could finding the corners be done more efficiently?
+
             Point[] corners = { _rayBase, _centerPoint, clockwisePoint, counterclockwisePoint };
             //Find the minimum/maximum X and Y of the 4 bounding points (the edges of the rectangle basically)
             int minX = _rayBase.X;
@@ -239,7 +252,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                         &&
                         (clockwiseRay.Y * candidateVector.X - clockwiseRay.X * candidateVector.Y) *
                         (clockwiseRay.Y * counterclockwiseRay.X - clockwiseRay.X * counterclockwiseRay.Y) >= 0
-                        && candidateVector.Length() <= centerRay.Length()) //TODO: Is there a better way to keep it from going over the end?
+                        && candidateVector.Length() <= centerRay.Length())
                     {
                         //Make sure we're not including walls in the vision tile
                         Point candidatePoint = new Point(x, y);
@@ -262,7 +275,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                     }
                 }
             }
-            //Permanantely save this into an array that won't be changed and indicates the full kite with no obstructions
+            //Permanently save this into an array that won't be changed and indicates the full kite with no obstructions
             _visionKite = _watchedTiles.ToArray();
             #endregion
             //Note that the length of _endPoints may be even or odd depending on rounding
@@ -281,16 +294,15 @@ namespace MakeEveryDayRecount.GameObjects.Props
         public Camera(Point location, Texture2D[] spriteArray, int spriteIndex, Room containingRoom, Point centerPoint, float spread, Point boxLocation)
             : this(location, spriteArray, spriteIndex, containingRoom, centerPoint, spread)
         {
-
-
-
-            //Add the wire box to the list of props in the room so that it gets drawn
-            //I think we have to add it this way because we can't call the methods directly on this property. I might be wrong tho
-            //It's like copy-alter-replace
+            //Add the wire box to the list of props in the room so that it gets interacted with
             WireBox = new WireBox(boxLocation, AssetManager.CameraTextures, this, 2);
             CameraRoom.WireBoxes.Add(WireBox);
         }
 
+        /// <summary>
+        /// Update what tiles are being watched and if the player is in any of them
+        /// </summary>
+        /// <param name="deltaTime">Time since last frame</param>
         public void Update(float deltaTime)
         {
             if (_active)
@@ -336,7 +348,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                                     //Remove all the tiles between the box and the end of the ray
                                     foreach (Point blockedTile in Rasterize(box, _endPoints[i])) _watchedTiles.Remove(blockedTile);
                                     //Now check the rays on either side of the ray you just found and treat them as blocked also
-                                    //TODO: There is probably a more efficent way to do this, I'm just trying it out
+
                                     if (i > 0) foreach (Point blockedTile in Rasterize(box, _endPoints[i - 1])) _watchedTiles.Remove(blockedTile);
                                     if (i < _endPoints.Length - 1) foreach (Point blockedTile in Rasterize(box, _endPoints[i + 1])) _watchedTiles.Remove(blockedTile);
                                 }
@@ -345,16 +357,10 @@ namespace MakeEveryDayRecount.GameObjects.Props
                     }
 
                     //Now do one more check of the watched tiles. If any of them is isolated, remove it
-                    //NOTE: If there's lag or bugs in this area, this might be the cause. This is doing a lot of looping 
                     List<Point> isolatedTiles = new List<Point>();
                     foreach (Point watchedTile in _watchedTiles)
                     {
-                        //Check the tiles above, below, and to either side of this tile.
-                        //TODO: This may also be inefficent. Using a dictionary instead of a list of points might help with this, but I'm not sure yet
-                        //In this case, unwalkable tiles also count as watched tiles basically
-                        //Let's see if this causes problems
 
-                        //TODO: Only check if the tile is further from the camera than the box is
                         //But what if there are multiple boxes?
                         int watchedNeighbors = 0;
                         Point watchedNeighbor = watchedTile;
@@ -394,7 +400,12 @@ namespace MakeEveryDayRecount.GameObjects.Props
             }
         }
 
-        //int endpointnumber = 0;
+        /// <summary>
+        /// Draw the camera, wire box and all tiles this camera can see
+        /// </summary>
+        /// <param name="sb">Sprite batch to draw with</param>
+        /// <param name="worldToScreen">Number of pixels between world and screen positions</param>
+        /// <param name="pixelOffset">Number of pixels the map is offset by</param>
         public override void Draw(SpriteBatch sb, Point worldToScreen, Point pixelOffset)
         {
             sb.Draw(Sprite, new Rectangle(MapUtils.TileToWorld(Location) - worldToScreen + pixelOffset + AssetManager.HalfTileSize, AssetManager.TileSize), null, //no source rectangle
@@ -409,34 +420,40 @@ namespace MakeEveryDayRecount.GameObjects.Props
             }
         }
 
-        private List<Point> Rasterize(Point p1, Point p2)
+        /// <summary>
+        /// Cast a ray between two points
+        /// </summary>
+        /// <param name="point1">Point to cast from</param>
+        /// <param name="Point2">Point to cast to</param>
+        /// <returns>List of all points between the two points</returns>
+        private List<Point> Rasterize(Point point1, Point Point2)
         {
             bool rotated = false;
 
             // Swap X and Y if the line is steep
-            if (Math.Abs(p2.Y - p1.Y) > Math.Abs(p2.X - p1.X))
+            if (Math.Abs(Point2.Y - point1.Y) > Math.Abs(Point2.X - point1.X))
             {
                 rotated = true;
-                (p1.X, p1.Y) = (p1.Y, p1.X);
-                (p2.X, p2.Y) = (p2.Y, p2.X);
+                (point1.X, point1.Y) = (point1.Y, point1.X);
+                (Point2.X, Point2.Y) = (Point2.Y, Point2.X);
             }
 
             // Ensure left-to-right drawing
-            if (p1.X > p2.X)
+            if (point1.X > Point2.X)
             {
-                (p1, p2) = (p2, p1);
+                (point1, Point2) = (Point2, point1);
             }
 
-            int dx = p2.X - p1.X;
-            int dy = Math.Abs(p2.Y - p1.Y);
-            int yStep = p2.Y > p1.Y ? 1 : -1; //If the line is going down, this will examine one tile down instead of one tile above
+            int dx = Point2.X - point1.X;
+            int dy = Math.Abs(Point2.Y - point1.Y);
+            int yStep = Point2.Y > point1.Y ? 1 : -1; //If the line is going down, this will examine one tile down instead of one tile above
 
             int decisionParam = 2 * dy - dx;
-            int y = p1.Y;
+            int y = point1.Y;
 
             List<Point> returnPoints = new();
 
-            for (int x = p1.X; x <= p2.X; x++)
+            for (int x = point1.X; x <= Point2.X; x++)
             {
                 //Add the current point
                 if (rotated) returnPoints.Add(new Point(y, x));
@@ -454,15 +471,18 @@ namespace MakeEveryDayRecount.GameObjects.Props
             return returnPoints;
         }
 
+        /// <summary>
+        /// The player can not interact with a camera
+        /// </summary>
+        /// <param name="player">Player that tried to interact</param>
         public override void Interact(Player player)
         {
             //The cameras can't be interacted with directly so this function doesn't do anything
-            //TODO: I could change the inheritance to GameObject to take this function out of this class
             //But I think this is fine for now. This function will be called but won't do anything
         }
 
         /// <summary>
-        /// Deacrivate this camera and stop running all detection logic
+        /// Deactivate this camera and stop running all detection logic
         /// </summary>
         public void Deactivate()
         {

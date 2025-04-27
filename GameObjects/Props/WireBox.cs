@@ -75,6 +75,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                 _camera.Deactivate();
                 SpriteIndex = 3;
                 Sprite = AssetManager.CameraTextures[SpriteIndex];
+                SoundManager.PlaySFX(SoundManager.WirecutterSound, -40, 40);
             }
         }
     }

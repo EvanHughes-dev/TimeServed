@@ -1,10 +1,22 @@
-﻿using MakeEveryDayRecount.DebugModes;
+﻿
+/********************************************************\
+ * Leah Crain, Avigail Daniels, James Young, Evan Hughes
+ * 
+ * 4/27/2025
+ * 
+ * Create a game titled "Time Served" in which the player
+ * plays as a prisoner trying to escape from prison. 
+ * The player goes backwards through the days, gathering
+ * the tools and items they had in the previous level, 
+ * finally watching their fall escape in a replay
+\********************************************************/
+
+using MakeEveryDayRecount.DebugModes;
 using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MakeEveryDayRecount.Managers;
-using System.Net.Security;
 
 namespace MakeEveryDayRecount
 {
@@ -85,8 +97,8 @@ namespace MakeEveryDayRecount
             //Initialize button lists
             InterfaceManager.InitializeScaling(ScreenSize);
             InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.MainMenu;
-            InterfaceManager.gameStateChange += SwitchState;
-            InterfaceManager.exitGame += ExitGame;
+            InterfaceManager.GameStateChange += SwitchState;
+            InterfaceManager.ExitGame += ExitGame;
             InterfaceManager.ReplaySpeedChange += ChangeReplaySpeed;
 
             ReplayManager.Initialize();
@@ -139,7 +151,6 @@ namespace MakeEveryDayRecount
                     if (InputManager.GetKeyPress(Keys.Escape))
                     {
                         _state = GameState.Level;
-                        SoundManager.ResumeBGM();
                         InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.Level;
                     }
                     break;
@@ -149,7 +160,6 @@ namespace MakeEveryDayRecount
                     if (InputManager.GetKeyPress(Keys.Escape))
                     {
                         _state = GameState.Pause;
-                        SoundManager.PauseBGM();
                         InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.PauseMenu;
                         // Don't call anything after the game has paused
                         break;
@@ -232,8 +242,8 @@ namespace MakeEveryDayRecount
                         if (MapManager.CurrentRoom.RoomName == "JRoom0")
                         {
                             //Press E or Mouse to interact, use Moue to select items from inventory
-                            _spriteBatch.DrawString(AssetManager.Arial20, "Press E or click to Interact.", new Vector2(150, 400), Color.White);
-                            _spriteBatch.DrawString(AssetManager.Arial20, "Use the mouse to select items \nfrom the inventory.", new Vector2(1350, 400), Color.White);
+                            _spriteBatch.DrawString(AssetManager.Arial20, "Press E or click to Interact.", new Point(ScreenSize.X / 5, ScreenSize.Y / 4).ToVector2(), Color.White);
+                            _spriteBatch.DrawString(AssetManager.Arial20, "Use the mouse to select items \nfrom the inventory.", new Point(ScreenSize.X / 5, ScreenSize.Y / 2).ToVector2(), Color.White);
                         }
                     }
                     break;
@@ -316,16 +326,13 @@ namespace MakeEveryDayRecount
             {
                 EndReplay();
             }
-
-            if (state == GameState.Level)
+            else if (state == GameState.Menu)
             {
+                GameplayManager.Initialize(ScreenSize);
 
-                if (SoundManager.PlayingMusic)
-                    SoundManager.ResumeBGM();
-                else
-                    SoundManager.PlayBGM(GameplayManager.Level);
             }
-            else if (state == GameState.Cutscene)
+
+            if (state == GameState.Cutscene)
             {
                 if (AssetManager.LevelChanges.Length <= GameplayManager.Level)
                 {

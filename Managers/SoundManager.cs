@@ -10,14 +10,6 @@ namespace MakeEveryDayRecount.Managers
     /// </summary>
     public static class SoundManager
     {
-        //Fields
-        static Random rng = new Random();
-
-        /// <summary>
-        /// Array of all background tracks in the game
-        /// </summary>
-        public static Song[] BackgroundMusic { get; private set; }
-
 
 
         /// <summary>
@@ -40,10 +32,8 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static SoundEffect VentUnscrewSound { get; private set; }
 
-        //TODO: use the wirecutter sound and camera sound
-
         /// <summary>
-        /// Sound effect for when the wirecutters cut wire
+        /// Sound effect for when the wire cutters cut wire
         /// </summary>
         public static SoundEffect WirecutterSound { get; private set; }
 
@@ -52,12 +42,7 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static SoundEffect PowerDownSound { get; private set; }
 
-        /// <summary>
-        /// If the background music has a track
-        /// </summary>
-        public static bool PlayingMusic { get; set; }
-
-        //Methods
+        private static Random rng;
 
         /// <summary>
         /// Loads all music and sound effects.
@@ -65,11 +50,6 @@ namespace MakeEveryDayRecount.Managers
         /// <param name="content">Content manager used to load all music and sound effects.</param>
         public static void LoadContent(ContentManager content)
         {
-            //Background Music
-            BackgroundMusic = new Song[]
-            {
-                content.Load<Song>("Audio/Music/Sneaky Snitch")
-            };
 
             //Sound effects
             PlayerStepSound = content.Load<SoundEffect>("Audio/Sound Effects/Player Step");
@@ -79,47 +59,9 @@ namespace MakeEveryDayRecount.Managers
             PowerDownSound = content.Load<SoundEffect>("Audio/Sound Effects/Power Down");
             VentUnscrewSound = content.Load<SoundEffect>("Audio/Sound Effects/Unscrew");
 
-            PlayingMusic = false;
+            rng = new Random();
         }
 
-        /// <summary>
-        /// Plays background music for the requested level
-        /// </summary>
-        /// <param name="level">Level for which background music is being played</param>
-        public static void PlayBGM(int level)
-        {
-            if (MediaPlayer.State == MediaState.Playing)
-                MediaPlayer.Stop();
-            //TODO: Lower the volume
-            //TODO: find better music
-            //MediaPlayer.Play(BackgroundMusic[level - 1]);
-            PlayingMusic = true;
-        }
-
-        /// <summary>
-        /// Pauses the background music.
-        /// </summary>
-        public static void PauseBGM()
-        {
-            MediaPlayer.Pause();
-        }
-
-        /// <summary>
-        /// Resumes the background music.
-        /// </summary>
-        public static void ResumeBGM()
-        {
-            MediaPlayer.Resume();
-        }
-
-        /// <summary>
-        /// Stop the current bgm
-        /// </summary>
-        public static void StopBGM()
-        {
-            MediaPlayer.Stop();
-            PlayingMusic = false;
-        }
 
         /// <summary>
         /// Plays a sound effect.

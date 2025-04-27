@@ -13,7 +13,6 @@ namespace MakeEveryDayRecount.UI
     internal class UserMouse
     {
 
-
         /// <summary>
         /// The mouse hover state
         /// </summary>

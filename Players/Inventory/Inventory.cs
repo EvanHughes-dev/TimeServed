@@ -8,18 +8,15 @@ using System.Collections.ObjectModel;
 
 namespace MakeEveryDayRecount.Players.InventoryFiles
 {
+    /// <summary>
+    /// Represent what the player is holding in there inventory to the player
+    /// </summary>
     internal class Inventory
     {
         private Point _boxSize;
 
-        /// <summary>
-        /// Array of buttons used to display the inventory
-        /// </summary>
         private InventorySpace[] _inventoryUI;
 
-        /// <summary>
-        /// A list of the items the inventory currently holds
-        /// </summary>
         private List<Item> _contents;
 
         /// <summary>
@@ -61,6 +58,7 @@ namespace MakeEveryDayRecount.Players.InventoryFiles
 
             _contents = new List<Item> { };
         }
+
         /// <summary>
         /// Updates the inventory array
         /// </summary>
@@ -71,11 +69,12 @@ namespace MakeEveryDayRecount.Players.InventoryFiles
                 _inventoryUI[i].Update();
             }
         }
+
         /// <summary>
         /// Draws the inventory's UI using a button array 
         /// </summary>
         /// <param name="sb">SpriteBatch to draw with</param>
-        public void Draw(SpriteBatch sb, Point screenSize)
+        public void Draw(SpriteBatch sb)
         {
             for (int i = 0; i < _inventoryUI.Length; i++)
             {
