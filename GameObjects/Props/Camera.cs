@@ -6,7 +6,6 @@ using MakeEveryDayRecount.Players;
 using MakeEveryDayRecount.Map;
 using MakeEveryDayRecount.Managers;
 using System.Linq;
-using System.Diagnostics;
 
 namespace MakeEveryDayRecount.GameObjects.Props
 {
@@ -47,6 +46,11 @@ namespace MakeEveryDayRecount.GameObjects.Props
         private Room _room;
         //It also needs a reference to the player to know if they step into the vision kite
         private Player _player = GameplayManager.PlayerObject;
+
+        /// <summary>
+        /// The wire box this is connected to
+        /// </summary>
+        public WireBox WireBox { get; private set; }
 
         public Point CenterPoint
         {
@@ -437,32 +441,12 @@ namespace MakeEveryDayRecount.GameObjects.Props
         public Camera(Point location, Texture2D[] spriteArray, int spriteIndex, Room containingRoom, Point centerPoint, float spread, Point boxLocation)
             : this(location, spriteArray, spriteIndex, containingRoom, centerPoint, spread)
         {
-            //TODO: There's no asset for the box right now, so for now direction will always be 0 because we don't know the starting rotation
-            #region Box Direction Check
-            //TODO: Right now this prioritizes up, down, left, right. If it matters we can change that
-            //Also if we put a wirebox next to a regular box it will cause problems because boxes aren't walkable, but that shouldn't be a huge deal
-            if (_room.VerifyWalkable(new Point(boxLocation.X, boxLocation.Y - 1), false)) //Point above
-            {
-                //face up
-            }
-            else if (_room.VerifyWalkable(new Point(boxLocation.X, boxLocation.Y + 1), false)) //Point below
-            {
-                //face down
-            }
-            else if (_room.VerifyWalkable(new Point(boxLocation.X - 1, boxLocation.Y), false)) //Point left
-            {
-                //face left
-            }
-            else if (_room.VerifyWalkable(new Point(boxLocation.X + 1, boxLocation.Y), false)) //Point right
-            {
-                //face right
-            }
-            #endregion
             //Add the wire box to the list of props in the room so that it gets drawn
             //I think we have to add it this way because we can't call the methods directly on this property. I might be wrong tho
             //It's like copy-alter-replace
             List<Prop> alteredRoomItems = _room.ItemsInRoom;
-            alteredRoomItems.Add(new WireBox(boxLocation, AssetManager.PropTextures, 0f, this, 2));
+            WireBox = new WireBox(boxLocation, AssetManager.PropTextures, 0f, this, 2);
+            alteredRoomItems.Add(WireBox);
             _room.ItemsInRoom = alteredRoomItems;
         }
 

@@ -38,6 +38,7 @@
             tabPageProps = new TabPage();
             flowLayoutPanelProps = new FlowLayoutPanel();
             tabPageTriggers = new TabPage();
+            flowLayoutPanelTriggers = new FlowLayoutPanel();
             splitContainer = new SplitContainer();
             buttonSave = new Button();
             buttonResize = new Button();
@@ -137,12 +138,20 @@
             // 
             // tabPageTriggers
             // 
+            tabPageTriggers.Controls.Add(flowLayoutPanelTriggers);
             tabPageTriggers.Location = new Point(4, 24);
             tabPageTriggers.Name = "tabPageTriggers";
             tabPageTriggers.Size = new Size(207, 437);
             tabPageTriggers.TabIndex = 1;
             tabPageTriggers.Text = "Triggers";
             tabPageTriggers.UseVisualStyleBackColor = true;
+            // 
+            // flowLayoutPanelTriggers
+            // 
+            flowLayoutPanelTriggers.Location = new Point(3, 3);
+            flowLayoutPanelTriggers.Name = "flowLayoutPanelTrigers";
+            flowLayoutPanelTriggers.Size = new Size(201, 431);
+            flowLayoutPanelTriggers.TabIndex = 0;
             // 
             // splitContainer
             // 
@@ -213,6 +222,7 @@
         private SplitContainer splitContainer;
         private FlowLayoutPanel flowLayoutPanelTiles;
         private FlowLayoutPanel flowLayoutPanelProps;
+        private FlowLayoutPanel flowLayoutPanelTriggers;
         private TabPage tabPageTriggers;
         private Controls.RoomRenderer roomRenderer;
         private Button buttonResize;

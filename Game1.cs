@@ -49,6 +49,11 @@ namespace MakeEveryDayRecount
 
         private int _replaySpeed;
         private const int MaxReplaySpeed = 5;
+        private int _currentAnimationIndex;
+        private const float SecondsPerAnimationFrame = .2f;
+        private float _currentElapsedTimeAnimation;
+        private Texture2D[] _currentAnimation;
+
 
         public Game1()
         {
@@ -87,8 +92,12 @@ namespace MakeEveryDayRecount
             TriggerManager.Initialize();
             //Set initial GameState
             _state = GameState.Menu;
-
             _replaySpeed = 2;
+
+            _currentAnimation = null;
+            _currentAnimationIndex = 0;
+            _currentElapsedTimeAnimation = 0f;
+
             base.Initialize();
         }
 
@@ -101,6 +110,8 @@ namespace MakeEveryDayRecount
 
             GlobalDebug.Initialize();
             GameplayManager.Initialize(ScreenSize);
+            GameplayManager.WinCondition += () => SwitchState(GameState.Cutscene);
+
             MapUtils.Initialize(this);
 
             // Initialize all items that need assets to be loaded 
@@ -133,9 +144,7 @@ namespace MakeEveryDayRecount
                     break;
 
                 case GameState.Level:
-                    //TODO: On level end
-                    //_state = GameState.Cutscene;
-
+                    ReplayManager.SaveState((float)gameTime.ElapsedGameTime.TotalSeconds);
                     if (InputManager.GetKeyPress(Keys.Escape))
                     {
                         _state = GameState.Pause;
@@ -146,15 +155,21 @@ namespace MakeEveryDayRecount
                     }
                     GameplayManager.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
                     // Save the current state of the keyboard
-                    ReplayManager.SaveState((float)gameTime.ElapsedGameTime.TotalSeconds);
+
                     break;
 
                 case GameState.Cutscene:
-                    //When the cutscene is over
-                    //_state = GameState.Level;
-
-                    //If this is the last cutscene
-                    //_state = GameState.Playback;
+                    _currentElapsedTimeAnimation += (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    if (_currentElapsedTimeAnimation >= SecondsPerAnimationFrame)
+                    {
+                        _currentAnimationIndex++;
+                        _currentElapsedTimeAnimation -= SecondsPerAnimationFrame;
+                        if (_currentAnimationIndex >= _currentAnimation.Length)
+                        {
+                            GameplayManager.NextLevel();
+                            SwitchState(GameState.Level);
+                        }
+                    }
                     break;
 
                 case GameState.Playback:
@@ -173,11 +188,11 @@ namespace MakeEveryDayRecount
                         }
                         else if (!ReplayManager.NextFrame())
                         {
-                            _state = GameState.Menu;
-                            ReplayManager.EndReplay();
-                            InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.MainMenu;
-                            IsMouseVisible = false;
-                            break;
+                            if (GameplayManager.Level == 1)
+                            {
+                                EndReplay();
+                                break;
+                            }
                         }
 
                         InputManager.ReplayUpdate();
@@ -217,6 +232,7 @@ namespace MakeEveryDayRecount
                     DisplayDebug();
                     break;
                 case GameState.Cutscene:
+                    _spriteBatch.Draw(_currentAnimation[_currentAnimationIndex], new Rectangle(Point.Zero, ScreenSize), Color.White);
                     break;
                 case GameState.Playback:
                     GameplayManager.Draw(_spriteBatch);
@@ -285,12 +301,32 @@ namespace MakeEveryDayRecount
         /// <param name="state">The state that should be applied when the delegate is called.</param>
         public void SwitchState(GameState state)
         {
+
+            if (_state == GameState.Playback && state == GameState.Menu)
+            {
+                EndReplay();
+            }
+
             if (state == GameState.Level)
             {
+
                 if (SoundManager.PlayingMusic)
                     SoundManager.ResumeBGM();
                 else
                     SoundManager.PlayBGM(GameplayManager.Level);
+            }
+            else if (state == GameState.Cutscene)
+            {
+                if (AssetManager.LevelChanges.Length <= GameplayManager.Level)
+                {
+                    state = GameState.Playback;
+                }
+                else
+                {
+                    _currentElapsedTimeAnimation = 0f;
+                    _currentAnimationIndex = 0;
+                    _currentAnimation = AssetManager.LevelChanges[GameplayManager.Level - 1];
+                }
             }
             _state = state;
         }
@@ -311,5 +347,16 @@ namespace MakeEveryDayRecount
             return _replaySpeed;
         }
 
+        public void EndReplay()
+        {
+            _state = GameState.Menu;
+            ReplayManager.ClearSavedData();
+            GameplayManager.ClearSavedData();
+            MapManager.ClearMap();
+            InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.MainMenu;
+            ReplayManager.EndReplay();
+
+            GameplayManager.Initialize(ScreenSize);
+        }
     }
 }

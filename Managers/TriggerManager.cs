@@ -1,6 +1,8 @@
 ﻿using MakeEveryDayRecount.GameObjects.Triggers;
 using System.Collections.Generic;
 using System.IO;
+using System;
+using System.Linq;
 
 namespace MakeEveryDayRecount.Managers
 {
@@ -38,17 +40,27 @@ namespace MakeEveryDayRecount.Managers
         public static void Reset()
         {
             Checkpoints.Clear();
-            PlayerSpawn = null; //TODO: is this needed?
+            PlayerSpawn = null;
+
             //...and all the other lists of triggers, once they're implemented
         }
 
+
         /// <summary>
-        /// Adds the given checkpoint to the list of all checkpoints in the current level
+        /// Add a checkpoint to the list of checkpoints without ordering it
         /// </summary>
-        /// <param name="checkpoint">Checkpoint to be added</param>
+        /// <param name="checkpoint">Checkpoint to add</param>
         public static void AddCheckpoint(Checkpoint checkpoint)
         {
             Checkpoints.Add(checkpoint);
+        }
+
+        /// <summary>
+        /// Sort the list of checkpoints in ascending order
+        /// </summary>
+        public static void SortCheckpoints()
+        {
+            Checkpoints.Sort((a, b) => a.Index.CompareTo(b.Index));
         }
 
         /// <summary>
@@ -74,10 +86,11 @@ namespace MakeEveryDayRecount.Managers
         /// <summary>
         /// Load data from a saved checkpoint file
         /// </summary>
-        public static void LoadCheckpoint()
+        /// <returns>If the loading was successful</returns>
+        public static bool LoadCheckpoint()
         {
             if (!ValidateCheckpointData())
-                return;
+                return false;
             int level;
             int roomIndex;
             int selectedCheckpointIndex;
@@ -100,6 +113,8 @@ namespace MakeEveryDayRecount.Managers
             }
 
             GameplayManager.LoadLevelFromCheckpoint(level);
+
+            return true;
         }
 
     }

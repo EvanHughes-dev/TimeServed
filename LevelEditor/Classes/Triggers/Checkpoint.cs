@@ -16,7 +16,10 @@ namespace LevelEditor.Classes.Triggers
         ///   from lowest index to highest index.
         /// </summary>
         public int Index { get; set; }
-
+        /// <summary>
+        /// The color representing this trigger
+        /// </summary>
+        public override Color Color => Color.YellowGreen;
         /// <summary>
         /// Creates a new Checkpoint with the given index.
         /// </summary>

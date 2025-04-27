@@ -149,7 +149,7 @@ namespace MakeEveryDayRecount.Map
             if (MapManager.CurrentRoom == null)
                 return Point.Zero;
             Point worldToScreen = WorldToScreen();
-            Point screenToWorld = new Point(screenPos.X + worldToScreen.X, screenPos.Y + worldToScreen.Y);
+            Point screenToWorld = new Point(screenPos.X + worldToScreen.X, screenPos.Y + worldToScreen.Y) - PixelOffset();
 
             return new Point(screenToWorld.X / AssetManager.TileSize.X, screenToWorld.Y / AssetManager.TileSize.Y);
         }

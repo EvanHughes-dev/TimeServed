@@ -91,7 +91,8 @@ namespace MakeEveryDayRecount.Managers
             if (MediaPlayer.State == MediaState.Playing)
                 MediaPlayer.Stop();
             //TODO: Lower the volume
-            MediaPlayer.Play(BackgroundMusic[level - 1]);
+            //TODO: find better music
+            //MediaPlayer.Play(BackgroundMusic[level - 1]);
             PlayingMusic = true;
         }
 
