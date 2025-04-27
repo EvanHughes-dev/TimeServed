@@ -86,10 +86,11 @@ namespace MakeEveryDayRecount.Managers
         /// <summary>
         /// Load data from a saved checkpoint file
         /// </summary>
-        public static void LoadCheckpoint()
+        /// <returns>If the loading was successful</returns>
+        public static bool LoadCheckpoint()
         {
             if (!ValidateCheckpointData())
-                return;
+                return false;
             int level;
             int roomIndex;
             int selectedCheckpointIndex;
@@ -112,6 +113,8 @@ namespace MakeEveryDayRecount.Managers
             }
 
             GameplayManager.LoadLevelFromCheckpoint(level);
+
+            return true;
         }
 
     }

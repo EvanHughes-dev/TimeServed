@@ -121,6 +121,8 @@ namespace MakeEveryDayRecount.Players
             KeyboardInput(deltaTime);
 
             _inventory.Update();
+
+            TriggerInteract();
         }
 
         #region Player Movement
@@ -189,9 +191,13 @@ namespace MakeEveryDayRecount.Players
         /// <param name="directionMove">Direction of movement</param>
         private void PlayerMovement(float deltaTime, Point movement, Direction directionMove)
         {
-            if (!_readyToMove) UpdateWalkingTime(deltaTime);
+            if (!_readyToMove)
+            {
+                UpdateWalkingTime(deltaTime);
+                return;
+            }
 
-            else if (HoldingBox)
+            if (HoldingBox)
             {
                 // Drop the box if the player is holding it and they attempt to move a direction the 
                 // box can't be moved in
@@ -203,8 +209,7 @@ namespace MakeEveryDayRecount.Players
                     directionMove = _currentHeldBox.AttachmentDirection;
                 }
             }
-
-            else if (_playerState == PlayerState.Walking)
+            if (_playerState == PlayerState.Walking)
             {
                 if (directionMove == _playerCurrentDirection &&
                     MapManager.CheckPlayerCollision(Location + movement) &&
@@ -260,23 +265,9 @@ namespace MakeEveryDayRecount.Players
                     UpdateAnimation(false);
                 }
 
-                //Check triggers
-                Trigger trigger = MapManager.CurrentRoom.VerifyTrigger(Location);
-
-
-                //Only trigger that cares about if it was activated right now is the Win trigger
-                //If there are more that are created this will turn into a larger if statement
-                if (trigger != null && trigger.Activate(this) && trigger is Win)
-                {
-                    //TODO: Code in this if statement runs if a player triggers a Win trigger,
-                    //Meaning it should get them to the next level
-                }
-
-
-                //Checkpoints are slightly slightly buggy when holding a box and walking on to them (box is saved a tile away from where it should be)
-                //But it's not a big issue, and the player shouldn't be holding a box and proccing a trigger anyways
             }
         }
+
         /// <summary>
         /// Update the time value in between each movements
         /// </summary>
@@ -291,6 +282,7 @@ namespace MakeEveryDayRecount.Players
                 _walkingSeconds -= SecondsPerTile;
             }
         }
+
         /// <summary>
         /// Updates the amount of time the player hase been not moving
         /// if they stand long enough, it resets their animation to the standing frame
@@ -330,6 +322,7 @@ namespace MakeEveryDayRecount.Players
             //Because nothing in the game should be drawn on top of the UI
             _inventory.Draw(sb, MapUtils.ScreenSize);
         }
+
         /// <summary>
         /// Updates the player's animation frame, and advances it to the next frame if necessarry
         /// </summary>
@@ -361,6 +354,25 @@ namespace MakeEveryDayRecount.Players
         #endregion
 
         #region Interaction
+
+        /// <summary>
+        /// Check if there is a trigger to interact with
+        /// </summary>
+        private void TriggerInteract()
+        {
+            //Check triggers
+            Trigger trigger = MapManager.CurrentRoom.VerifyTrigger(Location);
+
+
+            //Only trigger that cares about if it was activated right now is the Win trigger
+            //If there are more that are created this will turn into a larger if statement
+            if (trigger != null && trigger.Activate(this) && trigger is Win)
+            {
+                ReplayManager.SaveData(GameplayManager.Level, TriggerManager.CurrentCheckpoint.Index + 1);
+                GameplayManager.PlayerWinTrigger();
+            }
+        }
+
         /// <summary>
         /// Determines if the player's inventory contains a key of the specified type
         /// </summary>
@@ -525,7 +537,6 @@ namespace MakeEveryDayRecount.Players
         ///     int keyType
         /// </summary>
         /// <param name="baseFolder">Folder to save player data to</param>
-
         public void Save(string baseFolder)
         {
 

@@ -169,16 +169,15 @@ namespace MakeEveryDayRecount.Managers
             };
             DoorTexture = new Texture2D[]
             {
+                content.Load<Texture2D>("Doors/prop_door_locked-top"),
+                content.Load<Texture2D>("Doors/prop_door_locked-right"),
+                content.Load<Texture2D>("Doors/prop_door_locked-bottom"),
+                content.Load<Texture2D>("Doors/prop_door_locked-left"),
 
                 content.Load<Texture2D>("Doors/prop_vent-top"),
                 content.Load<Texture2D>("Doors/prop_vent-right"),
                 content.Load<Texture2D>("Doors/prop_vent-bottom"),
                 content.Load<Texture2D>("Doors/prop_vent-left"),
-
-                content.Load<Texture2D>("Doors/prop_door_locked-top"),
-                content.Load<Texture2D>("Doors/prop_door_locked-right"),
-                content.Load<Texture2D>("Doors/prop_door_locked-bottom"),
-                content.Load<Texture2D>("Doors/prop_door_locked-left"),
 
                 content.Load<Texture2D>("Doors/Door-Top"),
                 content.Load<Texture2D>("Doors/Door-Right"),

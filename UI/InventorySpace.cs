@@ -64,6 +64,13 @@ namespace MakeEveryDayRecount.UI
         public void ReplaceItem(Item newItem)
         {
             CurrentItem = newItem;
+            if (_spaceSelected)
+            {
+                OnInventorySpaceSelected?.Invoke(this);
+                _spaceSelected = true;
+                _isInteractive = false;
+            }
+
         }
 
         /// <summary>

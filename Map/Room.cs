@@ -229,185 +229,191 @@ namespace MakeEveryDayRecount.Map
             // save the file path for debug uses
             FilePath = filePath;
 
-            // try
-            // {
-            using (BinaryReader binaryReader = new BinaryReader(File.OpenRead(filePath)))
+            try
             {
-                /*
-                * Form of the room data is as follows
-                *
-                * int tileMapWidth
-                * int tileMapHeight
-                *
-                * Tiles:
-                *   bool isWalkable
-                *   int textureIndex
-                *
-                * int gameObjectCount
-                *
-                * GameObject:
-                *   int propIndex
-                *   int positionX
-                *   int positionY
-                *   int objectType 
-                *       0 = Item
-                *       1 = Camera
-                *       2 = Box
-                *       3 = Door 
-                * 
-                *   if objectType == 0 || objectType == 3
-                *   int keyType
-                *       0 = None
-                *       1 = Key card
-                *       2 = Screwdriver
-                *       For doors, this is the key that can unlock them
-                *       For items, this is the key type they are
-                * 
-                *   if objectType == 3
-                *       int destRoom
-                *       int outputPosX
-                *       int outputPosY
-                */
-
-                // Define the size of the current room and loop to populate tiles
-                int tileMapWidth = binaryReader.ReadInt32();
-                int tileMapHeight = binaryReader.ReadInt32();
-
-                _map = new Tile[tileMapWidth, tileMapHeight];
-                MapSize = new Point(tileMapWidth, tileMapHeight);
-                for (int tileYIndex = 0; tileYIndex < tileMapHeight; tileYIndex++)
+                using (BinaryReader binaryReader = new BinaryReader(File.OpenRead(filePath)))
                 {
-                    for (int tileXIndex = 0; tileXIndex < tileMapWidth; tileXIndex++)
+                    /*
+                    * Form of the room data is as follows
+                    *
+                    * int tileMapWidth
+                    * int tileMapHeight
+                    *
+                    * Tiles:
+                    *   bool isWalkable
+                    *   int textureIndex
+                    *
+                    * int gameObjectCount
+                    *
+                    * GameObject:
+                    *   int propIndex
+                    *   int positionX
+                    *   int positionY
+                    *   int objectType 
+                    *       0 = Item
+                    *       1 = Camera
+                    *       2 = Box
+                    *       3 = Door 
+                    * 
+                    *   if objectType == 0 || objectType == 3
+                    *   int keyType
+                    *       0 = None
+                    *       1 = Key card
+                    *       2 = Screwdriver
+                    *       For doors, this is the key that can unlock them
+                    *       For items, this is the key type they are
+                    * 
+                    *   if objectType == 3
+                    *       int destRoom
+                    *       int outputPosX
+                    *       int outputPosY
+                    */
+
+                    // Define the size of the current room and loop to populate tiles
+                    int tileMapWidth = binaryReader.ReadInt32();
+                    int tileMapHeight = binaryReader.ReadInt32();
+
+                    _map = new Tile[tileMapWidth, tileMapHeight];
+                    MapSize = new Point(tileMapWidth, tileMapHeight);
+                    for (int tileYIndex = 0; tileYIndex < tileMapHeight; tileYIndex++)
                     {
-                        _map[tileXIndex, tileYIndex] = new Tile(
-                            binaryReader.ReadBoolean(),
-                            binaryReader.ReadInt32()
-                        );
-                    }
-                }
-
-                // Define the number of GameObjects in the room
-                // Could be a door
-                int numberOfGameObjects = binaryReader.ReadInt32();
-                Dictionary<int, Point> direction = new Dictionary<int, Point> { { 0, new Point(0, -1) }, { 1, new Point(1, 0) }, { 2, new Point(0, 1) }, { 3, new Point(-1, 0) } };
-
-                // Parse all needed GameObjects from the file
-                while (numberOfGameObjects > 0)
-                {
-                    int propIndex = binaryReader.ReadInt32();
-
-                    Point tileLocation = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
-
-                    ObjectTypes objectType = (ObjectTypes)binaryReader.ReadInt32();
-
-                    switch (objectType)
-                    {
-
-                        case ObjectTypes.Item:
-                            Door.DoorKeyType keyTypeItem = (Door.DoorKeyType)binaryReader.ReadInt32();
-
-                            Item newItemInRoom = new Item(
-                                tileLocation,
-                                AssetManager.PropTextures,
-                                propIndex,
-                                "TEMP_NAME",
-                                keyTypeItem
-                            );
-
-                            newItemInRoom.OnItemPickup += RemoveGameObject;
-                            _itemsInRoom.Add(newItemInRoom);
-                            break;
-                        case ObjectTypes.Camera:
-                            Point centerCastPoint = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
-                            float spread = (float)binaryReader.ReadDouble();
-                            Point wireBoxPoint = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
-
-                            Camera cam;
-                            if (wireBoxPoint != new Point(-1, -1))
-                                cam = new Camera(
-                                    tileLocation,
-                                    AssetManager.CameraTextures,
-                                    propIndex,
-                                    this,
-                                    centerCastPoint,
-                                    spread,
-                                    wireBoxPoint);
-                            else
-                                cam = new Camera(
-                                    tileLocation,
-                                    AssetManager.CameraTextures,
-                                    propIndex,
-                                    this,
-                                    centerCastPoint,
-                                    spread);
-                            _itemsInRoom.Add(cam);
-                            Cameras.Add(cam);
-                            break;
-                        case ObjectTypes.Box:
-                            _itemsInRoom.Add(new Box(tileLocation, AssetManager.Boxes, propIndex));
-                            break;
-                        case ObjectTypes.Door:
-                            Door.DoorKeyType keyTypeDoor = (Door.DoorKeyType)binaryReader.ReadInt32();
-
-                            // Parse a door from the file
-                            // Next three values correspond to the needed data
-                            Door doorFromFile = new Door(
-                                binaryReader.ReadInt32(),//Read destination room
-                                new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32()),// Read the destination point in the new room
-                                keyTypeDoor,
-                                tileLocation,
-                                AssetManager.DoorTexture,
-                                propIndex
-                            );
-                            // When this door is interacted with, transition the player
-                            doorFromFile.OnDoorInteract += TransitionPlayer;
-                            Doors.Add(doorFromFile);
-                            break;
-                    }
-
-                    numberOfGameObjects--;
-                }
-
-                //Define number of triggers in the room
-                int numberOfTriggers = binaryReader.ReadInt32();
-
-                //Parse all needed triggers from file
-                while (numberOfTriggers > 0)
-                {
-                    Point triggerPos = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
-                    int triggerWidth = binaryReader.ReadInt32();
-                    int triggerHeight = binaryReader.ReadInt32();
-
-                    TriggerTypes triggerType = (TriggerTypes)binaryReader.ReadInt32();
-
-                    if (triggerType == TriggerTypes.Checkpoint)
-                    {
-                        Checkpoint checkpoint = new Checkpoint(triggerPos, binaryReader.ReadInt32(), triggerWidth, triggerHeight, binaryReader.ReadBoolean());
-
-                        _triggersInRoom.Add(checkpoint);
-                        TriggerManager.AddCheckpoint(checkpoint);
-
-                        //If it's the first checkpoint, make that the player's spawn
-                        if (checkpoint.Index == 0)
+                        for (int tileXIndex = 0; tileXIndex < tileMapWidth; tileXIndex++)
                         {
-                            TriggerManager.SetPlayerSpawn(checkpoint);
+                            _map[tileXIndex, tileYIndex] = new Tile(
+                                binaryReader.ReadBoolean(),
+                                binaryReader.ReadInt32()
+                            );
                         }
                     }
-                    else if (triggerType == TriggerTypes.Win)
-                    {
-                        int itemIndex = binaryReader.ReadInt32();
-                        Win winTrigger = new Win(triggerPos, itemIndex, triggerWidth, triggerHeight);
-                        _triggersInRoom.Add(winTrigger);
-                    }
-                    numberOfTriggers--;
-                }
-            }
 
-            // }
-            // catch (Exception e)
-            // {
-            //     System.Diagnostics.Debug.Write(e.Message);
-            // }
+                    // Define the number of GameObjects in the room
+                    // Could be a door
+                    int numberOfGameObjects = binaryReader.ReadInt32();
+                    Dictionary<int, Point> direction = new Dictionary<int, Point> { { 0, new Point(0, -1) }, { 1, new Point(1, 0) }, { 2, new Point(0, 1) }, { 3, new Point(-1, 0) } };
+
+                    // Parse all needed GameObjects from the file
+                    while (numberOfGameObjects > 0)
+                    {
+                        int propIndex = binaryReader.ReadInt32();
+
+                        Point tileLocation = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
+
+                        ObjectTypes objectType = (ObjectTypes)binaryReader.ReadInt32();
+
+                        switch (objectType)
+                        {
+
+                            case ObjectTypes.Item:
+                                Door.DoorKeyType keyTypeItem = (Door.DoorKeyType)binaryReader.ReadInt32();
+
+                                Item newItemInRoom = new Item(
+                                    tileLocation,
+                                    AssetManager.PropTextures,
+                                    propIndex,
+                                    "TEMP_NAME",
+                                    keyTypeItem
+                                );
+
+                                newItemInRoom.OnItemPickup += RemoveGameObject;
+                                _itemsInRoom.Add(newItemInRoom);
+                                break;
+                            case ObjectTypes.Camera:
+                                Point centerCastPoint = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
+                                float spread = (float)binaryReader.ReadDouble();
+                                Point wireBoxPoint = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
+
+                                Camera cam;
+                                if (wireBoxPoint != new Point(-1, -1))
+                                    cam = new Camera(
+                                        tileLocation,
+                                        AssetManager.CameraTextures,
+                                        propIndex,
+                                        this,
+                                        centerCastPoint,
+                                        spread,
+                                        wireBoxPoint);
+                                else
+                                    cam = new Camera(
+                                        tileLocation,
+                                        AssetManager.CameraTextures,
+                                        propIndex,
+                                        this,
+                                        centerCastPoint,
+                                        spread);
+                                _itemsInRoom.Add(cam);
+                                Cameras.Add(cam);
+                                break;
+                            case ObjectTypes.Box:
+                                _itemsInRoom.Add(new Box(tileLocation, AssetManager.Boxes, propIndex));
+                                break;
+                            case ObjectTypes.Door:
+                                Door.DoorKeyType keyTypeDoor = (Door.DoorKeyType)binaryReader.ReadInt32();
+
+                                // Parse a door from the file
+                                // Next three values correspond to the needed data
+                                Door doorFromFile = new Door(
+                                    binaryReader.ReadInt32(),//Read destination room
+                                    new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32()),// Read the destination point in the new room
+                                    keyTypeDoor,
+                                    tileLocation,
+                                    AssetManager.DoorTexture,
+                                    propIndex
+                                );
+                                // When this door is interacted with, transition the player
+                                doorFromFile.OnDoorInteract += TransitionPlayer;
+                                Doors.Add(doorFromFile);
+                                break;
+                        }
+
+                        numberOfGameObjects--;
+                    }
+
+                    //Define number of triggers in the room
+                    int numberOfTriggers = binaryReader.ReadInt32();
+
+                    //Parse all needed triggers from file
+                    while (numberOfTriggers > 0)
+                    {
+                        Point triggerPos = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
+                        int triggerWidth = binaryReader.ReadInt32();
+                        int triggerHeight = binaryReader.ReadInt32();
+
+                        TriggerTypes triggerType = (TriggerTypes)binaryReader.ReadInt32();
+
+                        if (triggerType == TriggerTypes.Checkpoint)
+                        {
+                            Checkpoint checkpoint = new Checkpoint(triggerPos, binaryReader.ReadInt32(), triggerWidth, triggerHeight, binaryReader.ReadBoolean());
+
+                            _triggersInRoom.Add(checkpoint);
+                            TriggerManager.AddCheckpoint(checkpoint);
+
+                            //If it's the first checkpoint, make that the player's spawn
+                            if (checkpoint.Index == 0)
+                            {
+                                TriggerManager.SetPlayerSpawn(checkpoint);
+                            }
+                        }
+                        else if (triggerType == TriggerTypes.Win)
+                        {
+                            int itemIndex = binaryReader.ReadInt32();
+                            Win winTrigger = new Win(triggerPos, itemIndex, triggerWidth, triggerHeight);
+                            _triggersInRoom.Add(winTrigger);
+                        }
+
+                        numberOfTriggers--;
+                    }
+
+                    if (RoomName == "Room2")
+                    {
+                        _triggersInRoom.Add(new Win(new Point(1, 1), 0, 1, 1));
+                    }
+                }
+
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.Write(e.Message);
+            }
         }
 
         /// <summary>
@@ -488,6 +494,8 @@ namespace MakeEveryDayRecount.Map
         {
             foreach (Trigger trigger in _triggersInRoom)
             {
+                if (trigger is Checkpoint && !((Checkpoint)trigger).Active)
+                    continue;
                 if (playerPosition.X >= trigger.Location.X && playerPosition.X < trigger.Location.X + trigger.Width &&
                     playerPosition.Y >= trigger.Location.Y && playerPosition.Y < trigger.Location.Y + trigger.Height)
                     return trigger;
@@ -613,33 +621,53 @@ namespace MakeEveryDayRecount.Map
                 //Write out all the cameras
                 for (int i = 0; i < Cameras.Count; i++)
                 {
+                    Camera cam = Cameras[i];
                     //Standard game object parameters
-                    binaryWriter.Write(Cameras[i].SpriteIndex);
-                    binaryWriter.Write(Cameras[i].Location.X);
-                    binaryWriter.Write(Cameras[i].Location.Y);
+                    binaryWriter.Write(cam.SpriteIndex);
+                    binaryWriter.Write(cam.Location.X);
+                    binaryWriter.Write(cam.Location.Y);
                     binaryWriter.Write((int)ObjectTypes.Camera);
 
                     //Unique to cameras
-                    binaryWriter.Write(Cameras[i].CenterPoint.X);
-                    binaryWriter.Write(Cameras[i].CenterPoint.Y);
-                    binaryWriter.Write((double)Cameras[i].Spread);
+                    binaryWriter.Write(cam.CenterPoint.X);
+                    binaryWriter.Write(cam.CenterPoint.Y);
+                    binaryWriter.Write((double)cam.Spread);
+                    WireBox camWireBox = cam.WireBox;
+                    if (camWireBox == null)
+                    {
+                        binaryWriter.Write(-1);
+                        binaryWriter.Write(-1);
+                    }
+                    else
+                    {
+                        binaryWriter.Write(camWireBox.Location.X);
+                        binaryWriter.Write(camWireBox.Location.Y);
+                    }
+
                 }
 
                 //Write out all triggers
                 binaryWriter.Write(_triggersInRoom.Count);
                 for (int i = 0; i < _triggersInRoom.Count; i++)
                 {
-                    binaryWriter.Write(_triggersInRoom[i].Location.X);
-                    binaryWriter.Write(_triggersInRoom[i].Location.Y);
-                    binaryWriter.Write(_triggersInRoom[i].Width);
-                    binaryWriter.Write(_triggersInRoom[i].Height);
+                    Trigger trigger = _triggersInRoom[i];
 
+                    binaryWriter.Write(trigger.Location.X);
+                    binaryWriter.Write(trigger.Location.Y);
+                    binaryWriter.Write(trigger.Width);
+                    binaryWriter.Write(trigger.Height);
                     //If statements to determine trigger type
-                    if (_triggersInRoom[i] is Checkpoint)
+                    if (trigger is Checkpoint)
                     {
                         binaryWriter.Write((int)TriggerTypes.Checkpoint);
-                        binaryWriter.Write(((Checkpoint)_triggersInRoom[i]).Index);
-                        binaryWriter.Write(((Checkpoint)_triggersInRoom[i]).Active);
+                        binaryWriter.Write(((Checkpoint)trigger).Index);
+                        binaryWriter.Write(((Checkpoint)trigger).Active);
+                    }
+                    else if (trigger is Win)
+                    {
+                        binaryWriter.Write((int)TriggerTypes.Win);
+                        binaryWriter.Write(((Win)trigger).ItemIndex);
+
                     }
                 }
             }

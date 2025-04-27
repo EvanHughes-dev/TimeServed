@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Players;
 using MakeEveryDayRecount.GameObjects.Props;
 using System.IO;
+using System.Reflection.Metadata;
 
 namespace MakeEveryDayRecount.Managers
 {
@@ -26,6 +27,13 @@ namespace MakeEveryDayRecount.Managers
         /// The current level being played
         /// </summary>
         public static int Level { get; private set; }
+
+        private readonly static int _highestLevel = 2;
+
+        /// <summary>
+        /// Get the highest level for the game
+        /// </summary>
+        public static int HighestLevel { get => _highestLevel; }
 
         /// <summary>
         /// Access the reference to the Player
@@ -54,7 +62,7 @@ namespace MakeEveryDayRecount.Managers
             Level++;
             MapManager.ChangeLevel(Level);
             PlayerObject.ChangeRoom(TriggerManager.PlayerSpawn.Location);
-
+            PlayerObject.ClearStates();
             // Don't activate triggers if replay mode is active
             if (!ReplayManager.PlayingReplay)
                 TriggerManager.PlayerSpawn.Activate(PlayerObject);
@@ -99,7 +107,7 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static void ReplayMode()
         {
-            Level = 1;
+            Level = _highestLevel;
             MapManager.ChangeLevel(Level);
             PlayerObject.ChangeRoom(TriggerManager.PlayerSpawn.Location);
             PlayerObject.ClearStates();
@@ -114,8 +122,6 @@ namespace MakeEveryDayRecount.Managers
             //Delete saved data
             if (Directory.Exists("./CheckpointData"))
                 RecursiveDelete("./CheckpointData");
-            if (Directory.Exists("./PlayerData"))
-                RecursiveDelete("./PlayerData");
         }
 
         /// <summary>
@@ -123,7 +129,21 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static void PlayerWinTrigger()
         {
-            WinCondition?.Invoke();
+            if (ReplayManager.PlayingReplay)
+            {
+                if (Level != 1)
+                {
+                    Level--;
+                    ReplayManager.NextLevel();
+                    MapManager.ChangeLevel(Level);
+                    PlayerObject.ChangeRoom(TriggerManager.PlayerSpawn.Location);
+                    PlayerObject.ClearStates();
+                }
+            }
+            else
+            {
+                WinCondition?.Invoke();
+            }
         }
 
         /// <summary>

@@ -96,7 +96,7 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static void BeginReplay()
         {
-            _currentLevel = 1;
+            _currentLevel = GameplayManager.HighestLevel;
             LoadLevel(_currentLevel);
             PlayingReplay = true;
             CurrentReplayState = _currentReplyStates.Dequeue();
@@ -129,7 +129,7 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static void NextLevel()
         {
-            _currentLevel++;
+            _currentLevel--;
             LoadLevel(_currentLevel);
             CurrentReplayState = _currentReplyStates.Dequeue();
         }
@@ -181,6 +181,9 @@ namespace MakeEveryDayRecount.Managers
         /// <param name="folderPath">Folder to delete</param>
         private static void RecursiveDelete(string folderPath)
         {
+
+            if (!Directory.Exists(folderPath))
+                return;
 
             foreach (string file in Directory.GetFiles(folderPath))
                 File.Delete(file);

@@ -144,9 +144,7 @@ namespace MakeEveryDayRecount
                     break;
 
                 case GameState.Level:
-                    //TODO: On level end
-                    //_state = GameState.Cutscene;
-
+                    ReplayManager.SaveState((float)gameTime.ElapsedGameTime.TotalSeconds);
                     if (InputManager.GetKeyPress(Keys.Escape))
                     {
                         _state = GameState.Pause;
@@ -157,7 +155,7 @@ namespace MakeEveryDayRecount
                     }
                     GameplayManager.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
                     // Save the current state of the keyboard
-                    ReplayManager.SaveState((float)gameTime.ElapsedGameTime.TotalSeconds);
+
                     break;
 
                 case GameState.Cutscene:
@@ -190,11 +188,11 @@ namespace MakeEveryDayRecount
                         }
                         else if (!ReplayManager.NextFrame())
                         {
-                            _state = GameState.Menu;
-                            ReplayManager.EndReplay();
-                            InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.MainMenu;
-                            IsMouseVisible = false;
-                            break;
+                            if (GameplayManager.Level == 1)
+                            {
+                                EndReplay();
+                                break;
+                            }
                         }
 
                         InputManager.ReplayUpdate();
@@ -303,8 +301,15 @@ namespace MakeEveryDayRecount
         /// <param name="state">The state that should be applied when the delegate is called.</param>
         public void SwitchState(GameState state)
         {
+
+            if (_state == GameState.Playback && state == GameState.Menu)
+            {
+                EndReplay();
+            }
+
             if (state == GameState.Level)
             {
+
                 if (SoundManager.PlayingMusic)
                     SoundManager.ResumeBGM();
                 else
@@ -312,9 +317,16 @@ namespace MakeEveryDayRecount
             }
             else if (state == GameState.Cutscene)
             {
-                _currentElapsedTimeAnimation = 0f;
-                _currentAnimationIndex = 0;
-                _currentAnimation = AssetManager.LevelChanges[GameplayManager.Level];
+                if (AssetManager.LevelChanges.Length <= GameplayManager.Level)
+                {
+                    state = GameState.Playback;
+                }
+                else
+                {
+                    _currentElapsedTimeAnimation = 0f;
+                    _currentAnimationIndex = 0;
+                    _currentAnimation = AssetManager.LevelChanges[GameplayManager.Level - 1];
+                }
             }
             _state = state;
         }
@@ -335,5 +347,16 @@ namespace MakeEveryDayRecount
             return _replaySpeed;
         }
 
+        public void EndReplay()
+        {
+            _state = GameState.Menu;
+            ReplayManager.ClearSavedData();
+            GameplayManager.ClearSavedData();
+            MapManager.ClearMap();
+            InterfaceManager.CurrentMenu = InterfaceManager.MenuModes.MainMenu;
+            ReplayManager.EndReplay();
+
+            GameplayManager.Initialize(ScreenSize);
+        }
     }
 }
