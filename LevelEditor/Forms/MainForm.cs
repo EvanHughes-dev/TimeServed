@@ -215,7 +215,7 @@ namespace LevelEditor
                         FileIOHelpers.LoadItem("wireCutters.png",2, KeyType.None),
                         FileIOHelpers.LoadItem("hook.png",3, KeyType.None),
                         FileIOHelpers.LoadItem("hookAndRope.png",4, KeyType.None),
-                        FileIOHelpers.LoadBox("Box.png", 0),
+                        FileIOHelpers.LoadBox("prop_box.png", 0),
                         FileIOHelpers.LoadDoor("prop_door_locked_top.png", 0, KeyType.KeyCard),
                         FileIOHelpers.LoadDoor("prop_door_locked_right.png", 1, KeyType.KeyCard),
                         FileIOHelpers.LoadDoor("prop_door_locked_bottom.png", 2, KeyType.KeyCard),

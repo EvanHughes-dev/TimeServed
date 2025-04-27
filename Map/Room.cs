@@ -458,7 +458,7 @@ namespace MakeEveryDayRecount.Map
                 }
             }
 
-            if (pointToCheck.X < 0 || pointToCheck.X >= _map.GetLength(0) 
+            if (pointToCheck.X < 0 || pointToCheck.X >= _map.GetLength(0)
                 || pointToCheck.Y < 0 || pointToCheck.Y >= _map.GetLength(1))
             {
                 return false;
@@ -518,6 +518,7 @@ namespace MakeEveryDayRecount.Map
             }
             return null;
         }
+
 
         /// <summary>
         /// Remove an object from the room's inventory

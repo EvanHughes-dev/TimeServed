@@ -71,8 +71,11 @@ namespace MakeEveryDayRecount.GameObjects.Props
         public override void Interact(Player player)
         {
             if (_camera.SpriteIndex == 0 && player.ContainsItem(2))
+            {
                 _camera.Deactivate();
-            //TODO: This should make itself un-interactable after this function is called once
+                SpriteIndex = 3;
+                Sprite = AssetManager.CameraTextures[SpriteIndex];
+            }
         }
     }
 }
