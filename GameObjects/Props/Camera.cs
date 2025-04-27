@@ -399,7 +399,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         {
             sb.Draw(Sprite, new Rectangle(MapUtils.TileToWorld(Location) - worldToScreen + pixelOffset + AssetManager.HalfTileSize, AssetManager.TileSize), null, //no source rectangle
                 Color.White, _direction, new Point(Sprite.Width / 2, Sprite.Height / 2).ToVector2(), SpriteEffects.None, 0f); //Layer depth is not used
-            WireBox.Draw(sb, worldToScreen, pixelOffset);
+            WireBox?.Draw(sb, worldToScreen, pixelOffset);
             if (_active)
             {
                 foreach (Point tile in _watchedTiles)

@@ -99,7 +99,11 @@ namespace MakeEveryDayRecount.Map
         public List<Camera> Cameras { get; private set; }
         private List<Trigger> _triggersInRoom;
         public List<Door> Doors { get; private set; }
-        public List<WireBox> WireBoxes { get; private set; }
+
+        /// <summary>
+        /// Wire boxes in the room
+        /// </summary>
+        public List<WireBox> WireBoxes { get; set; }
 
         /// <summary>
         /// Size of current map
@@ -231,8 +235,8 @@ namespace MakeEveryDayRecount.Map
             // save the file path for debug uses
             FilePath = filePath;
 
-            try
-            {
+            //try
+            //{
                 using (BinaryReader binaryReader = new BinaryReader(File.OpenRead(filePath)))
                 {
                     /*
@@ -296,7 +300,7 @@ namespace MakeEveryDayRecount.Map
                     // Parse all needed GameObjects from the file
                     while (numberOfGameObjects > 0)
                     {
-                        int propIndex = binaryReader.ReadInt32();
+                        int propIndex = binaryReader.ReadInt32(); 
 
                         Point tileLocation = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
 
@@ -385,6 +389,7 @@ namespace MakeEveryDayRecount.Map
                         if (triggerType == TriggerTypes.Checkpoint)
                         {
                             Checkpoint checkpoint = new Checkpoint(triggerPos, binaryReader.ReadInt32(), triggerWidth, triggerHeight, binaryReader.ReadBoolean());
+                            checkpoint.RoomIndex = RoomIndex;
 
                             _triggersInRoom.Add(checkpoint);
                             TriggerManager.AddCheckpoint(checkpoint);
@@ -407,11 +412,11 @@ namespace MakeEveryDayRecount.Map
 
                 }
 
-            }
-            catch (Exception e)
-            {
-                System.Diagnostics.Debug.Write(e.Message);
-            }
+            //}
+            //catch (Exception e)
+            //{
+            //    System.Diagnostics.Debug.Write(e.Message);
+            //}
         }
 
         /// <summary>

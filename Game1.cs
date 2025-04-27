@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MakeEveryDayRecount.Managers;
+using System.Net.Security;
 
 namespace MakeEveryDayRecount
 {
@@ -74,7 +75,7 @@ namespace MakeEveryDayRecount
             //_graphics.PreferredBackBufferHeight = 360;
 
             _graphics.HardwareModeSwitch = false;
-            _graphics.IsFullScreen = true;
+            _graphics.IsFullScreen = false; //JTODO: Revert
             _graphics.ApplyChanges();
 
             _debugState = DebugState.None;
@@ -225,9 +226,18 @@ namespace MakeEveryDayRecount
                 case GameState.Level:
                     GameplayManager.Draw(_spriteBatch);
                     DisplayDebug();
+                    //If statement in order to display tutorial text
+                    if (GameplayManager.Level == 1)
+                    {
+                        if (MapManager.CurrentRoom.RoomName == "JRoom0")
+                        {
+                            //Press E or Mouse to interact, use Moue to select items from inventory
+                            _spriteBatch.DrawString(AssetManager.Arial20, "Press E or click to Interact.", new Vector2(150, 400), Color.White);
+                            _spriteBatch.DrawString(AssetManager.Arial20, "Use the mouse to select items \nfrom the inventory.", new Vector2(1350, 400), Color.White);
+                        }
+                    }
                     break;
                 case GameState.Pause:
-                    //TODO: Blur the gameplay in the background.
                     GameplayManager.Draw(_spriteBatch);
                     DisplayDebug();
                     break;

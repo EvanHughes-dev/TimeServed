@@ -4,6 +4,7 @@ using MakeEveryDayRecount.Players;
 using MakeEveryDayRecount.GameObjects.Props;
 using System.IO;
 using System.Reflection.Metadata;
+using MakeEveryDayRecount.Players.InventoryFiles;
 
 namespace MakeEveryDayRecount.Managers
 {
@@ -62,7 +63,9 @@ namespace MakeEveryDayRecount.Managers
             Level++;
             MapManager.ChangeLevel(Level);
             PlayerObject.ChangeRoom(TriggerManager.PlayerSpawn.Location);
+            MapManager.ChangeRoom(TriggerManager.PlayerSpawn.RoomIndex); 
             PlayerObject.ClearStates();
+            GiveItems(Level);
             // Don't activate triggers if replay mode is active
             if (!ReplayManager.PlayingReplay)
                 TriggerManager.PlayerSpawn.Activate(PlayerObject);
@@ -162,6 +165,19 @@ namespace MakeEveryDayRecount.Managers
             }
 
             Directory.Delete(folderPath);
+        }
+
+        /// <summary>
+        /// Gives items to the player based on their current level
+        /// </summary>
+        /// <param name="level"></param>
+        private static void GiveItems(int level)
+        {
+            PlayerObject.AddItemToInventory(new Item(Point.Zero, AssetManager.PropTextures, 0, "Card", Door.DoorKeyType.Card));
+            if (level < 3)
+                PlayerObject.AddItemToInventory(new Item(Point.Zero, AssetManager.PropTextures, 2, "Wirecutters", Door.DoorKeyType.None));
+            if (level < 2)
+                PlayerObject.AddItemToInventory(new Item(Point.Zero, AssetManager.PropTextures, 1, "Screwdriver", Door.DoorKeyType.Screwdriver));
         }
     }
 }

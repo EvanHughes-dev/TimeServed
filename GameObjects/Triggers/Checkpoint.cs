@@ -26,7 +26,7 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
         /// <summary>
         /// Index of the room this checkpoint is housed in
         /// </summary>
-        public int RoomIndex { get; private set; }
+        public int RoomIndex { get; set; }
 
         public static readonly string BaseFolder = "./CheckpointData";
 
