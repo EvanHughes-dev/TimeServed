@@ -99,7 +99,8 @@ namespace LevelEditor
 
             Triggers = new Trigger[]
             {
-                new Checkpoint(-1, null)
+                new Checkpoint(-1, null),
+                new WinTrigger(null!, null)
             };
 
             // In case LoadTiles creating a MessageBox, activating this window will ensure it still becomes
