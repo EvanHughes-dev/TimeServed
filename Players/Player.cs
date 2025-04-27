@@ -9,8 +9,6 @@ using MakeEveryDayRecount.Players.InventoryFiles;
 using MakeEveryDayRecount.GameObjects.Triggers;
 using System.IO;
 using System;
-using System.Diagnostics.Contracts;
-using System.Collections.Generic;
 
 
 namespace MakeEveryDayRecount.Players
