@@ -215,10 +215,18 @@ namespace LevelEditor
                         FileIOHelpers.LoadItem("hook.png",3, KeyType.None),
                         FileIOHelpers.LoadItem("hookAndRope.png",4, KeyType.None),
                         FileIOHelpers.LoadBox("Box.png", 0),
-                        FileIOHelpers.LoadDoor("Door-Top.png", 0, KeyType.KeyCard),
-                        FileIOHelpers.LoadDoor("Door-Right.png", 1, KeyType.KeyCard),
-                        FileIOHelpers.LoadDoor("Door-Bottom.png", 2, KeyType.KeyCard),
-                        FileIOHelpers.LoadDoor("Door-Left.png", 3, KeyType.KeyCard),
+                        FileIOHelpers.LoadDoor("prop_door_locked_top.png", 0, KeyType.KeyCard),
+                        FileIOHelpers.LoadDoor("prop_door_locked_right.png", 1, KeyType.KeyCard),
+                        FileIOHelpers.LoadDoor("prop_door_locked_bottom.png", 2, KeyType.KeyCard),
+                        FileIOHelpers.LoadDoor("prop_door_locked_left.png", 3, KeyType.KeyCard),
+                        FileIOHelpers.LoadDoor("prop_vent_top.png", 4, KeyType.Screwdriver),
+                        FileIOHelpers.LoadDoor("prop_vent_right.png", 5, KeyType.Screwdriver),
+                        FileIOHelpers.LoadDoor("prop_vent_bottom.png", 6, KeyType.Screwdriver),
+                        FileIOHelpers.LoadDoor("prop_vent_left.png", 7, KeyType.Screwdriver),
+                        FileIOHelpers.LoadDoor("Door-Top.png", 8, KeyType.None),
+                        FileIOHelpers.LoadDoor("Door-Right.png", 9, KeyType.None),
+                        FileIOHelpers.LoadDoor("Door-Bottom.png", 10, KeyType.None),
+                        FileIOHelpers.LoadDoor("Door-Left.png", 11, KeyType.None),
                         FileIOHelpers.LoadCamera("prop_cameraOn.png", 0)
                     ];
 
