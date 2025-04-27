@@ -360,6 +360,14 @@ namespace LevelEditor
 
                         checkpoint.Index = (int)checkpointIndex; // give it an index
                     }
+                    if (trigger is WinTrigger winTrigger) //if what we are making is a win trigger
+                    {
+                        Item? requiredItem = ItemInputForm.Prompt(_mainForm.Props);
+
+                        if (requiredItem == null) return;
+
+                        winTrigger.RequiredItem = (Item)requiredItem; // give it an item to look for
+                    }
 
                     Room.AddTrigger(trigger);
 

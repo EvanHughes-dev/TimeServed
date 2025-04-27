@@ -10,9 +10,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Update="Sprites\Props\Box.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="Sprites\Props\hook.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
