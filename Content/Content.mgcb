@@ -701,11 +701,7 @@
 #begin Levels/Level2/level.level
 /copy:Levels/Level2/level.level
 
-#begin Levels/Level2/Room1.room
-/copy:Levels/Level2/Room1.room
 
-#begin Levels/Level2/Room2.room
-/copy:Levels/Level2/Room2.room
 
 #begin Player/Inventory/InventoryBox_hover.png
 /importer:TextureImporter
@@ -1196,8 +1192,7 @@
 #begin Levels/Level1/level.level
 /copy:Levels/Level1/level.level
 
-#begin Levels/Level3/level.level
-/copy:Levels/Level3/level.level
 
-#begin Levels/Level3/maze.room
-/copy:Levels/Level3/maze.room
+
+#begin Levels/Level2/maze.room
+/copy:Levels/Level2/maze.room
