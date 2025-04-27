@@ -1184,3 +1184,9 @@
 /processorParam:TextureFormat=Color
 /build:UI/ui_cursorHover.png
 
+
+#begin Levels/Level1/JRoom3.room
+/copy:Levels/Level1/JRoom3.room
+
+#begin Levels/Level1/JRoom4.room
+/copy:Levels/Level1/JRoom4.room
