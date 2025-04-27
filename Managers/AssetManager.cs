@@ -185,7 +185,6 @@ namespace MakeEveryDayRecount.Managers
                 content.Load<Texture2D>("Doors/Door-Left")
             };
             TileSize = InterfaceManager.ScalePointUniform(new Point(TileMap[0].Width / 3, TileMap[0].Height / 3));
-            HalfTileSize = new Point(TileSize.X / 2, TileSize.Y / 2);
 
             //LOAD DEBUG ASSETS
             DebugWalkableTile = content.Load<Texture2D>("DebugAssets/WALKABLE");
