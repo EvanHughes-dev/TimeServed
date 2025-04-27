@@ -403,10 +403,6 @@ namespace MakeEveryDayRecount.Map
                         numberOfTriggers--;
                     }
 
-                    if (RoomName == "Room2")
-                    {
-                        _triggersInRoom.Add(new Win(new Point(1, 1), 0, 1, 1));
-                    }
                 }
 
             }
