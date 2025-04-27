@@ -98,8 +98,8 @@ namespace MakeEveryDayRecount.Map
         /// </summary>
         public List<Camera> Cameras { get; private set; }
         private List<Trigger> _triggersInRoom;
-        public List<Door> Doors
-        { get; private set; }
+        public List<Door> Doors { get; private set; }
+        public List<WireBox> WireBoxes { get; private set; }
 
         /// <summary>
         /// Size of current map
@@ -121,6 +121,8 @@ namespace MakeEveryDayRecount.Map
             _itemsInRoom = new List<Prop> { };
             _triggersInRoom = new List<Trigger> { };
             Cameras = new List<Camera>();
+            WireBoxes = new List<WireBox>();
+
             Doors = new List<Door> { };
             ParseData(filePath);
         }
@@ -451,6 +453,12 @@ namespace MakeEveryDayRecount.Map
                 }
             }
 
+            if (pointToCheck.X < 0 || pointToCheck.X >= _map.GetLength(0) 
+                || pointToCheck.Y < 0 || pointToCheck.Y >= _map.GetLength(1))
+            {
+                return false;
+            }
+
             return _map[pointToCheck.X, pointToCheck.Y].IsWalkable;
         }
 
@@ -476,6 +484,13 @@ namespace MakeEveryDayRecount.Map
                 if (playerFacing == door.Location)
                 {
                     return door;
+                }
+            }
+            foreach (WireBox box in WireBoxes)
+            {
+                if (playerFacing == box.Location)
+                {
+                    return box;
                 }
             }
             return null;
