@@ -462,7 +462,9 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //But I think this is fine for now. This function will be called but won't do anything
         }
 
-        //TODO: Ask Evan if making this method is efficent, or if I should use events/delegates instead?
+        /// <summary>
+        /// Deacrivate this camera and stop running all detection logic
+        /// </summary>
         public void Deactivate()
         {
             _active = false;

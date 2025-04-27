@@ -290,10 +290,5 @@ namespace MakeEveryDayRecount.Managers
 
         #endregion
 
-        public static string GetTileSpriteName(int roomIndex, Point tileLocation)
-        {
-            return _rooms[roomIndex].GetTileSpriteName(tileLocation);
-        }
-
     }
 }

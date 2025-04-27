@@ -677,6 +677,11 @@ namespace MakeEveryDayRecount.Map
             }
         }
 
+        /// <summary>
+        /// Get the name of the texture 2d for a tile
+        /// </summary>
+        /// <param name="tileLocation">Location of the tile</param>
+        /// <returns>Name of the texture 2d</returns>
         public string GetTileSpriteName(Point tileLocation)
         {
             return AssetManager.TileMap[_map[tileLocation.X, tileLocation.Y].SpriteIndex].Name;
