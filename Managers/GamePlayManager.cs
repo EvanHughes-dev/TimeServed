@@ -4,6 +4,7 @@ using MakeEveryDayRecount.Players;
 using MakeEveryDayRecount.GameObjects.Props;
 using System.IO;
 using System.Reflection.Metadata;
+using MakeEveryDayRecount.Players.InventoryFiles;
 
 namespace MakeEveryDayRecount.Managers
 {
@@ -63,6 +64,11 @@ namespace MakeEveryDayRecount.Managers
             MapManager.ChangeLevel(Level);
             PlayerObject.ChangeRoom(TriggerManager.PlayerSpawn.Location);
             PlayerObject.ClearStates();
+            //JTODO: This will eventually be a switch statement, hardcoding it for now
+            //There's probably a better place for this but its fine
+            PlayerObject.AddItemToInventory(new Item(Point.Zero, AssetManager.PropTextures, 0, "Card", Door.DoorKeyType.Card));
+            PlayerObject.AddItemToInventory(new Item(Point.Zero, AssetManager.PropTextures, 1, "Screwdriver", Door.DoorKeyType.Screwdriver));
+            PlayerObject.AddItemToInventory(new Item(Point.Zero, AssetManager.PropTextures, 2, "Wirecutters", Door.DoorKeyType.None));
             // Don't activate triggers if replay mode is active
             if (!ReplayManager.PlayingReplay)
                 TriggerManager.PlayerSpawn.Activate(PlayerObject);

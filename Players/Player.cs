@@ -629,5 +629,14 @@ namespace MakeEveryDayRecount.Players
             }
             return false;
         }
+
+        /// <summary>
+        /// Adds an item to the player's inventory
+        /// </summary>
+        /// <param name="item">Item to be added</param>
+        public void AddItemToInventory(Item item)
+        {
+            _inventory.AddItemToInventory(item);
+        }
     }
 }
