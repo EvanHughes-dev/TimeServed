@@ -115,7 +115,7 @@ namespace MakeEveryDayRecount.Managers
         /// <summary>
         /// The size of each tile divided by 2
         /// </summary>
-        public static Point HalfTileSize { get; private set; }
+        public static Point HalfTileSize => new Point(TileSize.X / 2, TileSize.Y / 2);
 
         public static void LoadContent(ContentManager content)
         {
