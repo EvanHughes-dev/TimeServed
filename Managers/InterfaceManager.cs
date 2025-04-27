@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using System;
 using System.Net.NetworkInformation;
+using MakeEveryDayRecount.Map;
 namespace MakeEveryDayRecount.Managers
 {
     delegate void GameStateChange(GameState gameState);
@@ -102,9 +103,15 @@ namespace MakeEveryDayRecount.Managers
 
                 Rectangle menuCheckPointRect = new Rectangle(IncrementScreenPos(drawPoint, 1, buttonSize.Y, buttonSpacing), buttonSize);
                 Button menuCheckPoint = new Button(menuCheckPointRect, AssetManager.DefaultButton, AssetManager.DefaultButton, true, "Checkpoints", font);
-                menuCheckPoint.OnClick += TriggerManager.LoadCheckpoint;
-                menuCheckPoint.OnClick += () => CurrentMenu = MenuModes.Level;
-                menuCheckPoint.OnClick += () => gameStateChange.Invoke(GameState.Level);
+                menuCheckPoint.OnClick += () =>
+                {
+                    if (TriggerManager.LoadCheckpoint())
+                    {
+                        CurrentMenu = MenuModes.Level;
+                        gameStateChange.Invoke(GameState.Level);
+                    }
+
+                };
                 buttons.Add(menuCheckPoint);
 
 
@@ -139,15 +146,12 @@ namespace MakeEveryDayRecount.Managers
             }
             {
                 int numberOfButtons = 1;
-                Point drawPoint = FindFirstPoint(buttonSize, screenSize, numberOfButtons, buttonSpacing);
+                Point drawPoint = FindFirstPoint(buttonSize, screenSize + new Point(0, MapUtils.ScreenCenter.Y), numberOfButtons, buttonSpacing);
 
                 Rectangle replayQuitRect = new Rectangle(IncrementScreenPos(drawPoint, 1, buttonSize.Y, buttonSpacing), buttonSize);
-                Button replayQuit = new Button(replayQuitRect, AssetManager.DefaultButton, AssetManager.DefaultButton, true, "Exit", font);
+                Button replayQuit = new Button(replayQuitRect, AssetManager.DefaultButton, AssetManager.DefaultButton, true, "Menu", font);
                 replayQuit.OnClick += () => gameStateChange.Invoke(GameState.Menu);
-                replayQuit.OnClick += () => CurrentMenu = MenuModes.MainMenu;
-                replayQuit.OnClick += GameplayManager.ClearSavedData;
-                replayQuit.OnClick += ReplayManager.ClearSavedData;
-                replayQuit.OnClick += ReplayManager.EndReplay;
+
 
                 Point bottomRightStartPoint = new Point(9 * screenSize.X / 10, 9 * screenSize.Y / 10);
                 Point replayButtonSize = ScalePointUniform(new Point(10, 10));

@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Managers;
 using MakeEveryDayRecount.GameObjects.Triggers;
+using System.ComponentModel.Design;
 
 namespace MakeEveryDayRecount.Map
 {
@@ -34,7 +35,8 @@ namespace MakeEveryDayRecount.Map
 
     public enum TriggerTypes
     {
-        Checkpoint = 0
+        Checkpoint = 0,
+        Win = 1
     }
 
     /// <summary>
@@ -317,7 +319,7 @@ namespace MakeEveryDayRecount.Map
                                 break;
                             case ObjectTypes.Camera:
                                 Point centerCastPoint = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
-
+                                float spread = (float)binaryReader.ReadDouble();
                                 Point wireBoxPoint = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
 
                                 Camera cam;
@@ -328,7 +330,7 @@ namespace MakeEveryDayRecount.Map
                                         propIndex,
                                         this,
                                         centerCastPoint,
-                                        (float)binaryReader.ReadDouble(),
+                                        spread,
                                         wireBoxPoint);
                                 else
                                     cam = new Camera(
@@ -337,7 +339,7 @@ namespace MakeEveryDayRecount.Map
                                         propIndex,
                                         this,
                                         centerCastPoint,
-                                        (float)binaryReader.ReadDouble());
+                                        spread);
                                 _itemsInRoom.Add(cam);
                                 Cameras.Add(cam);
                                 break;
@@ -381,19 +383,26 @@ namespace MakeEveryDayRecount.Map
                         if (triggerType == TriggerTypes.Checkpoint)
                         {
                             Checkpoint checkpoint = new Checkpoint(triggerPos, binaryReader.ReadInt32(), triggerWidth, triggerHeight, binaryReader.ReadBoolean());
-                            _triggersInRoom.Add(checkpoint);
 
-                            //Add it to the trigger manager if it's the first time its been added
-                            TriggerManager.AddUniqueCheckpoint(checkpoint);
+                            _triggersInRoom.Add(checkpoint);
+                            TriggerManager.AddCheckpoint(checkpoint);
 
                             //If it's the first checkpoint, make that the player's spawn
-                            if (TriggerManager.Checkpoints.Count == 1)
+                            if (checkpoint.Index == 0)
                             {
                                 TriggerManager.SetPlayerSpawn(checkpoint);
                             }
                         }
+                        else if (triggerType == TriggerTypes.Win)
+                        {
+                            int itemIndex = binaryReader.ReadInt32();
+                            Win winTrigger = new Win(triggerPos, itemIndex, triggerWidth, triggerHeight);
+                            _triggersInRoom.Add(winTrigger);
+                        }
+
                         numberOfTriggers--;
                     }
+
                 }
 
             }
@@ -481,6 +490,8 @@ namespace MakeEveryDayRecount.Map
         {
             foreach (Trigger trigger in _triggersInRoom)
             {
+                if (trigger is Checkpoint && !((Checkpoint)trigger).Active)
+                    continue;
                 if (playerPosition.X >= trigger.Location.X && playerPosition.X < trigger.Location.X + trigger.Width &&
                     playerPosition.Y >= trigger.Location.Y && playerPosition.Y < trigger.Location.Y + trigger.Height)
                     return trigger;
@@ -606,33 +617,53 @@ namespace MakeEveryDayRecount.Map
                 //Write out all the cameras
                 for (int i = 0; i < Cameras.Count; i++)
                 {
+                    Camera cam = Cameras[i];
                     //Standard game object parameters
-                    binaryWriter.Write(Cameras[i].SpriteIndex);
-                    binaryWriter.Write(Cameras[i].Location.X);
-                    binaryWriter.Write(Cameras[i].Location.Y);
+                    binaryWriter.Write(cam.SpriteIndex);
+                    binaryWriter.Write(cam.Location.X);
+                    binaryWriter.Write(cam.Location.Y);
                     binaryWriter.Write((int)ObjectTypes.Camera);
 
                     //Unique to cameras
-                    binaryWriter.Write(Cameras[i].CenterPoint.X);
-                    binaryWriter.Write(Cameras[i].CenterPoint.Y);
-                    binaryWriter.Write((double)Cameras[i].Spread);
+                    binaryWriter.Write(cam.CenterPoint.X);
+                    binaryWriter.Write(cam.CenterPoint.Y);
+                    binaryWriter.Write((double)cam.Spread);
+                    WireBox camWireBox = cam.WireBox;
+                    if (camWireBox == null)
+                    {
+                        binaryWriter.Write(-1);
+                        binaryWriter.Write(-1);
+                    }
+                    else
+                    {
+                        binaryWriter.Write(camWireBox.Location.X);
+                        binaryWriter.Write(camWireBox.Location.Y);
+                    }
+
                 }
 
                 //Write out all triggers
                 binaryWriter.Write(_triggersInRoom.Count);
                 for (int i = 0; i < _triggersInRoom.Count; i++)
                 {
-                    binaryWriter.Write(_triggersInRoom[i].Location.X);
-                    binaryWriter.Write(_triggersInRoom[i].Location.Y);
-                    binaryWriter.Write(_triggersInRoom[i].Width);
-                    binaryWriter.Write(_triggersInRoom[i].Height);
+                    Trigger trigger = _triggersInRoom[i];
 
+                    binaryWriter.Write(trigger.Location.X);
+                    binaryWriter.Write(trigger.Location.Y);
+                    binaryWriter.Write(trigger.Width);
+                    binaryWriter.Write(trigger.Height);
                     //If statements to determine trigger type
-                    if (_triggersInRoom[i] is Checkpoint)
+                    if (trigger is Checkpoint)
                     {
                         binaryWriter.Write((int)TriggerTypes.Checkpoint);
-                        binaryWriter.Write(((Checkpoint)_triggersInRoom[i]).Index);
-                        binaryWriter.Write(((Checkpoint)_triggersInRoom[i]).Active);
+                        binaryWriter.Write(((Checkpoint)trigger).Index);
+                        binaryWriter.Write(((Checkpoint)trigger).Active);
+                    }
+                    else if (trigger is Win)
+                    {
+                        binaryWriter.Write((int)TriggerTypes.Win);
+                        binaryWriter.Write(((Win)trigger).ItemIndex);
+
                     }
                 }
             }

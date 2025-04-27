@@ -1,11 +1,8 @@
-﻿using System;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
 using MakeEveryDayRecount.Players;
 using MakeEveryDayRecount.Managers;
 using System.IO;
-using System.Runtime.CompilerServices;
-using System.Reflection.Metadata;
+
 
 namespace MakeEveryDayRecount.GameObjects.Triggers
 {
@@ -53,7 +50,7 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
         /// Saves the map and player data
         /// </summary>
         /// <param name="player">The player object</param>
-        /// <returns>True if the checkpoint succesfully activated, false otherwise</returns>
+        /// <returns>True if the checkpoint successfully activated, false otherwise</returns>
         public override bool Activate(Player player)
         {
             // Don't use checkpoints if in replay mode.
@@ -67,8 +64,7 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
                     return false;
             if (!Active)
                 return false;
-            
-            string baseFolder = "./CheckpointData";
+
 
             //Deactivate the checkpoint, need to before it has saved the data
             Active = false;
@@ -95,11 +91,8 @@ namespace MakeEveryDayRecount.GameObjects.Triggers
                 binaryWriter.Write(Index);
             }
 
-
-
             //Update the current checkpoint
             TriggerManager.CurrentCheckpoint = this;
-            TriggerManager.UpdateCheckpoint(this);
 
             //Call the replay manager function
             ReplayManager.SaveData(GameplayManager.Level, Index);

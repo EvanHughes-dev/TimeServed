@@ -2,15 +2,13 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Players;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MakeEveryDayRecount.Managers;
 
 namespace MakeEveryDayRecount.GameObjects.Props
 {
+    /// <summary>
+    /// Wire box that can deactivate a camera
+    /// </summary>
     internal class WireBox : Prop
     {
         //Boxes need a direction just like the camera 
@@ -18,6 +16,14 @@ namespace MakeEveryDayRecount.GameObjects.Props
         private Camera _camera;
         private Point _drawOrigin;
 
+        /// <summary>
+        /// Create a wire box that is linked to a camera 
+        /// </summary>
+        /// <param name="location">Location of creation</param>
+        /// <param name="sprite">Sprite array to get the sprite from</param>
+        /// <param name="direction">Direction to face</param>
+        /// <param name="connectedCamera">Camera this is connected to</param>
+        /// <param name="spriteIndex">Index for the sprite</param>
         public WireBox(Point location, Texture2D[] sprite, float direction, Camera connectedCamera, int spriteIndex)
             : base(location, sprite, spriteIndex)
         {
@@ -26,12 +32,22 @@ namespace MakeEveryDayRecount.GameObjects.Props
             _drawOrigin = new Point(AssetManager.TileSize.X / 2, AssetManager.TileSize.Y / 2);
         }
 
+        /// <summary>
+        /// Draw this wire box
+        /// </summary>
+        /// <param name="sb">Sprite batch to draw with</param>
+        /// <param name="worldToScreen">Offset for the world position and screen position</param>
+        /// <param name="pixelOffset">Number of pixels to offset for map offset</param>
         public override void Draw(SpriteBatch sb, Point worldToScreen, Point pixelOffset)
         {
             sb.Draw(Sprite, new Rectangle(MapUtils.TileToWorld(Location) - worldToScreen + pixelOffset + _drawOrigin, AssetManager.TileSize), null, //no source rectangle
                 Color.White, _direction, _drawOrigin.ToVector2(), SpriteEffects.None, 0f);
         }
 
+        /// <summary>
+        /// Allow the player to interact with this item
+        /// </summary>
+        /// <param name="player">Player that interacted</param>
         public override void Interact(Player player)
         {
             _camera.Deactivate();
