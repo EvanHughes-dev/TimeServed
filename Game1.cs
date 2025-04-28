@@ -87,7 +87,7 @@ namespace MakeEveryDayRecount
             //_graphics.PreferredBackBufferHeight = 360;
 
             _graphics.HardwareModeSwitch = false;
-            _graphics.IsFullScreen = true;
+            _graphics.IsFullScreen = false; //JTODO: revert
             _graphics.ApplyChanges();
 
             _debugState = DebugState.None;
@@ -241,9 +241,12 @@ namespace MakeEveryDayRecount
                     {
                         if (MapManager.CurrentRoom.RoomName == "JRoom0")
                         {
-                            //Press E or Mouse to interact, use Moue to select items from inventory
-                            _spriteBatch.DrawString(AssetManager.Arial20, "Press E or click to Interact.", new Point(ScreenSize.X / 5, ScreenSize.Y / 4).ToVector2(), Color.White);
-                            _spriteBatch.DrawString(AssetManager.Arial20, "Use the mouse to select items \nfrom the inventory.", new Point(ScreenSize.X / 5, ScreenSize.Y / 2).ToVector2(), Color.White);
+                            _spriteBatch.DrawString(AssetManager.ArialFonts[InterfaceManager.FontIndex], "Press E or click to Interact.", 
+                                new Point(ScreenSize.X / 25, ScreenSize.Y / 4).ToVector2(), Color.White);
+
+                            _spriteBatch.DrawString(AssetManager.ArialFonts[InterfaceManager.FontIndex], 
+                                "Use the mouse to select items \nfrom the inventory.", new Point(ScreenSize.X / 25, ScreenSize.Y / 2).ToVector2(), 
+                                Color.White);
                         }
                     }
                     break;
