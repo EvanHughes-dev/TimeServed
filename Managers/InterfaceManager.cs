@@ -61,12 +61,15 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static float ScaleFactorY { get => _scaleFactorY; }
 
+        /// <summary>
+        /// Index of the font to use
+        /// </summary>
+        public static int FontIndex { get; private set; }
 
         /// <summary>
         /// Called to update the game state in Gam1
         /// </summary>
         public static event GameStateChange GameStateChange;
-
 
         /// <summary>
         /// Called to exit the game
@@ -109,8 +112,8 @@ namespace MakeEveryDayRecount.Managers
             _mouse = new UserMouse(screenSize.X / 64);
 
             Point buttonSize = ScalePoint(new Point(100, 25));
-            int fontIndex = ((int)ScaleFactorX) > AssetManager.ArialFonts.Length ? AssetManager.ArialFonts.Length - 1 : (int)ScaleFactorX;
-            SpriteFont font = AssetManager.ArialFonts[fontIndex];
+            FontIndex = ((int)ScaleFactorX) > AssetManager.ArialFonts.Length ? AssetManager.ArialFonts.Length - 1 : (int)ScaleFactorX;
+            SpriteFont font = AssetManager.ArialFonts[FontIndex];
 
             int buttonSpacing = buttonSize.Y / 4;
 
@@ -120,9 +123,12 @@ namespace MakeEveryDayRecount.Managers
                 Point drawPoint = FindFirstPoint(buttonSize, screenSize, numberOfButtons, buttonSpacing);
 
                 List<Button> buttons = new List<Button> { };
+                Point menuSize = ScalePointUniform(new Point(AssetManager.MenuButtons[3].Width * 4, AssetManager.MenuButtons[3].Height * 4));
+                Image title = new Image(new Point(screenSize.X/2- menuSize.X/2, screenSize.Y/5),
+                    menuSize, AssetManager.MenuButtons[3]);
 
                 Rectangle menuPlayRect = new Rectangle(drawPoint, buttonSize);
-                Button menuPlay = new Button(menuPlayRect, AssetManager.DefaultButton, AssetManager.DefaultButton, true, "Play", font);
+                Button menuPlay = new Button(menuPlayRect, AssetManager.MenuButtons[0], AssetManager.MenuButtons[0], true);
                 menuPlay.OnClick += GameplayManager.ClearSavedData;
                 menuPlay.OnClick += ReplayManager.ClearSavedData;
                 menuPlay.OnClick += GameplayManager.NextLevel;
@@ -130,11 +136,8 @@ namespace MakeEveryDayRecount.Managers
                 menuPlay.OnClick += () => CurrentMenu = MenuModes.Level;
                 buttons.Add(menuPlay);
 
-                Point titleOffset = AssetManager.TitleFont.MeasureString("TIME SERVED").ToPoint();
-                Text title = new Text(new Point(screenSize.X / 2 - titleOffset.X / 2, drawPoint.Y - titleOffset.Y * 3), Color.White, "TIME SERVED", AssetManager.TitleFont);
-
                 Rectangle menuCheckPointRect = new Rectangle(IncrementScreenPos(drawPoint, 1, buttonSize.Y, buttonSpacing), buttonSize);
-                Button menuCheckPoint = new Button(menuCheckPointRect, AssetManager.DefaultButton, AssetManager.DefaultButton, true, "Checkpoints", font);
+                Button menuCheckPoint = new Button(menuCheckPointRect, AssetManager.MenuButtons[1], AssetManager.MenuButtons[1], true);
                 menuCheckPoint.OnClick += () =>
                 {
                     if (TriggerManager.LoadCheckpoint())
@@ -148,23 +151,23 @@ namespace MakeEveryDayRecount.Managers
 
 
                 Rectangle menuQuitRect = new Rectangle(IncrementScreenPos(drawPoint, 2, buttonSize.Y, buttonSpacing), buttonSize);
-                Button menuQuit = new Button(menuQuitRect, AssetManager.DefaultButton, AssetManager.DefaultButton, true, "Exit", font);
+                Button menuQuit = new Button(menuQuitRect, AssetManager.MenuButtons[2], AssetManager.MenuButtons[2], true);
                 menuQuit.OnClick += () => ExitGame.Invoke();
                 buttons.Add(menuQuit);
 
-                _mainMenu = new Menu(null, buttons, new List<Text> { title });
+                _mainMenu = new Menu(null, new List<Image> { title }, buttons );
             }
             {
                 int numberOfButtons = 2;
                 Point drawPoint = FindFirstPoint(buttonSize, screenSize, numberOfButtons, buttonSpacing);
 
                 Rectangle pauseContinueRect = new Rectangle(drawPoint, buttonSize);
-                Button pauseContinue = new Button(pauseContinueRect, AssetManager.DefaultButton, AssetManager.DefaultButton, true, "Resume", font);
+                Button pauseContinue = new Button(pauseContinueRect, AssetManager.MenuButtons[0], AssetManager.MenuButtons[0], true);
                 pauseContinue.OnClick += () => GameStateChange.Invoke(GameState.Level);
                 pauseContinue.OnClick += () => CurrentMenu = MenuModes.Level;
 
                 Rectangle pauseQuitRect = new Rectangle(IncrementScreenPos(drawPoint, 1, buttonSize.Y, buttonSpacing), buttonSize);
-                Button pauseQuit = new Button(pauseQuitRect, AssetManager.DefaultButton, AssetManager.DefaultButton, true, "Exit", font);
+                Button pauseQuit = new Button(pauseQuitRect, AssetManager.MenuButtons[2], AssetManager.MenuButtons[2], true);
                 pauseQuit.OnClick += () => GameStateChange.Invoke(GameState.Menu);
                 pauseQuit.OnClick += () => CurrentMenu = MenuModes.MainMenu;
 
@@ -181,7 +184,7 @@ namespace MakeEveryDayRecount.Managers
                 Point drawPoint = FindFirstPoint(buttonSize, screenSize + new Point(0, MapUtils.ScreenCenter.Y), numberOfButtons, buttonSpacing);
 
                 Rectangle replayQuitRect = new Rectangle(IncrementScreenPos(drawPoint, 1, buttonSize.Y, buttonSpacing), buttonSize);
-                Button replayQuit = new Button(replayQuitRect, AssetManager.DefaultButton, AssetManager.DefaultButton, true, "Menu", font);
+                Button replayQuit = new Button(replayQuitRect, AssetManager.MenuButtons[2], AssetManager.MenuButtons[2], true);
                 replayQuit.OnClick += () => GameStateChange.Invoke(GameState.Menu);
 
 
@@ -190,7 +193,7 @@ namespace MakeEveryDayRecount.Managers
                 // Display the change in replay speed in the bottom right
                 // Decrease button left, current speed center, increase button right
                 Rectangle replaySpeedDecreaseRect = new Rectangle(bottomRightStartPoint, replayButtonSize);
-                Button replaySpeedDecrease = new Button(replaySpeedDecreaseRect, AssetManager.DefaultButton, AssetManager.DefaultButton, true, "<", font);
+                Button replaySpeedDecrease = new Button(replaySpeedDecreaseRect, AssetManager.MenuButtons[5], AssetManager.MenuButtons[5], true);
                 replaySpeedDecrease.OnClick += () => _replaySpeed = ReplaySpeedChange.Invoke(-1);
 
 
@@ -200,7 +203,7 @@ namespace MakeEveryDayRecount.Managers
 
                 bottomRightStartPoint += new Point(replayButtonSize.X, 0);
                 Rectangle replaySpeedIncreaseRect = new Rectangle(bottomRightStartPoint, replayButtonSize);
-                Button replaySpeedIncrease = new Button(replaySpeedIncreaseRect, AssetManager.DefaultButton, AssetManager.DefaultButton, true, ">", font);
+                Button replaySpeedIncrease = new Button(replaySpeedIncreaseRect, AssetManager.MenuButtons[4], AssetManager.MenuButtons[4], true);
                 replaySpeedIncrease.OnClick += () => _replaySpeed = ReplaySpeedChange.Invoke(1);
 
                 List<Button> buttons = new List<Button>

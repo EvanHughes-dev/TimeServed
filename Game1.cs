@@ -231,7 +231,6 @@ namespace MakeEveryDayRecount
             switch (_state)
             {
                 case GameState.Menu:
-                    // DrawMenu(_spriteBatch);
                     break;
                 case GameState.Level:
                     GameplayManager.Draw(_spriteBatch);
@@ -241,9 +240,12 @@ namespace MakeEveryDayRecount
                     {
                         if (MapManager.CurrentRoom.RoomName == "JRoom0")
                         {
-                            //Press E or Mouse to interact, use Moue to select items from inventory
-                            _spriteBatch.DrawString(AssetManager.Arial20, "Press E or click to Interact.", new Point(ScreenSize.X / 5, ScreenSize.Y / 4).ToVector2(), Color.White);
-                            _spriteBatch.DrawString(AssetManager.Arial20, "Use the mouse to select items \nfrom the inventory.", new Point(ScreenSize.X / 5, ScreenSize.Y / 2).ToVector2(), Color.White);
+                            _spriteBatch.DrawString(AssetManager.ArialFonts[InterfaceManager.FontIndex], "Press E or click to Interact.", 
+                                new Point(ScreenSize.X / 25, ScreenSize.Y / 4).ToVector2(), Color.White);
+
+                            _spriteBatch.DrawString(AssetManager.ArialFonts[InterfaceManager.FontIndex], 
+                                "Use the mouse to select items \nfrom the inventory.", new Point(ScreenSize.X / 25, ScreenSize.Y / 2).ToVector2(), 
+                                Color.White);
                         }
                     }
                     break;
@@ -364,6 +366,9 @@ namespace MakeEveryDayRecount
             return _replaySpeed;
         }
 
+        /// <summary>
+        /// Called to end all replays reset the level
+        /// </summary>
         public void EndReplay()
         {
             _state = GameState.Menu;

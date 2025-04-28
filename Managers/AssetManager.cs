@@ -77,6 +77,11 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static Texture2D[] CursorStates { get; private set; }
 
+        /// <summary>
+        /// Get all the buttons for the ui
+        /// </summary>
+        public static Texture2D[] MenuButtons { get; private set; }
+
         #endregion
 
         #region Prop Assets
@@ -225,6 +230,16 @@ namespace MakeEveryDayRecount.Managers
             {
                 content.Load<Texture2D>("UI/ui_cursor "), //DO NOT REMOVE THE SPACE
                 content.Load<Texture2D>("UI/ui_cursorHover")
+            };
+
+            MenuButtons = new Texture2D[]
+            {
+                content.Load<Texture2D>("UI/ui_button_play"), 
+                content.Load<Texture2D>("UI/ui_button_load"), 
+                content.Load<Texture2D>("UI/ui_button_exit"), 
+                content.Load<Texture2D>("UI/ui_title"), 
+                content.Load<Texture2D>("UI/ui_button_arrow"), 
+                content.Load<Texture2D>("UI/ui_button_arrow-left") 
             };
 
             //LOAD PROP ASSETS

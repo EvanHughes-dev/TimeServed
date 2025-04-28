@@ -90,6 +90,7 @@ namespace MakeEveryDayRecount.Players
         private Inventory _inventory;
 
         private Box _currentHeldBox;
+
         /// <summary>
         /// Get if the player is holing a box 
         /// </summary>
@@ -369,7 +370,8 @@ namespace MakeEveryDayRecount.Players
             //If there are more that are created this will turn into a larger if statement
             if (trigger != null && trigger.Activate(this) && trigger is Win)
             {
-                ReplayManager.SaveData(GameplayManager.Level, TriggerManager.CurrentCheckpoint.Index + 1);
+                if (!ReplayManager.PlayingReplay)
+                    ReplayManager.SaveData(GameplayManager.Level, TriggerManager.CurrentCheckpoint.Index + 1);
                 GameplayManager.PlayerWinTrigger();
             }
         }
@@ -508,6 +510,7 @@ namespace MakeEveryDayRecount.Players
         public void Detected()
         {
             //Reset the map to the last checkpoint
+
             TriggerManager.CurrentCheckpoint.LoadCheckpoint(this);
             ReplayManager.ClearData();
         }
