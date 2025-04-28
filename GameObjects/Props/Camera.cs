@@ -360,26 +360,29 @@ namespace MakeEveryDayRecount.GameObjects.Props
                     List<Point> isolatedTiles = new List<Point>();
                     foreach (Point watchedTile in _watchedTiles)
                     {
+                        Vector2 raybaseVector = new Vector2(_rayBase.X - watchedTile.X, _rayBase.Y - watchedTile.Y);
+                        if (raybaseVector.Length() > 2)
+                        {
+                            //But what if there are multiple boxes?
+                            int watchedNeighbors = 0;
+                            Point watchedNeighbor = watchedTile;
+                            //Left
+                            watchedNeighbor.X -= 1;
+                            if (_watchedTiles.Contains(watchedNeighbor) || !CameraRoom.VerifyWalkable(watchedNeighbor)) watchedNeighbors++;
+                            //Right
+                            watchedNeighbor.X += 2;
+                            if (_watchedTiles.Contains(watchedNeighbor) || !CameraRoom.VerifyWalkable(watchedNeighbor)) watchedNeighbors++;
+                            //Above
+                            watchedNeighbor.X -= 1;
+                            watchedNeighbor.Y -= 1;
+                            if (_watchedTiles.Contains(watchedNeighbor) || !CameraRoom.VerifyWalkable(watchedNeighbor)) watchedNeighbors++;
+                            //Below
+                            watchedNeighbor.Y += 2;
+                            if (_watchedTiles.Contains(watchedNeighbor) || !CameraRoom.VerifyWalkable(watchedNeighbor)) watchedNeighbors++;
 
-                        //But what if there are multiple boxes?
-                        int watchedNeighbors = 0;
-                        Point watchedNeighbor = watchedTile;
-                        //Left
-                        watchedNeighbor.X -= 1;
-                        if (_watchedTiles.Contains(watchedNeighbor) || !CameraRoom.VerifyWalkable(watchedNeighbor)) watchedNeighbors++;
-                        //Right
-                        watchedNeighbor.X += 2;
-                        if (_watchedTiles.Contains(watchedNeighbor) || !CameraRoom.VerifyWalkable(watchedNeighbor)) watchedNeighbors++;
-                        //Above
-                        watchedNeighbor.X -= 1;
-                        watchedNeighbor.Y -= 1;
-                        if (_watchedTiles.Contains(watchedNeighbor) || !CameraRoom.VerifyWalkable(watchedNeighbor)) watchedNeighbors++;
-                        //Below
-                        watchedNeighbor.Y += 2;
-                        if (_watchedTiles.Contains(watchedNeighbor) || !CameraRoom.VerifyWalkable(watchedNeighbor)) watchedNeighbors++;
-
-                        //If the tile has one watched neighbor or less, then remove it
-                        if (watchedNeighbors <= 1) isolatedTiles.Add(watchedTile);
+                            //If the tile has one watched neighbor or less, then remove it
+                            if (watchedNeighbors <= 1) isolatedTiles.Add(watchedTile);
+                        }
                     }
                     //Now remove them all at once
                     foreach (Point p in isolatedTiles) _watchedTiles.Remove(p);

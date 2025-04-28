@@ -61,7 +61,7 @@ namespace MakeEveryDayRecount
         private BaseDebug[] _debugModes;
 
         private int _replaySpeed;
-        private const int MaxReplaySpeed = 5;
+        private const int MaxReplaySpeed = 10;
         private int _currentAnimationIndex;
         private const float SecondsPerAnimationFrame = .2f;
         private float _currentElapsedTimeAnimation;
@@ -334,7 +334,7 @@ namespace MakeEveryDayRecount
 
             if (state == GameState.Cutscene)
             {
-                if (AssetManager.LevelChanges.Length <= GameplayManager.Level)
+                if (AssetManager.LevelChanges.Length < GameplayManager.Level)
                 {
                     state = GameState.Playback;
                 }

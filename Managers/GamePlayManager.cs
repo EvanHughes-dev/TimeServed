@@ -29,7 +29,7 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static int Level { get; private set; }
 
-        private readonly static int _highestLevel = 2;
+        private readonly static int _highestLevel = 3;
 
         /// <summary>
         /// Get the highest level for the game

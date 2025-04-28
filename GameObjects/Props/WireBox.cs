@@ -33,13 +33,13 @@ namespace MakeEveryDayRecount.GameObjects.Props
                     _direction = MathHelper.PiOver2;
                     break;
                 case "bottom":
-                    _direction = 0f;
+                    _direction = MathHelper.Pi;
                     break;
                 case "left":
                     _direction = MathHelper.PiOver2 * 3;
                     break;
                 case "top":
-                    _direction = MathHelper.Pi;
+                    _direction = 0f;
                     break;
                 default:
                     _direction = 0f;
