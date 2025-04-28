@@ -732,12 +732,6 @@
 #begin Levels/Level1/level.level
 /copy:Levels/Level1/level.level
 
-#begin Levels/Level1/Room1.room
-/copy:Levels/Level1/Room1.room
-
-#begin Levels/Level1/Room2.room
-/copy:Levels/Level1/Room2.room
-
 #begin Levels/Level2/level.level
 /copy:Levels/Level2/level.level
 
