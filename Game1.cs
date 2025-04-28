@@ -231,7 +231,6 @@ namespace MakeEveryDayRecount
             switch (_state)
             {
                 case GameState.Menu:
-                    // DrawMenu(_spriteBatch);
                     break;
                 case GameState.Level:
                     GameplayManager.Draw(_spriteBatch);
@@ -367,6 +366,9 @@ namespace MakeEveryDayRecount
             return _replaySpeed;
         }
 
+        /// <summary>
+        /// Called to end all replays reset the level
+        /// </summary>
         public void EndReplay()
         {
             _state = GameState.Menu;

@@ -90,6 +90,7 @@ namespace MakeEveryDayRecount.Players
         private Inventory _inventory;
 
         private Box _currentHeldBox;
+
         /// <summary>
         /// Get if the player is holing a box 
         /// </summary>
@@ -508,6 +509,7 @@ namespace MakeEveryDayRecount.Players
         public void Detected()
         {
             //Reset the map to the last checkpoint
+            if
             TriggerManager.CurrentCheckpoint.LoadCheckpoint(this);
             ReplayManager.ClearData();
         }
