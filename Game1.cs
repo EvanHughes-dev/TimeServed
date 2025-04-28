@@ -87,7 +87,7 @@ namespace MakeEveryDayRecount
             //_graphics.PreferredBackBufferHeight = 360;
 
             _graphics.HardwareModeSwitch = false;
-            _graphics.IsFullScreen = false; //JTODO: revert
+            _graphics.IsFullScreen = true;
             _graphics.ApplyChanges();
 
             _debugState = DebugState.None;
