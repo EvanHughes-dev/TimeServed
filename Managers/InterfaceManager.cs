@@ -61,12 +61,15 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static float ScaleFactorY { get => _scaleFactorY; }
 
+        /// <summary>
+        /// Index of the font to use
+        /// </summary>
+        public static int FontIndex { get; private set; }
 
         /// <summary>
         /// Called to update the game state in Gam1
         /// </summary>
         public static event GameStateChange GameStateChange;
-
 
         /// <summary>
         /// Called to exit the game
@@ -109,8 +112,8 @@ namespace MakeEveryDayRecount.Managers
             _mouse = new UserMouse(screenSize.X / 64);
 
             Point buttonSize = ScalePoint(new Point(100, 25));
-            int fontIndex = ((int)ScaleFactorX) > AssetManager.ArialFonts.Length ? AssetManager.ArialFonts.Length - 1 : (int)ScaleFactorX;
-            SpriteFont font = AssetManager.ArialFonts[fontIndex];
+            FontIndex = ((int)ScaleFactorX) > AssetManager.ArialFonts.Length ? AssetManager.ArialFonts.Length - 1 : (int)ScaleFactorX;
+            SpriteFont font = AssetManager.ArialFonts[FontIndex];
 
             int buttonSpacing = buttonSize.Y / 4;
 
