@@ -509,7 +509,6 @@ namespace MakeEveryDayRecount.Players
         public void Detected()
         {
             //Reset the map to the last checkpoint
-            if
             TriggerManager.CurrentCheckpoint.LoadCheckpoint(this);
             ReplayManager.ClearData();
         }
