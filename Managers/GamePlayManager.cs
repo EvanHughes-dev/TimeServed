@@ -87,12 +87,6 @@ namespace MakeEveryDayRecount.Managers
         {
             //Update Player
             PlayerObject.Update(gameTime);
-
-            //Update all the cameras in the current room
-            foreach (Camera cam in MapManager.CurrentRoom.Cameras)
-            {
-                cam.Update(gameTime);
-            }
         }
 
         /// <summary>

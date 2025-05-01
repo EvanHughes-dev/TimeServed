@@ -294,15 +294,6 @@ namespace MakeEveryDayRecount.GameObjects.Props
         }
 
         /// <summary>
-        /// Update what tiles are being watched and if the player is in any of them
-        /// </summary>
-        /// <param name="deltaTime">Time since last frame</param>
-        public void Update(float deltaTime)
-        {
-
-        }
-
-        /// <summary>
         /// Update which tiles are watched
         /// </summary>
         private void UpdateTrackedTiles()
