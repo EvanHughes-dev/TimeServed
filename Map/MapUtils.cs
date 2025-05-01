@@ -84,6 +84,26 @@ namespace MakeEveryDayRecount.Map
             }
         }
 
+        /// <summary>
+        /// Get the point to offset between screen and world positions assuming the map
+        /// is larger than the size of the screen. To compensate for any needed offset,
+        /// add the PixelOffset value. This value should be subtracted from the target's 
+        /// world position
+        /// </summary>
+        public static Point WorldToScreen
+        {
+            get; private set;
+        }
+
+        /// <summary>
+        /// Get the number of pixel the map needs to be offset by due to the map
+        /// being smaller than the size of the screen
+        /// </summary>
+        public static Point PixelOffset
+        {
+            get; private set;
+        }
+
         #endregion
 
         #region Utility Functions
@@ -97,6 +117,8 @@ namespace MakeEveryDayRecount.Map
             return TileToWorld(tilePosition.X, tilePosition.Y);
         }
 
+
+
         /// <summary>
         /// Convert an a position from tile space to world space
         /// </summary>
@@ -109,26 +131,45 @@ namespace MakeEveryDayRecount.Map
         }
 
         /// <summary>
+        /// Calculate the location of a tile in screen space
+        /// </summary>
+        /// <param name="tileLocation">Tile location to translate</param>
+        /// <returns>Point of the tile in screen space</returns>
+        public static Point TileToScreen(Point tileLocation)
+        {
+            return TileToWorld(tileLocation) - WorldToScreen + PixelOffset;
+        }
+
+        /// <summary>
+        /// Calculate the location of a tile in screen space
+        /// </summary>
+        /// <param name="xPos">X position in tile space</param>
+        /// <param name="yPos">Y position in tile space</param>
+        /// <returns>Point of the tile in screen space</returns>
+        public static Point TileToScreen(int xPos, int yPos)
+        {
+            return TileToWorld(xPos, yPos) - WorldToScreen + PixelOffset;
+        }
+
+        /// <summary>
         /// Get the point to offset between screen and world positions assuming the map
         /// is larger than the size of the screen. To compensate for any needed offset,
         /// add the PixelOffset value
         /// </summary>
-        /// <returns>Point that corresponds to the distance between world and screen pos</returns>
-        public static Point WorldToScreen()
+        private static void CalculateWorldToScreen()
         {
-            Point worldToScreen = _currentPlayer.PlayerWorldPosition - ScreenCenter;
+            Point worldToScreen = TileToWorld(_currentPlayer.Location) - ScreenCenter;
             // Clamp the screen's position so only tiles will be displayed without any empty space
-            return new Point(
-                MathHelper.Clamp(worldToScreen.X, 0, MapSizePixels.X - ScreenSize.X),
-                MathHelper.Clamp(worldToScreen.Y, 0, MapSizePixels.Y - ScreenSize.Y)
-            );
+            WorldToScreen = new Point(
+                 MathHelper.Clamp(worldToScreen.X, 0, MapSizePixels.X - ScreenSize.X),
+                 MathHelper.Clamp(worldToScreen.Y, 0, MapSizePixels.Y - ScreenSize.Y)
+             );
         }
 
         /// <summary>
         /// Calculate the difference between the size of the map and size of the screen
         /// </summary>
-        /// <returns>Point which hold the X and Y axis differences</returns>
-        public static Point PixelOffset()
+        private static void CalculatePixelOffset()
         {
             Point offset = Point.Zero;
             if (ScreenSize.X > MapSizePixels.X)
@@ -136,7 +177,7 @@ namespace MakeEveryDayRecount.Map
 
             if (ScreenSize.Y > MapSizePixels.Y)
                 offset.Y = (ScreenSize.Y - MapSizePixels.Y) / 2;
-            return offset;
+            PixelOffset = offset;
         }
 
         /// <summary>
@@ -148,8 +189,7 @@ namespace MakeEveryDayRecount.Map
         {
             if (MapManager.CurrentRoom == null)
                 return Point.Zero;
-            Point worldToScreen = WorldToScreen();
-            Point screenToWorld = new Point(screenPos.X + worldToScreen.X, screenPos.Y + worldToScreen.Y) - PixelOffset();
+            Point screenToWorld = new Point(screenPos.X + WorldToScreen.X, screenPos.Y + WorldToScreen.Y) - PixelOffset;
 
             return new Point(screenToWorld.X / AssetManager.TileSize.X, screenToWorld.Y / AssetManager.TileSize.Y);
         }
@@ -188,6 +228,16 @@ namespace MakeEveryDayRecount.Map
             // memory before the function is added to the event, so get the initial value manually
             _currentPlayer = GameplayManager.PlayerObject;
             _currentRoom = MapManager.CurrentRoom;
+        }
+
+        /// <summary>
+        /// Update all the values that will not change during the draw phase. Call
+        /// this function last in the update function to ensure accurate calculations
+        /// </summary>
+        public static void UpdateValues()
+        {
+            CalculateWorldToScreen();
+            CalculatePixelOffset();
         }
     }
 }

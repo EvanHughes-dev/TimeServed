@@ -219,12 +219,8 @@ namespace MakeEveryDayRecount.Players
                     MapManager.CheckPlayerCollision(Location + movement) &&
                     (!HoldingBox || MapManager.CheckPlayerCollision(_currentHeldBox.Location + movement)))
                 {
-                    _readyToMove = false;
-                    Location += movement;
+                    MovePlayer(movement);
 
-                    SoundManager.PlaySFX(SoundManager.PlayerStepSound, -40, 40);
-
-                    UpdateAnimation(true);
                 }
                 else //Player can't move where they want to 
                 {
@@ -242,13 +238,8 @@ namespace MakeEveryDayRecount.Players
                     (!HoldingBox || MapManager.CheckPlayerCollision(_currentHeldBox.Location + movement)))
                     {
                         _readyToMove = false;
-                        Location += movement;
-                        if (_playerState != PlayerState.Walking)
-                            _playerState = PlayerState.Walking;
+                        MovePlayer(movement);
 
-                        SoundManager.PlaySFX(SoundManager.PlayerStepSound, -40, 40);
-
-                        UpdateAnimation(true);
                         _standingSeconds = 0;
                     }
                     else
@@ -270,6 +261,27 @@ namespace MakeEveryDayRecount.Players
                 }
 
             }
+        }
+
+        /// <summary>
+        /// Move the player in the imputed direction and play sfx
+        /// </summary>
+        /// <param name="direction"></param>
+        private void MovePlayer(Point direction)
+        {
+            Location += direction;
+            // Let the tile know that the player has entered
+            MapManager.CurrentRoom.GetTile(Location).PlayerEnter();
+            if (_playerState != PlayerState.Walking)
+                _playerState = PlayerState.Walking;
+
+            SoundManager.PlaySFX(SoundManager.PlayerStepSound, -40, 40);
+
+
+            _readyToMove = false;
+            UpdateAnimation(true);
+            _currentHeldBox?.UpdatePosition(Location);
+
         }
 
         /// <summary>
@@ -346,10 +358,7 @@ namespace MakeEveryDayRecount.Players
         /// </summary>
         private void UpdatePlayerPos()
         {
-            PlayerWorldPosition = MapUtils.TileToWorld(Location);
-
-            Point worldToScreen = MapUtils.WorldToScreen();
-            PlayerScreenPosition = PlayerWorldPosition - worldToScreen + MapUtils.PixelOffset();
+            PlayerScreenPosition = MapUtils.TileToScreen(Location);
             _currentHeldBox?.UpdatePosition(Location);
         }
 
@@ -609,7 +618,7 @@ namespace MakeEveryDayRecount.Players
                         int spriteIndex = binaryReader.ReadInt32();
                         int keyType = binaryReader.ReadInt32();
 
-                        _inventory.AddItemToInventory(new Item(Point.Zero, AssetManager.PropTextures, spriteIndex, "TEMP_NAME", (Door.DoorKeyType)keyType));
+                        _inventory.AddItemToInventory(new Item(Point.Zero, AssetManager.PropTextures, spriteIndex, (Door.DoorKeyType)keyType));
                     }
                 }
             }

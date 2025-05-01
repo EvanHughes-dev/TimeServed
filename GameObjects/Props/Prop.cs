@@ -30,12 +30,9 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// Allow props to draw themselves
         /// </summary>
         /// <param name="sb">Spritebatch to draw with</param>
-        /// <param name="worldToScreen">Pixel offset between the world position and screen position</param>
-        /// <param name="pixelOffset">Pixel offset between the map in the world and on the screen</param>
-        public virtual void Draw(SpriteBatch sb, Point worldToScreen, Point pixelOffset)
+        public virtual void Draw(SpriteBatch sb)
         {
-            sb.Draw(Sprite, new Rectangle(MapUtils.TileToWorld(Location) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.White);
-
+            sb.Draw(Sprite, new Rectangle(MapUtils.TileToScreen(Location), AssetManager.TileSize), Color.White);
         }
     }
 }

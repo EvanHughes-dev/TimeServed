@@ -8,7 +8,6 @@ using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Managers;
 using MakeEveryDayRecount.GameObjects.Triggers;
 
-
 namespace MakeEveryDayRecount.Map
 {
     /// <summary>
@@ -72,53 +71,19 @@ namespace MakeEveryDayRecount.Map
         /// </summary>
         public string RoomName { get; private set; }
 
-        /// <summary>
-        /// Get the number of items in the current room
-        /// </summary>
-        public int ItemCount
-        {
-            get => _itemsInRoom.Count;
-        }
-        private Tile[,] _map;
-        private List<Prop> _itemsInRoom;
-        /// <summary>
-        /// A public property for the items in this room.
-        /// You can only add items to the room through this property, you can't remove them
-        /// This property references a private list, so you can't directly use its methods
-        /// </summary>
-        public List<Prop> ItemsInRoom
-        {
-            get { return _itemsInRoom; }
-            set
-            {
-                if (value.Count > _itemsInRoom.Count)
-                {
-                    _itemsInRoom = value;
-                }
-            }
-        }
+        private TileMap _map;
+
 
         /// <summary>
         /// Get the list of cameras in the room
         /// </summary>
         public List<Camera> Cameras { get; private set; }
 
-        /// <summary>
-        /// Get all the doors in the room
-        /// </summary>
-        public List<Door> Doors { get; private set; }
-
-        /// <summary>
-        /// Wire boxes in the room
-        /// </summary>
-        public List<WireBox> WireBoxes { get; set; }
 
         /// <summary>
         /// Size of current map
         /// </summary>
         public Point MapSize { get; private set; }
-
-        private List<Trigger> _triggersInRoom;
 
         /// <summary>
         /// Establish the room object
@@ -131,13 +96,10 @@ namespace MakeEveryDayRecount.Map
             RoomIndex = roomIndex;
             RoomName = roomName;
 
-            _map = new Tile[,] { };
-            _itemsInRoom = new List<Prop> { };
-            _triggersInRoom = new List<Trigger> { };
-            Cameras = new List<Camera>();
-            WireBoxes = new List<WireBox>();
+            _map = new TileMap();
 
-            Doors = new List<Door> { };
+            Cameras = new List<Camera>();
+
             ParseData(filePath);
         }
 
@@ -157,7 +119,7 @@ namespace MakeEveryDayRecount.Map
             * Doors (type of GameObject)
             */
 
-            Point worldToScreen = MapUtils.WorldToScreen();
+            Point worldToScreen = MapUtils.WorldToScreen;
 
             Point TileSize = AssetManager.TileSize;
 
@@ -170,63 +132,19 @@ namespace MakeEveryDayRecount.Map
             int screenMaxX = (worldToScreen.X + MapUtils.ScreenSize.X) / TileSize.X;
             int screenMaxY = (worldToScreen.Y + MapUtils.ScreenSize.Y) / TileSize.Y;
 
-            Point pixelOffset = MapUtils.PixelOffset();
-
             // Display all tiles that are on screen by looping between the screenMin and screenMax on each axis
             for (int xTile = screenMinX; xTile <= screenMaxX; xTile++)
             {
                 for (int yTile = screenMinY; yTile <= screenMaxY; yTile++)
                 {
-                    if (xTile >= _map.GetLength(0) || yTile >= _map.GetLength(1) || xTile < 0 || yTile < 0)
+                    if (!_map.WithinBounds(xTile, yTile))
                         continue;
-                    Tile currentTile = _map[xTile, yTile];
-                    Point screenPos =
-                        MapUtils.TileToWorld(xTile, yTile) - worldToScreen + pixelOffset;
-                    sb.Draw(
-                        AssetManager.TileMap[currentTile.SpriteIndex],
-                        new Rectangle(screenPos, TileSize),
-                        Color.White
-                    );
+                    Tile currentTile = _map[yTile, xTile];
+
+                    currentTile.Draw(sb);
                 }
             }
 
-            // Display all GameObjects on screen
-            foreach (Prop propToDraw in _itemsInRoom)
-            {
-                Point propPosition = propToDraw.Location;
-                if (propToDraw is Camera)
-                    continue;
-                if (
-                    propPosition.X >= screenMinX
-                    && propPosition.X <= screenMaxX
-                    && propPosition.Y >= screenMinY
-                    && propPosition.Y <= screenMaxY
-                )
-                {
-                    propToDraw.Draw(sb, worldToScreen, pixelOffset);
-                }
-            }
-
-            // Display all doors
-            foreach (Door doorToDraw in Doors)
-            {
-                Point propPosition = doorToDraw.Location;
-
-                if (
-                    propPosition.X >= screenMinX
-                    && propPosition.X <= screenMaxX
-                    && propPosition.Y >= screenMinY
-                    && propPosition.Y <= screenMaxY
-                )
-                {
-                    doorToDraw.Draw(sb, worldToScreen, pixelOffset);
-                }
-            }
-
-            foreach (Camera cam in Cameras)
-            {
-                cam.Draw(sb, worldToScreen, pixelOffset);
-            }
         }
 
         #endregion
@@ -289,15 +207,17 @@ namespace MakeEveryDayRecount.Map
                     int tileMapWidth = binaryReader.ReadInt32();
                     int tileMapHeight = binaryReader.ReadInt32();
 
-                    _map = new Tile[tileMapWidth, tileMapHeight];
+                    _map = new TileMap(tileMapWidth, tileMapHeight);
                     MapSize = new Point(tileMapWidth, tileMapHeight);
+
                     for (int tileYIndex = 0; tileYIndex < tileMapHeight; tileYIndex++)
                     {
                         for (int tileXIndex = 0; tileXIndex < tileMapWidth; tileXIndex++)
                         {
-                            _map[tileXIndex, tileYIndex] = new Tile(
+                            _map[tileYIndex, tileXIndex] = new Tile(
                                 binaryReader.ReadBoolean(),
-                                binaryReader.ReadInt32()
+                                binaryReader.ReadInt32(),
+                                new Point(tileXIndex, tileYIndex)
                             );
                         }
                     }
@@ -315,7 +235,7 @@ namespace MakeEveryDayRecount.Map
                         Point tileLocation = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
 
                         ObjectTypes objectType = (ObjectTypes)binaryReader.ReadInt32();
-
+                        Prop newProp = null;
                         switch (objectType)
                         {
 
@@ -326,12 +246,11 @@ namespace MakeEveryDayRecount.Map
                                     tileLocation,
                                     AssetManager.PropTextures,
                                     propIndex,
-                                    "TEMP_NAME",
                                     keyTypeItem
                                 );
 
                                 newItemInRoom.OnItemPickup += RemoveGameObject;
-                                _itemsInRoom.Add(newItemInRoom);
+                                newProp = newItemInRoom;
                                 break;
                             case ObjectTypes.Camera:
                                 Point centerCastPoint = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
@@ -356,11 +275,12 @@ namespace MakeEveryDayRecount.Map
                                         this,
                                         centerCastPoint,
                                         spread);
-                                _itemsInRoom.Add(cam);
                                 Cameras.Add(cam);
+                                newProp = cam;
+
                                 break;
                             case ObjectTypes.Box:
-                                _itemsInRoom.Add(new Box(tileLocation, AssetManager.Boxes, propIndex));
+                                newProp = new Box(tileLocation, AssetManager.Boxes, propIndex);
                                 break;
                             case ObjectTypes.Door:
                                 Door.DoorKeyType keyTypeDoor = (Door.DoorKeyType)binaryReader.ReadInt32();
@@ -377,9 +297,10 @@ namespace MakeEveryDayRecount.Map
                                 );
                                 // When this door is interacted with, transition the player
                                 doorFromFile.OnDoorInteract += TransitionPlayer;
-                                Doors.Add(doorFromFile);
+                                newProp = doorFromFile;
                                 break;
                         }
+                        _map[tileLocation].PropHeld = newProp;
 
                         numberOfGameObjects--;
                     }
@@ -390,32 +311,41 @@ namespace MakeEveryDayRecount.Map
                     //Parse all needed triggers from file
                     while (numberOfTriggers > 0)
                     {
+                        Trigger triggerFound = null;
+
                         Point triggerPos = new Point(binaryReader.ReadInt32(), binaryReader.ReadInt32());
                         int triggerWidth = binaryReader.ReadInt32();
                         int triggerHeight = binaryReader.ReadInt32();
 
                         TriggerTypes triggerType = (TriggerTypes)binaryReader.ReadInt32();
+                        // Figure out what type of trigger to create 
 
-                        if (triggerType == TriggerTypes.Checkpoint)
+                        switch (triggerType)
                         {
-                            Checkpoint checkpoint = new Checkpoint(triggerPos, binaryReader.ReadInt32(), triggerWidth, triggerHeight, binaryReader.ReadBoolean());
-                            checkpoint.RoomIndex = RoomIndex;
+                            case TriggerTypes.Checkpoint:
+                                Checkpoint checkpoint = new Checkpoint(triggerPos, binaryReader.ReadInt32(), triggerWidth, triggerHeight, binaryReader.ReadBoolean());
+                                checkpoint.RoomIndex = RoomIndex;
 
-                            _triggersInRoom.Add(checkpoint);
-                            TriggerManager.AddCheckpoint(checkpoint);
+                                TriggerManager.AddCheckpoint(checkpoint);
 
-                            //If it's the first checkpoint, make that the player's spawn
-                            if (checkpoint.Index == 0)
-                            {
-                                TriggerManager.SetPlayerSpawn(checkpoint);
-                            }
+                                //If it's the first checkpoint, make that the player's spawn
+                                if (checkpoint.Index == 0)
+                                {
+                                    TriggerManager.SetPlayerSpawn(checkpoint);
+                                }
+                                triggerFound = checkpoint;
+                                break;
+
+                            case TriggerTypes.Win:
+                                int itemIndex = binaryReader.ReadInt32();
+                                triggerFound = new Win(triggerPos, itemIndex, triggerWidth, triggerHeight);
+                                break;
                         }
-                        else if (triggerType == TriggerTypes.Win)
-                        {
-                            int itemIndex = binaryReader.ReadInt32();
-                            Win winTrigger = new Win(triggerPos, itemIndex, triggerWidth, triggerHeight);
-                            _triggersInRoom.Add(winTrigger);
-                        }
+
+                        // Add the created trigger to all tiles it spans
+                        for (int xIndex = 0; xIndex < triggerWidth; xIndex++)
+                            for (int yIndex = 0; yIndex < triggerHeight; yIndex++)
+                                _map[yIndex + triggerPos.Y, xIndex + triggerPos.X].TriggerHeld = triggerFound;
 
                         numberOfTriggers--;
                     }
@@ -447,68 +377,40 @@ namespace MakeEveryDayRecount.Map
         /// <returns>If the tile is walkable. True means the tile is walkable</returns>
         public bool VerifyWalkable(Point pointToCheck, bool isCamera = false)
         {
-            foreach (Prop prop in _itemsInRoom)
+            if (!_map.WithinBounds(pointToCheck))
+                return false;
+
+            Prop prop;
+            if ((prop = _map[pointToCheck].PropHeld) != null)
             {
-                // If the object is a box that is held and in the square, check if it is unwalkable in the context
-                if (prop.Location.Equals(pointToCheck))
+                if (prop is Box box)
                 {
-                    if (prop is Box)
-                    {
-                        // The position is unwalkable if the player isn't holding it or the item requesting the check is a camera
-                        if (((Box)prop).AttachmentDirection == Players.Direction.None || isCamera)
-                            return false;
-
-                        return true;
-                    }
-                    else if (!isCamera)
-                    {
-
+                    // The position is unwalkable if the player isn't holding it or the item requesting the check is a camera
+                    if (isCamera || box.AttachmentDirection == Players.Direction.None)
                         return false;
-                    }
+
+                    return true;
+                }
+                else if (!isCamera)
+                {
+
+                    return false;
                 }
             }
 
-            if (pointToCheck.X < 0 || pointToCheck.X >= _map.GetLength(0)
-                || pointToCheck.Y < 0 || pointToCheck.Y >= _map.GetLength(1))
-            {
-                return false;
-            }
-
-            return _map[pointToCheck.X, pointToCheck.Y].IsWalkable;
+            return _map[pointToCheck].IsWalkable;
         }
 
         /// <summary>
         /// Verifies that the tile the player is looking at contains an interactable item
         /// </summary>
         /// <param name="playerFacing">The location of the tile the player is facing</param>
-        /// <returns></returns>
+        /// <returns>Prop to interact with</returns>
         public Prop VerifyInteractable(Point playerFacing)
         {
-            foreach (Prop obj in _itemsInRoom)
-            {
-                if (obj is Prop prop)
-                {
-                    if (playerFacing == prop.Location)
-                    {
-                        return prop;
-                    }
-                }
-            }
-            foreach (Door door in Doors)
-            {
-                if (playerFacing == door.Location)
-                {
-                    return door;
-                }
-            }
-            foreach (WireBox box in WireBoxes)
-            {
-                if (playerFacing == box.Location)
-                {
-                    return box;
-                }
-            }
-            return null;
+            if (!_map.WithinBounds(playerFacing))
+                return null;
+            return _map[playerFacing].PropHeld;
         }
 
         /// <summary>
@@ -518,15 +420,7 @@ namespace MakeEveryDayRecount.Map
         /// <returns>The trigger the player is standing on, or null if no such trigger exists.</returns>
         public Trigger VerifyTrigger(Point playerPosition)
         {
-            foreach (Trigger trigger in _triggersInRoom)
-            {
-                if (trigger is Checkpoint && !((Checkpoint)trigger).Active)
-                    continue;
-                if (playerPosition.X >= trigger.Location.X && playerPosition.X < trigger.Location.X + trigger.Width &&
-                    playerPosition.Y >= trigger.Location.Y && playerPosition.Y < trigger.Location.Y + trigger.Height)
-                    return trigger;
-            }
-            return null;
+            return _map[playerPosition].TriggerHeld;
         }
 
 
@@ -536,7 +430,7 @@ namespace MakeEveryDayRecount.Map
         /// <param name="itemToRemove">Item to remove</param>
         public void RemoveGameObject(Item itemToRemove)
         {
-            _itemsInRoom.Remove(itemToRemove);
+            _map[itemToRemove.Location].PropHeld = null;
         }
 
         /// <summary>
@@ -592,6 +486,9 @@ namespace MakeEveryDayRecount.Map
                 Stream stream = File.OpenWrite(Path.Join(filepath, $"{RoomName}.room"));
                 binaryWriter = new BinaryWriter(stream);
 
+                List<Prop> propsInRoom = new List<Prop> { };
+                List<Trigger> triggersInRoom = new List<Trigger> { };
+
                 //Write dimensions of room
                 binaryWriter.Write(MapSize.X);
                 binaryWriter.Write(MapSize.Y);
@@ -601,84 +498,79 @@ namespace MakeEveryDayRecount.Map
                 {
                     for (int x = 0; x < MapSize.X; x++)
                     {
-                        binaryWriter.Write(_map[x, y].IsWalkable);
-                        binaryWriter.Write(_map[x, y].SpriteIndex);
+                        Tile tile = _map[y, x];
+                        binaryWriter.Write(tile.IsWalkable);
+                        binaryWriter.Write(tile.SpriteIndex);
+
+                        if (tile.PropHeld != null && !(tile.PropHeld is WireBox))
+                            propsInRoom.Add(tile.PropHeld);
+                        if (tile.TriggerHeld != null)
+                            triggersInRoom.Add(tile.TriggerHeld);
                     }
                 }
 
                 //Write prop count
-                binaryWriter.Write(_itemsInRoom.Count + Doors.Count);
+                binaryWriter.Write(propsInRoom.Count);
 
                 //Write out all non-door non-camera props
-                for (int i = 0; i < _itemsInRoom.Count; i++)
+                foreach (Prop propToSave in propsInRoom)
                 {
-                    if (_itemsInRoom[i] is Camera)
-                        continue;
 
-                    binaryWriter.Write(_itemsInRoom[i].SpriteIndex);
-                    binaryWriter.Write(_itemsInRoom[i].Location.X);
-                    binaryWriter.Write(_itemsInRoom[i].Location.Y);
+
+                    binaryWriter.Write(propToSave.SpriteIndex);
+                    binaryWriter.Write(propToSave.Location.X);
+                    binaryWriter.Write(propToSave.Location.Y);
 
                     //If statements to determine what kind of prop this is, and if it needs extra data
-                    if (_itemsInRoom[i] is Item)
+                    if (propToSave is Item)
                     {
                         binaryWriter.Write((int)ObjectTypes.Item);
-                        binaryWriter.Write((int)((Item)_itemsInRoom[i]).ItemKeyType);
+                        binaryWriter.Write((int)((Item)propToSave).ItemKeyType);
                     }
-                    else if (_itemsInRoom[i] is Box)
-                        binaryWriter.Write((int)ObjectTypes.Box);
-                }
-
-                //Write out all doors
-                for (int i = 0; i < Doors.Count; i++)
-                {
-                    //Standard game object parameters
-                    binaryWriter.Write(Doors[i].SpriteIndex);
-                    binaryWriter.Write(Doors[i].Location.X);
-                    binaryWriter.Write(Doors[i].Location.Y);
-                    binaryWriter.Write((int)ObjectTypes.Door);
-
-                    //Unique to doors
-                    binaryWriter.Write((int)Doors[i].KeyType);
-                    binaryWriter.Write(Doors[i].DestRoom);
-                    binaryWriter.Write(Doors[i].DestinationTile.X);
-                    binaryWriter.Write(Doors[i].DestinationTile.Y);
-                }
-
-                //Write out all the cameras
-                for (int i = 0; i < Cameras.Count; i++)
-                {
-                    Camera cam = Cameras[i];
-                    //Standard game object parameters
-                    binaryWriter.Write(cam.SpriteIndex);
-                    binaryWriter.Write(cam.Location.X);
-                    binaryWriter.Write(cam.Location.Y);
-                    binaryWriter.Write((int)ObjectTypes.Camera);
-
-                    //Unique to cameras
-                    binaryWriter.Write(cam.CenterPoint.X);
-                    binaryWriter.Write(cam.CenterPoint.Y);
-                    binaryWriter.Write((double)cam.Spread);
-                    WireBox camWireBox = cam.WireBox;
-                    if (camWireBox == null)
+                    else if (propToSave is Box)
                     {
-                        binaryWriter.Write(-1);
-                        binaryWriter.Write(-1);
+                        binaryWriter.Write((int)ObjectTypes.Box);
+                    }
+                    else if (propToSave is Door door)
+                    {
+                        binaryWriter.Write((int)ObjectTypes.Door);
+
+                        //Unique to doors
+                        binaryWriter.Write((int)door.KeyType);
+                        binaryWriter.Write(door.DestRoom);
+                        binaryWriter.Write(door.DestinationTile.X);
+                        binaryWriter.Write(door.DestinationTile.Y);
+                    }
+                    else if (propToSave is Camera cam)
+                    {
+                        binaryWriter.Write((int)ObjectTypes.Camera);
+
+                        //Unique to cameras
+                        binaryWriter.Write(cam.CenterPoint.X);
+                        binaryWriter.Write(cam.CenterPoint.Y);
+                        binaryWriter.Write((double)cam.Spread);
+                        WireBox camWireBox = cam.WireBox;
+                        if (camWireBox == null)
+                        {
+                            binaryWriter.Write(-1);
+                            binaryWriter.Write(-1);
+                        }
+                        else
+                        {
+                            binaryWriter.Write(camWireBox.Location.X);
+                            binaryWriter.Write(camWireBox.Location.Y);
+                        }
                     }
                     else
                     {
-                        binaryWriter.Write(camWireBox.Location.X);
-                        binaryWriter.Write(camWireBox.Location.Y);
+                        throw new Exception("Attempted to save an unknown prop");
                     }
-
                 }
 
                 //Write out all triggers
-                binaryWriter.Write(_triggersInRoom.Count);
-                for (int i = 0; i < _triggersInRoom.Count; i++)
+                binaryWriter.Write(triggersInRoom.Count);
+                foreach (Trigger trigger in triggersInRoom)
                 {
-                    Trigger trigger = _triggersInRoom[i];
-
                     binaryWriter.Write(trigger.Location.X);
                     binaryWriter.Write(trigger.Location.Y);
                     binaryWriter.Write(trigger.Width);
@@ -694,7 +586,6 @@ namespace MakeEveryDayRecount.Map
                     {
                         binaryWriter.Write((int)TriggerTypes.Win);
                         binaryWriter.Write(((Win)trigger).ItemIndex);
-
                     }
                 }
             }
@@ -715,7 +606,24 @@ namespace MakeEveryDayRecount.Map
         /// <returns>Name of the texture 2d</returns>
         public string GetTileSpriteName(Point tileLocation)
         {
-            return AssetManager.TileMap[_map[tileLocation.X, tileLocation.Y].SpriteIndex].Name;
+            return AssetManager.TileMap[_map[tileLocation.Y, tileLocation.X].SpriteIndex].Name;
+        }
+
+        /// <summary>
+        /// Add a prop in a new location
+        /// </summary>
+        /// <param name="prop">Prop to add</param>
+        public void AddProp(Prop prop)
+        {
+            _map[prop.Location].PropHeld = prop;
+        }
+
+        /// <summary>
+        /// Get the tile at a location
+        /// </summary>
+        public Tile GetTile(Point location)
+        {
+            return _map[location];
         }
     }
 }

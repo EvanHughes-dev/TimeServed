@@ -35,7 +35,6 @@ namespace MakeEveryDayRecount.Managers
             get => _currentRoom;
         }
 
-        //private static Room[] _rooms;
         private static Dictionary<int, Room> _rooms;
 
         /// <summary>
@@ -245,7 +244,6 @@ namespace MakeEveryDayRecount.Managers
         {
             GameplayManager.PlayerObject.ChangeRoom(transDoor.DestinationTile);
             ChangeRoom(destRoom);
-
         }
 
         /// <summary>

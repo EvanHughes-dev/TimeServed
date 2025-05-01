@@ -57,10 +57,10 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// <param name="sb">Sprite batch to draw with</param>
         /// <param name="worldToScreen">Offset for the world position and screen position</param>
         /// <param name="pixelOffset">Number of pixels to offset for map offset</param>
-        public override void Draw(SpriteBatch sb, Point worldToScreen, Point pixelOffset)
+        public override void Draw(SpriteBatch sb)
         {
 
-            sb.Draw(Sprite, new Rectangle(MapUtils.TileToWorld(Location) - worldToScreen + pixelOffset + AssetManager.HalfTileSize, AssetManager.TileSize), null, //no source rectangle
+            sb.Draw(Sprite, new Rectangle(MapUtils.TileToScreen(Location) + AssetManager.HalfTileSize, AssetManager.TileSize), null, //no source rectangle
                 Color.White, _direction, _drawOrigin.ToVector2(), SpriteEffects.None, 0f);
         }
 

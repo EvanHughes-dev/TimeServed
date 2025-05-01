@@ -5,6 +5,7 @@ using MakeEveryDayRecount.GameObjects.Props;
 using System.IO;
 using System.Reflection.Metadata;
 using MakeEveryDayRecount.Players.InventoryFiles;
+using MakeEveryDayRecount.Map;
 
 namespace MakeEveryDayRecount.Managers
 {
@@ -69,6 +70,8 @@ namespace MakeEveryDayRecount.Managers
             // Don't activate triggers if replay mode is active
             if (!ReplayManager.PlayingReplay)
                 TriggerManager.PlayerSpawn.Activate(PlayerObject);
+
+            MapUtils.UpdateValues();
         }
 
         /// <summary>
@@ -177,11 +180,11 @@ namespace MakeEveryDayRecount.Managers
         /// <param name="level"></param>
         private static void GiveItems(int level)
         {
-            PlayerObject.AddItemToInventory(new Item(Point.Zero, AssetManager.PropTextures, 0, "Card", Door.DoorKeyType.Card));
+            PlayerObject.AddItemToInventory(new Item(Point.Zero, AssetManager.PropTextures, 0, Door.DoorKeyType.Card));
             if (level < 3)
-                PlayerObject.AddItemToInventory(new Item(Point.Zero, AssetManager.PropTextures, 2, "Wirecutters", Door.DoorKeyType.None));
+                PlayerObject.AddItemToInventory(new Item(Point.Zero, AssetManager.PropTextures, 2, Door.DoorKeyType.None));
             if (level < 2)
-                PlayerObject.AddItemToInventory(new Item(Point.Zero, AssetManager.PropTextures, 1, "Screwdriver", Door.DoorKeyType.Screwdriver));
+                PlayerObject.AddItemToInventory(new Item(Point.Zero, AssetManager.PropTextures, 1, Door.DoorKeyType.Screwdriver));
         }
     }
 }
