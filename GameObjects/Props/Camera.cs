@@ -418,16 +418,14 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// Draw the path of each camera's vision cone
         /// </summary>
         /// <param name="sb">Sprite batch to draw with</param>
-        /// <param name="worldToScreen">Pixels between the world and screen pos</param>
-        /// <param name="pixelOffset">Number of pixels to offset by</param>
-        public void DebugDraw(SpriteBatch sb, Point worldToScreen, Point pixelOffset)
+        public void DebugDraw(SpriteBatch sb)
         {
             // TODO find some other way to draw rays and endpoints
             foreach (Point EndPoint in _endPoints)
                 foreach (Point endpoint in Rasterize(_rayBase, EndPoint))
-                    sb.Draw(AssetManager.PropTextures[3], new Rectangle(MapUtils.TileToWorld(endpoint) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.Red);
+                    sb.Draw(AssetManager.PropTextures[3], new Rectangle(MapUtils.TileToScreen(endpoint), AssetManager.TileSize), Color.Red);
             foreach (Point endpoint in _endPoints)
-                sb.Draw(AssetManager.PropTextures[3], new Rectangle(MapUtils.TileToWorld(endpoint) - worldToScreen + pixelOffset, AssetManager.TileSize), Color.Green);
+                sb.Draw(AssetManager.PropTextures[3], new Rectangle(MapUtils.TileToScreen(endpoint), AssetManager.TileSize), Color.Green);
         }
 
         /// <summary>

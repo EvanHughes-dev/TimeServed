@@ -12,6 +12,10 @@ namespace MakeEveryDayRecount.DebugModes
     internal class CameraDebug : BaseDebug
     {
         private Room _currentRoom;
+
+        /// <summary>
+        /// Create a new camera debug
+        /// </summary>
         public CameraDebug()
         {
             MapManager.OnRoomUpdate += newRoom => _currentRoom = newRoom;
@@ -26,7 +30,7 @@ namespace MakeEveryDayRecount.DebugModes
 
             foreach (Camera cam in _currentRoom.Cameras)
             {
-                cam.DebugDraw(sb, MapUtils.WorldToScreen, MapUtils.PixelOffset);
+                cam.DebugDraw(sb);
             }
             base.Draw(sb, "Camera");
         }
