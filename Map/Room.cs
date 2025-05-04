@@ -116,7 +116,6 @@ namespace MakeEveryDayRecount.Map
             *
             * Tiles
             * GameObjects
-            * Doors (type of GameObject)
             */
 
             Point worldToScreen = MapUtils.WorldToScreen;
@@ -145,6 +144,39 @@ namespace MakeEveryDayRecount.Map
                 }
             }
 
+        }
+
+        /// <summary>
+        /// Draw the debug version of the map
+        /// </summary>
+        /// <param name="sb">Sprite batch to draw with</param>
+        public void DebugDraw(SpriteBatch sb)
+        {
+            Point worldToScreen = MapUtils.WorldToScreen;
+
+            Point TileSize = AssetManager.TileSize;
+
+            // Find the coordinates of the four corners to figure out which
+            // tiles and objects need to be displayed in tile positions
+            // By casting to an int, we make sure we get all partial tiles
+            // If any edge of a tile is on the screen, it still is displayed
+            int screenMinX = worldToScreen.X / TileSize.X;
+            int screenMinY = worldToScreen.Y / TileSize.Y;
+            int screenMaxX = (worldToScreen.X + MapUtils.ScreenSize.X) / TileSize.X;
+            int screenMaxY = (worldToScreen.Y + MapUtils.ScreenSize.Y) / TileSize.Y;
+
+            // Display all tiles that are on screen by looping between the screenMin and screenMax on each axis
+            for (int xTile = screenMinX; xTile <= screenMaxX; xTile++)
+            {
+                for (int yTile = screenMinY; yTile <= screenMaxY; yTile++)
+                {
+                    if (!_map.WithinBounds(xTile, yTile))
+                        continue;
+                    Tile currentTile = _map[yTile, xTile];
+
+                    currentTile.Draw(sb);
+                }
+            }
         }
 
         #endregion
