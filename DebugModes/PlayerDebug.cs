@@ -28,13 +28,7 @@ namespace MakeEveryDayRecount.DebugModes
             AddPlayerDebugInfo();
             _walkableTileDebug = AssetManager.DebugWalkableTile;
             _notWalkableTileDebug = AssetManager.DebugNotWalkableTile;
-            _playerMovementDirections = new Point[]
-            {
-                new Point(-1, 0),
-                new Point(1, 0),
-                new Point(0, -1),
-                new Point(0, 1)
-            };
+            _playerMovementDirections = MapUtils.DirectionArray;
         }
 
         /// <summary>
@@ -67,7 +61,7 @@ namespace MakeEveryDayRecount.DebugModes
         {
             Point playerTilePos = _player.Location;
 
-            foreach (var direction in _playerMovementDirections)
+            foreach (Point direction in _playerMovementDirections)
             {
                 Point playerDest = playerTilePos + direction;
                 Texture2D displayTile = MapManager.CheckPlayerCollision(playerDest)
