@@ -31,7 +31,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         }
 
         /// <summary>
-        /// The wire box this is connected to
+        /// The wire location this is connected to
         /// </summary>
         public WireBox WireBox { get; private set; }
 
@@ -70,8 +70,8 @@ namespace MakeEveryDayRecount.GameObjects.Props
         //All the rays come out from the point on the floor right "in front of" the camera
         private Point _rayBase;
 
-        private Point[] _visionKite;
-        private List<Point> _watchedTiles;
+        private HashSet<Tile> _visionKite;
+        private List<Tile> _watchedTiles;
 
         //It also needs a reference to the player to know if they step into the vision kite
         private Player _player;
@@ -90,7 +90,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
         public Camera(Point location, Texture2D[] spriteArray, int spriteIndex, Room containingRoom, Point centerPoint, float spread)
             : base(location, spriteArray, spriteIndex)
         {
-            _watchedTiles = new List<Point>(); //This ends up being the same as visionkite by the end of this function
+            _watchedTiles = new List<Tile>(); //This ends up being the same as visionkite by the end of this function
             _player = GameplayManager.PlayerObject;
             //All cams start active
             _active = SpriteIndex == 0;
@@ -258,8 +258,10 @@ namespace MakeEveryDayRecount.GameObjects.Props
                         Point candidatePoint = new Point(x, y);
                         if (CameraRoom.VerifyWalkable(candidatePoint, true)) //If it's walkable, add it
                         {
-                            _watchedTiles.Add(candidatePoint);
+
                             Tile pointTile = CameraRoom.GetTile(candidatePoint);
+                            _watchedTiles.Add(pointTile);
+                            
                             pointTile.AddWatcher();
                             pointTile.BoxChange += UpdateTrackedTiles;
                             pointTile.PlayerEnteredTile += DetectPlayer;
@@ -269,13 +271,13 @@ namespace MakeEveryDayRecount.GameObjects.Props
                 }
             }
             //Permanently save this into an array that won't be changed and indicates the full kite with no obstructions
-            _visionKite = _watchedTiles.ToArray();
+            _visionKite = _watchedTiles.ToHashSet<Tile>();
             #endregion
             //Note that the length of _endPoints may be even or odd depending on rounding
         }
 
         /// <summary>
-        /// Makes a security camera that watches a certain vision kite to see if the player is inside it, and has an electrical box which the player can interact with to deactivate it
+        /// Makes a security camera that watches a certain vision kite to see if the player is inside it, and has an electrical location which the player can interact with to deactivate it
         /// </summary>
         /// <param name="location">The location of the camera, from which the vision kite is projected</param>
         /// <param name="spriteArray">The array of the camera's sprites</param>
@@ -283,11 +285,11 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// <param name="containingRoom">The room containing the camera. Used to check if tiles are walkable</param>
         /// <param name="centerPoint">The point that forms the center of the camera's vision kite</param>
         /// <param name="spread">The arc from the center of the vision kite to the edge, in radians</param>
-        /// <param name="boxLocation">The location of the camera's electrical box</param>
+        /// <param name="boxLocation">The location of the camera's electrical location</param>
         public Camera(Point location, Texture2D[] spriteArray, int spriteIndex, Room containingRoom, Point centerPoint, float spread, Point boxLocation)
             : this(location, spriteArray, spriteIndex, containingRoom, centerPoint, spread)
         {
-            //Add the wire box to the list of props in the room so that it gets interacted with
+            //Add the wire location to the list of props in the room so that it gets interacted with
             WireBox = new WireBox(boxLocation, AssetManager.CameraTextures, this, 2);
             CameraRoom.AddProp(WireBox);
 
@@ -298,90 +300,57 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// </summary>
         private void UpdateTrackedTiles()
         {
-            foreach (Point location in _watchedTiles)
+            foreach (Tile tile in _watchedTiles)
             {
-                UnWatch(location);
+                UnWatch(tile);
             }
 
             //Check for boxes before we look for the player
-            List<Point> boxes = new List<Point>();
-            //Used to check if there's a box on the raybase
+            List<Tile> boxes = new List<Tile>();
+            //Used to check if there's a location on the raybase
             bool raybaseBlocked = false;
             //Check the entire vision kite for boxes in order to figure out what tiles are currently watched
-            foreach (Point box in _visionKite)
+            _watchedTiles.Clear();
+
+            // If the raybase itself is blocked, camera sees nothing
+            Tile rayBaseTile = CameraRoom.GetTile(_rayBase);
+            if (rayBaseTile.IsBlockingCamera)
+                return;
+
+            _watchedTiles.Add(rayBaseTile);
+            WatchTile(rayBaseTile);
+
+            // This code needs to be optimized
+            // This currently runs in O(n^2) time
+            // I think I can get this down to O(n) or maybe O(nlog(n)) time
+            // We can cache the result of the ray and look for similar points
+            // or Rasterize to ends then find any missed points and raterize them
+
+            foreach (Tile target in _visionKite)
             {
-                //Check if there's a box. Any un-walkable tile is treated like a box
-                if (!CameraRoom.VerifyWalkable(box, true))
+                List<Point> ray = Rasterize(_rayBase, target.Location);
+
+                bool blocked = false;
+                if(target.IsBlockingCamera)
                 {
-                    boxes.Add(box);
-                    if (box == _rayBase) raybaseBlocked = true;
+                    
+                    continue;
                 }
-            }
-
-            //If the raybase is blocked, we can't see anything and can't detect the player
-            if (raybaseBlocked) _watchedTiles.Clear();
-            else
-            {
-
-                //We've found a new box in the way. Check all the rays fellas!
-                _watchedTiles = _visionKite.ToList();
-                for (int i = 0; i < _endPoints.Length; i++)
+                // Skip raybase (i = 1) and stop *before* the target tile
+                for (int i = 1; i < ray.Count - 1; i++)
                 {
-                    List<Point> tilesInRay = Rasterize(_rayBase, _endPoints[i]);
-                    foreach (Point box in boxes)
+                    Tile stepTile = CameraRoom.GetTile(ray[i]);
+                    if (stepTile.IsBlockingCamera)
                     {
-
-                        //Debug.WriteLine($"Checking {_rayBase} with {endpoint}");
-                        //foreach (Point point in Rasterize(_rayBase, endpoint)) Debug.Write(point + " ");
-                        //Debug.WriteLine(null);
-                        if (Rasterize(_rayBase, _endPoints[i]).Contains(box)) //A ray is blocked by the box
-                        {
-                            //Debug.WriteLine($"Endpoint {endpoint.X}, {endpoint.Y} is blocked");
-                            //Remove all the tiles between the box and the end of the ray
-                            foreach (Point blockedTile in Rasterize(box, _endPoints[i])) _watchedTiles.Remove(blockedTile);
-                            //Now check the rays on either side of the ray you just found and treat them as blocked also
-
-                            if (i > 0) foreach (Point blockedTile in Rasterize(box, _endPoints[i - 1])) _watchedTiles.Remove(blockedTile);
-                            if (i < _endPoints.Length - 1) foreach (Point blockedTile in Rasterize(box, _endPoints[i + 1])) _watchedTiles.Remove(blockedTile);
-                        }
+                        blocked = true;
+                        break;
                     }
                 }
 
-
-                //Now do one more check of the watched tiles. If any of them is isolated, remove it
-                List<Point> isolatedTiles = new List<Point>();
-                foreach (Point watchedTile in _watchedTiles)
+                if (!blocked)
                 {
-                    WatchTile(watchedTile);
-                    Vector2 raybaseVector = new Vector2(_rayBase.X - watchedTile.X, _rayBase.Y - watchedTile.Y);
-                    if (raybaseVector.Length() > 2)
-                    {
-                        //But what if there are multiple boxes?
-                        int watchedNeighbors = 0;
-                        Point watchedNeighbor = watchedTile;
-                        //Left
-                        watchedNeighbor.X -= 1;
-                        if (_watchedTiles.Contains(watchedNeighbor) || !CameraRoom.VerifyWalkable(watchedNeighbor)) watchedNeighbors++;
-                        //Right
-                        watchedNeighbor.X += 2;
-                        if (_watchedTiles.Contains(watchedNeighbor) || !CameraRoom.VerifyWalkable(watchedNeighbor)) watchedNeighbors++;
-                        //Above
-                        watchedNeighbor.X -= 1;
-                        watchedNeighbor.Y -= 1;
-                        if (_watchedTiles.Contains(watchedNeighbor) || !CameraRoom.VerifyWalkable(watchedNeighbor)) watchedNeighbors++;
-                        //Below
-                        watchedNeighbor.Y += 2;
-                        if (_watchedTiles.Contains(watchedNeighbor) || !CameraRoom.VerifyWalkable(watchedNeighbor)) watchedNeighbors++;
-
-                        //If the tile has one watched neighbor or less, then remove it
-                        if (watchedNeighbors <= 1) isolatedTiles.Add(watchedTile);
-                    }
-                }
-                //Now remove them all at once
-                foreach (Point p in isolatedTiles)
-                {
-                    _watchedTiles.Remove(p);
-                    UnWatch(p);
+                    _watchedTiles.Add(target);
+                    WatchTile(target);
                 }
             }
         }
@@ -389,22 +358,22 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// <summary>
         /// Let the tile know that it is being watched
         /// </summary>
-        /// <param name="watchTile">Point to watch</param>
-        private void WatchTile(Point watchTile)
+        /// <param name="watchTile">Tile to watch</param>
+        private void WatchTile(Tile watchTile)
         {
-            CameraRoom.GetTile(watchTile).AddWatcher();
+            watchTile.AddWatcher();
         }
 
         /// <summary>
         /// Let the tile know that this camera is no longer watching it
         /// </summary>
-        /// <param name="unWatch">Point to un watch</param>
-        private void UnWatch(Point unWatch)
+        /// <param name="unWatch">Tile to un watch</param>
+        private void UnWatch(Tile unWatch)
         {
-            CameraRoom.GetTile(unWatch).RemoveWatcher();
+            unWatch.RemoveWatcher();
         }
         /// <summary>
-        /// Draw the camera, wire box and all tiles this camera can see
+        /// Draw the camera, wire location and all tiles this camera can see
         /// </summary>
         /// <param name="sb">Sprite batch to draw with</param>
         public override void Draw(SpriteBatch sb)
@@ -499,16 +468,15 @@ namespace MakeEveryDayRecount.GameObjects.Props
             _active = false;
             SpriteIndex = 1;
             Sprite = AssetManager.CameraTextures[SpriteIndex];
-            foreach (Point p in _visionKite)
+            foreach (Tile tile in _visionKite)
             {
-                Tile tile = MapManager.CurrentRoom.GetTile(p);
                 tile.BoxChange -= UpdateTrackedTiles;
                 tile.PlayerEnteredTile -= DetectPlayer;
             }
 
-            foreach (Point p in _watchedTiles)
+            foreach (Tile tile in _watchedTiles)
             {
-                MapManager.CurrentRoom.GetTile(p).RemoveWatcher();
+                tile.RemoveWatcher();
             }
         }
 
@@ -519,9 +487,9 @@ namespace MakeEveryDayRecount.GameObjects.Props
         private void DetectPlayer(Point location)
         {
             //Now check for the player :)
-            foreach (Point watchedTile in _watchedTiles)
+            foreach (Tile watchedTile in _watchedTiles)
             {
-                if (location == watchedTile)
+                if (location == watchedTile.Location)
                 {
                     //WE FOUND THE PLAYER! GET HIM BOYS!
                     _player.Detected();

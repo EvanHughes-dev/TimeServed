@@ -54,6 +54,16 @@ namespace MakeEveryDayRecount.Managers
         /// </summary>
         public static Texture2D DebugNotWalkableTile { get; private set; }
 
+        /// <summary>
+        /// Texture for the debug tile for when a tile holds an item that can be interacted with
+        /// </summary>
+        public static Texture2D DebugInteractableTile { get; private set; }
+
+        /// <summary>
+        /// Texture for the debug tile for when a tile holds a trigger
+        /// </summary>
+        public static Texture2D DebugTriggerTile { get; private set; }
+
         #endregion
 
         #region UI Assets
