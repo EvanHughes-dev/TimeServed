@@ -15,9 +15,15 @@ namespace MakeEveryDayRecount.Map
         private static Player _currentPlayer;
 
         private static Game1 game1Instance;
+        
+        
 
         #region Utility Properties
 
+        /// <summary>
+        /// Get an array of points that reprersent the four directions in tile space. Points are in the order Up, Right, Down, Left
+        /// </summary>
+        public static Point[] DirectionArray { get => new Point[] { new Point(0, -1), new Point(1, 0), new Point(0, 1), new Point(-1, 0) }; }
         /// <summary>
         /// Get the size of the screen in pixels
         /// </summary>

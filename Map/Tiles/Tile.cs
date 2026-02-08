@@ -49,9 +49,19 @@ namespace MakeEveryDayRecount.Map.Tiles
         public bool IsWalkable { get; private set; }
 
         /// <summary>
+        /// Get if a camera can look past this. 
+        /// </summary>
+        public bool IsBlockingCamera { get => PropHeld != null && PropHeld is Box; }
+
+        /// <summary>
         /// Get then index that corresponds to this tile's sprite
         /// </summary>
         public int SpriteIndex { get; private set; }
+
+        /// <summary>
+        /// Get the location of this tile in world space
+        /// </summary>
+        public Point Location { get=>_location; }
         private Point _location;
 
         private int _watcherCount;
@@ -90,6 +100,21 @@ namespace MakeEveryDayRecount.Map.Tiles
             if (_watcherCount > 0)
                 sb.Draw(AssetManager.CameraSight, new Rectangle(MapUtils.TileToScreen(_location), AssetManager.TileSize), Color.White);
 
+        }
+
+        /// <summary>
+        /// Draw this tile in debug mode. Display if it is walkable, if something can be interacted with, and if 
+        /// there is a trigger on the tile. Display a different debug image for a checkpoint vs a win trigger.
+        /// Also, if it is a checkpoint, display the index for the checkpoint.
+        /// </summary>
+        /// <param name="sb">Sprite batch to draw the tile with</param>
+        public void DebugDraw(SpriteBatch sb)
+        {
+            // TODO To whomever reviews this pr or to my future self when I'm looking back through this code, remember to remove this block comment
+
+            /*
+            * This section of code aims to draw this instance of a tile in debug mode, but we have some options for how we draw this.
+            */
         }
 
         /// <summary>

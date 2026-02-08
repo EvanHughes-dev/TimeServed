@@ -12,8 +12,7 @@ namespace MakeEveryDayRecount.DebugModes
     /// </summary>
     internal class PlayerDebug : BaseDebug
     {
-        private readonly Texture2D _walkableTileDebug;
-        private readonly Texture2D _notWalkableTileDebug;
+
         private readonly Player _player;
 
         private readonly Point[] _playerMovementDirections;
@@ -26,15 +25,8 @@ namespace MakeEveryDayRecount.DebugModes
         {
             _player = GameplayManager.PlayerObject;
             AddPlayerDebugInfo();
-            _walkableTileDebug = AssetManager.DebugWalkableTile;
-            _notWalkableTileDebug = AssetManager.DebugNotWalkableTile;
-            _playerMovementDirections = new Point[]
-            {
-                new Point(-1, 0),
-                new Point(1, 0),
-                new Point(0, -1),
-                new Point(0, 1)
-            };
+
+            _playerMovementDirections = MapUtils.DirectionArray;
         }
 
         /// <summary>
@@ -67,15 +59,11 @@ namespace MakeEveryDayRecount.DebugModes
         {
             Point playerTilePos = _player.Location;
 
-            foreach (var direction in _playerMovementDirections)
+            foreach (Point direction in _playerMovementDirections)
             {
                 Point playerDest = playerTilePos + direction;
-                Texture2D displayTile = MapManager.CheckPlayerCollision(playerDest)
-                    ? _walkableTileDebug
-                    : _notWalkableTileDebug;
 
-                Point screenPos = MapUtils.TileToScreen(playerDest);
-                sb.Draw(displayTile, new Rectangle(screenPos, AssetManager.TileSize), Color.White);
+                MapManager.GetTile(playerDest)?.DebugDraw(sb);
             }
         }
     }
