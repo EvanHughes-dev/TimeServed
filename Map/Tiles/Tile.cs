@@ -160,5 +160,13 @@ namespace MakeEveryDayRecount.Map.Tiles
             if (_watcherCount > 0)
                 PlayerEnteredTile?.Invoke(_location);
         }
+
+
+        #region Operators
+
+        public static implicit operator Point(Tile t) => t.Location;
+        public static implicit operator Vector2(Tile t) => new Vector2(t.Location.X, t.Location.Y);
+
+        #endregion
     }
 }

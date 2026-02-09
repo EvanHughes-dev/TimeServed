@@ -62,21 +62,19 @@ namespace MakeEveryDayRecount.GameObjects.Props
         private Point _centerPoint;
         private float _spread;
         //The camera will get a certain set of endpoints to look towards when it's created, and those points will never change, even if they get blocked
-        private Point[] _endPoints;
+        private List<Tile> _endPoints;
         //This float tells the camera which way it's facing. By default, the camera faces down
         private float _direction;
 
         //The rays don't project from inside of the wall, where the camera is technically drawn
         //All the rays come out from the point on the floor right "in front of" the camera
-        private Point _rayBase;
+        private Tile _rayBase;
 
         private HashSet<Tile> _visionKite;
         private List<Tile> _watchedTiles;
 
         //It also needs a reference to the player to know if they step into the vision kite
         private Player _player;
-
-
 
         /// <summary>
         /// Makes a security camera that watches a certain vision kite to see if the player is inside it
@@ -105,18 +103,18 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //Check which way the ray for the camera is pointing
             Vector2 centerRay = new Vector2(_centerPoint.X - location.X, _centerPoint.Y - location.Y); //base of this ray is at location
 
-
+            // TODO rewite this logic for the love of god
             //Please do not put the centerpoint on top of the camera it breaks everything
             if (Math.Abs(centerRay.X) > Math.Abs(centerRay.Y)) //The ray is more horizontal
             {
                 if (centerRay.X < 0 && containingRoom.VerifyWalkable(new Point(location.X - 1, location.Y), true)) //cam is pointing left
                 {
-                    _rayBase = new Point(location.X - 1, location.Y);
+                    _rayBase = CameraRoom.GetTile(new Point(location.X - 1, location.Y));
                     _direction = 0.5f;
                 }
                 else if (containingRoom.VerifyWalkable(new Point(location.X + 1, location.Y), true))//Cam is pointing right
                 {
-                    _rayBase = new Point(location.X + 1, location.Y);
+                    _rayBase = CameraRoom.GetTile(new Point(location.X + 1, location.Y));
                     _direction = 1.5f;
                 }
                 //If both the left and right tiles aren't walkable, try to set the raybase either up or down
@@ -124,12 +122,12 @@ namespace MakeEveryDayRecount.GameObjects.Props
                 {
                     if (centerRay.Y < 0 && containingRoom.VerifyWalkable(new Point(Location.X, Location.Y - 1), true))
                     {
-                        _rayBase = new Point(location.X, Location.Y - 1);
+                        _rayBase = CameraRoom.GetTile(new Point(location.X, Location.Y - 1));
                         _direction = 1f;
                     }
                     else //This will be fine unless the camera is deep in the wall or cameraRay is zero vector
                     {
-                        _rayBase = new Point(location.X, Location.Y + 1);
+                        _rayBase = CameraRoom.GetTile(new Point(location.X, Location.Y + 1));
                         _direction = 0f;
                     }
                 }
@@ -138,12 +136,12 @@ namespace MakeEveryDayRecount.GameObjects.Props
             {
                 if (centerRay.Y < 0 && containingRoom.VerifyWalkable(new Point(location.X, location.Y - 1), true)) //camera is pointing up
                 {
-                    _rayBase = new Point(Location.X, location.Y - 1);
+                    _rayBase = CameraRoom.GetTile(new Point(Location.X, location.Y - 1));
                     _direction = 1f;
                 }
                 else if (containingRoom.VerifyWalkable(new Point(location.X, location.Y + 1), true)) //camera is pointing down
                 {
-                    _rayBase = new Point(Location.X, location.Y + 1);
+                    _rayBase = CameraRoom.GetTile(new Point(Location.X, location.Y + 1));
                     _direction = 0f;
                 }
                 //If both the up and down tiles aren't walkable, try to set the raybase either left or right
@@ -151,12 +149,12 @@ namespace MakeEveryDayRecount.GameObjects.Props
                 {
                     if (centerRay.X < 0 && containingRoom.VerifyWalkable(new Point(location.X - 1, location.Y), true))
                     {
-                        _rayBase = new Point(Location.X - 1, location.Y);
+                        _rayBase = CameraRoom.GetTile(new Point(Location.X - 1, location.Y));
                         _direction = 0.5f;
                     }
                     else //This will be fine unless the camera is deep in the wall or cameraRay is zero vector
                     {
-                        _rayBase = new Point(Location.X + 1, Location.Y);
+                        _rayBase = CameraRoom.GetTile(new Point(Location.X + 1, Location.Y));
                         _direction = 1.5f;
                     }
                 }
@@ -169,15 +167,15 @@ namespace MakeEveryDayRecount.GameObjects.Props
             #region Vision Kite
             //---Find the endpoints for the corners of the kite---
             //Create a vector for the center from the raybase to the centerpoint
-            centerRay = new Vector2(_centerPoint.X - _rayBase.X, _centerPoint.Y - location.Y); //Base of the ray is now at raybase
+            centerRay = new Vector2(_centerPoint.X - _rayBase.Location.X, _centerPoint.Y - location.Y); //Base of the ray is now at raybase
             //Rotate that vector by spread in both directions
             Vector2 clockwiseRay = Vector2.Transform(centerRay, Matrix.CreateRotationZ(spread));
             Vector2 counterclockwiseRay = Vector2.Transform(centerRay, Matrix.CreateRotationZ(-spread));
             //^These built-in methods are *chef kiss*
 
             //Turn these rotated vectors back into points to get the corners of the kite
-            Point clockwisePoint = new Point((int)MathF.Round(_rayBase.X + clockwiseRay.X), (int)MathF.Round(_rayBase.Y + clockwiseRay.Y));
-            Point counterclockwisePoint = new Point((int)MathF.Round(_rayBase.X + counterclockwiseRay.X), (int)MathF.Round(_rayBase.Y + counterclockwiseRay.Y));
+            Point clockwisePoint = new Point((int)MathF.Round(_rayBase.Location.X + clockwiseRay.X), (int)MathF.Round(_rayBase.Location.Y + clockwiseRay.Y));
+            Point counterclockwisePoint = new Point((int)MathF.Round(_rayBase.Location.X + counterclockwiseRay.X), (int)MathF.Round(_rayBase.Location.Y + counterclockwiseRay.Y));
             //Gang why does mathF still return a float when you round to the nearest integer. This is highly unserious
 
             //Rasterize between the corners and the centerpoint to get all the points we need to send out a ray to
@@ -216,16 +214,16 @@ namespace MakeEveryDayRecount.GameObjects.Props
             }
             //Now save this into the field of the class
             // TODO finding endpoints is wrong
-            _endPoints = endPoints.ToArray();
+            _endPoints = endPoints.Select(p => CameraRoom.GetTile(p)).ToList<Tile>();
 
             //Create a rectangle that bounds the entire kite
 
             Point[] corners = { _rayBase, _centerPoint, clockwisePoint, counterclockwisePoint };
             //Find the minimum/maximum X and Y of the 4 bounding points (the edges of the rectangle basically)
-            int minX = _rayBase.X;
-            int maxX = _rayBase.X;
-            int minY = _rayBase.Y;
-            int maxY = _rayBase.Y;
+            int minX = _rayBase.Location.X;
+            int maxX = _rayBase.Location.X;
+            int minY = _rayBase.Location.Y;
+            int maxY = _rayBase.Location.Y;
             foreach (Point corner in corners)
             {
                 if (corner.X < minX) minX = corner.X;
@@ -240,7 +238,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                 {
 
                     //For each point in that rectangle, create a vector from the raybase to it
-                    Vector2 candidateVector = new Vector2(x - _rayBase.X, y - _rayBase.Y);
+                    Vector2 candidateVector = new Vector2(x, y) - _rayBase;
                     //Figure out if that vector is between the two edge vectors. If it is, then it should be inside of the vision kite
                     //NOTE: Chris suggested using the dot product for this but I think cross product is better because it doesn't require trigonometry
                     //But maybe if we normalized the vectors and then did dot product? I won't worry about it for now
@@ -305,8 +303,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                 UnWatch(tile);
             }
 
-            //Check for boxes before we look for the player
-            List<Tile> boxes = new List<Tile>();
+ 
             //Used to check if there's a location on the raybase
             bool raybaseBlocked = false;
             //Check the entire vision kite for boxes in order to figure out what tiles are currently watched
@@ -317,8 +314,14 @@ namespace MakeEveryDayRecount.GameObjects.Props
             if (rayBaseTile.IsBlockingCamera)
                 return;
 
+            HashSet<Tile> uncheckedTiles = new HashSet<Tile>(_visionKite);
+
+            uncheckedTiles.Remove(rayBaseTile);
+
             _watchedTiles.Add(rayBaseTile);
             WatchTile(rayBaseTile);
+
+
 
             // This code needs to be optimized
             // This currently runs in O(n^2) time
@@ -326,16 +329,48 @@ namespace MakeEveryDayRecount.GameObjects.Props
             // We can cache the result of the ray and look for similar points
             // or Rasterize to ends then find any missed points and raterize them
 
-            foreach (Tile target in _visionKite)
+            foreach (Tile target in _endPoints)
             {
+                // Cast from start to endpoint
+                List<Point> ray = Rasterize(_rayBase, target.Location);
+
+                // Skip raybase (i = 1) 
+                for (int i = 1; i < ray.Count; i++)
+                {
+                    Tile stepTile = CameraRoom.GetTile(ray[i]);
+                    uncheckedTiles.Remove(stepTile);
+
+                    // If this tile has a box
+                    if (stepTile.IsBlockingCamera)
+                    {
+                        // Remove all tiles in the ray cast from this tile to the endPoint
+                        // These tiles can not be seen by the camera
+                        for (int j = i + 1; j < ray.Count; j++)
+                        {
+                            Tile nextTileNotInView = CameraRoom.GetTile(ray[j]);
+                            uncheckedTiles.Remove(nextTileNotInView);
+                        }
+                        break;
+                    }
+                    else
+                    {
+                        // Otherwise this tile can be seen
+                        _watchedTiles.Add(stepTile);
+                    }
+                }   
+
+
+            }
+
+            foreach (Tile target in uncheckedTiles)
+            {
+                // Check if this tile has a box on it
+                if (target.IsBlockingCamera) continue;
+
                 List<Point> ray = Rasterize(_rayBase, target.Location);
 
                 bool blocked = false;
-                if(target.IsBlockingCamera)
-                {
-                    
-                    continue;
-                }
+                
                 // Skip raybase (i = 1) and stop *before* the target tile
                 for (int i = 1; i < ray.Count - 1; i++)
                 {
