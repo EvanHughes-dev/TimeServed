@@ -214,7 +214,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
             }
             //Now save this into the field of the class
             // TODO finding endpoints is wrong
-            _endPoints = endPoints.Select(p => CameraRoom.GetTile(p)).ToList<Tile>();
+            _endPoints = endPoints.Select(p => CameraRoom.GetTile(p)).OfType<Tile>().ToList<Tile>();
 
             //Create a rectangle that bounds the entire kite
 
@@ -238,7 +238,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                 {
 
                     //For each point in that rectangle, create a vector from the raybase to it
-                    Vector2 candidateVector = new Vector2(x, y) - _rayBase;
+                    Vector2 candidateVector = new Vector2(x - _rayBase.Location.X, y - _rayBase.Location.Y);
                     //Figure out if that vector is between the two edge vectors. If it is, then it should be inside of the vision kite
                     //NOTE: Chris suggested using the dot product for this but I think cross product is better because it doesn't require trigonometry
                     //But maybe if we normalized the vectors and then did dot product? I won't worry about it for now

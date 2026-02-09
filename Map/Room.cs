@@ -655,7 +655,9 @@ namespace MakeEveryDayRecount.Map
         /// </summary>
         public Tile GetTile(Point location)
         {
+            if(_map.WithinBounds(location))
             return _map[location];
+            else return null;
         }
     }
 }
