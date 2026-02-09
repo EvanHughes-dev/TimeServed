@@ -354,6 +354,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                     }
                     else
                     {
+                        WatchTile(stepTile);
                         // Otherwise this tile can be seen
                         _watchedTiles.Add(stepTile);
                     }
