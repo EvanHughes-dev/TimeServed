@@ -20,15 +20,6 @@ namespace MakeEveryDayRecount.GameObjects.Props
     {
         //If the camera is on or off
         private bool _active;
-        //The direction in which the camera's sprite is facing
-        //This isn't currently used but if we add more features it might come in handy so I'm keeping it
-        private enum CameraDirections
-        {
-            Up,
-            Down,
-            Left,
-            Right
-        }
 
         /// <summary>
         /// The wire location this is connected to
@@ -103,7 +94,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
             //Check which way the ray for the camera is pointing
             Vector2 centerRay = new Vector2(_centerPoint.X - location.X, _centerPoint.Y - location.Y); //base of this ray is at location
 
-            // TODO rewite this logic for the love of god
+            // TODO rewrite this logic for the love of god
             //Please do not put the centerpoint on top of the camera it breaks everything
             if (Math.Abs(centerRay.X) > Math.Abs(centerRay.Y)) //The ray is more horizontal
             {
