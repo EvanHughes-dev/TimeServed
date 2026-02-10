@@ -14,6 +14,7 @@ jobs:
   build-timeserved:
     name: Build TimeServed
     runs-on: windows-latest
+    if: github.actor != 'github-actions[bot]'
 
     steps:
       - name: Checkout repo
@@ -36,25 +37,12 @@ jobs:
             --no-restore `
             --output build-output/TimeServed
 
-      - name: Commit build output
-        shell: pwsh
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          git add build-output/TimeServed
-
-          if (git diff --cached --quiet) {
-            Write-Host "No changes to commit"
-          } else {
-            git commit -m "Build TimeServed (CI)"
-            git push
-          }
-
 
   build-level-editor:
     name: Build LevelEditor
+    needs: build-timeserved
     runs-on: windows-latest
+    if: github.actor != 'github-actions[bot]'
 
     steps:
       - name: Checkout repo
@@ -77,17 +65,18 @@ jobs:
             --no-restore `
             --output build-output/LevelEditor
 
-      - name: Commit build output
+      - name: Commit build outputs
         shell: pwsh
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+          git add build-output/TimeServed
           git add build-output/LevelEditor
 
           if (git diff --cached --quiet) {
             Write-Host "No changes to commit"
           } else {
-            git commit -m "Build LevelEditor (CI)"
+            git commit -m "Build outputs (CI)"
             git push
           }
