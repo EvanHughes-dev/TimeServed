@@ -204,7 +204,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
                 for (int i = 0; i < clockwisePoints.Count; i++) endPoints.Add(clockwisePoints[i]);
             }
             //Now save this into the field of the class
-            // TODO finding endpoints is wrong
+
             _endPoints = endPoints.Select(p => CameraRoom.GetTile(p)).OfType<Tile>().ToList<Tile>();
 
             //Create a rectangle that bounds the entire kite
@@ -215,6 +215,7 @@ namespace MakeEveryDayRecount.GameObjects.Props
             int maxX = _rayBase.Location.X;
             int minY = _rayBase.Location.Y;
             int maxY = _rayBase.Location.Y;
+
             foreach (Point corner in corners)
             {
                 if (corner.X < minX) minX = corner.X;
@@ -259,6 +260,8 @@ namespace MakeEveryDayRecount.GameObjects.Props
                     }
                 }
             }
+
+
             //Permanently save this into an array that won't be changed and indicates the full kite with no obstructions
             _visionKite = _watchedTiles.ToHashSet<Tile>();
             #endregion

@@ -51,7 +51,7 @@ namespace MakeEveryDayRecount.Map.Tiles
         /// <summary>
         /// Get if a camera can look past this. 
         /// </summary>
-        public bool IsBlockingCamera { get => PropHeld != null && PropHeld is Box; }
+        public bool IsBlockingCamera { get =>!IsWalkable || PropHeld != null && PropHeld is Box; }
 
         /// <summary>
         /// Get then index that corresponds to this tile's sprite
