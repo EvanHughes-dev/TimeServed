@@ -2,11 +2,14 @@ name: Build Solutions
 
 on:
   push:
-    branches: 
+    branches:
       - '**'
+  pull_request:
+  workflow_dispatch:
 
 jobs:
-  build-solution-a:
+  build-timeserved:
+    name: Build TimeServed (Linux)
     runs-on: ubuntu-latest
 
     steps:
@@ -19,15 +22,18 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore
-        run: dotnet restore TimeServed.sln
+        run: dotnet restore TimeServed.linux.slnf
 
-      - name: Build Solution A
+      - name: Build
         run: |
-          dotnet build TimeServed.sln \
+          dotnet build TimeServed.linux.slnf \
             --configuration Release \
+            --no-restore \
             --output build-output/TimeServed
 
+
   build-level-editor:
+    name: Build LevelEditor (Windows)
     runs-on: windows-latest
 
     steps:
@@ -42,8 +48,9 @@ jobs:
       - name: Restore
         run: dotnet restore LevelEditor/LevelEditor.sln
 
-      - name: Build Solution B
+      - name: Build
         run: |
-          dotnet build LevelEditor/LevelEditor.sln \
-            --configuration Release \
+          dotnet build LevelEditor/LevelEditor.sln `
+            --configuration Release `
+            --no-restore `
             --output build-output/LevelEditor
