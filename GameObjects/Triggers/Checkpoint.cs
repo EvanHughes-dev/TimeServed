@@ -1,10 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
-using MakeEveryDayRecount.Players;
-using MakeEveryDayRecount.Managers;
+using TimeServed.Players;
+using TimeServed.Managers;
 using System.IO;
 
 
-namespace MakeEveryDayRecount.GameObjects.Triggers
+namespace TimeServed.GameObjects.Triggers
 {
     /// <summary>
     /// Trigger that saves the player's progress when they trigger it

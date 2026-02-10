@@ -2,9 +2,9 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
-using MakeEveryDayRecount.Managers;
+using TimeServed.Managers;
 
-namespace MakeEveryDayRecount.UI
+namespace TimeServed.UI
 {
 
     /// <summary>

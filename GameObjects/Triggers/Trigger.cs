@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
-using MakeEveryDayRecount.Players;
+using TimeServed.Players;
 
-namespace MakeEveryDayRecount.GameObjects.Triggers
+namespace TimeServed.GameObjects.Triggers
 {
     /// <summary>
     /// Extension of GameObject that can "trigger" an event if the player steps onto it

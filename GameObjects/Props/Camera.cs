@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MakeEveryDayRecount.Players;
-using MakeEveryDayRecount.Map;
-using MakeEveryDayRecount.Managers;
+using TimeServed.Players;
+using TimeServed.Map;
+using TimeServed.Managers;
 using System.Linq;
-using MakeEveryDayRecount.Map.Tiles;
+using TimeServed.Map.Tiles;
 
-namespace MakeEveryDayRecount.GameObjects.Props
+namespace TimeServed.GameObjects.Props
 {
 
     /// <summary>

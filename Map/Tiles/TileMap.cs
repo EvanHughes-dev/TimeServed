@@ -1,6 +1,6 @@
 using Microsoft.Xna.Framework;
 
-namespace MakeEveryDayRecount.Map.Tiles
+namespace TimeServed.Map.Tiles
 {
     /// <summary>
     /// This class exists to make accessing the tile map easier,

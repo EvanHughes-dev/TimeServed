@@ -1,10 +1,10 @@
-using MakeEveryDayRecount.Managers;
-using MakeEveryDayRecount.Map;
+using TimeServed.Managers;
+using TimeServed.Map;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using MakeEveryDayRecount.GameObjects.Props;
+using TimeServed.GameObjects.Props;
 
-namespace MakeEveryDayRecount.DebugModes
+namespace TimeServed.DebugModes
 {
     /// <summary>
     /// Debug all cameras in the current room

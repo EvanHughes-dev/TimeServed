@@ -1,10 +1,10 @@
-﻿using MakeEveryDayRecount.Map;
+﻿using TimeServed.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MakeEveryDayRecount.Players;
-using MakeEveryDayRecount.Managers;
+using TimeServed.Players;
+using TimeServed.Managers;
 
-namespace MakeEveryDayRecount.GameObjects.Props
+namespace TimeServed.GameObjects.Props
 {
     /// <summary>
     /// A door that has the same properties of a

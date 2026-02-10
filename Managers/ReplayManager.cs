@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.IO;
-using MakeEveryDayRecount.Managers.Replay;
+using TimeServed.Managers.Replay;
 using Microsoft.Xna.Framework.Input;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace MakeEveryDayRecount.Managers
+namespace TimeServed.Managers
 {
     /// <summary>
     /// Keep track of the important keys the player presses every frame

@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using MakeEveryDayRecount.Managers;
+using TimeServed.Managers;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace MakeEveryDayRecount.UI
+namespace TimeServed.UI
 {
     /// <summary>
     /// Represent a single menu to display when selected

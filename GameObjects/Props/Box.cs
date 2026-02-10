@@ -1,11 +1,11 @@
 using System.Collections.Generic;
-using MakeEveryDayRecount.Map;
-using MakeEveryDayRecount.Players;
-using MakeEveryDayRecount.Managers;
+using TimeServed.Map;
+using TimeServed.Players;
+using TimeServed.Managers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace MakeEveryDayRecount.GameObjects.Props
+namespace TimeServed.GameObjects.Props
 {
     /// <summary>
     /// A box that the player can push and pull around the map.

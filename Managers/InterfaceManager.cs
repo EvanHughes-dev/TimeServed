@@ -1,10 +1,10 @@
 using System.Collections.Generic;
-using MakeEveryDayRecount.UI;
+using TimeServed.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using System;
-using MakeEveryDayRecount.Map;
-namespace MakeEveryDayRecount.Managers
+using TimeServed.Map;
+namespace TimeServed.Managers
 {
     /// <summary>
     /// Called to update the game state in Game1

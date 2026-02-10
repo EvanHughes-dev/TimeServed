@@ -1,17 +1,17 @@
-﻿using MakeEveryDayRecount.GameObjects;
-using MakeEveryDayRecount.GameObjects.Props;
-using MakeEveryDayRecount.Map;
+﻿using TimeServed.GameObjects;
+using TimeServed.GameObjects.Props;
+using TimeServed.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MakeEveryDayRecount.Managers;
-using MakeEveryDayRecount.Players.InventoryFiles;
-using MakeEveryDayRecount.GameObjects.Triggers;
+using TimeServed.Managers;
+using TimeServed.Players.InventoryFiles;
+using TimeServed.GameObjects.Triggers;
 using System.IO;
 using System;
 
 
-namespace MakeEveryDayRecount.Players
+namespace TimeServed.Players
 {
 
     /// <summary>
@@ -87,7 +87,7 @@ namespace MakeEveryDayRecount.Players
         private readonly Point _playerSize;
 
         //The player's inventory
-        private Inventory _inventory;
+        private InventorySystem _inventory;
 
         private Box _currentHeldBox;
 
@@ -108,7 +108,7 @@ namespace MakeEveryDayRecount.Players
             _walkingSeconds = 0;
             _animationFrame = 0;
             //Create an inventory
-            _inventory = new Inventory(screenSize);
+            _inventory = new InventorySystem(screenSize);
             _currentHeldBox = null;
 
             _playerSize = new Point(sprite.Width / 4, sprite.Height / 4);

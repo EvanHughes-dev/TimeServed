@@ -1,7 +1,7 @@
-﻿using MakeEveryDayRecount.Players;
+﻿using TimeServed.Players;
 using Microsoft.Xna.Framework;
 
-namespace MakeEveryDayRecount.GameObjects.Triggers
+namespace TimeServed.GameObjects.Triggers
 {
     /// <summary>
     /// Trigger that allows the player to win the current level if they step onto it with the correct item

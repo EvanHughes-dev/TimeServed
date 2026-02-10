@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System.Linq;
 
-namespace MakeEveryDayRecount.Managers
+namespace TimeServed.Managers
 {
 
     /// <summary>

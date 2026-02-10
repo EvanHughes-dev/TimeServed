@@ -1,13 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MakeEveryDayRecount.Players;
-using MakeEveryDayRecount.GameObjects.Props;
+using TimeServed.Players;
+using TimeServed.GameObjects.Props;
 using System.IO;
 using System.Reflection.Metadata;
-using MakeEveryDayRecount.Players.InventoryFiles;
-using MakeEveryDayRecount.Map;
+using TimeServed.Players.InventoryFiles;
+using TimeServed.Map;
 
-namespace MakeEveryDayRecount.Managers
+namespace TimeServed.Managers
 {
     /// <summary>
     /// Called when the player object is updated in memory

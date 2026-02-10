@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MakeEveryDayRecount.Managers;
+using TimeServed.Managers;
 
-namespace MakeEveryDayRecount.DebugModes
+namespace TimeServed.DebugModes
 {
     /// <summary>
     /// Provides a centralized debugging system for the game.

@@ -1,8 +1,8 @@
-﻿using MakeEveryDayRecount.Managers;
+﻿using TimeServed.Managers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace MakeEveryDayRecount.GameObjects
+namespace TimeServed.GameObjects
 {
     internal abstract class GameObject
     {
