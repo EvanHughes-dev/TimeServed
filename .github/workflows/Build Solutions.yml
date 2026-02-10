@@ -1,0 +1,48 @@
+name: Build Solutions
+
+on:
+  push:
+    branches: [ main * ]
+
+jobs:
+  build-solution-a:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        run: dotnet restore TimeServed.sln
+
+      - name: Build Solution A
+        run: |
+          dotnet build TimeServed.sln \
+            --configuration Release \
+            --output build-output/TimeServed
+
+  build-solution-b:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        run: dotnet restore LevelEditor/LevelEditor.sln
+
+      - name: Build Solution B
+        run: |
+          dotnet build LevelEditor/LevelEditor.sln \
+            --configuration Release \
+            --output build-output/LevelEditor
