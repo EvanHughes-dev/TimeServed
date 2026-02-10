@@ -1,5 +1,8 @@
 name: Build Solutions
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
@@ -9,36 +12,55 @@ on:
 
 jobs:
   build-timeserved:
-    name: Build TimeServed (Linux)
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
-
-      - name: Restore
-        run: dotnet restore TimeServed.linux.slnf
-
-      - name: Build
-        run: |
-          dotnet build TimeServed.linux.slnf \
-            --configuration Release \
-            --no-restore \
-            --output build-output/TimeServed
-
-
-  build-level-editor:
-    name: Build LevelEditor (Windows)
+    name: Build TimeServed
     runs-on: windows-latest
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '6.0.x'
+
+      - name: Restore
+        run: dotnet restore TimeServed.sln
+
+      - name: Build
+        run: |
+          dotnet build TimeServed.sln `
+            --configuration Release `
+            --no-restore `
+            --output build-output/TimeServed
+
+      - name: Commit build output
+        shell: pwsh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add build-output/TimeServed
+
+          if (git diff --cached --quiet) {
+            Write-Host "No changes to commit"
+          } else {
+            git commit -m "Build TimeServed (CI)"
+            git push
+          }
+
+
+  build-level-editor:
+    name: Build LevelEditor
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -54,3 +76,18 @@ jobs:
             --configuration Release `
             --no-restore `
             --output build-output/LevelEditor
+
+      - name: Commit build output
+        shell: pwsh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add build-output/LevelEditor
+
+          if (git diff --cached --quiet) {
+            Write-Host "No changes to commit"
+          } else {
+            git commit -m "Build LevelEditor (CI)"
+            git push
+          }
