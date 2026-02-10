@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Media;
 using System;
 
-namespace MakeEveryDayRecount.Managers
+namespace TimeServed.Managers
 {
     /// <summary>
     /// Manages all sounds in the game (music, sound effects).

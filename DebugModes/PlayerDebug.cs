@@ -1,10 +1,10 @@
-using MakeEveryDayRecount.Map;
+using TimeServed.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MakeEveryDayRecount.Managers;
-using MakeEveryDayRecount.Players;
+using TimeServed.Managers;
+using TimeServed.Players;
 
-namespace MakeEveryDayRecount.DebugModes
+namespace TimeServed.DebugModes
 {
     /// <summary>
     /// Debug class for the player, displaying relevant position data,

@@ -1,10 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MakeEveryDayRecount.Players;
-using MakeEveryDayRecount.Managers;
-using MakeEveryDayRecount.Map;
+using TimeServed.Players;
+using TimeServed.Managers;
+using TimeServed.Map;
 
-namespace MakeEveryDayRecount.GameObjects.Props
+namespace TimeServed.GameObjects.Props
 {
     /// <summary>
     /// Prop is a GameObject that can be interacted with and has its own draw function

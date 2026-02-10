@@ -1,8 +1,8 @@
-﻿using MakeEveryDayRecount.GameObjects.Triggers;
+﻿using TimeServed.GameObjects.Triggers;
 using System.Collections.Generic;
 using System.IO;
 
-namespace MakeEveryDayRecount.Managers
+namespace TimeServed.Managers
 {
     /// <summary>
     /// Keeps track of important triggers and loads level

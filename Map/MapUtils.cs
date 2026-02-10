@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
-using MakeEveryDayRecount.Managers;
-using MakeEveryDayRecount.Players;
+using TimeServed.Managers;
+using TimeServed.Players;
 
-namespace MakeEveryDayRecount.Map
+namespace TimeServed.Map
 {
     /// <summary>
     /// This class serves to handle any calculations needed related

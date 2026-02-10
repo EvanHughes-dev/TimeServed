@@ -1,15 +1,15 @@
 
-using MakeEveryDayRecount.GameObjects.Props;
+using TimeServed.GameObjects.Props;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MakeEveryDayRecount.Managers;
+using TimeServed.Managers;
 
-namespace MakeEveryDayRecount.UI
+namespace TimeServed.UI
 {
     /// <summary>
     /// Change to the inventory space
     /// </summary>
-    /// <param name="inventorySpace">Inventory space that changed</param>
+    /// <param name="inventorySpace">InventorySystem space that changed</param>
     delegate void OnInventoryChange(InventorySpace inventorySpace);
 
     /// <summary>
@@ -103,6 +103,12 @@ namespace MakeEveryDayRecount.UI
             if (_spaceSelected)
                 sb.Draw(_selectedSpaceTexture, DisplayRect, Color.White);
 
+        }
+
+        public void UpdateRectangle(Rectangle rect)
+        {
+            _origin = rect.Center;
+            _size = rect.Size;
         }
 
         /// <summary>

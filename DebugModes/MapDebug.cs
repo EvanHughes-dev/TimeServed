@@ -1,8 +1,8 @@
-using MakeEveryDayRecount.Map;
+using TimeServed.Map;
 using Microsoft.Xna.Framework.Graphics;
-using MakeEveryDayRecount.Managers;
+using TimeServed.Managers;
 
-namespace MakeEveryDayRecount.DebugModes
+namespace TimeServed.DebugModes
 {
     /// <summary>
     /// Debug information relating to the map such as what

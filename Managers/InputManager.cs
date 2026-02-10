@@ -1,8 +1,8 @@
-using MakeEveryDayRecount.Managers.Replay;
+using TimeServed.Managers.Replay;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
-namespace MakeEveryDayRecount.Managers
+namespace TimeServed.Managers
 {
     /// <summary>
     /// Which keyboard button to reference

@@ -1,10 +1,10 @@
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MakeEveryDayRecount.Managers;
-using MakeEveryDayRecount.Map;
+using TimeServed.Managers;
+using TimeServed.Map;
 
-namespace MakeEveryDayRecount.UI
+namespace TimeServed.UI
 {
     /// <summary>
     /// A mouse to draw over the user's mouse. Keep track of hover state

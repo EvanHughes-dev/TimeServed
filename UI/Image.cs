@@ -1,7 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace MakeEveryDayRecount.UI
+namespace TimeServed.UI
 {
     /// <summary>
     /// An image to display on the menu. No interaction needed, only a visual

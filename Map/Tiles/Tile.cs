@@ -1,10 +1,10 @@
-﻿using MakeEveryDayRecount.GameObjects.Props;
-using MakeEveryDayRecount.GameObjects.Triggers;
-using MakeEveryDayRecount.Managers;
+﻿using TimeServed.GameObjects.Props;
+using TimeServed.GameObjects.Triggers;
+using TimeServed.Managers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace MakeEveryDayRecount.Map.Tiles
+namespace TimeServed.Map.Tiles
 {
     /// <summary>
     /// Called when a box changes state in this tile

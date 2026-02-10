@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using MakeEveryDayRecount.GameObjects.Props;
-using MakeEveryDayRecount.Map.Tiles;
+using TimeServed.GameObjects.Props;
+using TimeServed.Map.Tiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MakeEveryDayRecount.Managers;
-using MakeEveryDayRecount.GameObjects.Triggers;
+using TimeServed.Managers;
+using TimeServed.GameObjects.Triggers;
 
-namespace MakeEveryDayRecount.Map
+namespace TimeServed.Map
 {
     /// <summary>
     /// Transition from one room to another

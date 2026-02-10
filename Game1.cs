@@ -11,15 +11,15 @@
  * finally watching their fall escape in a replay
 \********************************************************/
 
-using MakeEveryDayRecount.DebugModes;
-using MakeEveryDayRecount.Map;
+using TimeServed.DebugModes;
+using TimeServed.Managers;
+using TimeServed.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MakeEveryDayRecount.Managers;
 using System.Diagnostics;
 
-namespace MakeEveryDayRecount
+namespace TimeServed
 {
     /// <summary>
     /// The current overall game state

@@ -1,7 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace MakeEveryDayRecount.UI
+namespace TimeServed.UI
 {
     /// <summary>
     /// Create a base class for all ui elements to inherit from. Contain

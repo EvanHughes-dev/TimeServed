@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using MakeEveryDayRecount.GameObjects.Props;
-using MakeEveryDayRecount.Map;
+using TimeServed.GameObjects.Props;
+using TimeServed.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MakeEveryDayRecount.Map.Tiles;
+using TimeServed.Map.Tiles;
 
-namespace MakeEveryDayRecount.Managers
+namespace TimeServed.Managers
 {
     /// <summary>
     /// Call to update the current room that is active on the map
