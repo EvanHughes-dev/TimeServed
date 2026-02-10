@@ -40,7 +40,7 @@ namespace MakeEveryDayRecount.DebugModes
 
             Vector2 drawPoint = new Vector2(10, 10);
 
-            sb.DrawString(_spriteFont, $"Debug Mode: {debugMode}", drawPoint, Color.Black);
+            sb.DrawString(_spriteFont, $"Debug Mode: {debugMode}", drawPoint, Color.White);
             drawPoint.Y += _yAxisIncrement;
             foreach (KeyValuePair<string, Func<object>> entry in _objectsToDisplay)
             {

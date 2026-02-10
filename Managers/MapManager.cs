@@ -4,6 +4,7 @@ using MakeEveryDayRecount.GameObjects.Props;
 using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MakeEveryDayRecount.Map.Tiles;
 
 namespace MakeEveryDayRecount.Managers
 {
@@ -35,7 +36,6 @@ namespace MakeEveryDayRecount.Managers
             get => _currentRoom;
         }
 
-        //private static Room[] _rooms;
         private static Dictionary<int, Room> _rooms;
 
         /// <summary>
@@ -245,7 +245,6 @@ namespace MakeEveryDayRecount.Managers
         {
             GameplayManager.PlayerObject.ChangeRoom(transDoor.DestinationTile);
             ChangeRoom(destRoom);
-
         }
 
         /// <summary>
@@ -279,6 +278,20 @@ namespace MakeEveryDayRecount.Managers
         public static Prop CheckInteractable(Point playerFacing)
         {
             return _currentRoom.VerifyInteractable(playerFacing);
+        }
+
+        /// <summary>
+        /// Return the <see cref="Tiles"/> at a given <see cref="Point"/>. Returns null if there is no current
+        /// <see cref="Room"/> or the <see cref="Point"/> is outside the bounds of the <see cref="TileMap"/>.  
+        /// </summary>
+        /// <param name="location"><see cref="Point"/> of the <see cref="Tile"/> to get.</param>
+        /// <returns>Returns the <see cref="Tile"/> at a <see cref="Point"/></returns>
+        public static Tile GetTile(Point location)
+        {
+            if (CurrentRoom == null)
+                return null;
+
+            return CurrentRoom.GetTile(location);
         }
 
         #endregion

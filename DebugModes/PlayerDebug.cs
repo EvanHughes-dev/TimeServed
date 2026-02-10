@@ -12,8 +12,7 @@ namespace MakeEveryDayRecount.DebugModes
     /// </summary>
     internal class PlayerDebug : BaseDebug
     {
-        private readonly Texture2D _walkableTileDebug;
-        private readonly Texture2D _notWalkableTileDebug;
+
         private readonly Player _player;
 
         private readonly Point[] _playerMovementDirections;
@@ -22,19 +21,12 @@ namespace MakeEveryDayRecount.DebugModes
         /// Initializes the player debug system.
         /// This must be called before drawing debug information.
         /// </summary>
-        public PlayerDebug() :  base()
+        public PlayerDebug() : base()
         {
             _player = GameplayManager.PlayerObject;
             AddPlayerDebugInfo();
-            _walkableTileDebug = AssetManager.DebugWalkableTile;
-            _notWalkableTileDebug = AssetManager.DebugNotWalkableTile;
-            _playerMovementDirections = new Point[]
-            {
-                new Point(-1, 0),
-                new Point(1, 0),
-                new Point(0, -1),
-                new Point(0, 1)
-            };
+
+            _playerMovementDirections = MapUtils.DirectionArray;
         }
 
         /// <summary>
@@ -65,17 +57,13 @@ namespace MakeEveryDayRecount.DebugModes
         /// <param name="sb">Sprite batch used for rendering.</param>
         private void DrawTileDebug(SpriteBatch sb)
         {
-            var playerTilePos = _player.Location;
+            Point playerTilePos = _player.Location;
 
-            foreach (var direction in _playerMovementDirections)
+            foreach (Point direction in _playerMovementDirections)
             {
-                var playerDest = playerTilePos + direction;
-                var displayTile = MapManager.CheckPlayerCollision(playerDest)
-                    ? _walkableTileDebug
-                    : _notWalkableTileDebug;
+                Point playerDest = playerTilePos + direction;
 
-                var screenPos = MapUtils.TileToWorld(playerDest) - MapUtils.WorldToScreen();
-                sb.Draw(displayTile, new Rectangle(screenPos, AssetManager.TileSize), Color.White);
+                MapManager.GetTile(playerDest)?.DebugDraw(sb);
             }
         }
     }

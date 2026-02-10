@@ -17,6 +17,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MakeEveryDayRecount.Managers;
+using System.Diagnostics;
 
 namespace MakeEveryDayRecount
 {
@@ -36,10 +37,11 @@ namespace MakeEveryDayRecount
     {
         private enum DebugState
         {
-            None,
-            Global,
-            Player,
-            Room
+            None = -2,
+            Global = -1,
+            Player = 0,
+            Room = 1,
+            Camera = 2
         }
 
         private GraphicsDeviceManager _graphics;
@@ -87,12 +89,17 @@ namespace MakeEveryDayRecount
             //_graphics.PreferredBackBufferHeight = 360;
 
             _graphics.HardwareModeSwitch = false;
+#if DEBUG
+            _graphics.IsFullScreen = false;
+#else
             _graphics.IsFullScreen = true;
+#endif
+
             _graphics.ApplyChanges();
 
             _debugState = DebugState.None;
 
-            _debugModes = new BaseDebug[2];
+            _debugModes = new BaseDebug[3];
 
             //Initialize button lists
             InterfaceManager.InitializeScaling(ScreenSize);
@@ -132,6 +139,7 @@ namespace MakeEveryDayRecount
 
             _debugModes[0] = new PlayerDebug();
             _debugModes[1] = new MapDebug();
+            _debugModes[2] = new CameraDebug();
         }
 
         protected override void Update(GameTime gameTime)
@@ -165,8 +173,7 @@ namespace MakeEveryDayRecount
                         break;
                     }
                     GameplayManager.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
-                    // Save the current state of the keyboard
-
+                    MapUtils.UpdateValues();
                     break;
 
                 case GameState.Cutscene:
@@ -208,6 +215,7 @@ namespace MakeEveryDayRecount
 
                         InputManager.ReplayUpdate();
                         GameplayManager.Update(ReplayManager.CurrentReplayState.DeltaTime);
+                        MapUtils.UpdateValues();
                     }
 
                     break;
@@ -234,20 +242,21 @@ namespace MakeEveryDayRecount
                     break;
                 case GameState.Level:
                     GameplayManager.Draw(_spriteBatch);
-                    DisplayDebug();
+
                     //If statement in order to display tutorial text
                     if (GameplayManager.Level == 1)
                     {
                         if (MapManager.CurrentRoom.RoomName == "JRoom0")
                         {
-                            _spriteBatch.DrawString(AssetManager.ArialFonts[InterfaceManager.FontIndex], "Press E or click to Interact.", 
+                            _spriteBatch.DrawString(AssetManager.ArialFonts[InterfaceManager.FontIndex], "Press E or click to Interact.",
                                 new Point(ScreenSize.X / 25, ScreenSize.Y / 4).ToVector2(), Color.White);
 
-                            _spriteBatch.DrawString(AssetManager.ArialFonts[InterfaceManager.FontIndex], 
-                                "Use the mouse to select items \nfrom the inventory.", new Point(ScreenSize.X / 25, ScreenSize.Y / 2).ToVector2(), 
+                            _spriteBatch.DrawString(AssetManager.ArialFonts[InterfaceManager.FontIndex],
+                                "Use the mouse to select items \nfrom the inventory.", new Point(ScreenSize.X / 25, ScreenSize.Y / 2).ToVector2(),
                                 Color.White);
                         }
                     }
+                    DisplayDebug();
                     break;
                 case GameState.Pause:
                     GameplayManager.Draw(_spriteBatch);
@@ -272,20 +281,13 @@ namespace MakeEveryDayRecount
         /// <summary>
         /// Draw the current debug display to the screen
         /// </summary>
+        [Conditional("DEBUG")]
         private void DisplayDebug()
         {
-            switch (_debugState)
-            {
-                case DebugState.Global:
-                    GlobalDebug.Draw(_spriteBatch);
-                    break;
-                case DebugState.Player:
-                    _debugModes[0].Draw(_spriteBatch);
-                    break;
-                case DebugState.Room:
-                    _debugModes[1].Draw(_spriteBatch);
-                    break;
-            }
+            if (_debugState == DebugState.Global)
+                GlobalDebug.Draw(_spriteBatch);
+            else if (_debugState != DebugState.None)
+                _debugModes[(int)_debugState].Draw(_spriteBatch);
         }
 
         /// <summary>
@@ -307,6 +309,8 @@ namespace MakeEveryDayRecount
                 _debugState = DebugState.Player;
             else if (InputManager.GetKeyStatus(Keys.F4))
                 _debugState = DebugState.Room;
+            else if (InputManager.GetKeyStatus(Keys.F5))
+                _debugState = DebugState.Camera;
         }
 
         /// <summary>

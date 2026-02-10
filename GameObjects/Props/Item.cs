@@ -1,5 +1,4 @@
-﻿using System;
-using MakeEveryDayRecount.Map;
+﻿using MakeEveryDayRecount.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MakeEveryDayRecount.Players;
@@ -15,10 +14,6 @@ namespace MakeEveryDayRecount.GameObjects.Props
         public event ItemPickup OnItemPickup;
 
         /// <summary>
-        /// Get-only. The name of the item
-        /// </summary>
-        public string ItemName { get; private set; }
-        /// <summary>
         /// The key type for this item. Tells it what doors it can open
         /// </summary>
         public Door.DoorKeyType ItemKeyType { get; private set; }
@@ -29,12 +24,10 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// <param name="location">Location in its room</param>
         /// <param name="spriteArray">Array of sprites containing this GameObject's sprite</param>
         /// <param name="spriteIndex">Index of this GameObject's sprite in its spriteArray</param>
-        /// <param name="name">Name of the item</param>
         /// <param name="keyType">Type of Door that this item unlocks (type None if it doesn't unlock a door)</param>
-        public Item(Point location, Texture2D[] spriteArray, int spriteIndex, string name, Door.DoorKeyType keyType)
+        public Item(Point location, Texture2D[] spriteArray, int spriteIndex, Door.DoorKeyType keyType)
             : base(location, spriteArray, spriteIndex)
         {
-            ItemName = name;
             ItemKeyType = keyType;
         }
 

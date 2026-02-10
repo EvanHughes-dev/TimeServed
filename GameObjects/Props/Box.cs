@@ -60,10 +60,14 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// <param name="newPosition">New position the box has been moved to</param>
         public void UpdatePosition(Point newPosition)
         {
+            if (newPosition + AttachmentPoint == Location)
+                return;
+            MapManager.CurrentRoom.GetTile(newPosition + AttachmentPoint).BoxMoved(this);
+            MapManager.CurrentRoom.GetTile(Location).BoxMoved(this);
+
             Location = newPosition + AttachmentPoint;
             _worldPos = MapUtils.TileToWorld(Location);
         }
-
 
         /// <summary>
         /// Have the box become "attached" to the player
@@ -89,11 +93,9 @@ namespace MakeEveryDayRecount.GameObjects.Props
         /// Draw this box to the screen
         /// </summary>
         /// <param name="sb">Sprite batch to draw with</param>
-        /// <param name="worldToScreen">Value to offset by</param>
-        /// <param name="pixelOffset">Value to offset by</param>
-        public override void Draw(SpriteBatch sb, Point worldToScreen, Point pixelOffset)
+        public override void Draw(SpriteBatch sb)
         {
-            sb.Draw(Sprite, new Rectangle(_worldPos - worldToScreen + pixelOffset +
+            sb.Draw(Sprite, new Rectangle(MapUtils.TileToScreen(Location) +
             new Point(_sizeOffset.X / 2, _sizeOffset.Y / 2), AssetManager.TileSize - _sizeOffset), Color.White);
         }
     }
