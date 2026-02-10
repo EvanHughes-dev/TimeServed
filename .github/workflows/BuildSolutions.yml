@@ -27,8 +27,8 @@ jobs:
             --configuration Release \
             --output build-output/TimeServed
 
-  build-solution-b:
-    runs-on: ubuntu-latest
+  build-level-editor:
+    runs-on: windows-latest
 
     steps:
       - name: Checkout repo
