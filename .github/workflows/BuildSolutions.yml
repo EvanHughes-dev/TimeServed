@@ -1,0 +1,81 @@
+name: Build Solutions
+
+permissions:
+  contents: write
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-timeserved:
+    name: Build TimeServed
+    runs-on: windows-latest
+    if: github.actor != 'github-actions[bot]'
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '6.0.x'
+
+      - name: Restore
+        run: dotnet restore TimeServed.sln
+
+      - name: Build
+        run: |
+          dotnet build TimeServed.sln `
+            --configuration Release `
+            --no-restore `
+            --output build-output/TimeServed
+
+  build-level-editor:
+    name: Build LevelEditor
+    needs: build-timeserved
+    runs-on: windows-latest
+    if: github.actor != 'github-actions[bot]'
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        run: dotnet restore LevelEditor/LevelEditor.sln
+
+      - name: Build
+        run: |
+          dotnet build LevelEditor/LevelEditor.sln `
+            --configuration Release `
+            --no-restore `
+            --output build-output/LevelEditor
+
+      - name: Commit build outputs to builds branch
+        shell: pwsh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Create or reset builds branch
+          git checkout -B builds
+
+          git add build-output/TimeServed
+          git add build-output/LevelEditor
+
+          if (git diff --cached --quiet) {
+            Write-Host "No changes to commit"
+          } else {
+            git commit -m "Build outputs (CI)"
+            git push origin builds
+          }

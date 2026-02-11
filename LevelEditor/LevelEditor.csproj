@@ -5,8 +5,10 @@
     <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+
     <ImplicitUsings>enable</ImplicitUsings>
-	<ForceDesignerDPIUnaware>true</ForceDesignerDPIUnaware>
+    <ForceDesignerDPIUnaware>true</ForceDesignerDPIUnaware>
   </PropertyGroup>
 
   <ItemGroup>
@@ -32,8 +34,8 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Sprites\Tiles\testWalkable.png">
-		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	</None>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <Compile Update="Controls\TriggerBox.cs">
       <SubType>Component</SubType>
     </Compile>
