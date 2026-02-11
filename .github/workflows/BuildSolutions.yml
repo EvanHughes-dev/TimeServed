@@ -67,15 +67,30 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Create or reset builds branch
-          git checkout -B builds
+          # Fetch all branches
+          git fetch origin
 
-          git add build-output/TimeServed
-          git add build-output/LevelEditor
+          # Create orphan builds branch if it doesn't exist
+          if (git show-ref --verify --quiet refs/remotes/origin/builds) {
+            git checkout builds
+          } else {
+            git checkout --orphan builds
+          }
+
+          # Remove EVERYTHING from the branch
+          git rm -rf . | Out-Null
+
+          # Recreate only build output folders
+          New-Item -ItemType Directory -Force -Path build-output | Out-Null
+
+          git checkout $env:GITHUB_SHA -- build-output/TimeServed
+          git checkout $env:GITHUB_SHA -- build-output/LevelEditor
+
+          git add build-output
 
           if (git diff --cached --quiet) {
             Write-Host "No changes to commit"
           } else {
             git commit -m "Build outputs (CI)"
-            git push origin builds
+            git push origin builds --force
           }
