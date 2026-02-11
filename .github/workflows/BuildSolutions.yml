@@ -34,7 +34,6 @@ jobs:
             --no-restore `
             --output build-output/TimeServed
 
-
   build-level-editor:
     name: Build LevelEditor
     needs: build-timeserved
@@ -62,11 +61,14 @@ jobs:
             --no-restore `
             --output build-output/LevelEditor
 
-      - name: Commit build outputs
+      - name: Commit build outputs to builds branch
         shell: pwsh
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Create or reset builds branch
+          git checkout -B builds
 
           git add build-output/TimeServed
           git add build-output/LevelEditor
@@ -75,5 +77,5 @@ jobs:
             Write-Host "No changes to commit"
           } else {
             git commit -m "Build outputs (CI)"
-            git push
+            git push origin builds
           }
